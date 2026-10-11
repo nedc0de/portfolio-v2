@@ -1347,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== BLOG POSTS: reactions =====*/
-// 🔥 😮 🤣 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
+// 🔥 😭 🤣 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
 // (stats/post_views → reactions.<post>.<emoji>). One pick per visitor per post:
 // tap again to remove it, tap another to switch. Firebase only loads once the
 // row scrolls into view, so posts stay fast.
@@ -1357,8 +1357,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   if (!post) return;
   const KEY = 'nedcode-react-' + post;
-  const EMOJI = { fire: '🔥', wow: '😮', lol: '🤣', dead: '💀' };
-  const LABEL = { fire: 'Fire', wow: 'Wow', lol: 'Funny', dead: "I'm dead" };
+  const EMOJI = { fire: '🔥', cry: '😭', lol: '🤣', dead: '💀' };
+  const LABEL = { fire: 'Fire', cry: 'Crying', lol: 'Funny', dead: "I'm dead" };
 
   const row = document.createElement('div');
   row.className = 'ps-react';
@@ -1369,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     '</div>';
   anchor.after(row);
 
-  const counts = { fire: 0, wow: 0, lol: 0, dead: 0 };
+  const counts = { fire: 0, cry: 0, lol: 0, dead: 0 };
   let mine = null;
   try { mine = localStorage.getItem(KEY); } catch (e) {}
   if (!EMOJI[mine]) mine = null;
