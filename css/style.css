@@ -4299,9 +4299,33 @@ a.bl-row:hover {
 .tk-here b { color: var(--fourth-color); }
 
 .tk-here-eyes {
-  width: 1.15rem;
-  height: 1.15rem;
-  margin-left: -.1rem;
+  width: 1.4rem;
+  height: .85rem;
+  overflow: visible;
+}
+
+/* the eyes glance left, right and back, and blink now and then (all
+   CSS, so it stays perfectly smooth) */
+.tk-here-eyes .pupil {
+  animation: eyes-look 6s cubic-bezier(.45, 0, .25, 1) infinite;
+}
+
+.tk-here-eyes .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eyes-blink 6s ease-in-out infinite;
+}
+
+@keyframes eyes-look {
+  0%, 12% { transform: translate(0, 0); }
+  20%, 38% { transform: translate(-3.2px, .6px); }
+  46%, 64% { transform: translate(3.2px, .6px); }
+  72%, 100% { transform: translate(0, 0); }
+}
+
+@keyframes eyes-blink {
+  0%, 86%, 92%, 100% { transform: scaleY(1); }
+  89% { transform: scaleY(.1); }
 }
 
 .tk-here-dot {
