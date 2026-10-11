@@ -194,11 +194,11 @@ position: relative;
 
 /* Neon sign: letters stay lit, then stutter off/on with hard cuts (steps),
    each on its own rhythm so they never sync up */
-.nav-logo1 { z-index: 3; animation: neon-n 7.3s steps(1, end) infinite; }
-.nav-logo2 { z-index: 3; animation: neon-e 11.1s steps(1, end) infinite 1.7s; }
+.nav-logo1 { z-index: 3; animation: neon-n 20s steps(1, end) infinite; }
+.nav-logo2 { z-index: 3; animation: neon-e 27s steps(1, end) infinite 3s; }
 .nav-logo3 { z-index: 3; }
 .nav-logo4 { z-index: 3; }
-.nav-logo5 { z-index: 3; animation: neon-o 5.3s steps(1, end) infinite .6s; }
+.nav-logo5 { z-index: 3; animation: neon-o 16s steps(1, end) infinite 1s; }
 .nav-logo6 { z-index: 3; }
 .nav-logo7 { z-index: 3; }
 .nav-logo  { z-index: 1; }
@@ -280,45 +280,42 @@ position: relative;
   76%, 100% { opacity: 1; }
 }
 
-/* N: mostly on, a quick double blink */
+/* N: lit almost all the time, then a quick double blink (about every 20s) */
 @keyframes neon-n {
-  0%, 61% { opacity: 1; }
-  62% { opacity: .1; }
-  63% { opacity: 1; }
-  64.5% { opacity: .15; }
-  65.5% { opacity: .9; }
-  66.5% { opacity: .05; }
-  68%, 100% { opacity: 1; }
+  0%, 88% { opacity: 1; }
+  88.4% { opacity: .1; }
+  88.8% { opacity: 1; }
+  89.3% { opacity: .15; }
+  89.6% { opacity: .9; }
+  90% { opacity: .05; }
+  90.4%, 100% { opacity: 1; }
 }
 
-/* E: a short stutter, then later a longer "dying" moment before it snaps back */
+/* E: a short stutter, then later a longer "dying" moment before it snaps back (27s cycle) */
 @keyframes neon-e {
-  0%, 27% { opacity: 1; }
-  28% { opacity: .2; }
-  29% { opacity: 1; }
-  30% { opacity: .1; }
-  31%, 80% { opacity: 1; }
-  81% { opacity: .35; }
-  82% { opacity: .1; }
-  86% { opacity: .5; }
-  87% { opacity: .05; }
-  89% { opacity: .8; }
-  90% { opacity: .2; }
-  91%, 100% { opacity: 1; }
+  0%, 30% { opacity: 1; }
+  30.4% { opacity: .2; }
+  30.8% { opacity: 1; }
+  31.2% { opacity: .1; }
+  31.6%, 80% { opacity: 1; }
+  80.4% { opacity: .35; }
+  80.8% { opacity: .1; }
+  82.4% { opacity: .5; }
+  82.8% { opacity: .05; }
+  83.6% { opacity: .8; }
+  84% { opacity: .2; }
+  84.4%, 100% { opacity: 1; }
 }
 
-/* O: the faulty tube, buzzes more often */
+/* O: the faulty tube, two quick buzzes (16s cycle) */
 @keyframes neon-o {
-  0%, 18% { opacity: 1; }
-  19% { opacity: .3; }
-  20% { opacity: 1; }
-  44% { opacity: 1; }
-  45% { opacity: .05; }
-  46% { opacity: .7; }
-  47% { opacity: .1; }
-  49%, 73% { opacity: 1; }
-  74% { opacity: .4; }
-  75%, 100% { opacity: 1; }
+  0%, 40% { opacity: 1; }
+  40.3% { opacity: .3; }
+  40.6%, 85% { opacity: 1; }
+  85.3% { opacity: .05; }
+  85.6% { opacity: .7; }
+  85.9% { opacity: .1; }
+  86.5%, 100% { opacity: 1; }
 }
 
 @keyframes flicker {
@@ -5839,9 +5836,9 @@ html.is-frozen .egg-crash * {
 }
 
 /* a couple of letters flicker like the logo */
-.neon-sign span[data-flicker="neon-n"] { animation: neon-n 7.3s steps(1, end) infinite; }
-.neon-sign span[data-flicker="neon-e"] { animation: neon-e 11.1s steps(1, end) infinite; }
-.neon-sign span[data-flicker="neon-o"] { animation: neon-o 5.3s steps(1, end) infinite; }
+.neon-sign span[data-flicker="neon-n"] { animation: neon-n 20s steps(1, end) infinite; }
+.neon-sign span[data-flicker="neon-e"] { animation: neon-e 27s steps(1, end) infinite; }
+.neon-sign span[data-flicker="neon-o"] { animation: neon-o 16s steps(1, end) infinite; }
 
 /* powering on: letters sputter on one by one */
 .neon.is-powering .neon-sign span {
