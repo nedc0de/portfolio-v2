@@ -5740,38 +5740,40 @@ html.is-frozen .egg-crash * {
 .ps-react-btns {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: 1rem;
 }
 
 .ps-react-btns button {
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
-  height: 2.8rem;
-  padding: 0 .9rem 0 .6rem;
+  gap: .35rem;
+  padding: .2rem .3rem;
   border: none;
-  border-radius: 8px;
-  background: #242424;
+  background: none;
   color: var(--fourth-color);
   font: 700 .9rem var(--body-font);
   cursor: pointer;
-  transition: background .25s, box-shadow .25s, color .25s;
 }
 
 .ps-react-btns img {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
+  transition: transform .2s, filter .25s;
 }
 
-.ps-react-btns button:hover,
-.ps-react-btns button:focus-visible {
-  background: #2c2c2c;
+.ps-react-btns button:hover img,
+.ps-react-btns button:focus-visible img {
+  transform: scale(1.12);
 }
 
+/* your pick: a yellow glow behind the emoji and a yellow count */
 .ps-react-btns button[aria-pressed="true"] {
-  background: rgba(255, 220, 22, .14);
   color: var(--fifteenth-color);
-  box-shadow: 0 0 16px rgba(255, 220, 22, .35);
+}
+
+.ps-react-btns button[aria-pressed="true"] img {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 8px rgba(255, 220, 22, .75));
 }
 
 .ps-react-btns button.is-pop img {
