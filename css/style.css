@@ -314,7 +314,7 @@ position: relative;
 
 /* a letter the spark reaches gives a quick electric flicker */
 .nav-logo-group .nav-logo-layer.is-zap {
-  animation: neon-zap 1s steps(1, end) both !important;
+  animation: neon-zap 1s steps(1, end) var(--d, 0s) both !important;
 }
 
 @keyframes neon-zap {

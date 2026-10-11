@@ -1199,6 +1199,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (n >= 0) powerTimer = setTimeout(() => setPower(2), 8000);
   };
 
+  // N-E-D: every letter flickers back on in a wave, and snakes race
+  // down both cables at once
+  let seq = [], seqAt = 0;
+  const celebrate = () => {
+    LETTERS.forEach(([cls], i) => {
+      const letter = logo.querySelector('.' + cls);
+      clearTimeout(timers[cls]);
+      letter.classList.remove('is-off', 'is-relight', 'is-zap');
+      void letter.offsetWidth;
+      letter.style.setProperty('--d', i * 0.09 + 's');
+      letter.classList.add('is-zap');
+      timers[cls] = setTimeout(() => { letter.classList.remove('is-zap'); letter.style.removeProperty('--d'); }, 1100 + i * 90);
+    });
+    if (logo.raceSparks) logo.raceSparks();
+  };
+
   logo.addEventListener('click', (e) => {
     if (!e.target.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     const box = logo.querySelector('.nav-logo img').getBoundingClientRect();
@@ -1216,6 +1232,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     e.preventDefault();
     if (power === 0 || power === 1) return; // power is cut or dimmed: the switch is in charge
+    // secret: tap N, E, D in a row (a couple of seconds apart at most)
+    const now = Date.now();
+    seq = now - seqAt < 2500 ? seq : [];
+    seqAt = now;
+    seq.push(hit[0]);
+    if (seq.join() === 'nav-logo1,nav-logo2,nav-logo3') { seq = []; celebrate(); return; }
+    if (!'nav-logo1,nav-logo2,nav-logo3'.startsWith(seq.join())) seq = [hit[0]];
     const letter = logo.querySelector('.' + hit[0]);
     clearTimeout(timers[hit[0]]);
     letter.classList.remove('is-relight');
@@ -1291,25 +1314,29 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dist < 40 && (!best || dist < best.dist)) best = { i, l, dist };
     }));
     if (!best) return false;
-    const c = cables[best.i];
-    if (!LETTER[best.i]) { // the top loop: a quick glow
-      svg.querySelectorAll('.spark-2').forEach((p) => p.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 }));
-      return true;
-    }
-    const ms = ((c.len - best.l) / SPEED) * 1000;
+    run(best.i, best.l, SPEED);
+    return true;
+  };
+  // one snake on cable i, its head starting at `from`, then a flicker at its letter
+  const glowLoop = () => svg.querySelectorAll('.spark-2').forEach((p) => p.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 }));
+  const run = (i, from, speed) => {
+    const c = cables[i];
+    if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
+    const ms = ((c.len - from) / speed) * 1000;
     ['', ' spark-core'].forEach((core) => {
       const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       p.setAttribute('class', 'spark-tap' + core);
       p.setAttribute('d', c.d);
       p.style.strokeDasharray = '120 3000';
       svg.append(p);
-      // the dash's head starts where the finger landed and runs off the end
-      p.animate([{ strokeDashoffset: 120 - best.l }, { strokeDashoffset: -(c.len + 10) }],
-        { duration: ms + (130 / SPEED) * 1000, easing: 'linear' }).onfinish = () => p.remove();
+      // the dash's head starts at `from` and runs off the end of the cable
+      p.animate([{ strokeDashoffset: 120 - from }, { strokeDashoffset: -(c.len + 10) }],
+        { duration: ms + (130 / speed) * 1000, easing: 'linear' }).onfinish = () => p.remove();
     });
-    setTimeout(() => zap(LETTER[best.i]), ms);
-    return true;
+    setTimeout(() => zap(LETTER[i]), ms);
   };
+  // the N-E-D secret: fast snakes down every cable at once
+  group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
 })();
 
 /*===== EASTER EGG: Konami code =====*/
