@@ -3514,10 +3514,17 @@ details>summary {
   margin-bottom: .15rem;
 }
 
-.ct-dm-text b {
-  display: block;
+.ct-dm-handle {
+  display: inline-block;
   font-size: 1.3rem;
+  font-weight: 700;
   color: var(--fifteenth-color);
+  text-underline-offset: 4px;
+}
+
+.ct-dm-handle:hover,
+.ct-dm-handle:focus-visible {
+  text-decoration: underline;
 }
 
 /* "Open" fills and glows like the other main buttons */
@@ -3540,9 +3547,12 @@ details>summary {
   font-size: 1.1rem;
 }
 
-.ct-dm:hover .ct-open,
-.ct-dm:focus-visible .ct-open,
-.ct-dm:active .ct-open {
+/* Only the handle and the button react: hovering either lights up the button */
+.ct-open:hover,
+.ct-open:focus-visible,
+.ct-open:active,
+.ct-dm:has(.ct-dm-handle:hover) .ct-open,
+.ct-dm:has(.ct-dm-handle:focus-visible) .ct-open {
   background: var(--fifteenth-color);
   color: var(--eleventh-color);
   box-shadow:
