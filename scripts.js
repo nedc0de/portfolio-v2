@@ -1177,6 +1177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     letter.classList.remove('is-relight');
     if (letter.classList.toggle('is-off')) {
       timers[hit[0]] = setTimeout(() => {
+        if (!letter.classList.contains('is-off')) return; // the cable spark already turned it back on
         letter.classList.remove('is-off');
         letter.classList.add('is-relight'); // flickers back on like a neon tube
         timers[hit[0]] = setTimeout(() => letter.classList.remove('is-relight'), 1000);
@@ -1207,11 +1208,12 @@ document.addEventListener('DOMContentLoaded', () => {
   svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/>`).join('');
   base.append(svg);
 
-  // flicker a letter when the spark arrives (unless it's been tapped off)
+  // flicker a letter when the spark arrives; a letter that was tapped off
+  // gets switched straight back on by it
   const zap = (cls) => {
     const letter = group.querySelector('.' + cls);
-    if (!letter || letter.classList.contains('is-off') || letter.classList.contains('is-relight')) return;
-    letter.classList.remove('is-zap');
+    if (!letter || letter.classList.contains('is-relight')) return;
+    letter.classList.remove('is-off', 'is-zap');
     void letter.offsetWidth;
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
