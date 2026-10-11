@@ -5651,3 +5651,66 @@ html.is-frozen .egg-crash * {
   transform-origin: left;
   pointer-events: none;
 }
+
+/*===== BLOG POSTS: share buttons =====*/
+.ps-share {
+  margin: -0.5rem 0 2.5rem;
+}
+
+.ps-share-title {
+  margin: 0 0 .7rem !important;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
+}
+
+.ps-share-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+
+@media screen and (min-width: 600px) {
+  .ps-share-btns {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.ps-share-btns [hidden] {
+  display: none !important;
+}
+
+.ps-share-btns a,
+.ps-share-btns button {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  justify-content: center;
+  height: 2.4rem;
+  padding: 0 .9rem;
+  border: 2px solid var(--fifteenth-color);
+  border-radius: 8px;
+  background: none;
+  color: var(--fifteenth-color);
+  font: 700 .88rem var(--body-font);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .3s, color .3s, box-shadow .3s;
+}
+
+.ps-share-btns iconify-icon {
+  font-size: 1.1rem;
+}
+
+.ps-share-btns a:hover,
+.ps-share-btns a:focus-visible,
+.ps-share-btns button:hover,
+.ps-share-btns button:focus-visible,
+.ps-share-copy.is-done {
+  background: var(--fifteenth-color);
+  color: var(--eleventh-color);
+  box-shadow: 0 0 0 2px rgba(255, 220, 22, .35), 0 0 18px rgba(255, 220, 22, .55);
+}

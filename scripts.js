@@ -1286,3 +1286,45 @@ document.addEventListener('DOMContentLoaded', () => {
   addEventListener('resize', update);
   update();
 })();
+
+/*===== BLOG POSTS: share buttons =====*/
+// A "Share this post" row right after the "My take" box.
+(() => {
+  const take = document.querySelector('.ps-article .ps-tldr');
+  if (!take) return;
+  const url = document.querySelector('link[rel="canonical"]')?.href || location.href;
+  const title = document.querySelector('.ps-title')?.textContent.trim() || document.title;
+  const text = encodeURIComponent(`${title} ${url}`);
+  const row = document.createElement('div');
+  row.className = 'ps-share';
+  row.innerHTML = `
+    <p class="ps-share-title">Share this post</p>
+    <div class="ps-share-btns">
+      <a href="https://www.threads.net/intent/post?text=${text}" target="_blank" rel="noopener"><iconify-icon icon="mingcute:threads-line"></iconify-icon>Threads</a>
+      <a href="https://x.com/intent/post?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" rel="noopener"><iconify-icon icon="ri:twitter-x-line"></iconify-icon>X</a>
+      <button type="button" class="ps-share-copy"><iconify-icon icon="mingcute:link-line"></iconify-icon><span>Copy link</span></button>
+      <button type="button" class="ps-share-native" hidden><iconify-icon icon="mingcute:share-2-line"></iconify-icon>Share…</button>
+    </div>`;
+  take.after(row);
+
+  const copy = row.querySelector('.ps-share-copy');
+  copy.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (e) {
+      const t = document.createElement('textarea');
+      t.value = url; document.body.append(t); t.select();
+      document.execCommand('copy'); t.remove();
+    }
+    copy.classList.add('is-done');
+    copy.querySelector('span').textContent = 'Copied!';
+    setTimeout(() => { copy.classList.remove('is-done'); copy.querySelector('span').textContent = 'Copy link'; }, 1800);
+  });
+
+  // Phones get their own share sheet (Messages, WhatsApp, Instagram...)
+  const native = row.querySelector('.ps-share-native');
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    native.hidden = false;
+    native.addEventListener('click', () => navigator.share({ title, url }).catch(() => {}));
+  }
+})();
