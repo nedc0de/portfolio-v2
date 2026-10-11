@@ -1339,3 +1339,82 @@ document.addEventListener('DOMContentLoaded', () => {
     native.addEventListener('click', () => navigator.share({ title, url }).catch(() => {}));
   }
 })();
+
+/*===== BLOG POSTS: reactions =====*/
+// 🔥 😮 😂 💀 with live counts, saved in Firestore next to the site stats
+// (stats/post_views → reactions.<post>.<emoji>). One pick per visitor per post:
+// tap again to remove it, tap another to switch. Firebase only loads once the
+// row scrolls into view, so posts stay fast.
+(() => {
+  const anchor = document.querySelector('.ps-article .ps-share') || document.querySelector('.ps-article .ps-tldr');
+  if (!anchor) return;
+  const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
+  if (!post) return;
+  const KEY = 'nedcode-react-' + post;
+  const EMOJI = { fire: '🔥', wow: '😮', lol: '😂', dead: '💀' };
+  const LABEL = { fire: 'Fire', wow: 'Wow', lol: 'Funny', dead: "I'm dead" };
+
+  const row = document.createElement('div');
+  row.className = 'ps-react';
+  row.innerHTML = '<p class="ps-react-title">What did you think?</p><div class="ps-react-btns">' +
+    Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><span>${EMOJI[k]}</span><b>0</b></button>`).join('') +
+    '</div>';
+  anchor.after(row);
+
+  const counts = { fire: 0, wow: 0, lol: 0, dead: 0 };
+  let mine = null;
+  try { mine = localStorage.getItem(KEY); } catch (e) {}
+  if (!EMOJI[mine]) mine = null;
+
+  const paint = () => {
+    row.querySelectorAll('button').forEach((b) => {
+      const k = b.dataset.r;
+      b.querySelector('b').textContent = Math.max(0, counts[k]);
+      b.setAttribute('aria-pressed', String(k === mine));
+    });
+  };
+  paint();
+
+  let ref = null;
+  const connect = async () => {
+    const db = await ensureFirebase();
+    if (!db) return;
+    ref = db.collection('stats').doc('post_views');
+    try {
+      const snap = await ref.get();
+      const saved = (snap.exists && snap.data().reactions && snap.data().reactions[post]) || {};
+      Object.keys(counts).forEach((k) => { counts[k] = Number(saved[k]) || 0; });
+      paint();
+    } catch (err) {
+      console.error('Reactions unavailable:', err);
+    }
+  };
+  const seen = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) { seen.disconnect(); connect(); }
+  }, { rootMargin: '300px' });
+  seen.observe(row);
+
+  const save = (changes) => {
+    if (!ref) return;
+    const inc = {};
+    Object.entries(changes).forEach(([k, n]) => { inc[k] = firebase.firestore.FieldValue.increment(n); });
+    ref.set({ reactions: { [post]: inc } }, { merge: true }).catch((err) => console.error('Reaction not saved:', err));
+  };
+
+  row.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-r]');
+    if (!btn) return;
+    const pick = btn.dataset.r;
+    const changes = {};
+    if (mine) { counts[mine]--; changes[mine] = -1; }
+    if (mine === pick) {
+      mine = null;
+    } else {
+      mine = pick; counts[pick]++; changes[pick] = (changes[pick] || 0) + 1;
+      btn.classList.remove('is-pop'); void btn.offsetWidth; btn.classList.add('is-pop');
+    }
+    try { mine ? localStorage.setItem(KEY, mine) : localStorage.removeItem(KEY); } catch (err) {}
+    paint();
+    save(changes);
+  });
+})();

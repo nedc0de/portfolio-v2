@@ -5722,3 +5722,64 @@ html.is-frozen .egg-crash * {
   font: 700 .75rem var(--body-font);
   white-space: nowrap;
 }
+
+/*===== BLOG POSTS: reactions =====*/
+.ps-react {
+  margin: -1rem 0 2.5rem;
+}
+
+.ps-react-title {
+  margin: 0 0 .7rem !important;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
+}
+
+.ps-react-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.ps-react-btns button {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  height: 2.6rem;
+  padding: 0 .85rem;
+  border: 2px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background: #242424;
+  color: var(--fourth-color);
+  font: 700 .9rem var(--body-font);
+  cursor: pointer;
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+
+.ps-react-btns span {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.ps-react-btns button:hover,
+.ps-react-btns button:focus-visible {
+  border-color: rgba(255, 220, 22, .6);
+}
+
+.ps-react-btns button[aria-pressed="true"] {
+  border-color: var(--fifteenth-color);
+  background: rgba(255, 220, 22, .1);
+  color: var(--fifteenth-color);
+  box-shadow: 0 0 14px rgba(255, 220, 22, .4);
+}
+
+.ps-react-btns button.is-pop span {
+  animation: react-pop .4s ease-out;
+}
+
+@keyframes react-pop {
+  40% { transform: scale(1.45) rotate(-8deg); }
+  100% { transform: none; }
+}
