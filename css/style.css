@@ -262,7 +262,8 @@ position: relative;
 
 
 
-/* A spark of current runs along the logo's cables (16s loop, see scripts.js) */
+/* The cables are dark until a snake of yellow neon light runs along them
+   (16s loop, see scripts.js) */
 .nav-logo-spark {
   position: absolute;
   inset: 0;
@@ -270,27 +271,27 @@ position: relative;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px #ffdc16) drop-shadow(0 0 12px #ffdc16);
+  filter: drop-shadow(0 0 3px #ffdc16) drop-shadow(0 0 9px rgba(255, 220, 22, .75));
 }
 
 .nav-logo-spark path {
   fill: none;
-  stroke: #fffbe6;
-  stroke-width: 10;
+  stroke: #ffdc16;
+  stroke-width: 9;
   stroke-linecap: round;
 }
 
-/* the spark is a 70-unit dash; each path is parked just before its start
+/* the snake is a 120-unit dash; each path is parked just before its start
    until its turn and ends just past its end, so no dot is left behind.
    Two separate cables, each with its own spark (no jumping between them):
    1: right cable into the O (311 long), 3: left cable into the N (876).
    2: the little loop on top just glows once on its own. */
-.nav-logo-spark .spark-1 { stroke-dasharray: 70 2000; animation: spark-1 16s linear infinite; }
+.nav-logo-spark .spark-1 { stroke-dasharray: 120 2000; animation: spark-1 16s linear infinite; }
 .nav-logo-spark .spark-2 { opacity: 0; animation: spark-2 16s ease-in-out infinite; }
-.nav-logo-spark .spark-3 { stroke-dasharray: 70 2000; animation: spark-3 16s linear infinite; }
+.nav-logo-spark .spark-3 { stroke-dasharray: 120 2000; animation: spark-3 16s linear infinite; }
 
 @keyframes spark-1 {
-  0% { stroke-dashoffset: 75; }
+  0% { stroke-dashoffset: 125; }
   14%, 100% { stroke-dashoffset: -325; }
 }
 
@@ -301,7 +302,7 @@ position: relative;
 }
 
 @keyframes spark-3 {
-  0%, 22% { stroke-dashoffset: 75; }
+  0%, 22% { stroke-dashoffset: 125; }
   55%, 100% { stroke-dashoffset: -890; }
 }
 
