@@ -192,11 +192,13 @@ position: relative;
   height: auto;
 }
 
-.nav-logo1 { z-index: 3; animation: flicker 12s infinite reverse; }
-.nav-logo2 { z-index: 3; animation: flicker 18s infinite alternate; }
+/* Neon sign: letters stay lit, then stutter off/on with hard cuts (steps),
+   each on its own rhythm so they never sync up */
+.nav-logo1 { z-index: 3; animation: neon-n 7.3s steps(1, end) infinite; }
+.nav-logo2 { z-index: 3; animation: neon-e 11.1s steps(1, end) infinite 1.7s; }
 .nav-logo3 { z-index: 3; }
 .nav-logo4 { z-index: 3; }
-.nav-logo5 { z-index: 3; animation: flicker 15s infinite alternate; }
+.nav-logo5 { z-index: 3; animation: neon-o 5.3s steps(1, end) infinite .6s; }
 .nav-logo6 { z-index: 3; }
 .nav-logo7 { z-index: 3; }
 .nav-logo  { z-index: 1; }
@@ -259,6 +261,47 @@ position: relative;
 
 
 
+
+/* N: mostly on, a quick double blink */
+@keyframes neon-n {
+  0%, 61% { opacity: 1; }
+  62% { opacity: .1; }
+  63% { opacity: 1; }
+  64.5% { opacity: .15; }
+  65.5% { opacity: .9; }
+  66.5% { opacity: .05; }
+  68%, 100% { opacity: 1; }
+}
+
+/* E: a short stutter, then later a longer "dying" moment before it snaps back */
+@keyframes neon-e {
+  0%, 27% { opacity: 1; }
+  28% { opacity: .2; }
+  29% { opacity: 1; }
+  30% { opacity: .1; }
+  31%, 80% { opacity: 1; }
+  81% { opacity: .35; }
+  82% { opacity: .1; }
+  86% { opacity: .5; }
+  87% { opacity: .05; }
+  89% { opacity: .8; }
+  90% { opacity: .2; }
+  91%, 100% { opacity: 1; }
+}
+
+/* O: the faulty tube, buzzes more often */
+@keyframes neon-o {
+  0%, 18% { opacity: 1; }
+  19% { opacity: .3; }
+  20% { opacity: 1; }
+  44% { opacity: 1; }
+  45% { opacity: .05; }
+  46% { opacity: .7; }
+  47% { opacity: .1; }
+  49%, 73% { opacity: 1; }
+  74% { opacity: .4; }
+  75%, 100% { opacity: 1; }
+}
 
 @keyframes flicker {
   0% { opacity: 0.4; }
