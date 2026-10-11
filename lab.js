@@ -359,7 +359,8 @@
   const pickerList = picker.querySelector('.flap-picker-list');
   const pickerNote = picker.querySelector('.flap-picker-note');
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Animations play for everyone, even with "reduce motion" turned on (Ned's call)
+  const reduceMotion = { matches: false };
 
   /*---------- time zone helpers ----------*/
   const formatters = {};

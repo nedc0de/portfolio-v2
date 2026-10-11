@@ -826,7 +826,7 @@ function countTo(el, value) {
   const fmt = (n) => Math.round(n).toLocaleString('en-US');
   const from = Number(el.dataset.value) || 0;
   el.dataset.value = value;
-  if (from === value || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (from === value) {
     el.textContent = fmt(value);
     return;
   }

@@ -717,7 +717,8 @@
     '#304a5a',
     '#4a5a30',
   ];
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Animations play for everyone, even with "reduce motion" turned on (Ned's call)
+  const reduceMotion = { matches: false };
 
   /*---------- stats line ----------*/
   function renderStats() {

@@ -3545,12 +3545,6 @@ details>summary {
   animation: neon-flicker .9s steps(1) 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ct-open {
-    animation: none !important;
-  }
-}
-
 /*===== BUTTONS: one shared soft-square style (Lab buttons keep their own) =====*/
 /* Main action: solid yellow */
 .product-link-button,
@@ -3837,14 +3831,6 @@ details>summary {
     color: var(--fourth-color);
     font-weight: 600;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .nav-menu,
-    .nav-menu .nav-item {
-      transition: none;
-      transform: none;
-    }
-  }
 }
 
 /* The extras only exist for phones */
@@ -4063,14 +4049,6 @@ a.bl-row:hover {
   36% { opacity: 1; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ab-cta a,
-  .ct-send,
-  .menu-foot .menu-cta {
-    animation: none !important;
-  }
-}
-
 /*===== HOME: ticker, explore, newsletter =====*/
 .hm-block,
 .hm-news {
@@ -4244,13 +4222,6 @@ a.tk-item:hover {
   color: #8a8a8a;
 }
 
-/* Reduced motion: no auto-scroll, swipe through instead */
-/* The ticker keeps scrolling even with reduced motion (Ned's call: it's the
-   only way to see every post). It still pauses on hover and keyboard focus.
-   Only the decorative pulsing dot stops. */
-@media (prefers-reduced-motion: reduce) {
-  .tk-dot::after { animation: none; }
-}
 
 /* Section label */
 .hm-label {
@@ -4636,12 +4607,6 @@ a.tk-item:hover {
 
 .vs-wave-count b {
   color: var(--fourth-color);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .vs-dot::after,
-  .vs-bar,
-  .vs-wave-btn .vs-hand { animation: none !important; }
 }
 
 
