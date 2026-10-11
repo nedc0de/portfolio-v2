@@ -1167,3 +1167,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }, onHome ? 4400 : 650);
   });
 })();
+
+/*===== EASTER EGG: Konami code =====*/
+// Keyboard: ↑ ↑ ↓ ↓ ← → ← → B A. Phone: swipe up, up, down, down, left,
+// right, left, right, then tap twice. Turns on "arcade mode" for a few seconds.
+(() => {
+  const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'];
+  let pos = 0;
+  let running = false;
+
+  const press = (step) => {
+    pos = step === CODE[pos] ? pos + 1 : step === CODE[0] ? 1 : 0;
+    if (pos === CODE.length) { pos = 0; arcade(); }
+  };
+
+  const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', b: 'b', B: 'b', a: 'a', A: 'a' };
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+    if (KEYS[e.key]) press(KEYS[e.key]);
+    else pos = 0;
+  });
+
+  // Swipes for the arrows, then two taps stand in for B and A
+  let sx = 0, sy = 0;
+  document.addEventListener('touchstart', (e) => {
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) {
+      if (pos >= 8) press(pos === 8 ? 'b' : 'a');
+      return;
+    }
+    press(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+  }, { passive: true });
+
+  function arcade() {
+    if (running) return;
+    running = true;
+    if (!document.getElementById('arcade-font')) {
+      const font = document.createElement('link');
+      font.id = 'arcade-font';
+      font.rel = 'stylesheet';
+      font.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap';
+      document.head.append(font);
+    }
+    const layer = document.createElement('div');
+    layer.className = 'arcade';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.innerHTML = '<div class="arcade-banner"><b>CHEAT CODE UNLOCKED</b><span>+30 LIVES · INSERT COIN</span></div>';
+    for (let i = 0; i < 28; i++) {
+      const coin = document.createElement('i');
+      coin.className = 'arcade-coin';
+      coin.style.left = Math.random() * 100 + 'vw';
+      coin.style.animationDelay = (Math.random() * 2.5).toFixed(2) + 's';
+      coin.style.animationDuration = (2 + Math.random() * 2).toFixed(2) + 's';
+      layer.append(coin);
+    }
+    document.body.append(layer);
+    document.documentElement.classList.add('is-arcade');
+    setTimeout(() => {
+      layer.classList.add('is-leaving');
+      document.documentElement.classList.remove('is-arcade');
+      setTimeout(() => { layer.remove(); running = false; }, 600);
+    }, 8000);
+  }
+})();
