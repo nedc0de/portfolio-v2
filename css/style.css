@@ -5481,6 +5481,65 @@ html.is-cyber h3 {
   animation: egg-fill 2.5s steps(20, end) forwards;
 }
 
+/* Hacker pop-up windows after the breach */
+.egg-pop {
+  position: absolute;
+  border: 1px solid var(--c);
+  border-radius: 6px;
+  background: rgba(10, 10, 12, .95);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--c) 55%, transparent), 0 8px 18px rgba(0, 0, 0, .6);
+  font-family: monospace;
+  overflow: hidden;
+  animation: egg-pop .18s steps(3, end);
+}
+
+@keyframes egg-pop {
+  from { transform: scale(.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.egg-pop-top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: .25rem .45rem;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+}
+
+.egg-pop-top i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+
+.egg-pop-top i:nth-child(2) { background: #febc2e; }
+.egg-pop-top i:nth-child(3) { background: #28c840; }
+
+.egg-pop-top span {
+  margin-left: auto;
+  font-size: .62rem;
+  color: rgba(255, 255, 255, .6);
+}
+
+.egg-pop-body {
+  padding: .4rem .55rem .5rem;
+}
+
+.egg-pop-body p {
+  margin: 0;
+  font-size: .68rem;
+  line-height: 1.5;
+  color: var(--c);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.egg-win {
+  z-index: 2;
+}
+
 @keyframes egg-fill {
   from { width: 0; }
   to { width: 100%; }

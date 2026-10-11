@@ -1225,10 +1225,38 @@ document.addEventListener('DOMContentLoaded', () => {
       if (p < 100) requestAnimationFrame(count);
     };
     requestAnimationFrame(count);
+
+    // Once the breach hits 100%, hacker windows start popping up all over the screen
+    const TITLES = ['root@nedcode', 'ned.dll', 'firewall.sys', 'payload.js', 'neon.exe', 'mainframe', 'trace.log', 'access.key'];
+    const LINES = [
+      '> injecting ned.dll...', '> bypassing firewall... OK', '> NEDCODE//ROOT', '> decrypting 0x4E4544',
+      '> uploading neon.exe', '> access level: GOD', '> tracing ip... failed', '> sudo rm -rf boredom',
+      '> 01001110 01000101 01000100', '> mainframe: online', '> brewing coffee... 100%', '> rebooting reality...',
+    ];
+    const COLORS = ['#ff2a3d', '#ffdc16', '#00f0ff'];
+    const pick = (list) => list[(Math.random() * list.length) | 0];
+    let spawned = 0;
+    let popper;
+    const popup = () => {
+      const w = document.createElement('div');
+      w.className = 'egg-pop';
+      const width = 150 + Math.random() * 90;
+      w.style.width = width + 'px';
+      w.style.left = Math.random() * Math.max(0, innerWidth - width) + 'px';
+      w.style.top = Math.random() * Math.max(0, innerHeight - 110) + 'px';
+      w.style.setProperty('--c', pick(COLORS));
+      const lines = Array.from({ length: 2 + ((Math.random() * 2) | 0) }, () => `<p>${pick(LINES)}</p>`).join('');
+      w.innerHTML = `<div class="egg-pop-top"><i></i><i></i><i></i><span>${pick(TITLES)}</span></div><div class="egg-pop-body">${lines}</div>`;
+      layer.insertBefore(w, layer.querySelector('.egg-win'));
+      if (++spawned >= 40) clearInterval(popper);
+    };
+    setTimeout(() => { popper = setInterval(popup, 90); }, 2600);
+
     setTimeout(() => {
+      clearInterval(popper);
       layer.classList.add('is-leaving');
       document.documentElement.classList.remove('is-cyber');
       setTimeout(() => { layer.remove(); running = false; }, 600);
-    }, 6500);
+    }, 8500);
   }
 })();
