@@ -3239,14 +3239,21 @@ details>summary {
   line-height: 1.55;
 }
 
-/* Five words */
+/* Six words: an even grid (2 across on phones, 3 on wider screens) */
 .ab-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: .6rem;
 }
 
+@media screen and (min-width: 600px) {
+  .ab-chips {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .ab-chips li {
+  text-align: center;
   padding: .55rem 1.1rem;
   border: 2px solid var(--fifteenth-color);
   border-radius: 999px;
