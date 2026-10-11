@@ -262,8 +262,10 @@ position: relative;
 
 
 
-/* The cables are dark until a snake of yellow neon light runs along them
-   (16s loop, see scripts.js) */
+/* The cables are dark until a yellow flame runs along them (16s loop, see
+   scripts.js). Each flame is four stacked dashes whose heads line up: a long,
+   thin, faded orange tail, a yellow body, a brighter neck and a white-hot tip,
+   so it tapers and cools towards the back. The tip and body flicker. */
 .nav-logo-spark {
   position: absolute;
   inset: 0;
@@ -271,34 +273,37 @@ position: relative;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 0 2px #ffdc16) drop-shadow(0 0 7px #ffdc16) drop-shadow(0 0 16px rgba(255, 220, 22, .7));
+  filter: drop-shadow(0 0 2px #ffdc16) drop-shadow(0 0 7px rgba(255, 190, 20, .9)) drop-shadow(0 0 16px rgba(255, 150, 0, .55));
 }
 
 .nav-logo-spark path {
   fill: none;
-  stroke: #ffdc16;
-  stroke-width: 10;
   stroke-linecap: round;
+  stroke-dasharray: var(--d) 3000px;
 }
 
-/* the bright centre of the neon tube, same glow as the letters */
-.nav-logo-spark .spark-core {
-  stroke: #fff8cc;
-  stroke-width: 4;
-}
+.nav-logo-spark .fl-smoke { --d: 240px; stroke: #ff8a00; stroke-width: 3; opacity: .35; }
+.nav-logo-spark .fl-tail  { --d: 170px; stroke: #ffa514; stroke-width: 6; opacity: .7; }
+.nav-logo-spark .fl-body  { --d: 100px; stroke: #ffdc16; stroke-width: 10; }
+.nav-logo-spark .fl-tip   { --d: 40px;  stroke: #fff6c2; stroke-width: 5; }
 
-/* the snake is a 120-unit dash; each path is parked just before its start
-   until its turn and ends just past its end, so no dot is left behind.
-   Two separate cables, each with its own spark (no jumping between them):
-   1: right cable into the O (311 long), 3: left cable into the N (876).
-   2: the little loop on top just glows once on its own. */
-.nav-logo-spark .spark-1 { stroke-dasharray: 120 2000; animation: spark-1 16s linear infinite; }
-.nav-logo-spark .spark-2 { opacity: 0; animation: spark-2 16s ease-in-out infinite; }
-.nav-logo-spark .spark-3 { stroke-dasharray: 120 2000; animation: spark-3 16s linear infinite; }
+/* the head is parked 5 units before the start, and the whole flame (240 long)
+   finishes past the end: 1 = right cable into the O (311 long), 3 = left cable
+   into the N (876). 2 = the little loop on top just glows once. */
+.nav-logo-spark .spark-1 { animation: spark-1 16s linear infinite; }
+.nav-logo-spark .spark-3 { animation: spark-3 16s linear infinite; }
+.nav-logo-spark .spark-1.fl-body,
+.nav-logo-spark .spark-1.fl-tip { animation: spark-1 16s linear infinite, flame .9s linear infinite; }
+.nav-logo-spark .spark-3.fl-body,
+.nav-logo-spark .spark-3.fl-tip { animation: spark-3 16s linear infinite, flame .9s linear infinite; }
+.nav-logo-spark .spark-2 { --d: 3000px; stroke: #ffdc16; stroke-width: 8; opacity: 0; animation: spark-2 16s ease-in-out infinite; }
+.nav-logo-spark .spark-2.fl-smoke,
+.nav-logo-spark .spark-2.fl-tail,
+.nav-logo-spark .spark-2.fl-tip { display: none; }
 
 @keyframes spark-1 {
-  0% { stroke-dashoffset: 125; }
-  14%, 100% { stroke-dashoffset: -325; }
+  0% { stroke-dashoffset: calc(var(--d) + 5px); }
+  17%, 100% { stroke-dashoffset: calc(var(--d) - 561px); }
 }
 
 @keyframes spark-2 {
@@ -308,8 +313,18 @@ position: relative;
 }
 
 @keyframes spark-3 {
-  0%, 22% { stroke-dashoffset: 125; }
-  55%, 100% { stroke-dashoffset: -890; }
+  0%, 22% { stroke-dashoffset: calc(var(--d) + 5px); }
+  60%, 100% { stroke-dashoffset: calc(var(--d) - 1126px); }
+}
+
+/* uneven flicker, like a flame catching the air */
+@keyframes flame {
+  0%, 100% { opacity: 1; }
+  15% { opacity: .7; }
+  30% { opacity: .95; }
+  45% { opacity: .65; }
+  60% { opacity: 1; }
+  80% { opacity: .8; }
 }
 
 /* a letter the spark reaches gives a quick electric flicker */

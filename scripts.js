@@ -1205,8 +1205,9 @@ document.addEventListener('DOMContentLoaded', () => {
   svg.setAttribute('class', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  // each snake is a neon tube: a yellow tube with a pale, white-hot core
-  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/><path class="spark-${i + 1} spark-core" d="${d}"/>`).join('');
+  // each flame is four stacked layers: faded tail to white-hot tip
+  const LAYERS = ['fl-smoke', 'fl-tail', 'fl-body', 'fl-tip'];
+  svg.innerHTML = CABLES.map((d, i) => LAYERS.map((l) => `<path class="spark-${i + 1} ${l}" d="${d}"/>`).join('')).join('');
   base.append(svg);
 
   // flicker a letter when the spark arrives; a letter that was tapped off
@@ -1219,9 +1220,10 @@ document.addEventListener('DOMContentLoaded', () => {
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
   };
-  const loop = () => {
-    setTimeout(() => zap('nav-logo5'), 2240); // the O, end of the right cable
-    setTimeout(() => zap('nav-logo1'), 8800); // the N, end of the left cable
+  const loop = (e) => {
+    if (e.animationName !== 'spark-1') return; // the flame flicker has its own, shorter loop
+    setTimeout(() => zap('nav-logo5'), 1520); // the O, end of the right cable
+    setTimeout(() => zap('nav-logo1'), 8260); // the N, end of the left cable
   };
   const first = svg.querySelector('.spark-1');
   first.addEventListener('animationstart', loop);
