@@ -5796,3 +5796,141 @@ html.is-frozen .egg-crash * {
   color: inherit;
   text-decoration: underline;
 }
+
+/*===== LAB: neon sign maker =====*/
+.neon {
+  --neon: #ffdc16;
+}
+
+.neon-wall {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  min-height: 190px;
+  padding: 1.5rem 1rem;
+  border-radius: 10px;
+  /* dark brick wall */
+  background:
+    linear-gradient(rgba(10, 10, 12, .55), rgba(10, 10, 12, .8)),
+    repeating-linear-gradient(0deg, transparent 0 26px, rgba(0, 0, 0, .55) 26px 28px),
+    repeating-linear-gradient(90deg, transparent 0 58px, rgba(0, 0, 0, .5) 58px 60px),
+    #2a2523;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  overflow: hidden;
+}
+
+.neon-sign {
+  max-width: 100%;
+  margin: 0;
+  font-family: 'Tilt Neon', var(--body-font);
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--neon) 35%, #fff);
+  text-shadow:
+    0 0 3px #fff,
+    0 0 8px var(--neon),
+    0 0 18px var(--neon),
+    0 0 36px var(--neon),
+    0 0 70px var(--neon);
+  transition: color .3s;
+}
+
+.neon[data-font="script"] .neon-sign { font-family: 'Neonderthaw', cursive; }
+.neon[data-font="bold"] .neon-sign { font-family: var(--body-font); font-weight: 700; }
+
+.neon-sign span {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* a couple of letters flicker like the logo */
+.neon-sign span[data-flicker="neon-n"] { animation: neon-n 7.3s steps(1, end) infinite; }
+.neon-sign span[data-flicker="neon-e"] { animation: neon-e 11.1s steps(1, end) infinite; }
+.neon-sign span[data-flicker="neon-o"] { animation: neon-o 5.3s steps(1, end) infinite; }
+
+/* powering on: letters sputter on one by one */
+.neon.is-powering .neon-sign span {
+  animation: neon-power .8s steps(1, end) var(--d, 0s) both;
+}
+
+/* switched off: dark glass tubes */
+.neon.is-off .neon-sign {
+  color: #4a4442;
+  text-shadow: none;
+}
+
+.neon.is-off .neon-sign span {
+  animation: none;
+}
+
+.neon-controls {
+  display: grid;
+  gap: .8rem;
+  margin-top: 1rem;
+}
+
+.neon-input {
+  width: 100%;
+  height: 2.8rem;
+  padding: 0 .9rem;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  background: #242424;
+  color: var(--fourth-color);
+  font: 600 1rem var(--body-font);
+}
+
+.neon-input:focus {
+  outline: none;
+  border-color: var(--fifteenth-color);
+}
+
+.neon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+}
+
+.neon-colors {
+  display: flex;
+  gap: .5rem;
+}
+
+.neon-colors button {
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--swatch) 60%, transparent);
+  cursor: pointer;
+}
+
+.neon-colors button[aria-pressed="true"] {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #1d1d1d inset, 0 0 14px var(--swatch);
+}
+
+.neon-power {
+  height: 2.2rem;
+  padding: 0 .9rem;
+  border: 2px solid var(--fifteenth-color);
+  border-radius: 8px;
+  background: none;
+  color: var(--fifteenth-color);
+  font: 700 .8rem var(--body-font);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.neon-power[aria-pressed="false"] {
+  background: var(--fifteenth-color);
+  color: var(--eleventh-color);
+}
+
+.neon-fonts {
+  justify-self: center;
+}

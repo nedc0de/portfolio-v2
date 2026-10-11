@@ -33,6 +33,7 @@
   <meta name="twitter:title" content="The Lab: Interactive Web Experiments | NEDCODE">
   <meta name="twitter:description" content="Small interactive experiments by Ned: a dot-matrix departure board world clock and a live visitor counter. Play with them.">
   <meta name="twitter:image" content="https://nedcode.com/img/og-nedcode.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tilt+Neon&family=Neonderthaw&display=swap">
 </head>
 
 <body>
@@ -175,6 +176,40 @@
           <div class="vs-wave">
             <button type="button" class="flap-add vs-wave-btn"><span class="vs-hand" aria-hidden="true">👋</span> <span class="vs-wave-text">Wave at everyone</span></button>
             <p class="vs-wave-count" aria-live="polite"><b data-stat="waves">–</b> waves today</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- EXPERIMENT 3: neon sign maker -->
+      <article class="lab-item" aria-labelledby="neon-title">
+        <h2 class="lab-item-title" id="neon-title">Neon sign maker</h2>
+        <p class="lab-item-note">Type something and light it up.</p>
+
+        <div class="neon" id="neonMaker">
+          <div class="neon-wall">
+            <p class="neon-sign" aria-live="polite"></p>
+          </div>
+
+          <div class="neon-controls">
+            <input class="neon-input" type="text" maxlength="18" value="Hello world" placeholder="Type your sign" aria-label="Sign text" autocomplete="off" spellcheck="false">
+
+            <div class="neon-row">
+              <div class="neon-colors" role="group" aria-label="Color">
+                <button type="button" data-color="#ffdc16" aria-label="Yellow" aria-pressed="true"></button>
+                <button type="button" data-color="#ff3fb4" aria-label="Pink" aria-pressed="false"></button>
+                <button type="button" data-color="#26e8ff" aria-label="Cyan" aria-pressed="false"></button>
+                <button type="button" data-color="#ff3b3b" aria-label="Red" aria-pressed="false"></button>
+                <button type="button" data-color="#39ff7a" aria-label="Green" aria-pressed="false"></button>
+                <button type="button" data-color="#f4f4ff" aria-label="White" aria-pressed="false"></button>
+              </div>
+              <button type="button" class="neon-power" aria-pressed="true">Turn off</button>
+            </div>
+
+            <div class="flap-toggle neon-fonts" role="group" aria-label="Style">
+              <button type="button" data-font="tube" aria-pressed="true">Tube</button>
+              <button type="button" data-font="script" aria-pressed="false">Script</button>
+              <button type="button" data-font="bold" aria-pressed="false">Bold</button>
+            </div>
           </div>
         </div>
       </article>

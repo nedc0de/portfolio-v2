@@ -1071,3 +1071,82 @@
     if (document.visibilityState === 'visible') kick();
   });
 })();
+
+/*===== EXPERIMENT 3: neon sign maker =====*/
+// Type a word, pick a color and a style, and it lights up like a neon sign.
+// A couple of letters flicker like the NEDCODE logo; the switch powers it
+// off and back on letter by letter.
+(() => {
+  const root = document.getElementById('neonMaker');
+  if (!root) return;
+  const sign = root.querySelector('.neon-sign');
+  const input = root.querySelector('.neon-input');
+  const power = root.querySelector('.neon-power');
+  const FLICKERS = ['neon-n', 'neon-e', 'neon-o'];
+  let on = true;
+
+  // shrink the text until the whole sign fits on the wall
+  const fit = () => {
+    const room = root.querySelector('.neon-wall').clientWidth - 40;
+    sign.style.fontSize = '64px';
+    const w = sign.scrollWidth;
+    if (w > room) sign.style.fontSize = Math.max(14, Math.floor(64 * room / w)) + 'px';
+  };
+
+  const render = (powerUp) => {
+    const text = input.value.trim() || 'Type something';
+    sign.textContent = '';
+    const letters = [...text];
+    const visible = letters.map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
+    // pick up to two letters to flicker
+    const flicker = new Set();
+    while (flicker.size < Math.min(2, visible.length)) flicker.add(visible[(Math.random() * visible.length) | 0]);
+    let n = 0;
+    letters.forEach((c, i) => {
+      const span = document.createElement('span');
+      span.textContent = c;
+      if (c !== ' ') {
+        if (powerUp) span.style.setProperty('--d', (n++ * 0.22).toFixed(2) + 's');
+        if (flicker.has(i)) span.dataset.flicker = FLICKERS[(Math.random() * FLICKERS.length) | 0];
+      }
+      sign.append(span);
+    });
+    sign.setAttribute('aria-label', text);
+    root.classList.toggle('is-powering', !!powerUp);
+    if (powerUp) setTimeout(() => root.classList.remove('is-powering'), n * 220 + 900);
+    fit();
+  };
+
+  input.addEventListener('input', () => render(false));
+
+  root.querySelectorAll('.neon-colors button').forEach((btn) => {
+    btn.style.setProperty('--swatch', btn.dataset.color);
+    btn.addEventListener('click', () => {
+      root.style.setProperty('--neon', btn.dataset.color);
+      root.querySelectorAll('.neon-colors button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    });
+  });
+
+  root.querySelectorAll('.neon-fonts button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      root.dataset.font = btn.dataset.font;
+      root.querySelectorAll('.neon-fonts button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      fit();
+      // fonts download the first time they're used: measure again once they arrive
+      if (document.fonts) document.fonts.load(`64px "${btn.dataset.font === 'script' ? 'Neonderthaw' : 'Tilt Neon'}"`).then(fit);
+    });
+  });
+
+  power.addEventListener('click', () => {
+    on = !on;
+    root.classList.toggle('is-off', !on);
+    power.textContent = on ? 'Turn off' : 'Turn on';
+    power.setAttribute('aria-pressed', String(on));
+    if (on) render(true);
+  });
+
+  addEventListener('resize', fit);
+  root.dataset.font = 'tube';
+  render(true);
+  if (document.fonts) document.fonts.ready.then(fit);
+})();
