@@ -4285,6 +4285,33 @@ a.bl-row:hover {
   text-transform: uppercase;
 }
 
+/* "3 people here now": live visitors, with a soft green pulse */
+.tk-here {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--fourteenth-color);
+  letter-spacing: .06em;
+  text-transform: none;
+  font-size: .78rem;
+}
+
+.tk-here b { color: var(--fourth-color); }
+
+.tk-here-dot {
+  width: .45rem;
+  height: .45rem;
+  border-radius: 50%;
+  background: #2ee66b;
+  box-shadow: 0 0 0 0 rgba(46, 230, 107, .6);
+  animation: here-pulse 2s ease-out infinite;
+}
+
+@keyframes here-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 230, 107, .6); }
+  70%, 100% { box-shadow: 0 0 0 7px rgba(46, 230, 107, 0); }
+}
+
 .tk-live {
   display: inline-flex;
   align-items: center;

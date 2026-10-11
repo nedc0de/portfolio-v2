@@ -972,10 +972,19 @@ async function initSiteStats() {
     }
   };
 
+  // Home page: "3 here now" next to the blog ticker
+  const here = document.querySelector('.tk-here');
+  const showHere = () => {
+    if (!here || !state.online) return;
+    here.querySelector('b').textContent = state.online === 1 ? 'Just you' : `${state.online} people`;
+    here.hidden = false;
+  };
+
   const tick = async () => {
     if (document.visibilityState === 'hidden') return;
     await heartbeat();
-    if (!panel) return; // only the Lab page reads the numbers
+    if (here && !panel) { await refreshOnline(); showHere(); return; }
+    if (!panel) return; // only the Lab page and the home page read the numbers
     await Promise.all([refreshOnline(), refreshViews()]);
     renderLabStats(panel, state);
   };
