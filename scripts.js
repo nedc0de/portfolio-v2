@@ -1209,9 +1209,11 @@ document.addEventListener('DOMContentLoaded', () => {
       setPower((power + 1) % 3);
       return;
     }
-    if (y < 175 || y > 340) return; // above or below the letters: normal link
-    const hit = LETTERS.find(([, from, to]) => x >= from && x < to);
-    if (!hit) return;
+    const hit = y >= 175 && y <= 340 && LETTERS.find(([, from, to]) => x >= from && x < to);
+    if (!hit) {
+      if (logo.sendSpark && logo.sendSpark(x, y)) e.preventDefault(); // a cable: send a snake
+      return; // anywhere else: the normal link home
+    }
     e.preventDefault();
     if (power === 0 || power === 1) return; // power is cut or dimmed: the switch is in charge
     const letter = logo.querySelector('.' + hit[0]);
@@ -1268,6 +1270,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const first = svg.querySelector('.spark-1');
   first.addEventListener('animationstart', loop);
   first.addEventListener('animationiteration', loop);
+
+  // Home page: tap a cable and a snake sets off from that exact spot towards
+  // its letter (right cable to the O, left cable to the N); the little loop on
+  // top just lights up. The letter switch code calls this for taps that don't
+  // land on a letter or the window's dots.
+  const cables = [...svg.querySelectorAll('path:not(.spark-core)')].map((p) => {
+    const len = p.getTotalLength();
+    const pts = [];
+    for (let l = 0; l <= len; l += 4) { const q = p.getPointAtLength(l); pts.push([l, q.x, q.y]); }
+    return { d: p.getAttribute('d'), len, pts };
+  });
+  const LETTER = ['nav-logo5', null, 'nav-logo1'];
+  const SPEED = 140; // units per second, same pace as the loop
+  group.sendSpark = (x, y) => {
+    if (group.classList.contains('is-power-off')) return false;
+    let best = null;
+    cables.forEach((c, i) => c.pts.forEach(([l, px, py]) => {
+      const dist = Math.hypot(px - x, py - y);
+      if (dist < 40 && (!best || dist < best.dist)) best = { i, l, dist };
+    }));
+    if (!best) return false;
+    const c = cables[best.i];
+    if (!LETTER[best.i]) { // the top loop: a quick glow
+      svg.querySelectorAll('.spark-2').forEach((p) => p.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 }));
+      return true;
+    }
+    const ms = ((c.len - best.l) / SPEED) * 1000;
+    ['', ' spark-core'].forEach((core) => {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('class', 'spark-tap' + core);
+      p.setAttribute('d', c.d);
+      p.style.strokeDasharray = '120 3000';
+      svg.append(p);
+      // the dash's head starts where the finger landed and runs off the end
+      p.animate([{ strokeDashoffset: 120 - best.l }, { strokeDashoffset: -(c.len + 10) }],
+        { duration: ms + (130 / SPEED) * 1000, easing: 'linear' }).onfinish = () => p.remove();
+    });
+    setTimeout(() => zap(LETTER[best.i]), ms);
+    return true;
+  };
 })();
 
 /*===== EASTER EGG: Konami code =====*/
