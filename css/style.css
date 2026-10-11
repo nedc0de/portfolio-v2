@@ -4011,8 +4011,24 @@ a.bl-row:hover {
 @media screen and (min-width: 768px) {
   .bl-feature {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
+    grid-template-columns: 1.3fr 1fr;
     align-items: center;
+    gap: .4rem;
+    padding: 1rem;
+  }
+
+  .bl-feature h2 {
+    font-size: 1.7rem;
+  }
+
+  /* The cover sits inside the card as a framed picture, so the card never
+     shows empty bands above and below it */
+  .bl-feature img {
+    border-radius: 12px;
+  }
+
+  .bl-feature-body {
+    padding: .6rem 1rem .6rem .8rem;
   }
 
 
