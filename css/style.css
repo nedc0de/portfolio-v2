@@ -5873,6 +5873,13 @@ html.is-frozen .egg-crash * {
   height: 38px;
 }
 
+/* the laughing emoji has extra room around it so its big tear drops can fall
+   clear of the face; scale it up so the face matches the other emojis */
+.ps-react img[src$="/lol.webp"],
+.ps-react-fly img[src$="/lol.webp"] {
+  scale: 1.45;
+}
+
 .ps-react-fan.is-shown button:hover,
 .ps-react-fan.is-shown button:focus-visible,
 .ps-react-fan.is-shown button.is-hot {
