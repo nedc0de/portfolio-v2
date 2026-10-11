@@ -1347,46 +1347,53 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== BLOG POSTS: reactions =====*/
-// 🔥 😭 🤣 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
-// (stats/post_views → reactions.<post>.<emoji>). One pick per visitor per post:
-// tap again to remove it, tap another to switch. Firebase only loads once the
-// row scrolls into view, so posts stay fast.
+// Facebook-style: one React button. Tap = 🔥 (tap again to remove it).
+// Tap and hold (or hover with a mouse) = a bubble with all six animated
+// emojis; slide onto one and let go, or tap one, to pick it. Next to the
+// button: the top 3 reactions and the total. Counts live in Firestore next to
+// the site stats (stats/post_views → reactions.<post>.<emoji>); one pick per
+// visitor per post. Firebase only loads once the row scrolls into view.
 (() => {
   const anchor = document.querySelector('.ps-article .ps-tldr'); // right after "My take", above the share buttons
   if (!anchor) return;
   const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   if (!post) return;
   const KEY = 'nedcode-react-' + post;
-  const EMOJI = { fire: '🔥', cry: '😭', lol: '🤣', dead: '💀' };
-  const LABEL = { fire: 'Fire', cry: 'Crying', lol: 'Funny', dead: "I'm dead" };
+  const EMOJI = { fire: '🔥', cry: '😭', lol: '🤣', mind: '🤯', eyes: '👀', heart: '❤️' };
+  const LABEL = { fire: 'Fire', cry: 'Crying', lol: 'Funny', mind: 'Mind blown', eyes: 'Watching', heart: 'Love it' };
+  const QUICK = 'fire';
+  const img = (k, still, size) => `<img src="/img/emoji/${k}${still ? '-still' : ''}.webp" alt="${EMOJI[k]}" width="${size}" height="${size}">`;
 
   const row = document.createElement('div');
   row.className = 'ps-react';
-  row.setAttribute('role', 'group');
-  row.setAttribute('aria-label', 'React to this post');
-  row.innerHTML = '<div class="ps-react-btns">' +
-    Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><img src="/img/emoji/${k}-still.webp" alt="${EMOJI[k]}" width="30" height="30" loading="lazy"><b>0</b></button>`).join('') +
-    '</div>';
+  row.innerHTML = `
+    <div class="ps-react-picker" role="menu" aria-label="Pick a reaction" hidden>
+      ${Object.keys(EMOJI).map((k) => `<button type="button" role="menuitem" data-r="${k}" aria-label="${LABEL[k]}"><span class="ps-react-tip">${LABEL[k]}</span>${img(k, false, 40)}</button>`).join('')}
+    </div>
+    <button type="button" class="ps-react-main" aria-haspopup="menu" aria-expanded="false"></button>
+    <span class="ps-react-sum" aria-live="polite"></span>`;
   anchor.after(row);
+  const picker = row.querySelector('.ps-react-picker');
+  const main = row.querySelector('.ps-react-main');
+  const sum = row.querySelector('.ps-react-sum');
 
-  const counts = { fire: 0, cry: 0, lol: 0, dead: 0 };
+  const counts = { fire: 0, cry: 0, lol: 0, mind: 0, eyes: 0, heart: 0 };
   let mine = null;
   try { mine = localStorage.getItem(KEY); } catch (e) {}
   if (!EMOJI[mine]) mine = null;
 
+  const SMILEY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>';
   const paint = () => {
-    row.querySelectorAll('button').forEach((b) => {
-      const k = b.dataset.r;
-      b.querySelector('b').textContent = Math.max(0, counts[k]);
-      b.setAttribute('aria-pressed', String(k === mine));
-      // only the picked emoji animates; the rest stay still
-      const img = b.querySelector('img');
-      const src = `/img/emoji/${k}${k === mine ? '' : '-still'}.webp`;
-      if (img.getAttribute('src') !== src) img.setAttribute('src', src);
-    });
+    main.classList.toggle('is-picked', !!mine);
+    main.innerHTML = mine ? `${img(mine, false, 26)}<span>${LABEL[mine]}</span>` : `${SMILEY}<span>React</span>`;
+    main.setAttribute('aria-label', mine ? `Your reaction: ${LABEL[mine]}. Tap to remove, hold for more` : 'React with fire, hold for more reactions');
+    const total = Object.values(counts).reduce((a, n) => a + Math.max(0, n), 0);
+    const top = Object.keys(counts).filter((k) => counts[k] > 0).sort((a, b) => counts[b] - counts[a]).slice(0, 3);
+    sum.innerHTML = total ? `<span class="ps-react-stack">${top.map((k) => img(k, true, 22)).join('')}</span><b>${total}</b>` : '';
   };
   paint();
 
+  // Firebase: read the counts once the row is close to the screen
   let ref = null;
   const connect = async () => {
     const db = await ensureFirebase();
@@ -1406,27 +1413,98 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { rootMargin: '300px' });
   seen.observe(row);
 
-  const save = (changes) => {
-    if (!ref) return;
-    const inc = {};
-    Object.entries(changes).forEach(([k, n]) => { inc[k] = firebase.firestore.FieldValue.increment(n); });
-    ref.set({ reactions: { [post]: inc } }, { merge: true }).catch((err) => console.error('Reaction not saved:', err));
-  };
-
-  row.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-r]');
-    if (!btn) return;
-    const pick = btn.dataset.r;
+  const pick = (k) => {
     const changes = {};
     if (mine) { counts[mine]--; changes[mine] = -1; }
-    if (mine === pick) {
+    if (mine === k || !k) {
       mine = null;
     } else {
-      mine = pick; counts[pick]++; changes[pick] = (changes[pick] || 0) + 1;
-      btn.classList.remove('is-pop'); void btn.offsetWidth; btn.classList.add('is-pop');
+      mine = k; counts[k]++; changes[k] = (changes[k] || 0) + 1;
     }
     try { mine ? localStorage.setItem(KEY, mine) : localStorage.removeItem(KEY); } catch (err) {}
     paint();
-    save(changes);
+    if (mine) { main.classList.remove('is-pop'); void main.offsetWidth; main.classList.add('is-pop'); }
+    if (ref) {
+      const inc = {};
+      Object.entries(changes).forEach(([key, n]) => { inc[key] = firebase.firestore.FieldValue.increment(n); });
+      ref.set({ reactions: { [post]: inc } }, { merge: true }).catch((err) => console.error('Reaction not saved:', err));
+    }
+  };
+
+  // open / close the bubble
+  const open = () => {
+    if (!picker.hidden) return;
+    picker.hidden = false;
+    main.setAttribute('aria-expanded', 'true');
+    requestAnimationFrame(() => picker.classList.add('is-open'));
+  };
+  let quiet = false; // just picked with the mouse: don't pop the bubble again until it leaves
+  let hoverTimer = null;
+  const close = () => {
+    clearTimeout(hoverTimer);
+    if (picker.hidden) return;
+    picker.classList.remove('is-open');
+    main.setAttribute('aria-expanded', 'false');
+    picker.querySelectorAll('.is-hot').forEach((b) => b.classList.remove('is-hot'));
+    picker.hidden = true;
+  };
+
+  // tap / hold on the main button
+  let holdTimer = null, held = false, holding = false;
+  main.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    held = false; holding = true;
+    holdTimer = setTimeout(() => { held = true; open(); }, 380);
   });
+  // while holding: slide over the emojis, let go on one to pick it
+  const hotAt = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    return el && el.closest('.ps-react-picker button');
+  };
+  document.addEventListener('pointermove', (e) => {
+    if (!holding || picker.hidden) return;
+    const hot = hotAt(e.clientX, e.clientY);
+    picker.querySelectorAll('button').forEach((b) => b.classList.toggle('is-hot', b === hot));
+  });
+  document.addEventListener('pointerup', (e) => {
+    if (!holding) return;
+    holding = false;
+    clearTimeout(holdTimer);
+    if (!held) return; // a quick tap: handled by click below
+    const hot = hotAt(e.clientX, e.clientY);
+    if (hot) { pick(hot.dataset.r); close(); quiet = true; }
+    // let go anywhere else: the bubble stays open so they can tap one
+  });
+  main.addEventListener('click', (e) => {
+    if (held) { held = false; e.preventDefault(); return; }
+    if (e.detail === 0) { picker.hidden ? open() : close(); return; } // keyboard: open the bubble
+    clearTimeout(hoverTimer);
+    close();
+    quiet = true;
+    pick(mine ? null : QUICK);
+  });
+  // the browser took over the touch (e.g. it became a scroll): reset
+  document.addEventListener('pointercancel', () => { holding = false; clearTimeout(holdTimer); });
+  main.addEventListener('contextmenu', (e) => e.preventDefault()); // no long-press menu on phones
+
+  // mouse: hover opens the bubble
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  row.addEventListener('mouseenter', () => { if (fine.matches && !quiet) hoverTimer = setTimeout(open, 450); });
+  row.addEventListener('mouseleave', () => {
+    clearTimeout(hoverTimer);
+    quiet = false;
+    if (fine.matches) setTimeout(() => { if (!row.matches(':hover')) close(); }, 250);
+  });
+
+  picker.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-r]');
+    if (!b) return;
+    pick(b.dataset.r);
+    close();
+    quiet = true;
+    main.focus({ preventScroll: true });
+  });
+  document.addEventListener('pointerdown', (e) => { if (!row.contains(e.target)) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  addEventListener('scroll', () => { if (!holding) close(); }, { passive: true });
 })();

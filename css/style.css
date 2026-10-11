@@ -5714,53 +5714,144 @@ html.is-frozen .egg-crash * {
   white-space: nowrap;
 }
 
-/*===== BLOG POSTS: reactions =====*/
+/*===== BLOG POSTS: reactions (Facebook-style picker) =====*/
 .ps-react {
-  margin: -0.75rem 0 1.5rem;
-}
-
-
-.ps-react-btns {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  align-items: center;
+  gap: .8rem;
+  margin: -0.5rem 0 2rem;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-.ps-react-btns button {
+.ps-react-main {
   display: inline-flex;
   align-items: center;
-  gap: .35rem;
-  padding: .2rem .3rem;
+  gap: .45rem;
+  height: 2.6rem;
+  padding: 0 .9rem 0 .7rem;
   border: none;
-  background: none;
+  border-radius: 8px;
+  background: #242424;
   color: var(--fourth-color);
   font: 700 .9rem var(--body-font);
   cursor: pointer;
+  touch-action: none; /* holding and sliding a finger shouldn't scroll the page */
+  -webkit-tap-highlight-color: transparent;
 }
 
-.ps-react-btns img {
-  width: 34px;
-  height: 34px;
-  transition: transform .2s, filter .25s;
+.ps-react-main svg {
+  width: 1.3rem;
+  height: 1.3rem;
 }
 
-.ps-react-btns button:hover img,
-.ps-react-btns button:focus-visible img {
-  transform: scale(1.12);
+.ps-react-main img {
+  width: 26px;
+  height: 26px;
 }
 
-/* your pick: a yellow glow behind the emoji and a yellow count */
-.ps-react-btns button[aria-pressed="true"] {
+.ps-react-main.is-picked {
   color: var(--fifteenth-color);
 }
 
-.ps-react-btns button[aria-pressed="true"] img {
-  transform: scale(1.12);
-  filter: drop-shadow(0 0 8px rgba(255, 220, 22, .75));
+.ps-react-main.is-pop img {
+  animation: react-pop .4s ease-out;
 }
 
-.ps-react-btns button.is-pop img {
-  animation: react-pop .4s ease-out;
+.ps-react-sum {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .85rem;
+  color: #9a9a9a;
+}
+
+.ps-react-stack {
+  display: inline-flex;
+}
+
+.ps-react-stack img {
+  width: 22px;
+  height: 22px;
+  margin-left: -5px;
+  border-radius: 50%;
+  background: #1d1d1d;
+  box-shadow: 0 0 0 2px #1d1d1d;
+}
+
+.ps-react-stack img:first-child {
+  margin-left: 0;
+}
+
+/* the bubble that pops up with all the emojis */
+.ps-react-picker {
+  touch-action: none;
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 20;
+  display: flex;
+  gap: .15rem;
+  padding: .35rem .45rem;
+  border-radius: 999px;
+  background: #2a2a2a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .06);
+  opacity: 0;
+  transform: translateY(8px) scale(.9);
+  transform-origin: 20% 100%;
+  transition: opacity .18s, transform .22s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+.ps-react-picker.is-open {
+  opacity: 1;
+  transform: none;
+}
+
+.ps-react-picker button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform .15s;
+}
+
+.ps-react-picker img {
+  width: 40px;
+  height: 40px;
+}
+
+.ps-react-picker button:hover,
+.ps-react-picker button:focus-visible,
+.ps-react-picker button.is-hot {
+  transform: translateY(-6px) scale(1.3);
+}
+
+/* little name label above the emoji you're on */
+.ps-react-tip {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: .1rem .45rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .8);
+  color: #fff;
+  font: 600 .62rem var(--body-font);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ps-react-picker button:hover .ps-react-tip,
+.ps-react-picker button.is-hot .ps-react-tip {
+  opacity: 1;
 }
 
 @keyframes react-pop {
