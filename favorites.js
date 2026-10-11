@@ -10,7 +10,8 @@
 //   tmdbId: 12345                 -> force the exact TMDB title if the search picks the wrong one (optional)
 (() => {
   const grid = document.getElementById('favGrid');
-  if (!grid) return;
+  const homeCard = document.querySelector('.hm-fav'); // the "latest pick" card on the home page
+  if (!grid && !homeCard) return;
 
   /*---------- settings ----------*/
   const COVER_CACHE_KEY = 'nedcode-fav-covers-v1';
@@ -1036,6 +1037,26 @@
     item.requested = true;
     queue.push(item);
     pump();
+  }
+
+  /*---------- home page: latest pick ----------*/
+  // The newest movie on the list (they're added at the top) with its poster
+  // and rating, so the home page stays up to date by itself.
+  if (!grid) {
+    const pick = FAVORITES.find((f) => f.type === 'movie');
+    if (!pick) return;
+    const stars = '★'.repeat(Math.floor(pick.rating)) + (pick.rating % 1 ? '½' : '');
+    homeCard.querySelector('h3').textContent = `${pick.title}${pick.year ? ` (${pick.year})` : ''}`;
+    homeCard.querySelector('p').textContent = `${stars} ${pick.rating}/5 · see all my favorites`;
+    homeCard.hidden = false;
+    coverFor(pick).then((url) => {
+      if (!url) return;
+      const img = homeCard.querySelector('.hm-poster img');
+      img.onload = () => homeCard.classList.add('has-poster');
+      img.src = url;
+      homeCard.querySelector('.hm-poster').style.setProperty('--poster', `url("${url}")`);
+    }).catch(() => {});
+    return;
   }
 
   /*---------- start ----------*/
