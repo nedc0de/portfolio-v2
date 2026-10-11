@@ -1348,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /*===== BLOG POSTS: reactions (neon orb) =====*/
 // A round neon "orb" button. Tap it (or tap and hold) and the six emojis fan
-// out in an arc above it, flickering on one by one like neon tubes. Tap one,
+// out in an arc above it, gliding out of the orb one after another. Tap one,
 // or slide a held finger onto one and let go, to pick it: it shoots into the
 // orb, which shorts out like a neon sign and sends out a shockwave and sparks. Tap your pick again to remove it.
 // Next to the orb: the top 3 reactions and the total. Counts live in Firestore
@@ -1488,18 +1488,30 @@ document.addEventListener('DOMContentLoaded', () => {
       b.style.setProperty('--y', (Math.sin(a) * RADIUS).toFixed(1) + 'px');
     });
   };
-  let openedAt = 0;
+  // open/close glide (no flicker): the emojis spring out of the orb one after another
+  // and shrink back into it when closing. `shown` is the real state; the fan stays
+  // in the page a moment after closing so it can animate away.
+  let openedAt = 0, shown = false, hideTimer = null, enterTimer = null;
   const open = () => {
-    if (!fan.hidden) return;
+    if (shown) return;
+    shown = true;
+    clearTimeout(hideTimer);
     place();
     openedAt = scrollY;
     fan.hidden = false;
+    fan.classList.add('is-entering');
+    void fan.offsetWidth; // start from the closed position
+    fan.classList.add('is-shown');
+    clearTimeout(enterTimer);
+    enterTimer = setTimeout(() => fan.classList.remove('is-entering'), 600);
     row.classList.add('is-open');
     orb.setAttribute('aria-expanded', 'true');
   };
   const close = () => {
-    if (fan.hidden) return;
-    fan.hidden = true;
+    if (!shown) return;
+    shown = false;
+    fan.classList.remove('is-shown', 'is-entering');
+    hideTimer = setTimeout(() => { fan.hidden = true; }, 260);
     row.classList.remove('is-open');
     orb.setAttribute('aria-expanded', 'false');
     fan.querySelectorAll('.is-hot').forEach((b) => b.classList.remove('is-hot'));
@@ -1510,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
   orb.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
     held = false; holding = true;
-    opened = fan.hidden; // this press opened it
+    opened = !shown; // this press opened it
     open();
     holdTimer = setTimeout(() => { held = true; }, 300);
   });
@@ -1519,13 +1531,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const o = orb.getBoundingClientRect();
     return x >= o.left && x <= o.right && y >= o.top && y <= o.bottom;
   };
+  // which emoji is under the finger, by where it ends up (works while they're still gliding out)
   const hotAt = (x, y) => {
     if (onOrb(x, y)) return null;
-    const el = document.elementFromPoint(x, y);
-    return el && el.closest('.ps-react-fan button');
+    const o = orb.getBoundingClientRect();
+    const cx = o.left + o.width / 2, cy = o.top + o.height / 2;
+    return [...fan.querySelectorAll('button')].find((b) => {
+      const a = (ANGLES[Number(b.style.getPropertyValue('--i'))] * Math.PI) / 180;
+      return Math.hypot(x - (cx + Math.cos(a) * RADIUS), y - (cy + Math.sin(a) * RADIUS)) < 30;
+    }) || null;
   };
   document.addEventListener('pointermove', (e) => {
-    if (!holding || fan.hidden) return;
+    if (!holding || !shown) return;
     const hot = hotAt(e.clientX, e.clientY);
     fan.querySelectorAll('button').forEach((b) => b.classList.toggle('is-hot', b === hot));
   });
@@ -1540,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener('pointercancel', () => { holding = false; clearTimeout(holdTimer); });
   orb.addEventListener('click', (e) => {
-    if (e.detail === 0) { fan.hidden ? open() : close(); return; } // keyboard
+    if (e.detail === 0) { shown ? close() : open(); return; } // keyboard
     if (held) { held = false; return; }
     if (!opened) close(); // a tap on an already open fan closes it
   });
@@ -1557,5 +1574,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('pointerdown', (e) => { if (!orb.contains(e.target) && !e.target.closest('.ps-react-fan button')) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   addEventListener('scroll', () => { if (!holding && Math.abs(scrollY - openedAt) > 60) close(); }, { passive: true });
-  addEventListener('resize', () => { if (!fan.hidden) place(); });
+  addEventListener('resize', () => { if (shown) place(); });
 })();
