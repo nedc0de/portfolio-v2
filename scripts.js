@@ -1210,9 +1210,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const layer = document.createElement('div');
     layer.className = 'egg-cyber';
     layer.setAttribute('aria-hidden', 'true');
-    layer.innerHTML = '<div class="egg-cyber-bars"></div><div class="egg-cyber-banner"><b data-text="ACCESS GRANTED">ACCESS GRANTED</b><span>// NEDCODE.EXE &nbsp;·&nbsp; BREACH 100%</span></div>';
+    layer.innerHTML = '<div class="egg-cyber-bars"></div>' +
+      '<div class="egg-win"><div class="egg-win-top"><i></i><i></i><i></i><span>nedcode.exe</span></div>' +
+      '<div class="egg-win-body"><b data-text="ACCESS GRANTED">ACCESS GRANTED</b>' +
+      '<div class="egg-win-bar"><i></i></div><span class="egg-win-pct">BREACH <em>0</em>%</span></div></div>';
     document.body.append(layer);
     document.documentElement.classList.add('is-cyber');
+    // count the breach up to 100% alongside the bar
+    const pct = layer.querySelector('.egg-win-pct em');
+    const start = performance.now();
+    const count = () => {
+      const p = Math.min(100, Math.round((performance.now() - start) / 25));
+      pct.textContent = p;
+      if (p < 100) requestAnimationFrame(count);
+    };
+    requestAnimationFrame(count);
     setTimeout(() => {
       layer.classList.add('is-leaving');
       document.documentElement.classList.remove('is-cyber');
