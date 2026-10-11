@@ -4245,13 +4245,10 @@ a.tk-item:hover {
 }
 
 /* Reduced motion: no auto-scroll, swipe through instead */
+/* The ticker keeps scrolling even with reduced motion (Ned's call: it's the
+   only way to see every post). It still pauses on hover and keyboard focus.
+   Only the decorative pulsing dot stops. */
 @media (prefers-reduced-motion: reduce) {
-  .tk.is-running .tk-track { animation: none; }
-  .tk-window {
-    overflow-x: auto;
-    scrollbar-width: none; /* still scrolls sideways, just without the bar */
-  }
-  .tk-window::-webkit-scrollbar { display: none; }
   .tk-dot::after { animation: none; }
 }
 
