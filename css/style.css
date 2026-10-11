@@ -5591,7 +5591,13 @@ html.is-frozen .egg-crash * {
   letter-spacing: .12em;
   color: #ff2a3d;
   text-shadow: 0 0 10px rgba(255, 42, 61, .8);
-  animation: arcade-blink 1.2s steps(1, end) infinite;
+  animation: egg-flash .9s steps(1, end) infinite;
+}
+
+/* fully on, fully off, like a warning light */
+@keyframes egg-flash {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
 }
 
 .egg-crash-body p {
