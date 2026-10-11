@@ -4298,6 +4298,12 @@ a.bl-row:hover {
 
 .tk-here b { color: var(--fourth-color); }
 
+.tk-here-eyes {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-left: -.1rem;
+}
+
 .tk-here-dot {
   width: .45rem;
   height: .45rem;
