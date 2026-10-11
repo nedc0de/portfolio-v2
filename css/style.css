@@ -4460,7 +4460,7 @@ a.tk-item:hover,
 
 .hm-row {
   display: grid;
-  grid-template-columns: 100px 1fr;
+  grid-template-columns: 140px 1fr;
   gap: 1rem;
   align-items: center;
   padding: .7rem;
@@ -4476,8 +4476,9 @@ a.tk-item:hover,
 
 .hm-row img,
 .hm-board {
-  width: 100px;
-  height: 84px;
+  width: 140px;
+  height: auto;
+  aspect-ratio: 940 / 788;
   border-radius: 6px;
   object-fit: cover;
 }
@@ -4518,12 +4519,18 @@ a.tk-item:hover,
 .hm-clock {
   font-family: ui-monospace, 'Courier New', monospace;
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.7rem;
   letter-spacing: .05em;
   color: var(--fifteenth-color);
   -webkit-mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 2.6px 2.6px;
   mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 2.6px 2.6px;
   text-shadow: 0 0 6px rgba(255, 220, 22, .5);
+}
+
+@media screen and (min-width: 768px) {
+  .hm-row { grid-template-columns: 200px 1fr; gap: 1.25rem; }
+  .hm-row img, .hm-board { width: 200px; }
+  .hm-clock { font-size: 2.3rem; }
 }
 
 /* Newsletter card */
