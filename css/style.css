@@ -282,9 +282,11 @@ position: relative;
 
 /* the spark is a 70-unit dash; each path is parked just before its start
    until its turn and ends just past its end, so no dot is left behind.
-   1: right cable to the O (311 long), 2: top loop (53), 3: left cable to the N (876) */
+   Two separate cables, each with its own spark (no jumping between them):
+   1: right cable into the O (311 long), 3: left cable into the N (876).
+   2: the little loop on top just glows once on its own. */
 .nav-logo-spark .spark-1 { stroke-dasharray: 70 2000; animation: spark-1 16s linear infinite; }
-.nav-logo-spark .spark-2 { stroke-dasharray: 70 2000; animation: spark-2 16s linear infinite; }
+.nav-logo-spark .spark-2 { opacity: 0; animation: spark-2 16s ease-in-out infinite; }
 .nav-logo-spark .spark-3 { stroke-dasharray: 70 2000; animation: spark-3 16s linear infinite; }
 
 @keyframes spark-1 {
@@ -293,13 +295,14 @@ position: relative;
 }
 
 @keyframes spark-2 {
-  0%, 19% { stroke-dashoffset: 75; }
-  23%, 100% { stroke-dashoffset: -65; }
+  0%, 64% { opacity: 0; }
+  67% { opacity: .9; }
+  71%, 100% { opacity: 0; }
 }
 
 @keyframes spark-3 {
-  0%, 28% { stroke-dashoffset: 75; }
-  61%, 100% { stroke-dashoffset: -890; }
+  0%, 22% { stroke-dashoffset: 75; }
+  55%, 100% { stroke-dashoffset: -890; }
 }
 
 /* a letter the spark reaches gives a quick electric flicker */

@@ -1186,9 +1186,10 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== LOGO: current running through the cables =====*/
-// A spark of light travels along the yellow cables: in along the right cable
-// to the O, through the little loop on top, then around the left cable down
-// to the N. Each letter flickers as the spark reaches it. The paths were
+// A spark of light runs along each yellow cable in turn: the right cable into
+// the O, then a moment later out of the window and around the left cable into
+// the N. Each letter flickers as its spark arrives, and the little loop on top
+// glows once on its own. The paths were
 // traced from the 1125×450 logo artwork; timings match the 16s CSS loop.
 (() => {
   const group = document.querySelector('.nav-logo-group');
@@ -1217,7 +1218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const loop = () => {
     setTimeout(() => zap('nav-logo5'), 2240); // the O, end of the right cable
-    setTimeout(() => zap('nav-logo1'), 9760); // the N, end of the left cable
+    setTimeout(() => zap('nav-logo1'), 8800); // the N, end of the left cable
   };
   const first = svg.querySelector('.spark-1');
   first.addEventListener('animationstart', loop);
