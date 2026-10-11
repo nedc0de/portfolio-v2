@@ -1170,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /*===== EASTER EGG: Konami code =====*/
 // Keyboard: ↑ ↑ ↓ ↓ ← → ← → B A. Phone: swipe up, up, down, down, left,
-// right, left, right, then tap twice. Turns on "arcade mode" for a few seconds.
+// right, left, right, then tap twice. Glitches the site, Cyberpunk style, for a few seconds.
 (() => {
   const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'];
   let pos = 0;
@@ -1178,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const press = (step) => {
     pos = step === CODE[pos] ? pos + 1 : step === CODE[0] ? 1 : 0;
-    if (pos === CODE.length) { pos = 0; arcade(); }
+    if (pos === CODE.length) { pos = 0; glitch(); }
   };
 
   const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', b: 'b', B: 'b', a: 'a', A: 'a' };
@@ -1203,87 +1203,20 @@ document.addEventListener('DOMContentLoaded', () => {
     press(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
   }, { passive: true });
 
-  // Three looks to choose from while sampling: 'arcade', 'matrix', 'cyber'
-  const STYLE = 'arcade';
-
-  function arcade(style = STYLE) {
+  // Cyberpunk glitch: the page shakes and splits, a red "ACCESS GRANTED" banner glitches in
+  function glitch() {
     if (running) return;
     running = true;
     const layer = document.createElement('div');
+    layer.className = 'egg-cyber';
     layer.setAttribute('aria-hidden', 'true');
-    let stop = () => {};
-    let length = 8000;
-
-    if (style === 'matrix') {
-      layer.className = 'egg-matrix';
-      const canvas = document.createElement('canvas');
-      layer.append(canvas);
-      const text = document.createElement('div');
-      text.className = 'egg-matrix-text';
-      layer.append(text);
-      document.body.append(layer);
-      const ctx = canvas.getContext('2d');
-      const size = 16;
-      const fit = () => { canvas.width = innerWidth; canvas.height = innerHeight; };
-      fit();
-      const cols = Math.ceil(innerWidth / size);
-      const drops = Array.from({ length: cols }, () => Math.random() * -40);
-      const glyphs = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789NEDCODE';
-      const draw = () => {
-        ctx.fillStyle = 'rgba(0, 0, 0, .08)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.font = size + 'px monospace';
-        drops.forEach((y, i) => {
-          ctx.fillStyle = Math.random() < .03 ? '#ffdc16' : '#00ff66';
-          ctx.fillText(glyphs[(Math.random() * glyphs.length) | 0], i * size, y * size);
-          drops[i] = y * size > canvas.height && Math.random() > .975 ? 0 : y + 1;
-        });
-      };
-      const timer = setInterval(draw, 45);
-      const lines = ['Wake up, Ned...', 'The site has you...', 'ACCESS GRANTED'];
-      let li = 0, ci = 0;
-      const typer = setInterval(() => {
-        if (li >= lines.length) return;
-        ci++;
-        text.innerHTML = lines.slice(0, li).map((l) => `<p>${l}</p>`).join('') + `<p>${lines[li].slice(0, ci)}<i></i></p>`;
-        if (ci >= lines[li].length) { li++; ci = 0; }
-      }, 90);
-      stop = () => { clearInterval(timer); clearInterval(typer); };
-    } else if (style === 'cyber') {
-      layer.className = 'egg-cyber';
-      layer.innerHTML = '<div class="egg-cyber-bars"></div><div class="egg-cyber-banner"><b data-text="ACCESS GRANTED">ACCESS GRANTED</b><span>// NEDCODE.EXE &nbsp;·&nbsp; BREACH 100%</span></div>';
-      document.body.append(layer);
-      document.documentElement.classList.add('is-cyber');
-      length = 6500;
-      stop = () => document.documentElement.classList.remove('is-cyber');
-    } else {
-      if (!document.getElementById('arcade-font')) {
-        const font = document.createElement('link');
-        font.id = 'arcade-font';
-        font.rel = 'stylesheet';
-        font.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap';
-        document.head.append(font);
-      }
-      layer.className = 'arcade';
-      layer.innerHTML = '<div class="arcade-banner"><b>CHEAT CODE UNLOCKED</b><span>+30 LIVES · INSERT COIN</span></div>';
-      for (let i = 0; i < 28; i++) {
-        const coin = document.createElement('i');
-        coin.className = 'arcade-coin';
-        coin.style.left = Math.random() * 100 + 'vw';
-        coin.style.animationDelay = (Math.random() * 2.5).toFixed(2) + 's';
-        coin.style.animationDuration = (2 + Math.random() * 2).toFixed(2) + 's';
-        layer.append(coin);
-      }
-      document.body.append(layer);
-      document.documentElement.classList.add('is-arcade');
-      stop = () => document.documentElement.classList.remove('is-arcade');
-    }
-
+    layer.innerHTML = '<div class="egg-cyber-bars"></div><div class="egg-cyber-banner"><b data-text="ACCESS GRANTED">ACCESS GRANTED</b><span>// NEDCODE.EXE &nbsp;·&nbsp; BREACH 100%</span></div>';
+    document.body.append(layer);
+    document.documentElement.classList.add('is-cyber');
     setTimeout(() => {
       layer.classList.add('is-leaving');
-      stop();
+      document.documentElement.classList.remove('is-cyber');
       setTimeout(() => { layer.remove(); running = false; }, 600);
-    }, length);
+    }, 6500);
   }
-  window.__egg = arcade; // lets the samples preview each style
 })();
