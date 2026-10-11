@@ -1252,11 +1252,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     setTimeout(() => { popper = setInterval(popup, 90); }, 2600);
 
+    // Then the site "crashes": everything freezes until the page is refreshed
     setTimeout(() => {
       clearInterval(popper);
-      layer.classList.add('is-leaving');
-      document.documentElement.classList.remove('is-cyber');
-      setTimeout(() => { layer.remove(); running = false; }, 600);
-    }, 8500);
+      const crash = document.createElement('div');
+      crash.className = 'egg-crash';
+      crash.innerHTML = '<div class="egg-pop-top"><i></i><i></i><i></i><span>fatal_error</span></div>' +
+        '<div class="egg-crash-body"><b>SYSTEM FROZEN</b><p>Refresh the page to reboot.</p></div>';
+      layer.append(crash);
+      document.documentElement.classList.add('is-frozen');
+      layer.setAttribute('aria-hidden', 'false');
+      crash.setAttribute('role', 'alert');
+    }, 7000);
   }
 })();

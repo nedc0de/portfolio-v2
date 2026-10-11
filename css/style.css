@@ -5540,6 +5540,66 @@ html.is-cyber h3 {
   z-index: 2;
 }
 
+/* The crash: everything stops, nothing responds until a refresh */
+html.is-frozen,
+html.is-frozen body {
+  overflow: hidden;
+}
+
+html.is-frozen *,
+html.is-frozen *::before,
+html.is-frozen *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+html.is-frozen .egg-cyber {
+  pointer-events: auto;
+  cursor: not-allowed;
+}
+
+html.is-frozen .egg-crash,
+html.is-frozen .egg-crash * {
+  animation-play-state: running !important;
+}
+
+.egg-crash {
+  --c: #ff2a3d;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(86vw, 340px);
+  border: 2px solid #ff2a3d;
+  border-radius: 8px;
+  background: #0a0a0c;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .45), 0 0 30px rgba(255, 42, 61, .6);
+  font-family: monospace;
+  text-align: center;
+  overflow: hidden;
+  animation: egg-pop .2s steps(3, end);
+}
+
+.egg-crash-body {
+  padding: 1.1rem 1rem 1.2rem;
+}
+
+.egg-crash-body b {
+  display: block;
+  font-size: 1.35rem;
+  letter-spacing: .12em;
+  color: #ff2a3d;
+  text-shadow: 0 0 10px rgba(255, 42, 61, .8);
+  animation: arcade-blink 1.2s steps(1, end) infinite;
+}
+
+.egg-crash-body p {
+  margin: .6rem 0 0;
+  font-size: .85rem;
+  color: rgba(255, 255, 255, .8);
+}
+
 @keyframes egg-fill {
   from { width: 0; }
   to { width: 100%; }
@@ -5565,3 +5625,8 @@ html.is-cyber h3 {
   80%, 100% { clip-path: inset(100% 0 0 0); transform: none; }
 }
 
+
+@keyframes arcade-blink {
+  0%, 70% { opacity: 1; }
+  71%, 100% { opacity: .45; }
+}
