@@ -4247,7 +4247,11 @@ a.tk-item:hover {
 /* Reduced motion: no auto-scroll, swipe through instead */
 @media (prefers-reduced-motion: reduce) {
   .tk.is-running .tk-track { animation: none; }
-  .tk-window { overflow-x: auto; }
+  .tk-window {
+    overflow-x: auto;
+    scrollbar-width: none; /* still scrolls sideways, just without the bar */
+  }
+  .tk-window::-webkit-scrollbar { display: none; }
   .tk-dot::after { animation: none; }
 }
 
