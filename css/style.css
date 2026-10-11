@@ -4147,8 +4147,8 @@ details>summary {
 
 .bl-row {
   display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr; /* phones: full-width cover on top, text below */
+  gap: .9rem;
   align-items: center;
   padding: .75rem;
   border-radius: 10px;
@@ -4161,7 +4161,7 @@ a.bl-row:hover {
 }
 
 .bl-row img {
-  width: 110px;
+  width: 100%;
   aspect-ratio: 940 / 788;
   object-fit: cover;
   border-radius: 6px;
@@ -4214,11 +4214,12 @@ a.bl-row:hover {
 
 
   .bl-row {
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: 240px 1fr;
+    gap: 1.25rem;
   }
 
   .bl-row img {
-    width: 150px;
+    width: 240px;
   }
 }
 
