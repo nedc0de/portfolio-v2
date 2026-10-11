@@ -5649,7 +5649,7 @@ html.is-frozen .egg-crash * {
   display: flex;
   align-items: center;
   gap: .5rem;
-  margin: -0.5rem 0 2.5rem;
+  margin: 0 0 2.5rem;
 }
 
 .ps-share-title {
@@ -5716,7 +5716,7 @@ html.is-frozen .egg-crash * {
 
 /*===== BLOG POSTS: reactions =====*/
 .ps-react {
-  margin: -1rem 0 2.5rem;
+  margin: -0.5rem 0 2rem;
 }
 
 .ps-react-title {

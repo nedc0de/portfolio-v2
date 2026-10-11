@@ -1352,7 +1352,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // tap again to remove it, tap another to switch. Firebase only loads once the
 // row scrolls into view, so posts stay fast.
 (() => {
-  const anchor = document.querySelector('.ps-article .ps-share') || document.querySelector('.ps-article .ps-tldr');
+  const anchor = document.querySelector('.ps-article .ps-tldr'); // right after "My take", above the share buttons
   if (!anchor) return;
   const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   if (!post) return;
