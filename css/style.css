@@ -5716,17 +5716,9 @@ html.is-frozen .egg-crash * {
 
 /*===== BLOG POSTS: reactions =====*/
 .ps-react {
-  margin: -0.5rem 0 2rem;
+  margin: -0.75rem 0 1.5rem;
 }
 
-.ps-react-title {
-  margin: 0 0 .7rem !important;
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--fifteenth-color);
-}
 
 .ps-react-btns {
   display: flex;

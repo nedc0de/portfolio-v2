@@ -1362,7 +1362,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const row = document.createElement('div');
   row.className = 'ps-react';
-  row.innerHTML = '<p class="ps-react-title">What did you think?</p><div class="ps-react-btns">' +
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'React to this post');
+  row.innerHTML = '<div class="ps-react-btns">' +
     Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><img src="/img/emoji/${k}-still.webp" alt="${EMOJI[k]}" width="30" height="30" loading="lazy"><b>0</b></button>`).join('') +
     '</div>';
   anchor.after(row);
