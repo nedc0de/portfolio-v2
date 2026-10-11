@@ -3519,12 +3519,6 @@ details>summary {
   font-size: 1.3rem;
   font-weight: 700;
   color: var(--fifteenth-color);
-  text-underline-offset: 4px;
-}
-
-.ct-dm-handle:hover,
-.ct-dm-handle:focus-visible {
-  text-decoration: underline;
 }
 
 /* "Open" fills and glows like the other main buttons */
