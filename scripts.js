@@ -1266,3 +1266,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 7000);
   }
 })();
+
+/*===== BLOG POSTS: reading progress bar =====*/
+// A thin neon line across the top that fills as you read the article.
+(() => {
+  const article = document.querySelector('.ps-article');
+  if (!article) return;
+  const bar = document.createElement('div');
+  bar.className = 'read-progress';
+  bar.setAttribute('aria-hidden', 'true');
+  document.body.append(bar);
+  const update = () => {
+    const rect = article.getBoundingClientRect();
+    const total = rect.height - innerHeight;
+    const done = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 1;
+    bar.style.transform = `scaleX(${done})`;
+  };
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+})();

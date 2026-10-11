@@ -5636,3 +5636,18 @@ html.is-frozen .egg-crash * {
   0%, 70% { opacity: 1; }
   71%, 100% { opacity: .45; }
 }
+
+/*===== BLOG POSTS: reading progress bar =====*/
+.read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 100%;
+  height: 3px;
+  background: var(--fifteenth-color);
+  box-shadow: 0 0 8px rgba(255, 220, 22, .8), 0 0 18px rgba(255, 220, 22, .45);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
