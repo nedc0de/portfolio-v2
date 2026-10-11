@@ -1189,7 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // A spark of light travels along the yellow cables: in along the right cable
 // to the O, through the little loop on top, then around the left cable down
 // to the N. Each letter flickers as the spark reaches it. The paths were
-// traced from the 1125×450 logo artwork; timings match the 10s CSS loop.
+// traced from the 1125×450 logo artwork; timings match the 16s CSS loop.
 (() => {
   const group = document.querySelector('.nav-logo-group');
   const base = group && group.querySelector('.nav-logo');
@@ -1216,8 +1216,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
   };
   const loop = () => {
-    setTimeout(() => zap('nav-logo5'), 1300); // the O, end of the right cable
-    setTimeout(() => zap('nav-logo1'), 6200); // the N, end of the left cable
+    setTimeout(() => zap('nav-logo5'), 2240); // the O, end of the right cable
+    setTimeout(() => zap('nav-logo1'), 9760); // the N, end of the left cable
   };
   const first = svg.querySelector('.spark-1');
   first.addEventListener('animationstart', loop);
