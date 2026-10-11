@@ -1347,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== BLOG POSTS: reactions =====*/
-// 🔥 😮 😂 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
+// 🔥 😮 🤣 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
 // (stats/post_views → reactions.<post>.<emoji>). One pick per visitor per post:
 // tap again to remove it, tap another to switch. Firebase only loads once the
 // row scrolls into view, so posts stay fast.
@@ -1357,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   if (!post) return;
   const KEY = 'nedcode-react-' + post;
-  const EMOJI = { fire: '🔥', wow: '😮', lol: '😂', dead: '💀' };
+  const EMOJI = { fire: '🔥', wow: '😮', lol: '🤣', dead: '💀' };
   const LABEL = { fire: 'Fire', wow: 'Wow', lol: 'Funny', dead: "I'm dead" };
 
   const row = document.createElement('div');
