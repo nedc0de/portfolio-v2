@@ -1146,3 +1146,24 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(() => build([]));
 })();
   
+
+/*===== LOGO: neon power-on when tapped =====*/
+// Tapping the logo switches the sign off and back on, letter by letter.
+// On the home page it only plays the effect; elsewhere it plays the start,
+// then goes home as before.
+(() => {
+  const logo = document.querySelector('.nav-logo-group');
+  if (!logo) return;
+  const onHome = /\/(index\.html)?$/.test(location.pathname);
+  logo.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    if (logo.classList.contains('is-buzzing')) return;
+    logo.classList.add('is-buzzing');
+    setTimeout(() => {
+      logo.classList.remove('is-buzzing');
+      if (!onHome) location.href = link.href;
+    }, onHome ? 1500 : 650);
+  });
+})();

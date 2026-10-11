@@ -262,6 +262,26 @@ position: relative;
 
 
 
+/* Tap the logo: every letter cuts out, then powers back on one by one */
+.nav-logo-group.is-buzzing .nav-logo-layer:not(.nav-logo) {
+  animation: neon-power 1s steps(1, end) var(--d, 0s) both !important;
+}
+.nav-logo2 { --d: .08s; }
+.nav-logo3 { --d: .16s; }
+.nav-logo4 { --d: .32s; }
+.nav-logo5 { --d: .40s; }
+.nav-logo6 { --d: .48s; }
+.nav-logo7 { --d: .56s; }
+
+@keyframes neon-power {
+  0% { opacity: 0; }
+  30% { opacity: .85; }
+  38% { opacity: 0; }
+  52% { opacity: 1; }
+  60% { opacity: .15; }
+  68%, 100% { opacity: 1; }
+}
+
 /* N: mostly on, a quick double blink */
 @keyframes neon-n {
   0%, 61% { opacity: 1; }
