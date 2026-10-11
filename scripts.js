@@ -1294,7 +1294,8 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== BLOG POSTS: share buttons =====*/
-// A "Share this post" row right after the "My take" box.
+// Share icons right after the "My take" box (the reactions block below puts them
+// on the right of the reactions line).
 (() => {
   const take = document.querySelector('.ps-article .ps-tldr');
   if (!take) return;
@@ -1312,7 +1313,6 @@ document.addEventListener('DOMContentLoaded', () => {
     share: svg('<path d="M12 15V3"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'),
   };
   row.innerHTML = `
-    <p class="ps-share-title">Share</p>
     <a href="https://www.threads.net/intent/post?text=${text}" target="_blank" rel="noopener" aria-label="Share on Threads" title="Share on Threads">${ICONS.threads}</a>
     <a href="https://x.com/intent/post?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}" target="_blank" rel="noopener" aria-label="Share on X" title="Share on X">${ICONS.x}</a>
     <button type="button" class="ps-share-copy" aria-label="Copy link" title="Copy link">${ICONS.link}<span class="ps-share-tip" role="status"></span></button>
@@ -1376,6 +1376,14 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <span class="ps-react-sum" aria-live="polite"></span>`;
   anchor.after(row);
+  // reactions on the left, share icons on the right, on one line
+  const share = row.nextElementSibling;
+  if (share && share.classList.contains('ps-share')) {
+    const bar = document.createElement('div');
+    bar.className = 'ps-bar';
+    row.before(bar);
+    bar.append(row, share);
+  }
   const orb = row.querySelector('.ps-react-orb');
   const fan = row.querySelector('.ps-react-fan');
   const sum = row.querySelector('.ps-react-sum');
