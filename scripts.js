@@ -1341,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== BLOG POSTS: reactions =====*/
-// 🔥 😮 😂 💀 with live counts, saved in Firestore next to the site stats
+// 🔥 😮 😂 💀 (animated only when picked) with live counts, saved in Firestore next to the site stats
 // (stats/post_views → reactions.<post>.<emoji>). One pick per visitor per post:
 // tap again to remove it, tap another to switch. Firebase only loads once the
 // row scrolls into view, so posts stay fast.
@@ -1357,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const row = document.createElement('div');
   row.className = 'ps-react';
   row.innerHTML = '<p class="ps-react-title">What did you think?</p><div class="ps-react-btns">' +
-    Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><img src="/img/emoji/${k}.webp" alt="${EMOJI[k]}" width="30" height="30" loading="lazy"><b>0</b></button>`).join('') +
+    Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><img src="/img/emoji/${k}-still.webp" alt="${EMOJI[k]}" width="30" height="30" loading="lazy"><b>0</b></button>`).join('') +
     '</div>';
   anchor.after(row);
 
@@ -1371,6 +1371,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const k = b.dataset.r;
       b.querySelector('b').textContent = Math.max(0, counts[k]);
       b.setAttribute('aria-pressed', String(k === mine));
+      // only the picked emoji animates; the rest stay still
+      const img = b.querySelector('img');
+      const src = `/img/emoji/${k}${k === mine ? '' : '-still'}.webp`;
+      if (img.getAttribute('src') !== src) img.setAttribute('src', src);
     });
   };
   paint();
