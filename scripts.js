@@ -1349,8 +1349,8 @@ document.addEventListener('DOMContentLoaded', () => {
 /*===== BLOG POSTS: reactions (neon orb) =====*/
 // A round neon "orb" button. Tap it (or tap and hold) and the six emojis fan
 // out in an arc above it, flickering on one by one like neon tubes. Tap one,
-// or slide a held finger onto one and let go, to pick it: it bursts into a few
-// floating copies and moves into the orb. Tap your pick again to remove it.
+// or slide a held finger onto one and let go, to pick it: it shoots into the
+// orb, which shorts out like a neon sign and sends out a shockwave and sparks. Tap your pick again to remove it.
 // Next to the orb: the top 3 reactions and the total. Counts live in Firestore
 // next to the site stats (stats/post_views → reactions.<post>.<emoji>); one
 // pick per visitor per post. Firebase only loads once the row is near.
@@ -1360,8 +1360,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const post = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
   if (!post) return;
   const KEY = 'nedcode-react-' + post;
-  const EMOJI = { fire: '🔥', cry: '😭', lol: '🤣', mind: '🤯', eyes: '👀', heart: '❤️' };
-  const LABEL = { fire: 'Fire', cry: 'Crying', lol: 'Funny', mind: 'Mind blown', eyes: 'Watching', heart: 'Love it' };
+  const EMOJI = { heart: '❤️', fire: '🔥', cry: '😭', lol: '🤣', mind: '🤯', eyes: '👀' };
+  const LABEL = { heart: 'Love it', fire: 'Fire', cry: 'Crying', lol: 'Funny', mind: 'Mind blown', eyes: 'Watching' };
   const KEYS = Object.keys(EMOJI);
   const ANGLES = [-92, -68, -44, -20, 4, 28]; // the arc, in degrees (0 = right, -90 = straight up)
   const RADIUS = 116;
@@ -1417,18 +1417,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { rootMargin: '300px' });
   seen.observe(row);
 
-  // a few small copies float up from the orb and fade
-  const burst = (k) => {
-    for (let i = 0; i < 6; i++) {
-      const p = document.createElement('span');
-      p.className = 'ps-react-float';
-      p.innerHTML = img(k, true, 20);
-      p.style.setProperty('--dx', (Math.random() * 70 - 35).toFixed(0) + 'px');
-      p.style.setProperty('--dy', (-60 - Math.random() * 60).toFixed(0) + 'px');
-      p.style.animationDelay = (i * 0.06).toFixed(2) + 's';
-      orb.after(p);
-      setTimeout(() => p.remove(), 1400);
-    }
+  // the picked emoji shoots into the orb, then the orb surges: flicker, glitch, shockwave, sparks
+  const surge = (k) => {
+    const from = fan.querySelector(`[data-r="${k}"]`).getBoundingClientRect();
+    const to = orb.getBoundingClientRect();
+    orb.classList.remove('is-surge');
+    orb.classList.add('is-landing');
+    const fly = document.createElement('span');
+    fly.className = 'ps-react-fly';
+    fly.innerHTML = img(k, false, 38);
+    fly.style.left = from.left + from.width / 2 + 'px';
+    fly.style.top = from.top + from.height / 2 + 'px';
+    document.body.append(fly);
+    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+    const land = () => {
+      fly.remove();
+      orb.classList.remove('is-landing');
+      void orb.offsetWidth; // restart the surge if it's already playing
+      orb.classList.add('is-surge');
+      setTimeout(() => orb.classList.remove('is-surge'), 650);
+      const fx = [];
+      const wave = document.createElement('span');
+      wave.className = 'ps-react-wave';
+      fx.push(wave);
+      for (let i = 0; i < 8; i++) {
+        const sp = document.createElement('span');
+        sp.className = 'ps-react-spark';
+        sp.style.setProperty('--a', i * 45 + Math.round(Math.random() * 20 - 10) + 'deg');
+        fx.push(sp);
+      }
+      orb.after(...fx);
+      setTimeout(() => fx.forEach((el) => el.remove()), 800);
+    };
+    if (!fly.animate) return land();
+    fly.animate([
+      { transform: 'translate(0, 0) scale(1.3)' },
+      { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 30}px) scale(1) rotate(-20deg)`, offset: 0.5 },
+      { transform: `translate(${dx}px, ${dy}px) scale(.7) rotate(0deg)` },
+    ], { duration: 320, easing: 'cubic-bezier(.5, 0, .9, .6)' }).onfinish = land;
   };
 
   const pick = (k) => {
@@ -1438,7 +1465,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mine = null;
     } else {
       mine = k; counts[k]++; changes[k] = (changes[k] || 0) + 1;
-      burst(k);
+      surge(k);
     }
     try { mine ? localStorage.setItem(KEY, mine) : localStorage.removeItem(KEY); } catch (err) {}
     paint();

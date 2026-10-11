@@ -5875,24 +5875,87 @@ html.is-frozen .egg-crash * {
   opacity: 1;
 }
 
-/* picking: small copies float up from the orb */
-.ps-react-float {
-  position: absolute;
-  left: calc(1.6rem - 10px);
-  top: calc(1.6rem - 10px);
+/* picking: the emoji shoots into the orb like a power surge. The orb shorts
+   out for a moment, then a neon shockwave and sparks fly out */
+.ps-react-fly {
+  position: fixed;
+  z-index: 30;
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
   pointer-events: none;
-  animation: react-float 1.1s ease-out both;
+  filter: drop-shadow(0 0 8px rgba(255, 220, 22, .9));
 }
 
-.ps-react-float img {
-  width: 20px;
-  height: 20px;
+.ps-react-fly img {
+  width: 38px;
+  height: 38px;
 }
 
-@keyframes react-float {
-  0% { opacity: 0; transform: translate(0, 0) scale(.6); }
-  15% { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2); }
+.ps-react-orb.is-landing img {
+  opacity: 0;
+}
+
+.ps-react-orb.is-surge {
+  animation: react-surge .6s steps(1, end);
+}
+
+.ps-react-orb.is-surge img {
+  animation: react-glitch .45s steps(1, end);
+}
+
+@keyframes react-surge {
+  0% { box-shadow: 0 0 30px #fff, inset 0 0 18px #fff; border-color: #fff; }
+  12% { box-shadow: none; border-color: #3a3a3a; }
+  24% { box-shadow: 0 0 26px rgba(255, 220, 22, 1), inset 0 0 16px rgba(255, 220, 22, .7); border-color: var(--fifteenth-color); }
+  36% { box-shadow: none; border-color: #3a3a3a; }
+  50%, 100% { box-shadow: 0 0 22px rgba(255, 220, 22, .9), inset 0 0 14px rgba(255, 220, 22, .5); border-color: var(--fifteenth-color); }
+}
+
+@keyframes react-glitch {
+  0% { transform: translate(-3px, 1px) scale(1.25); filter: drop-shadow(2px 0 0 #ff2a6d) drop-shadow(-2px 0 0 #05d9e8); }
+  25% { transform: translate(3px, -1px) scale(.9); filter: drop-shadow(-2px 0 0 #ff2a6d) drop-shadow(2px 0 0 #05d9e8); }
+  50% { transform: translate(-1px, 0) scale(1.1); filter: none; }
+  75%, 100% { transform: none; filter: none; }
+}
+
+.ps-react-wave,
+.ps-react-spark {
+  position: absolute;
+  left: 1.6rem;
+  top: 50%;
+  pointer-events: none;
+}
+
+.ps-react-wave {
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: -1.6rem 0 0 -1.6rem;
+  border: 2px solid var(--fifteenth-color);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255, 220, 22, .8);
+  animation: react-wave .7s ease-out both;
+}
+
+@keyframes react-wave {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+
+.ps-react-spark {
+  width: 14px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 2px;
+  background: var(--fifteenth-color);
+  box-shadow: 0 0 6px var(--fifteenth-color);
+  transform-origin: 0 50%;
+  animation: react-spark .5s ease-out both;
+}
+
+@keyframes react-spark {
+  0% { opacity: 1; transform: rotate(var(--a)) translateX(24px) scaleX(.4); }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(58px) scaleX(1); }
 }
 
 /* Small credits line at the bottom of the blog page */
