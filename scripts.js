@@ -1149,7 +1149,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /*===== LOGO: tap a letter to switch it off/on (home page only) =====*/
 // On the home page each NEDCODE letter is its own switch: tap it to turn it
-// off, tap again to turn it back on. Taps outside the letters do nothing
+// off, and a couple of seconds later it sputters back on by itself (or tap it
+// again to turn it back on straight away). Taps outside the letters do nothing
 // special, and on every other page the logo is just the normal link home.
 // The menu button sits outside every letter, so it always works as usual.
 (() => {
@@ -1161,6 +1162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['nav-logo1', 255, 364], ['nav-logo2', 364, 440], ['nav-logo3', 440, 548],
     ['nav-logo4', 548, 658], ['nav-logo5', 658, 772], ['nav-logo6', 772, 870], ['nav-logo7', 870, 950],
   ];
+  const timers = {};
   logo.addEventListener('click', (e) => {
     if (!e.target.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     const box = logo.querySelector('.nav-logo img').getBoundingClientRect();
@@ -1170,7 +1172,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const hit = LETTERS.find(([, from, to]) => x >= from && x < to);
     if (!hit) return;
     e.preventDefault();
-    logo.querySelector('.' + hit[0]).classList.toggle('is-off');
+    const letter = logo.querySelector('.' + hit[0]);
+    clearTimeout(timers[hit[0]]);
+    letter.classList.remove('is-relight');
+    if (letter.classList.toggle('is-off')) {
+      timers[hit[0]] = setTimeout(() => {
+        letter.classList.remove('is-off');
+        letter.classList.add('is-relight'); // flickers back on like a neon tube
+        timers[hit[0]] = setTimeout(() => letter.classList.remove('is-relight'), 1000);
+      }, 2500);
+    }
   });
 })();
 
