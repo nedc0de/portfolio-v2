@@ -1186,13 +1186,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
-/*===== LOGO: fire running through the cables =====*/
-// A small yellow fire runs along each cable in turn: up the right cable into
+/*===== LOGO: current running through the cables =====*/
+// A spark of light runs along each yellow cable in turn: the right cable into
 // the O, then a moment later out of the window and around the left cable into
-// the N. Flames lick upwards, sway and burn out, and the cable glows hot for a
-// moment where the fire has just been. Each letter flickers as the fire
-// reaches it (and comes back on if it was tapped off). The little loop on top
-// glows once on its own (CSS). Paths were traced from the 1125×450 artwork.
+// the N. Each letter flickers as its spark arrives, and the little loop on top
+// glows once on its own. The paths were
+// traced from the 1125×450 logo artwork; timings match the 16s CSS loop.
 (() => {
   const group = document.querySelector('.nav-logo-group');
   const base = group && group.querySelector('.nav-logo');
@@ -1206,18 +1205,12 @@ document.addEventListener('DOMContentLoaded', () => {
   svg.setAttribute('class', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/>`).join('');
+  // each flame is four stacked layers: faded tail to white-hot tip
+  const LAYERS = ['fl-smoke', 'fl-tail', 'fl-body', 'fl-tip'];
+  svg.innerHTML = CABLES.map((d, i) => LAYERS.map((l) => `<path class="spark-${i + 1} ${l}" d="${d}"/>`).join('')).join('');
   base.append(svg);
 
-  // sample each cable every 2 units once, so the fire can look up points cheaply
-  const paths = [...svg.querySelectorAll('path')].map((p) => {
-    const len = p.getTotalLength();
-    const pts = [];
-    for (let l = 0; l <= len; l += 2) { const q = p.getPointAtLength(l); pts.push([q.x, q.y]); }
-    return { len, at: (l) => pts[Math.max(0, Math.min(pts.length - 1, Math.round(l / 2)))] };
-  });
-
-  // flicker a letter when the fire arrives; a letter that was tapped off
+  // flicker a letter when the spark arrives; a letter that was tapped off
   // gets switched straight back on by it
   const zap = (cls) => {
     const letter = group.querySelector('.' + cls);
@@ -1227,109 +1220,14 @@ document.addEventListener('DOMContentLoaded', () => {
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
   };
-
-  // the 16s loop (matches the CSS loop of the little top cable)
-  const CYCLE = 16000;
-  const RUNS = [
-    { cable: 0, from: 0, to: 2240, letter: 'nav-logo5' },    // right cable into the O
-    { cable: 2, from: 3520, to: 9760, letter: 'nav-logo1' }, // left cable into the N
-  ];
-
-  // the canvas reaches past the logo so flames can rise above the cables
-  const PAD = 90, VW = 1125 + PAD * 2;
-  const canvas = document.createElement('canvas');
-  canvas.className = 'nav-logo-fire';
-  canvas.setAttribute('aria-hidden', 'true');
-  base.append(canvas);
-  const ctx = canvas.getContext('2d');
-  let scale = 1;
-  const fit = () => {
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(r.width * dpr);
-    canvas.height = Math.round(r.height * dpr);
-    scale = canvas.width / VW;
+  const loop = (e) => {
+    if (e.animationName !== 'spark-1') return; // the flame flicker has its own, shorter loop
+    setTimeout(() => zap('nav-logo5'), 1520); // the O, end of the right cable
+    setTimeout(() => zap('nav-logo1'), 8260); // the N, end of the left cable
   };
-  fit();
-  addEventListener('resize', fit);
-
-  const flames = [];
-  const rand = (a, b) => a + Math.random() * (b - a);
-  const start = performance.now(); // the CSS loop starts at the same moment
-  let last = start, lastCycle = 0, done = new Set(), spawn = 0;
-
-  const draw = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    const t = (now - start) % CYCLE;
-    const cycle = Math.floor((now - start) / CYCLE);
-    if (cycle !== lastCycle) { lastCycle = cycle; done = new Set(); }
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.setTransform(scale, 0, 0, scale, PAD * scale, PAD * scale);
-    ctx.globalCompositeOperation = 'lighter';
-
-    RUNS.forEach((run, i) => {
-      if (t < run.from) return;
-      const cable = paths[run.cable];
-      const k = Math.min(1, (t - run.from) / (run.to - run.from));
-      const head = k * cable.len;
-      if (k >= 1 && !done.has(i)) { done.add(i); zap(run.letter); }
-      if (t > run.to + 900) return;
-      // the cable glows hot just behind the fire, then cools off
-      const cool = k < 1 ? 1 : Math.max(0, 1 - (t - run.to) / 900);
-      for (let b = 0; b < 90; b += 3) {
-        const l = head - b;
-        if (l < 0 || l > cable.len) continue;
-        const [x, y] = cable.at(l);
-        const heat = (1 - b / 90) * cool;
-        ctx.fillStyle = `rgba(255, ${(170 + 60 * heat) | 0}, 20, ${0.35 * heat})`;
-        ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill();
-      }
-      // new flames at the burning point while the fire is on the cable
-      if (k < 1) {
-        spawn += dt * 110;
-        while (spawn >= 1) {
-          spawn--;
-          const [x, y] = cable.at(head - rand(0, 14));
-          flames.push({ x: x + rand(-4, 4), y: y + rand(-2, 2), vx: rand(-12, 12), vy: rand(-170, -90),
-            age: 0, life: rand(0.4, 0.85), r: rand(10, 17), seed: rand(0, 6.3) });
-        }
-      }
-    });
-
-    // flames rise, sway, shrink and cool from white-hot to yellow to orange
-    for (let n = flames.length - 1; n >= 0; n--) {
-      const f = flames[n];
-      f.age += dt;
-      const p = f.age / f.life;
-      if (p >= 1) { flames.splice(n, 1); continue; }
-      f.x += (f.vx + Math.sin(f.age * 14 + f.seed) * 28) * dt;
-      f.y += f.vy * dt;
-      f.vy *= 0.985;
-      const r = f.r * Math.pow(1 - p, 0.6);
-      const a = Math.pow(1 - p, 1.4) * 0.45;
-      // each flame is a tall teardrop: squeeze it sideways and stretch it upwards
-      ctx.save();
-      ctx.translate(f.x, f.y);
-      ctx.scale(0.6, 1.7);
-      const g = ctx.createRadialGradient(0, r * 0.3, 0, 0, 0, r);
-      if (p < 0.25) {
-        g.addColorStop(0, `rgba(255, 252, 225, ${a})`);
-        g.addColorStop(0.4, `rgba(255, 222, 40, ${a * 0.8})`);
-      } else {
-        g.addColorStop(0, `rgba(255, ${(226 - 70 * p) | 0}, 30, ${a})`);
-        g.addColorStop(0.4, `rgba(255, ${(190 - 70 * p) | 0}, 10, ${a * 0.6})`);
-      }
-      g.addColorStop(1, 'rgba(255, 140, 0, 0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
-      ctx.restore();
-    }
-    requestAnimationFrame(draw);
-  };
-  requestAnimationFrame(draw);
+  const first = svg.querySelector('.spark-1');
+  first.addEventListener('animationstart', loop);
+  first.addEventListener('animationiteration', loop);
 })();
 
 /*===== EASTER EGG: Konami code =====*/
