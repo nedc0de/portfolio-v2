@@ -264,22 +264,26 @@ position: relative;
 
 /* Tap the logo: every letter cuts out, then powers back on one by one */
 .nav-logo-group.is-buzzing .nav-logo-layer:not(.nav-logo) {
-  animation: neon-power 1s steps(1, end) var(--d, 0s) both !important;
+  animation: neon-power .8s steps(1, end) var(--d, 0s) both !important;
 }
-.nav-logo2 { --d: .08s; }
-.nav-logo3 { --d: .16s; }
-.nav-logo4 { --d: .32s; }
-.nav-logo5 { --d: .40s; }
-.nav-logo6 { --d: .48s; }
-.nav-logo7 { --d: .56s; }
+/* one letter at a time: N, E, D, a short pause, then C, O, D, E */
+.nav-logo2 { --d: .6s; }
+.nav-logo3 { --d: 1.2s; }
+.nav-logo4 { --d: 2s; }
+.nav-logo5 { --d: 2.6s; }
+.nav-logo6 { --d: 3.2s; }
+.nav-logo7 { --d: 3.8s; }
 
+/* each letter sputters a few times before it stays lit */
 @keyframes neon-power {
   0% { opacity: 0; }
-  30% { opacity: .85; }
-  38% { opacity: 0; }
-  52% { opacity: 1; }
-  60% { opacity: .15; }
-  68%, 100% { opacity: 1; }
+  12% { opacity: .7; }
+  20% { opacity: 0; }
+  36% { opacity: .9; }
+  44% { opacity: .1; }
+  56% { opacity: .6; }
+  62% { opacity: 0; }
+  76%, 100% { opacity: 1; }
 }
 
 /* N: mostly on, a quick double blink */
