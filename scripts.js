@@ -1084,20 +1084,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Two copies back to back so the loop has no gap
     for (let copy = 0; copy < 2; copy++) {
       for (const n of items) {
+        // Only the topic and title are a link; the read time and the gap after it aren't
+        const item = document.createElement('span');
+        item.className = 'tk-item';
         const a = document.createElement('a');
-        a.className = 'tk-item';
+        a.className = 'tk-link';
         a.href = n.link;
-        if (copy) { a.setAttribute('aria-hidden', 'true'); a.tabIndex = -1; }
+        if (copy) { item.setAttribute('aria-hidden', 'true'); a.tabIndex = -1; }
         const tag = document.createElement('span');
         tag.className = 'tk-tag';
         tag.textContent = n.topic;
         const title = document.createElement('span');
         title.textContent = n.title;
+        a.append(tag, title);
         const src = document.createElement('span');
         src.className = 'tk-src';
         src.textContent = n.read;
-        a.append(tag, title, src);
-        track.append(a);
+        item.append(a, src);
+        track.append(item);
       }
     }
     // Same reading speed no matter how many posts: about 60px per second

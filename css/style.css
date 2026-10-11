@@ -4228,7 +4228,15 @@ a.bl-row:hover {
   color: var(--fourth-color);
 }
 
-a.tk-item:hover {
+.tk-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: inherit;
+}
+
+a.tk-item:hover,
+.tk-link:hover {
   color: var(--fifteenth-color);
 }
 
