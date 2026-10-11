@@ -201,6 +201,14 @@ position: relative;
 .nav-logo5 { z-index: 3; animation: neon-o 16s steps(1, end) infinite 1s; }
 .nav-logo6 { z-index: 3; }
 .nav-logo7 { z-index: 3; }
+
+/* Late at night (midnight to 6am Montreal time, see scripts.js) the sign is
+   tired: the glow is weaker and letters stutter far more often */
+.nav-logo-group.is-late .nav-logo-layer:not(.nav-logo) img { filter: brightness(.88); }
+.nav-logo-group.is-late .nav-logo1 { animation: neon-n 6s steps(1, end) infinite; }
+.nav-logo-group.is-late .nav-logo2 { animation: neon-e 8s steps(1, end) infinite 1s; }
+.nav-logo-group.is-late .nav-logo5 { animation: neon-o 5s steps(1, end) infinite .5s; }
+.nav-logo-group.is-late .nav-logo6 { animation: neon-n 9s steps(1, end) infinite 2s; }
 .nav-logo  { z-index: 1; }
 
  @media screen and (max-width: 767px) {

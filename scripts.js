@@ -1147,6 +1147,22 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
   
 
+/*===== LOGO: tired neon sign late at night =====*/
+// From midnight to 6am Montreal time the logo flickers more and glows a bit
+// weaker, like a sign that's been on all day. Add ?late to the URL to see it
+// any time.
+(() => {
+  const logo = document.querySelector('.nav-logo-group');
+  if (!logo) return;
+  const forced = new URLSearchParams(location.search).has('late');
+  const check = () => {
+    const hour = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Montreal', hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+    logo.classList.toggle('is-late', forced || hour < 6);
+  };
+  check();
+  setInterval(check, 60000);
+})();
+
 /*===== LOGO: tap a letter to switch it off/on (home page only) =====*/
 // On the home page each NEDCODE letter is its own switch: tap it to turn it
 // off, and a couple of seconds later it sputters back on by itself (or tap it
