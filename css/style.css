@@ -336,8 +336,48 @@ position: relative;
 
 /* ...and a couple of seconds later it sputters back on */
 .nav-logo-group .nav-logo-layer.is-relight {
-  animation: neon-power .9s linear both !important;
+  animation: neon-power .9s linear var(--d, 0s) both !important;
 }
+
+/* Home page: the window's dots as a power switch (see scripts.js) */
+.nav-logo-group.is-power-off .nav-logo-layer:not(.nav-logo) {
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+.nav-logo-group.is-dim .nav-logo-layer:not(.nav-logo) {
+  opacity: .3 !important;
+  animation: none !important;
+}
+
+/* no power, no current in the cables either; dimmed, it runs faintly */
+.nav-logo-group.is-power-off .nav-logo-spark { opacity: 0; }
+.nav-logo-group.is-dim .nav-logo-spark { opacity: .35; }
+
+/* a glow over whichever dot is "pressed" (positions from the 1125×450 artwork) */
+.nav-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nav-dots i {
+  position: absolute;
+  top: 37.6%;
+  width: 1.4%;
+  aspect-ratio: 1;
+  margin: -.7% 0 0 -.7%;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.nav-dots .is-red { left: 19%; background: #ff4d4d; box-shadow: 0 0 6px 2px #ff3b3b; }
+.nav-dots .is-yellow { left: 19.75%; background: #ffd34d; box-shadow: 0 0 6px 2px #ffc21a; }
+.nav-dots .is-green { left: 20.45%; background: #3dff8a; box-shadow: 0 0 6px 2px #1ee06a; }
+.nav-dots[data-on="red"] .is-red,
+.nav-dots[data-on="yellow"] .is-yellow,
+.nav-dots[data-on="green"] .is-green { opacity: 1; }
 
 /* each letter sputters a few times before it stays lit */
 @keyframes neon-power {

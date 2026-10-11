@@ -1163,15 +1163,57 @@ document.addEventListener('DOMContentLoaded', () => {
     ['nav-logo4', 548, 658], ['nav-logo5', 658, 772], ['nav-logo6', 772, 870], ['nav-logo7', 870, 950],
   ];
   const timers = {};
+
+  // The window's three little dots work like a power switch. They're tiny, so
+  // the whole corner is one button that steps through them: red cuts the power
+  // (every letter goes dark), yellow dims the sign, green powers it back up one
+  // letter at a time. Left off or dimmed, it powers back up after 8 seconds.
+  const dots = document.createElement('span');
+  dots.className = 'nav-dots';
+  dots.setAttribute('aria-hidden', 'true');
+  dots.innerHTML = '<i class="is-red"></i><i class="is-yellow"></i><i class="is-green"></i>';
+  logo.querySelector('.nav-logo').append(dots);
+  const STATES = ['red', 'yellow', 'green'];
+  let power = -1, powerTimer = null;
+  const setPower = (n) => {
+    power = n;
+    clearTimeout(powerTimer);
+    logo.classList.remove('is-power-off', 'is-dim');
+    dots.dataset.on = STATES[n] || '';
+    if (n === 0) logo.classList.add('is-power-off');
+    if (n === 1) logo.classList.add('is-dim');
+    if (n === 2) {
+      // sputter back on, one letter after another
+      LETTERS.forEach(([cls], i) => {
+        const letter = logo.querySelector('.' + cls);
+        letter.classList.remove('is-off', 'is-zap', 'is-relight');
+        void letter.offsetWidth;
+        letter.style.setProperty('--d', i * 0.12 + 's');
+        letter.classList.add('is-relight');
+        clearTimeout(timers[cls]);
+        timers[cls] = setTimeout(() => { letter.classList.remove('is-relight'); letter.style.removeProperty('--d'); }, 1000 + i * 120);
+      });
+      powerTimer = setTimeout(() => { power = -1; dots.dataset.on = ''; }, 1600);
+      return;
+    }
+    if (n >= 0) powerTimer = setTimeout(() => setPower(2), 8000);
+  };
+
   logo.addEventListener('click', (e) => {
     if (!e.target.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     const box = logo.querySelector('.nav-logo img').getBoundingClientRect();
     const x = ((e.clientX - box.left) / box.width) * 1125;
     const y = ((e.clientY - box.top) / box.height) * 450;
+    if (x >= 180 && x < 255 && y >= 135 && y <= 205) { // the window's dots
+      e.preventDefault();
+      setPower((power + 1) % 3);
+      return;
+    }
     if (y < 175 || y > 340) return; // above or below the letters: normal link
     const hit = LETTERS.find(([, from, to]) => x >= from && x < to);
     if (!hit) return;
     e.preventDefault();
+    if (power === 0 || power === 1) return; // power is cut or dimmed: the switch is in charge
     const letter = logo.querySelector('.' + hit[0]);
     clearTimeout(timers[hit[0]]);
     letter.classList.remove('is-relight');
@@ -1213,7 +1255,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // gets switched straight back on by it
   const zap = (cls) => {
     const letter = group.querySelector('.' + cls);
-    if (!letter || letter.classList.contains('is-relight')) return;
+    if (!letter || letter.classList.contains('is-relight') || group.classList.contains('is-power-off')) return;
     letter.classList.remove('is-off', 'is-zap');
     void letter.offsetWidth;
     letter.classList.add('is-zap');
