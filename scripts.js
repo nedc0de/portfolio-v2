@@ -1358,7 +1358,7 @@ document.addEventListener('DOMContentLoaded', () => {
   row.className = 'ps-react';
   row.innerHTML = '<p class="ps-react-title">What did you think?</p><div class="ps-react-btns">' +
     Object.keys(EMOJI).map((k) => `<button type="button" data-r="${k}" aria-pressed="false" aria-label="${LABEL[k]}" title="${LABEL[k]}"><img src="/img/emoji/${k}.webp" alt="${EMOJI[k]}" width="30" height="30" loading="lazy"><b>0</b></button>`).join('') +
-    '</div><p class="ps-react-credit">Animated emoji: <a href="https://googlefonts.github.io/noto-emoji-animation/" target="_blank" rel="noopener">Google Noto</a> (CC BY 4.0)</p>';
+    '</div>';
   anchor.after(row);
 
   const counts = { fire: 0, wow: 0, lol: 0, dead: 0 };

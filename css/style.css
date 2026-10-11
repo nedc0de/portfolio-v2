@@ -5780,18 +5780,19 @@ html.is-frozen .egg-crash * {
   animation: react-pop .4s ease-out;
 }
 
-.ps-react-credit {
-  margin: .6rem 0 0 !important;
-  font-size: .7rem !important;
-  color: #6f6f6f;
-}
-
-.ps-react-credit a {
-  color: inherit !important;
-  text-decoration: underline;
-}
-
 @keyframes react-pop {
   40% { transform: scale(1.45) rotate(-8deg); }
   100% { transform: none; }
+}
+
+/* Small credits line at the bottom of the blog page */
+.bl-credit {
+  margin-top: 2.5rem;
+  font-size: .72rem;
+  color: #6f6f6f;
+}
+
+.bl-credit a {
+  color: inherit;
+  text-decoration: underline;
 }
