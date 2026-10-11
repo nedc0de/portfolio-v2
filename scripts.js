@@ -1535,6 +1535,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearTimeout(holdTimer);
     const hot = hotAt(e.clientX, e.clientY);
     if (hot) { pick(hot.dataset.r); close(); held = true; return; }
+    if (!onOrb(e.clientX, e.clientY)) { close(); held = true; return; } // held, slid away, let go on nothing: changed their mind
     fan.querySelectorAll('.is-hot').forEach((b) => b.classList.remove('is-hot'));
   });
   document.addEventListener('pointercancel', () => { holding = false; clearTimeout(holdTimer); });
@@ -1552,7 +1553,8 @@ document.addEventListener('DOMContentLoaded', () => {
     close();
     orb.focus({ preventScroll: true });
   });
-  document.addEventListener('pointerdown', (e) => { if (!row.contains(e.target)) close(); });
+  // a tap or click anywhere else (the counts and empty space next to the orb included) closes it
+  document.addEventListener('pointerdown', (e) => { if (!orb.contains(e.target) && !e.target.closest('.ps-react-fan button')) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   addEventListener('scroll', () => { if (!holding && Math.abs(scrollY - openedAt) > 60) close(); }, { passive: true });
   addEventListener('resize', () => { if (!fan.hidden) place(); });
