@@ -262,17 +262,11 @@ position: relative;
 
 
 
-/* Tap the logo: every letter cuts out, then powers back on one by one */
-.nav-logo-group.is-buzzing .nav-logo-layer:not(.nav-logo) {
-  animation: neon-power .8s steps(1, end) var(--d, 0s) both !important;
+/* Home page: a tapped letter is switched off (its flicker stops too) */
+.nav-logo-group .nav-logo-layer.is-off {
+  opacity: 0 !important;
+  animation: none !important;
 }
-/* one letter at a time: N, E, D, a short pause, then C, O, D, E */
-.nav-logo2 { --d: .6s; }
-.nav-logo3 { --d: 1.2s; }
-.nav-logo4 { --d: 2s; }
-.nav-logo5 { --d: 2.6s; }
-.nav-logo6 { --d: 3.2s; }
-.nav-logo7 { --d: 3.35s; } /* last two light up almost together */
 
 /* each letter sputters a few times before it stays lit */
 @keyframes neon-power {

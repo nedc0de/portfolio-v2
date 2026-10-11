@@ -1147,24 +1147,30 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
   
 
-/*===== LOGO: neon power-on when tapped =====*/
-// Tapping the logo switches the sign off and back on, letter by letter.
-// On the home page it only plays the effect; elsewhere it plays the start,
-// then goes home as before.
+/*===== LOGO: tap a letter to switch it off/on (home page only) =====*/
+// On the home page each NEDCODE letter is its own switch: tap it to turn it
+// off, tap again to turn it back on. Taps outside the letters do nothing
+// special, and on every other page the logo is just the normal link home.
+// The menu button sits outside every letter, so it always works as usual.
 (() => {
   const logo = document.querySelector('.nav-logo-group');
-  if (!logo) return;
   const onHome = /\/(index\.html)?$/.test(location.pathname);
+  if (!logo || !onHome) return;
+  // where each letter sits, as a share of the logo's width (from the 1125px artwork)
+  const LETTERS = [
+    ['nav-logo1', 255, 364], ['nav-logo2', 364, 440], ['nav-logo3', 440, 548],
+    ['nav-logo4', 548, 658], ['nav-logo5', 658, 772], ['nav-logo6', 772, 870], ['nav-logo7', 870, 950],
+  ];
   logo.addEventListener('click', (e) => {
-    const link = e.target.closest('a');
-    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    if (!e.target.closest('a') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const box = logo.querySelector('.nav-logo img').getBoundingClientRect();
+    const x = ((e.clientX - box.left) / box.width) * 1125;
+    const y = ((e.clientY - box.top) / box.height) * 450;
+    if (y < 175 || y > 340) return; // above or below the letters: normal link
+    const hit = LETTERS.find(([, from, to]) => x >= from && x < to);
+    if (!hit) return;
     e.preventDefault();
-    if (logo.classList.contains('is-buzzing')) return;
-    logo.classList.add('is-buzzing');
-    setTimeout(() => {
-      logo.classList.remove('is-buzzing');
-      if (!onHome) location.href = link.href;
-    }, onHome ? 4400 : 650);
+    logo.querySelector('.' + hit[0]).classList.toggle('is-off');
   });
 })();
 
