@@ -3738,6 +3738,7 @@ details>summary {
 .product-link-button,
 .ab-cta a,
 .ct-send,
+.hm-threads,
 .back-to-top-btn {
   font-family: var(--body-font);
   font-size: 1rem;
@@ -3760,7 +3761,8 @@ details>summary {
 .product-link-button:not(:disabled):hover,
 .product-link-button:not(:disabled):hover:active,
 .ab-cta a:hover,
-.ct-send:hover {
+.ct-send:hover,
+.hm-threads:hover {
   transform: translateY(-2px);
 }
 
@@ -4226,6 +4228,7 @@ a.bl-row:hover {
 /*===== NEON GLOW: main buttons light up like the NEDCODE logo =====*/
 .ab-cta a,
 .ct-send,
+.hm-threads,
 .menu-foot .menu-cta {
   transition: transform .2s, box-shadow .3s;
 }
@@ -4238,7 +4241,10 @@ a.bl-row:hover {
 .ct-send:active,
 .menu-foot .menu-cta:hover,
 .menu-foot .menu-cta:focus-visible,
-.menu-foot .menu-cta:active {
+.menu-foot .menu-cta:active,
+.hm-threads:hover,
+.hm-threads:focus-visible,
+.hm-threads:active {
   box-shadow:
     0 0 0 2px rgba(255, 220, 22, .35),
     0 0 18px rgba(255, 220, 22, .55),
@@ -4594,6 +4600,17 @@ a.tk-item:hover,
 .hm-news iframe {
   width: 100%;
   border-radius: 8px;
+}
+
+.hm-news-or {
+  margin: 1.5rem 0 .75rem;
+  font-size: .95rem;
+  color: var(--fourteenth-color);
+}
+
+.hm-threads svg {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 /* Latest posts: swipe through the 3 newest covers */
