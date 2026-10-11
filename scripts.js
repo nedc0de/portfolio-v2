@@ -1164,6 +1164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       logo.classList.remove('is-buzzing');
       if (!onHome) location.href = link.href;
-    }, onHome ? 4800 : 650);
+    }, onHome ? 4400 : 650);
   });
 })();
