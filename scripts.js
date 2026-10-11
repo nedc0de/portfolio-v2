@@ -1205,7 +1205,8 @@ document.addEventListener('DOMContentLoaded', () => {
   svg.setAttribute('class', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/>`).join('');
+  // each snake is a neon tube: a yellow tube with a pale, white-hot core
+  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/><path class="spark-${i + 1} spark-core" d="${d}"/>`).join('');
   base.append(svg);
 
   // flicker a letter when the spark arrives; a letter that was tapped off

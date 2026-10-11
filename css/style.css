@@ -271,14 +271,20 @@ position: relative;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 0 3px #ffdc16) drop-shadow(0 0 9px rgba(255, 220, 22, .75));
+  filter: drop-shadow(0 0 2px #ffdc16) drop-shadow(0 0 7px #ffdc16) drop-shadow(0 0 16px rgba(255, 220, 22, .7));
 }
 
 .nav-logo-spark path {
   fill: none;
   stroke: #ffdc16;
-  stroke-width: 9;
+  stroke-width: 10;
   stroke-linecap: round;
+}
+
+/* the bright centre of the neon tube, same glow as the letters */
+.nav-logo-spark .spark-core {
+  stroke: #fff8cc;
+  stroke-width: 4;
 }
 
 /* the snake is a 120-unit dash; each path is parked just before its start
