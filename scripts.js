@@ -1067,6 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: a.querySelector('h2, h3')?.textContent.trim() || '',
         topic: meta[1] || 'Blog',
         read: meta[2] || '',
+        img: a.querySelector('img')?.getAttribute('src') || '',
       };
     }).filter((p) => p.link && p.title);
   };
@@ -1142,8 +1143,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   fetch('blog.html')
     .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
-    .then((html) => build(readPosts(html)))
+    .then((html) => { const posts = readPosts(html); build(posts); latest(posts); })
     .catch(() => build([]));
+
+  // "Latest posts": the 3 newest posts as swipeable cover cards
+  const latestBox = document.querySelector('.hm-latest');
+  const latest = (posts) => {
+    if (!latestBox || !posts.length) return;
+    const list = latestBox.querySelector('.hm-cards');
+    posts.slice(0, 3).forEach((n) => {
+      const a = document.createElement('a');
+      a.className = 'hm-card';
+      a.href = n.link;
+      if (n.img) {
+        const img = document.createElement('img');
+        img.src = n.img; img.alt = ''; img.width = 940; img.height = 788; img.loading = 'lazy';
+        a.append(img);
+      }
+      const h = document.createElement('h3');
+      h.textContent = n.title;
+      const m = document.createElement('span');
+      m.className = 'hm-card-meta';
+      m.textContent = [n.topic, n.read].filter(Boolean).join(' · ');
+      a.append(h, m);
+      list.append(a);
+    });
+    latestBox.hidden = false;
+  };
 })();
   
 
