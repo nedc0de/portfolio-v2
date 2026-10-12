@@ -1594,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', () => {
   row.innerHTML = `
     <button type="button" class="ps-react-orb" aria-haspopup="menu" aria-expanded="false"></button>
     <div class="ps-react-fan" role="menu" aria-label="Pick a reaction" hidden>
-      ${KEYS.map((k, i) => `<button type="button" role="menuitem" data-r="${k}" aria-label="${LABEL[k]}" style="--i:${i}"><span class="ps-react-tip">${LABEL[k]}</span>${img(k, false, 38)}</button>`).join('')}
+      ${KEYS.map((k, i) => `<button type="button" role="menuitem" data-r="${k}" aria-label="${LABEL[k]}" style="--i:${i}"><span class="ps-react-tip">${LABEL[k]}</span>${img(k, false, 38).replace(' src=', ' data-src=')}</button>`).join('')}
     </div>
     <span class="ps-react-sum" aria-live="polite"></span>`;
   anchor.after(row);
@@ -1643,7 +1643,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   const seen = new IntersectionObserver((entries) => {
-    if (entries.some((e) => e.isIntersecting)) { seen.disconnect(); connect(); }
+    if (entries.some((e) => e.isIntersecting)) {
+      seen.disconnect();
+      connect();
+      // the animated emojis are fairly big files: only fetch them once the row is close
+      fan.querySelectorAll('img[data-src]').forEach((im) => { im.src = im.dataset.src; im.removeAttribute('data-src'); });
+    }
   }, { rootMargin: '300px' });
   seen.observe(row);
 
