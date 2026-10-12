@@ -4306,11 +4306,13 @@ a.bl-row:hover {
 
 /* the eyes glance left, right and back, and blink now and then (all
    CSS, so it stays perfectly smooth) */
-.tk-here-eyes .pupil {
+.tk-here-eyes .pupil,
+.nc-eyes:not(.is-still) .pupil {
   animation: eyes-look 6s cubic-bezier(.45, 0, .25, 1) infinite;
 }
 
-.tk-here-eyes .eye {
+.tk-here-eyes .eye,
+.nc-eyes:not(.is-still) .eye {
   transform-box: fill-box;
   transform-origin: center;
   animation: eyes-blink 6s ease-in-out infinite;
@@ -6056,7 +6058,8 @@ html.is-frozen .egg-crash * {
   height: 1.45rem;
 }
 
-.ps-react-orb img {
+.ps-react-orb img,
+.ps-react-orb .nc-eyes {
   width: 30px;
   height: 30px;
 }
@@ -6092,7 +6095,8 @@ html.is-frozen .egg-crash * {
   display: inline-flex;
 }
 
-.ps-react-stack img {
+.ps-react-stack img,
+.ps-react-stack .nc-eyes {
   width: 22px;
   height: 22px;
   margin-left: -5px;
@@ -6101,7 +6105,14 @@ html.is-frozen .egg-crash * {
   box-shadow: 0 0 0 2px #1d1d1d;
 }
 
-.ps-react-stack img:first-child {
+/* the drawn eyes are wider than an emoji: tuck them in so the next one doesn't cover them */
+.ps-react-stack .nc-eyes {
+  box-sizing: border-box;
+  padding: 4px 6px 4px 0;
+}
+
+.ps-react-stack img:first-child,
+.ps-react-stack .nc-eyes:first-child {
   margin-left: 0;
 }
 
@@ -6158,7 +6169,8 @@ html.is-frozen .egg-crash * {
   pointer-events: none; /* the tap that opened it lands on the orb, not an emoji passing over it */
 }
 
-.ps-react-fan img {
+.ps-react-fan img,
+.ps-react-fan .nc-eyes {
   width: 38px;
   height: 38px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .55)); /* keeps them readable over the text behind */
@@ -6213,12 +6225,14 @@ html.is-frozen .egg-crash * {
   filter: drop-shadow(0 0 8px rgba(255, 220, 22, .9));
 }
 
-.ps-react-fly img {
+.ps-react-fly img,
+.ps-react-fly .nc-eyes {
   width: 38px;
   height: 38px;
 }
 
-.ps-react-orb.is-landing img {
+.ps-react-orb.is-landing img,
+.ps-react-orb.is-landing .nc-eyes {
   opacity: 0;
 }
 
@@ -6226,7 +6240,8 @@ html.is-frozen .egg-crash * {
   animation: react-surge .6s steps(1, end);
 }
 
-.ps-react-orb.is-surge img {
+.ps-react-orb.is-surge img,
+.ps-react-orb.is-surge .nc-eyes {
   animation: react-glitch .45s steps(1, end);
 }
 

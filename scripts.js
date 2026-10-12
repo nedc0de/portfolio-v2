@@ -1581,7 +1581,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const KEYS = Object.keys(EMOJI);
   const ANGLES = [-92, -68, -44, -20, 4, 28]; // the arc, in degrees (0 = right, -90 = straight up)
   const RADIUS = 116;
-  const img = (k, still, size) => `<img src="/img/emoji/${k}${still ? '-still' : ''}.webp" alt="${EMOJI[k]}" width="${size}" height="${size}" draggable="false">`;
+  // the eyes are drawn in code (same smooth glancing, blinking eyes as the
+  // home page); every other reaction is an animated emoji image
+  const EYES = (still, size) => `<svg class="nc-eyes${still ? ' is-still' : ''}" viewBox="0 -8 40 40" width="${size}" height="${size}" role="img" aria-label="👀">`
+    + [11, 29].map((x) => `<g class="eye"><ellipse cx="${x}" cy="12" rx="8.5" ry="10.5" fill="#f4f4f4" stroke="#bdbdbd" stroke-width="1"/><g class="pupil"><ellipse cx="${x}" cy="13" rx="4.2" ry="5.4" fill="#1d1d1d"/><circle cx="${x + 1.6}" cy="10.8" r="1.4" fill="#fff"/></g></g>`).join('')
+    + '</svg>';
+  const img = (k, still, size) => k === 'eyes' ? EYES(still, size)
+    : `<img src="/img/emoji/${k}${still ? '-still' : ''}.webp" alt="${EMOJI[k]}" width="${size}" height="${size}" draggable="false">`;
 
   const row = document.createElement('div');
   row.className = 'ps-react';
