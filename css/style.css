@@ -1863,10 +1863,12 @@ ul li:before {
   font-weight: 400;
   letter-spacing: 0;
   color: var(--fourteenth-color);
-  max-height: 0;
+  /* the space is always reserved and the text only fades in, so rows never
+     change height (growing rows shifted the list under the cursor and flickered) */
+  margin-top: .4rem;
   opacity: 0;
-  overflow: hidden;
-  transition: max-height .4s, opacity .4s, margin .4s;
+  transform: translateY(-3px);
+  transition: opacity .35s, transform .35s;
 }
 
 .hl-meta {
@@ -1910,9 +1912,8 @@ ul li:before {
 }
 
 .hl-row:hover .hl-desc {
-  max-height: 3rem;
   opacity: 1;
-  margin-top: .4rem;
+  transform: none;
 }
 
 .hl-row:hover .hl-meta i {
@@ -1997,9 +1998,8 @@ ul li:before {
   }
 
   .hl-row.is-active .hl-desc {
-    max-height: 3rem;
     opacity: 1;
-    margin-top: .4rem;
+    transform: none;
   }
 
   .hl-row.is-active .hl-meta i {
