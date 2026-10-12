@@ -3916,22 +3916,80 @@ details>summary {
     margin: 0;
     counter-increment: menu;
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity .35s, transform .35s;
   }
 
+  /* Opening the menu: each item flickers on like a neon tube, top to bottom */
   .nav-menu.show-menu .nav-item {
-    opacity: 1;
-    transform: none;
+    animation: menu-neon .6s steps(1, end) both;
   }
 
-  .nav-menu.show-menu .nav-item:nth-child(2) { transition-delay: .03s; }
-  .nav-menu.show-menu .nav-item:nth-child(3) { transition-delay: .06s; }
-  .nav-menu.show-menu .nav-item:nth-child(4) { transition-delay: .09s; }
-  .nav-menu.show-menu .nav-item:nth-child(5) { transition-delay: .12s; }
-  .nav-menu.show-menu .nav-item:nth-child(6) { transition-delay: .15s; }
-  .nav-menu.show-menu .nav-item:nth-child(7) { transition-delay: .18s; }
-  .nav-menu.show-menu .nav-item:nth-child(8) { transition-delay: .21s; }
+  .nav-menu.show-menu .nav-item:nth-child(2) { animation-delay: .07s; }
+  .nav-menu.show-menu .nav-item:nth-child(3) { animation-delay: .14s; }
+  .nav-menu.show-menu .nav-item:nth-child(4) { animation-delay: .21s; }
+  .nav-menu.show-menu .nav-item:nth-child(5) { animation-delay: .28s; }
+  .nav-menu.show-menu .nav-item:nth-child(6) { animation-delay: .35s; }
+  .nav-menu.show-menu .nav-item:nth-child(7) { animation-delay: .42s; }
+  .nav-menu.show-menu .nav-item:nth-child(8) { animation-delay: .49s; }
+
+  @keyframes menu-neon {
+    0% { opacity: 0; }
+    15% { opacity: .8; }
+    25% { opacity: .1; }
+    40% { opacity: 1; }
+    52% { opacity: .35; }
+    65%, 100% { opacity: 1; }
+  }
+
+  /* little grey note on the right of each item */
+  .nav-menu .menu-note {
+    margin-left: auto;
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    color: var(--second-color);
+    white-space: nowrap;
+  }
+
+  .nav-menu .nav-link.active .menu-note {
+    color: var(--fourteenth-color);
+  }
+
+  /* the newest post, above "Let's talk" */
+  .menu-latest {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: .8rem;
+    align-items: center;
+    padding: .6rem;
+    border-radius: 10px;
+    background: var(--sixteenth-color);
+    text-align: left;
+  }
+
+  .menu-latest img {
+    width: 76px;
+    height: auto;
+    aspect-ratio: 940 / 788;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .menu-latest small {
+    display: block;
+    margin-bottom: .2rem;
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--fifteenth-color);
+  }
+
+  .menu-latest b {
+    display: block;
+    font-size: .92rem;
+    line-height: 1.3;
+    color: var(--fourth-color);
+  }
 
   .nav-menu .nav-link {
     display: flex;
@@ -3970,7 +4028,7 @@ details>summary {
     position: static;
     width: .7rem;
     height: .7rem;
-    margin-left: auto;
+    margin-left: .9rem;
     border-radius: 50%;
     background: var(--fifteenth-color);
     transform: none;
@@ -4023,6 +4081,7 @@ details>summary {
 
 /* The extras only exist for phones */
 @media screen and (min-width: 768px) {
+  .menu-note,
   .menu-top,
   .menu-foot {
     display: none;

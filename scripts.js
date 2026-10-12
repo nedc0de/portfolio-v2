@@ -193,6 +193,53 @@ document.querySelectorAll('.footer-year').forEach((el) => {
     navMenu.classList.remove('show-menu');
     navToggle?.querySelector('.ham1')?.classList.remove('active');
   };
+
+  // A short note on the right of each item, and the newest post above
+  // "Let's talk". The counts are read from the pages themselves the first
+  // time the menu opens, so they stay right without being typed anywhere.
+  const NOTES = { 'index.html': 'start here', 'about.html': "who's Ned", 'contact.html': 'say hi' };
+  navMenu.querySelectorAll('.nav-link').forEach((a) => {
+    const page = (a.getAttribute('href') || '').split('/').pop();
+    const note = document.createElement('span');
+    note.className = 'menu-note';
+    note.dataset.page = page;
+    note.textContent = NOTES[page] || '';
+    a.append(note);
+  });
+  const setNote = (page, text) => {
+    const el = navMenu.querySelector(`.menu-note[data-page="${page}"]`);
+    if (el && text) el.textContent = text;
+  };
+  const latest = document.createElement('a');
+  latest.className = 'menu-latest';
+  latest.hidden = true;
+  navMenu.querySelector('.menu-foot').prepend(latest);
+
+  let filled = false;
+  const fill = async () => {
+    if (filled) return;
+    filled = true;
+    const get = (url) => fetch(url).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+    const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
+    const [blog, favs, projects, lab] = await Promise.all([get('/blog.html'), get('/favorites.js'), get('/projects.html'), get('/lab.html')]);
+    if (blog) {
+      const doc = parse(blog);
+      const posts = doc.querySelectorAll('a.bl-feature, a.bl-row');
+      setNote('blog.html', `${posts.length} posts`);
+      const top = doc.querySelector('a.bl-feature');
+      if (top) {
+        const img = top.querySelector('img')?.getAttribute('src');
+        latest.href = '/' + top.getAttribute('href');
+        latest.innerHTML = `${img ? `<img src="/${img}" alt="" width="940" height="788">` : ''}<span><small>New on the blog</small><b></b></span>`;
+        latest.querySelector('b').textContent = top.querySelector('h2')?.textContent.trim() || '';
+        latest.hidden = false;
+      }
+    }
+    if (favs) setNote('favorites.html', `${(favs.match(/type: '(book|movie|tv)'/g) || []).length} picks`);
+    if (projects) setNote('projects.html', `${parse(projects).querySelectorAll('.hl-row').length} builds`);
+    if (lab) setNote('lab.html', `${parse(lab).querySelectorAll('.lab-item-title').length} experiments`);
+  };
+  navToggle?.addEventListener('click', fill);
   navMenu.querySelector('.menu-close').addEventListener('click', closeMenu);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && navMenu.classList.contains('show-menu')) closeMenu();
