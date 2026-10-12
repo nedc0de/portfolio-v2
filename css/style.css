@@ -6432,14 +6432,6 @@ html.is-frozen .egg-crash * {
   place-items: center;
   min-height: 190px;
   padding: 1.5rem 1rem;
-  border-radius: 10px;
-  /* dark brick wall */
-  background:
-    linear-gradient(rgba(10, 10, 12, .55), rgba(10, 10, 12, .8)),
-    repeating-linear-gradient(0deg, transparent 0 26px, rgba(0, 0, 0, .55) 26px 28px),
-    repeating-linear-gradient(90deg, transparent 0 58px, rgba(0, 0, 0, .5) 58px 60px),
-    #2a2523;
-  background-position: 0 0, 0 0, 0 0, 0 0;
   overflow: hidden;
 }
 
@@ -6450,13 +6442,7 @@ html.is-frozen .egg-crash * {
   line-height: 1.1;
   text-align: center;
   white-space: nowrap;
-  color: color-mix(in srgb, var(--neon) 35%, #fff);
-  text-shadow:
-    0 0 3px #fff,
-    0 0 8px var(--neon),
-    0 0 18px var(--neon),
-    0 0 36px var(--neon),
-    0 0 70px var(--neon);
+  color: var(--neon);
   transition: color .3s;
 }
 
@@ -6480,8 +6466,7 @@ html.is-frozen .egg-crash * {
 
 /* switched off: dark glass tubes */
 .neon.is-off .neon-sign {
-  color: #4a4442;
-  text-shadow: none;
+  color: var(--third-color);
 }
 
 .neon.is-off .neon-sign span {
@@ -6500,7 +6485,7 @@ html.is-frozen .egg-crash * {
   padding: 0 .9rem;
   border: 2px solid #3a3a3a;
   border-radius: 8px;
-  background: #242424;
+  background: transparent;
   color: var(--fourth-color);
   font: 600 1rem var(--body-font);
 }
@@ -6529,13 +6514,12 @@ html.is-frozen .egg-crash * {
   border: 2px solid transparent;
   border-radius: 50%;
   background: var(--swatch);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--swatch) 60%, transparent);
   cursor: pointer;
 }
 
 .neon-colors button[aria-pressed="true"] {
   border-color: #fff;
-  box-shadow: 0 0 0 2px #1d1d1d inset, 0 0 14px var(--swatch);
+  box-shadow: 0 0 0 2px var(--thirteenth-color) inset;
 }
 
 .neon-power {
@@ -6557,4 +6541,57 @@ html.is-frozen .egg-crash * {
 
 .neon-fonts {
   justify-self: center;
+}
+
+.neon-fonts,
+.neon-code-tabs {
+  background: transparent;
+}
+
+/* copy-paste code for the current sign */
+.neon-code {
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.neon-code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  padding: .4rem .5rem;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.neon-copy {
+  padding: .35rem .85rem;
+  border: 1px solid var(--fifteenth-color);
+  border-radius: 999px;
+  background: none;
+  color: var(--fifteenth-color);
+  font: 600 12px var(--body-font);
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+.neon-copy.is-copied {
+  background: var(--fifteenth-color);
+  color: var(--thirteenth-color);
+}
+
+.neon-copy:focus-visible {
+  outline: 2px solid var(--fifteenth-color);
+  outline-offset: 2px;
+}
+
+.neon-code-out {
+  margin: 0;
+  padding: .8rem .9rem;
+  max-height: 220px;
+  overflow: auto;
+  color: var(--fourteenth-color);
+  font: 12px/1.6 Consolas, Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
 }

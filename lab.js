@@ -1083,7 +1083,43 @@
   const input = root.querySelector('.neon-input');
   const power = root.querySelector('.neon-power');
   const FLICKERS = ['neon-n', 'neon-e', 'neon-o'];
+  const codeOut = root.querySelector('.neon-code-out code');
+  const copyBtn = root.querySelector('.neon-copy');
+  // Google Fonts family + CSS stack for each style, used in the copied code
+  const FONTS = {
+    tube: { family: 'Tilt+Neon', css: "'Tilt Neon', sans-serif", weight: 400 },
+    script: { family: 'Neonderthaw', css: "'Neonderthaw', cursive", weight: 400 },
+    bold: { family: 'Poppins:wght@700', css: "'Poppins', sans-serif", weight: 700 },
+  };
   let on = true;
+  let format = 'html';
+  let color = '#ffdc16';
+
+  const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  // The current sign as copy-paste code
+  const updateCode = () => {
+    const text = escape(input.value.trim() || 'Type something');
+    const font = FONTS[root.dataset.font] || FONTS.tube;
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${font.family}&display=swap`;
+    let code;
+    if (format === 'html') {
+      code =
+        `<link rel="stylesheet" href="${fontUrl}">\n` +
+        `<p style="margin:0; font-family:${font.css}; font-weight:${font.weight}; font-size:64px; color:${color};">${text}</p>`;
+    } else {
+      // size the SVG to the text, measured at 64px
+      const scale = 64 / parseFloat(sign.style.fontSize || 64);
+      const w = Math.ceil(sign.scrollWidth * scale) + 20;
+      const h = 90;
+      code =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">\n` +
+        `  <style>@import url('${fontUrl.replace(/&/g, '&amp;')}');</style>\n` + // SVG is XML: & must be escaped
+        `  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="${font.css}" font-weight="${font.weight}" font-size="64" fill="${color}">${text}</text>\n` +
+        `</svg>`;
+    }
+    codeOut.textContent = code;
+  };
 
   // shrink the text until the whole sign fits on the wall
   const fit = () => {
@@ -1115,6 +1151,7 @@
     root.classList.toggle('is-powering', !!powerUp);
     if (powerUp) setTimeout(() => root.classList.remove('is-powering'), n * 220 + 900);
     fit();
+    updateCode();
   };
 
   input.addEventListener('input', () => render(false));
@@ -1122,8 +1159,10 @@
   root.querySelectorAll('.neon-colors button').forEach((btn) => {
     btn.style.setProperty('--swatch', btn.dataset.color);
     btn.addEventListener('click', () => {
-      root.style.setProperty('--neon', btn.dataset.color);
+      color = btn.dataset.color;
+      root.style.setProperty('--neon', color);
       root.querySelectorAll('.neon-colors button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      updateCode();
     });
   });
 
@@ -1132,9 +1171,35 @@
       root.dataset.font = btn.dataset.font;
       root.querySelectorAll('.neon-fonts button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
       fit();
+      updateCode();
       // fonts download the first time they're used: measure again once they arrive
-      if (document.fonts) document.fonts.load(`64px "${btn.dataset.font === 'script' ? 'Neonderthaw' : 'Tilt Neon'}"`).then(fit);
+      if (document.fonts) document.fonts.load(`64px "${btn.dataset.font === 'script' ? 'Neonderthaw' : 'Tilt Neon'}"`).then(() => { fit(); updateCode(); });
     });
+  });
+
+  root.querySelectorAll('.neon-code-tabs button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      format = btn.dataset.format;
+      root.querySelectorAll('.neon-code-tabs button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      updateCode();
+    });
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(codeOut.textContent);
+    } catch {
+      // older browsers / file:// pages: select the code so it can be copied by hand
+      getSelection().selectAllChildren(codeOut);
+      document.execCommand('copy');
+    }
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('is-copied');
+    clearTimeout(copyBtn.timer);
+    copyBtn.timer = setTimeout(() => {
+      copyBtn.textContent = 'Copy';
+      copyBtn.classList.remove('is-copied');
+    }, 1500);
   });
 
   power.addEventListener('click', () => {
@@ -1148,5 +1213,5 @@
   addEventListener('resize', fit);
   root.dataset.font = 'tube';
   render(true);
-  if (document.fonts) document.fonts.ready.then(fit);
+  if (document.fonts) document.fonts.ready.then(() => { fit(); updateCode(); });
 })();
