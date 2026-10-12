@@ -4769,6 +4769,7 @@ a.tk-item:hover,
 }
 
 .hw-name {
+  min-width: 0; /* lets the one-line description truncate instead of widening the row */
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.15;
@@ -4782,10 +4783,15 @@ a.tk-item:hover,
   font-weight: 400;
   letter-spacing: 0;
   color: var(--fourteenth-color);
-  max-height: 0;
-  opacity: 0;
+  /* the line is always reserved and only fades in on hover, so the row never
+     changes height (growing rows shifted the list under the cursor and flickered) */
+  margin-top: .3rem;
+  white-space: nowrap;
   overflow: hidden;
-  transition: max-height .4s, opacity .4s, margin .4s;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity .3s, transform .3s;
 }
 
 .hw-meta {
@@ -4824,9 +4830,8 @@ a.tk-item:hover,
 }
 
 .hw-row:hover .hw-desc {
-  max-height: 2.5rem;
   opacity: 1;
-  margin-top: .3rem;
+  transform: none;
 }
 
 .hw-more {
@@ -4884,8 +4889,9 @@ a.tk-item:hover,
   }
 
   .hw-desc {
-    max-height: none;
+    white-space: normal;
     opacity: 1;
+    transform: none;
     margin-top: .15rem;
     font-size: .78rem;
   }
