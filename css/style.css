@@ -4588,10 +4588,10 @@ a.tk-item:hover,
 
 .hm-row {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 1rem;
+  grid-template-columns: 96px 1fr;
+  gap: .85rem;
   align-items: center;
-  padding: .7rem;
+  padding: .55rem;
   border-radius: 10px;
   background: #242424;
   text-align: left;
@@ -4602,12 +4602,18 @@ a.tk-item:hover,
   transform: translateY(-2px);
 }
 
+/* display: grid above would otherwise override the hidden attribute
+   (the Favorites row stays hidden until its pick has loaded) */
+.hm-row[hidden] {
+  display: none;
+}
+
 .hm-row img,
 .hm-board,
 .hm-poster {
-  width: 140px;
+  width: 96px;
   height: auto;
-  aspect-ratio: 940 / 788;
+  aspect-ratio: 4 / 3;
   border-radius: 6px;
   object-fit: cover;
 }
@@ -4691,7 +4697,7 @@ a.tk-item:hover,
 .hm-clock {
   font-family: ui-monospace, 'Courier New', monospace;
   font-weight: 800;
-  font-size: 1.7rem;
+  font-size: 1.25rem;
   letter-spacing: .05em;
   color: var(--fifteenth-color);
   -webkit-mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 2.6px 2.6px;
@@ -4699,10 +4705,13 @@ a.tk-item:hover,
   text-shadow: 0 0 6px rgba(255, 220, 22, .5);
 }
 
+/* Desktop: cards side by side, like the Latest posts row above.
+   auto-fit lets the others fill the row if the Favorites card stays hidden. */
 @media screen and (min-width: 768px) {
-  .hm-row { grid-template-columns: 200px 1fr; gap: 1.25rem; }
-  .hm-row img, .hm-board, .hm-poster { width: 200px; }
-  .hm-clock { font-size: 2.3rem; }
+  .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
+  .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
+  .hm-row img, .hm-board, .hm-poster { width: 100%; aspect-ratio: 16 / 9; }
+  .hm-clock { font-size: 2.1rem; }
 }
 
 /* Newsletter card */
