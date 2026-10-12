@@ -1932,3 +1932,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.2 });
   lists.forEach((l) => io.observe(l));
 })();
+
+/*===== HOVER LIST PREVIEW: the hovered row's GIF follows the cursor =====*/
+// Shared by the Projects page (projects.js) and the home page's Selected work list.
+// Desktop only: on touch screens / narrow windows it does nothing.
+function initHoverPreview(rows, preview, touchMode) {
+  const img = preview.querySelector('img');
+  let x = 0, y = 0, cx = 0, cy = 0;
+
+  rows.forEach((row) => {
+    row.addEventListener('mouseenter', () => {
+      if (touchMode.matches) return;
+      img.src = row.dataset.img;
+      preview.classList.add('is-on');
+    });
+    row.addEventListener('mouseleave', () => {
+      if (!touchMode.matches) preview.classList.remove('is-on');
+    });
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    // Flip to the left of the cursor near the right edge
+    x = e.clientX + (e.clientX > innerWidth - 420 ? -200 : 200);
+    y = e.clientY;
+  });
+
+  (function follow() {
+    if (!touchMode.matches) {
+      cx += (x - cx) * .15; // eased trailing motion
+      cy += (y - cy) * .15;
+      preview.style.left = cx + 'px';
+      preview.style.top = cy + 'px';
+    }
+    requestAnimationFrame(follow);
+  })();
+}
+
+/* Home page: Selected work list */
+(() => {
+  const rows = document.querySelectorAll('.hw-row');
+  const preview = document.getElementById('hw-preview');
+  if (!rows.length || !preview) return;
+  initHoverPreview(rows, preview, matchMedia('(hover: none), (max-width: 768px)'));
+})();

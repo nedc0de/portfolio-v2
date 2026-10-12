@@ -4610,7 +4610,8 @@ a.tk-item:hover,
 
 .hm-row img,
 .hm-board,
-.hm-poster {
+.hm-poster,
+.hm-hello {
   width: 96px;
   height: auto;
   aspect-ratio: 4 / 3;
@@ -4710,8 +4711,176 @@ a.tk-item:hover,
 @media screen and (min-width: 768px) {
   .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
-  .hm-row img, .hm-board, .hm-poster { width: 100%; aspect-ratio: 16 / 9; }
+  .hm-row img, .hm-board, .hm-poster, .hm-hello { width: 100%; aspect-ratio: 16 / 9; }
   .hm-clock { font-size: 2.1rem; }
+  .hm-row .hm-hello img { width: 46px !important; }
+}
+
+/* About row: the waving hand from the intro on a dark dotted tile; it waves on hover */
+.hm-hello {
+  display: grid;
+  place-items: center;
+  background: #141414 radial-gradient(circle, #2a2a2a 1px, transparent 1.4px) 0 0 / 4px 4px;
+  box-shadow: inset 0 0 0 1px #333;
+}
+
+.hm-hello img {
+  width: 34px !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+  transform-origin: 70% 80%;
+}
+
+.hm-row:hover .hm-hello img {
+  animation: wave-animation 2.1s infinite;
+}
+
+/* Selected work: a compact version of the Projects page hover list */
+.hw-list {
+  border-top: 1px solid var(--third-color);
+}
+
+.hw-row {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  align-items: center;
+  gap: .8rem;
+  padding: 1rem .25rem;
+  border-bottom: 1px solid var(--third-color);
+  color: var(--fourth-color);
+  text-align: left;
+  transition: padding .35s ease;
+}
+
+.hw-num {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--second-color);
+  transition: color .35s;
+}
+
+.hw-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  transition: color .35s;
+}
+
+.hw-desc {
+  display: block;
+  font-size: .85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--fourteenth-color);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .4s, opacity .4s, margin .4s;
+}
+
+.hw-meta {
+  text-align: right;
+  font-size: .75rem;
+  color: var(--fourteenth-color);
+  white-space: nowrap;
+}
+
+.hw-year {
+  display: block;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--fourth-color);
+}
+
+.hw-thumb {
+  display: none;
+}
+
+/* Dim the others while one is hovered */
+.hw-list:hover .hw-name {
+  color: var(--second-color);
+}
+
+.hw-list .hw-row:hover .hw-name {
+  color: var(--seventh-color);
+}
+
+.hw-row:hover {
+  padding-left: 1rem;
+}
+
+.hw-row:hover .hw-num {
+  color: var(--fifteenth-color);
+}
+
+.hw-row:hover .hw-desc {
+  max-height: 2.5rem;
+  opacity: 1;
+  margin-top: .3rem;
+}
+
+.hw-more {
+  display: block;
+  margin-top: .9rem;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--fourteenth-color);
+  text-align: left;
+}
+
+.hw-more b {
+  color: var(--fifteenth-color);
+}
+
+.hw-more:hover {
+  color: var(--seventh-color);
+}
+
+/* Phones: no hover, so each row shows its GIF as a small thumbnail */
+@media (hover: none), (max-width: 768px) {
+  .hw-row {
+    grid-template-columns: 72px 1fr auto;
+    padding: .7rem 0;
+  }
+
+  .hw-row:hover {
+    padding-left: 0;
+  }
+
+  .hw-list:hover .hw-name {
+    color: inherit;
+  }
+
+  .hw-num {
+    display: none;
+  }
+
+  .hw-thumb {
+    display: block;
+    width: 72px;
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .hw-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hw-name {
+    font-size: 1.05rem;
+  }
+
+  .hw-desc {
+    max-height: none;
+    opacity: 1;
+    margin-top: .15rem;
+    font-size: .78rem;
+  }
 }
 
 /* Newsletter card */
