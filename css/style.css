@@ -4646,16 +4646,30 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Explore tiles (About, Favorites, Lab): the blog cover background (tools/blog-cover.html)
-   without its yellow glow. The dot grid scales with the tile like the cover does
-   (14px on a 940px cover = 1.49cqw), with a dark grey layer on top to soften it. */
+/* Explore tiles (About, Favorites, Lab): a dark smoke background per section
+   (img/smoke/, made with tools/smoke-tiles.py) that drifts slowly, with a light
+   dark layer on top so the hand, icons and clock stand out. */
 .hm-board,
 .hm-faves,
 .hm-hello {
   position: relative;
-  container-type: inline-size;
-  background: #1d1d1d radial-gradient(circle, #2b2b2b .14cqw, transparent .19cqw) 0 0 / 1.49cqw 1.49cqw;
+  overflow: hidden;
+  background: #0b0b10 center / 135% auto no-repeat;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+  animation: hm-smoke 18s ease-in-out infinite alternate;
+}
+
+.hm-hello { background-image: url(../img/smoke/about.jpg); }
+.hm-faves { background-image: url(../img/smoke/favorites.jpg); }
+.hm-board { background-image: url(../img/smoke/lab.jpg); }
+
+@keyframes hm-smoke {
+  from { background-position: 30% 40%; }
+  to { background-position: 70% 60%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-board, .hm-faves, .hm-hello { animation: none; }
 }
 
 .hm-board::after,
@@ -4665,7 +4679,7 @@ a.tk-item:hover,
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: rgba(18, 18, 18, .25);
+  background: rgba(8, 8, 12, .15);
   pointer-events: none;
 }
 
