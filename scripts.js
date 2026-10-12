@@ -1893,3 +1893,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.6 });
   marks.forEach((m) => io.observe(m));
 })();
+
+/* About page: staggered reveal for How I work rows */
+(() => {
+  const rows = document.querySelectorAll('.ab-row');
+  if (!rows.length) return;
+  document.documentElement.classList.add('js');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!('IntersectionObserver' in window) || reduceMotion) {
+    rows.forEach((r) => r.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      el.style.transitionDelay = (Array.prototype.indexOf.call(rows, el) * 140) + 'ms';
+      el.classList.add('in');
+      io.unobserve(el);
+    });
+  }, { threshold: 0.35 });
+  rows.forEach((r) => io.observe(r));
+})();
