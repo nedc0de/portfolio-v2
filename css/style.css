@@ -6189,10 +6189,10 @@ html.is-frozen .egg-crash * {
   scale: 1.16;
 }
 
-/* heart: room for the pulse ring and the little hearts */
+/* heart: room for its soft glow */
 .ps-react img[src$="/heart.webp"],
 .ps-react-fly img[src$="/heart.webp"] {
-  scale: 1.24;
+  scale: 1.17;
 }
 
 /* mind blown: room all around for the explosion */
