@@ -3471,6 +3471,9 @@ details>summary {
 
 .ab-tile i {
   display: block;
+  /* same box for font icons and the inline SVG, so the titles line up */
+  height: 1em;
+  line-height: 1;
   font-size: 1.8rem;
   color: var(--fifteenth-color);
   margin-bottom: .6rem;
