@@ -1479,11 +1479,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const dx = e.changedTouches[0].clientX - sx;
     const dy = e.changedTouches[0].clientY - sy;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) {
-      if (pos >= 8) press(pos === 8 ? 'b' : 'a');
+      if (pos >= 8) {
+        // the two taps count as B and A: don't let them open whatever link is
+        // under the finger, or the page would change before the code finishes
+        e.preventDefault();
+        press(pos === 8 ? 'b' : 'a');
+      }
       return;
     }
     press(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
-  }, { passive: true });
+  }, { passive: false });
 
   // Cyberpunk glitch: the page shakes and splits, a red "ACCESS GRANTED" banner glitches in
   function glitch() {
