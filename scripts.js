@@ -1892,8 +1892,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const marks = document.querySelectorAll('.ab-lead mark');
   if (!marks.length) return;
   document.documentElement.classList.add('js');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!('IntersectionObserver' in window) || reduceMotion) {
+  if (!('IntersectionObserver' in window)) {
     marks.forEach((m) => m.classList.add('swept'));
     return;
   }
@@ -1914,14 +1913,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const lists = document.querySelectorAll('.ab-list');
   if (!lists.length) return;
   document.documentElement.classList.add('js');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveal = (list) => {
     list.querySelectorAll('.ab-row').forEach((r, i) => {
-      if (!reduceMotion) r.style.transitionDelay = (i * 220) + 'ms';
+      r.style.transitionDelay = (i * 220) + 'ms';
       r.classList.add('in');
     });
   };
-  if (!('IntersectionObserver' in window) || reduceMotion) {
+  if (!('IntersectionObserver' in window)) {
     lists.forEach(reveal);
     return;
   }

@@ -41,14 +41,6 @@
       color: var(--eleventh-color);
       transition: background-size .7s cubic-bezier(.22,.61,.36,1), color .3s ease .35s;
     }
-    @media (prefers-reduced-motion: reduce) {
-      html.js .ab-lead mark,
-      html.js .ab-lead mark.swept {
-        background-size: 100% 100%;
-        color: var(--eleventh-color);
-        transition: none;
-      }
-    }
     /* Staggered reveal for How I work rows */
     html.js .ab-row {
       opacity: 0;
@@ -58,10 +50,6 @@
       opacity: 1;
       transform: none;
       transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      html.js .ab-row { opacity: 1; transform: none; }
-      html.js .ab-row.in { transition: none; }
     }
   </style>
 </head>
