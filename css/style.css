@@ -4019,23 +4019,11 @@ details>summary {
     content: none;
   }
 
-  /* Current page: soft band plus a glowing dot, like the "online" dot */
+  /* Current page: a soft band and yellow text (no dot) */
   .nav-menu .nav-link.active {
     background: var(--sixteenth-color);
   }
 
-  .nav-menu .nav-link.active::after {
-    content: '';
-    position: static;
-    width: .7rem;
-    height: .7rem;
-    margin-left: .9rem;
-    border-radius: 50%;
-    background: var(--fifteenth-color);
-    transform: none;
-    opacity: 1;
-    box-shadow: 0 0 0 4px rgba(255, 220, 22, .15), 0 0 14px rgba(255, 220, 22, .7);
-  }
 
   .nav-menu .nav-link:hover {
     transform: none;
