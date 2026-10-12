@@ -5628,7 +5628,17 @@ a.tk-item:hover,
 }
 
 .ps-gap-name { grid-area: name; color: var(--fourteenth-color); }
-.ps-gap-val { grid-area: val; font-weight: 700; color: var(--fourth-color); }
+.ps-gap-val { grid-area: val; font-weight: 700; color: var(--fourth-color); font-variant-numeric: tabular-nums; }
+
+/* final chart value for screen readers while the visible one counts up */
+.ps-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 .ps-gap-track {
   grid-area: track;

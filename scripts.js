@@ -1564,6 +1564,75 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
+/*===== BLOG POSTS: animated bar charts =====*/
+// .ps-gap charts: when a chart scrolls into view, each yellow bar grows from
+// zero while its number counts up ($0 → $179), landing together. Rows go one
+// after another; a dashed "unknown" row fades in last. Without JS, or with
+// reduced motion, the bars just show at full size.
+(() => {
+  const charts = document.querySelectorAll('.ps-gap');
+  if (!charts.length || !('IntersectionObserver' in window)) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const DURATION = 1200, STAGGER = 220;
+  const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+  const prep = (chart) => chart.querySelectorAll('.ps-gap-row').forEach((row) => {
+    const bar = row.querySelector('.ps-gap-bar');
+    const val = row.querySelector('.ps-gap-val');
+    const m = val && val.textContent.trim().match(/^(\D*?)([\d,]+(?:\.\d+)?)(.*)$/);
+    row._bar = bar;
+    if (row.classList.contains('is-unknown')) { bar.style.opacity = 0; return; }
+    row._width = parseFloat(bar.style.width) || 0;
+    bar.style.width = '0%';
+    if (!m) return;
+    // the number counts on screen; screen readers get the final value
+    const [, pre, num, post] = m;
+    const target = parseFloat(num.replace(/,/g, ''));
+    const decimals = (num.split('.')[1] || '').length;
+    const fmt = (n) => pre + (num.includes(',') ? n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : n.toFixed(decimals)) + post;
+    val.textContent = '';
+    const shown = document.createElement('span');
+    shown.setAttribute('aria-hidden', 'true');
+    shown.textContent = fmt(0);
+    const real = document.createElement('span');
+    real.className = 'ps-sr';
+    real.textContent = fmt(target);
+    val.append(shown, real);
+    row._count = (p) => { shown.textContent = fmt(target * p); };
+  });
+
+  const play = (chart) => {
+    const rows = [...chart.querySelectorAll('.ps-gap-row')];
+    rows.forEach((row, i) => {
+      const delay = i * STAGGER;
+      if (row.classList.contains('is-unknown')) {
+        setTimeout(() => {
+          row._bar.style.transition = 'opacity .6s';
+          row._bar.style.opacity = 1;
+        }, delay + DURATION * .6);
+        return;
+      }
+      let start = null;
+      const step = (t) => {
+        if (start === null) start = t + delay;
+        const p = ease(Math.min(1, Math.max(0, (t - start) / DURATION)));
+        row._bar.style.width = (row._width * p) + '%';
+        if (row._count) row._count(p);
+        if (t - start < DURATION) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  };
+
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    play(e.target);
+  }), { threshold: .4 });
+  charts.forEach((c) => { prep(c); io.observe(c); });
+})();
+
 /*===== BLOG POSTS: touchscreen demo =====*/
 // A grid of row/column sensor lines. Each finger changes the reading at the
 // crossings near it (brighter dot = bigger change) and the "controller" works
