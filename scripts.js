@@ -295,32 +295,18 @@ if (textArea) {
   countCharacters();
 }
 
-/*===== BACK TO TOP BUTTON =====*/
-const createBackToTopButton = () => {
-  const button = document.createElement('button');
-  button.innerHTML = '<i class="uil uil-arrow-up"></i>';
-  button.className = 'back-to-top-btn';
-  button.id = 'backToTopBtn';
-  button.title = 'Back to top';
-  document.body.appendChild(button);
-  return button;
-};
-
-const backToTopBtn = createBackToTopButton();
-
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 300) {
-    backToTopBtn.classList.add('show');
-  } else {
-    backToTopBtn.classList.remove('show');
-  }
-});
-
-backToTopBtn.addEventListener('click', () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
+/*===== BACK TO TOP: a link at the end of the footer =====*/
+// (replaces the old floating yellow button, which sat on top of the footer)
+document.querySelectorAll('.footer').forEach((footer) => {
+  const top = document.createElement('a');
+  top.className = 'footer-top';
+  top.href = '#';
+  top.innerHTML = '<span aria-hidden="true">↑</span> Back to top';
+  top.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+  footer.append(top);
 });
 
 /*=============== FIREBASE LOADER (shared by every page) ===============*/

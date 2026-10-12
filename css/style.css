@@ -2382,6 +2382,24 @@ details>summary {
   color: var(--fifteenth-color);
 }
 
+.footer-top {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-top: .4rem;
+  padding: .5rem .75rem;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--fourteenth-color);
+  transition: color .2s, text-shadow .2s;
+}
+
+.footer-top:hover,
+.footer-top:focus-visible {
+  color: var(--fifteenth-color);
+  text-shadow: 0 0 10px rgba(255, 220, 22, .5);
+}
+
 /*===== MEDIA QUERIES =====*/
 @media screen and (min-width: 320px) {
   .section-title {
