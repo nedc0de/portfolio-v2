@@ -54,6 +54,12 @@ creator.
   of ads/affiliate links per Rockstar's non-commercial policy). Otherwise build
   them: charts (`.ps-chart`), quote cards (`.ps-quote`), speaker cards
   (`.ps-speaker`), timelines, comparison tables (`.ps-table`).
+- **Animate every graph, chart and visualization** so readers see what it
+  shows: bars grow while numbers count up (`.ps-gap` does this automatically
+  in `scripts.js`), diagrams build step by step, and interactive demos
+  (like the touchscreen grid) show themselves in action. Start when scrolled
+  into view, play once, keep it short, land on the exact values, and show the
+  final state with reduced motion or no JS. Apply to new and existing posts.
 - Never fake photos of real people or use company logos.
 - Review posts use Ned's own product photos, with short captions.
 
