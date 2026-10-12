@@ -4646,14 +4646,21 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Favorites row: movie, TV and book icons on the same dotted tile as the Lab and About rows */
+/* Explore tiles (About, Favorites, Lab): the blog cover background (tools/blog-cover.html),
+   same colors and dot grid scaled down to tile size, without the yellow glow */
+.hm-board,
+.hm-faves,
+.hm-hello {
+  background: #1d1d1d radial-gradient(circle, #2b2b2b 1px, transparent 1.4px) 0 0 / 6px 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+/* Favorites row: movie, TV and book icons */
 .hm-faves {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: .35rem;
-  background: #141414 radial-gradient(circle, #2a2a2a 1px, transparent 1.4px) 0 0 / 4px 4px;
-  box-shadow: inset 0 0 0 1px #333;
   font-size: 1.35rem;
   color: var(--fifteenth-color);
 }
@@ -4663,8 +4670,6 @@ a.tk-item:hover,
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #141414 radial-gradient(circle, #2a2a2a 1px, transparent 1.4px) 0 0 / 4px 4px;
-  box-shadow: inset 0 0 0 1px #333;
 }
 
 .hm-clock {
@@ -4698,12 +4703,10 @@ a.tk-item:hover,
   .hm-row .hm-hello img { width: 38px !important; }
 }
 
-/* About row: the waving hand from the intro on a dark dotted tile (no animation) */
+/* About row: the waving hand from the intro (no animation) */
 .hm-hello {
   display: grid;
   place-items: center;
-  background: #141414 radial-gradient(circle, #2a2a2a 1px, transparent 1.4px) 0 0 / 4px 4px;
-  box-shadow: inset 0 0 0 1px #333;
 }
 
 .hm-hello img {
