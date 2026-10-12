@@ -1373,13 +1373,26 @@ document.addEventListener('DOMContentLoaded', () => {
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
   };
-  const loop = () => {
-    setTimeout(() => zap('nav-logo5'), 2240); // the O, end of the right cable
-    setTimeout(() => zap('nav-logo1'), 8800); // the N, end of the left cable
-  };
-  const first = svg.querySelector('.spark-1');
-  first.addEventListener('animationstart', loop);
-  first.addEventListener('animationiteration', loop);
+  // The loop keeps going from page to page instead of starting over: the
+  // moment it first started is remembered for the visit, and every page picks
+  // the snakes up from wherever they'd be by now.
+  const CYCLE = 16000;
+  const T0_KEY = 'nedcode-snake-t0';
+  let t0 = NaN;
+  try { t0 = Number(sessionStorage.getItem(T0_KEY)); } catch (e) {}
+  if (!t0 || t0 > Date.now()) {
+    t0 = Date.now();
+    try { sessionStorage.setItem(T0_KEY, String(t0)); } catch (e) {}
+  }
+  const phase = () => (Date.now() - t0) % CYCLE;
+  svg.querySelectorAll('path').forEach((p) => { p.style.animationDelay = `-${phase()}ms`; });
+
+  // each letter flickers as its snake reaches it, on the same clock
+  const ARRIVALS = [['nav-logo5', 2240], ['nav-logo1', 8800]]; // the O, then the N
+  ARRIVALS.forEach(([cls, at]) => {
+    const next = () => setTimeout(() => { zap(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
+    next();
+  });
 
   // Home page: tap a cable and a snake sets off from that exact spot towards
   // its letter (right cable to the O, left cable to the N); the little loop on
