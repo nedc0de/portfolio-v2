@@ -4646,7 +4646,7 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Explore tiles (About, Favorites, Lab): a dark smoke background per section
+/* Explore tiles (About, Favorites, Lab): soft grey smoke in the site's charcoal
    (img/smoke/, made with tools/smoke-tiles.py) that drifts slowly, with a light
    dark layer on top so the hand, icons and clock stand out. */
 .hm-board,
@@ -4654,7 +4654,7 @@ a.tk-item:hover,
 .hm-hello {
   position: relative;
   overflow: hidden;
-  background: #0b0b10 center / 135% auto no-repeat;
+  background: #1d1d1d center / 135% auto no-repeat;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
   animation: hm-smoke 18s ease-in-out infinite alternate;
 }
@@ -4679,7 +4679,7 @@ a.tk-item:hover,
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: rgba(8, 8, 12, .15);
+  background: rgba(29, 29, 29, .2);
   pointer-events: none;
 }
 

@@ -49,6 +49,7 @@ def smoke(seed, dark, mid, light, glow_xy=(.5, .5), out='s.jpg'):
 
 if __name__ == '__main__':
     o = sys.argv[1]
-    smoke(11, (7, 6, 16), (46, 30, 78), (205, 180, 255), out=f'{o}/about.jpg')     # violet smoke
-    smoke(23, (8, 5, 10), (70, 22, 34), (255, 150, 165), out=f'{o}/favorites.jpg') # crimson smoke
-    smoke(37, (5, 8, 16), (28, 44, 82), (190, 220, 255), out=f'{o}/lab.jpg')       # icy blue smoke
+    # site charcoal (#1d1d1d / #242424) with soft grey wisps, a hint of the yellow accent
+    smoke(11, (24, 24, 24), (46, 45, 42), (150, 145, 128), out=f'{o}/about.jpg')
+    smoke(23, (24, 24, 24), (46, 45, 42), (150, 145, 128), out=f'{o}/favorites.jpg')
+    smoke(37, (24, 24, 24), (46, 45, 42), (150, 145, 128), out=f'{o}/lab.jpg')
