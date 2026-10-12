@@ -6183,6 +6183,12 @@ html.is-frozen .egg-crash * {
   scale: 1.45;
 }
 
+/* the fire has room above it for its sparks: scale it to match too */
+.ps-react img[src$="/fire.webp"],
+.ps-react-fly img[src$="/fire.webp"] {
+  scale: 1.16;
+}
+
 .ps-react-fan.is-shown button:hover,
 .ps-react-fan.is-shown button:focus-visible,
 .ps-react-fan.is-shown button.is-hot {
