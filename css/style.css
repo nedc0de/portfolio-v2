@@ -5854,6 +5854,52 @@ a.tk-item:hover,
   color: var(--fifteenth-color);
 }
 
+/* Blog post: timeline and stat tiles play in when scrolled into view (scripts.js) */
+.ps-timeline.is-anim li {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+
+.ps-timeline.is-anim li::before {
+  transform: scale(0);
+  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.ps-timeline.is-anim li::after {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform .4s ease .25s;
+}
+
+.ps-timeline.is-anim li.is-in,
+.ps-timeline.is-anim li.is-in::before,
+.ps-timeline.is-anim li.is-in::after {
+  opacity: 1;
+  transform: none;
+}
+
+.ps-stats.is-anim > div {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+
+.ps-stats.is-anim > div.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.ps-stats b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* the counting number sits in spans inside <b>: keep it big and yellow */
+.ps-stats b span {
+  font-size: inherit;
+  color: inherit;
+}
+
 /* Blog post: stat tiles (big number + label) */
 .ps-stats {
   display: grid;

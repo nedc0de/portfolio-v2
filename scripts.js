@@ -1564,73 +1564,99 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
-/*===== BLOG POSTS: animated bar charts =====*/
-// .ps-gap charts: when a chart scrolls into view, each yellow bar grows from
-// zero while its number counts up ($0 → $179), landing together. Rows go one
-// after another; a dashed "unknown" row fades in last. Without JS, or with
-// reduced motion, the bars just show at full size.
+/*===== BLOG POSTS: animated charts, stats and timelines =====*/
+// Every chart in a post plays once when it scrolls into view, so readers see
+// what it shows:
+// - .ps-gap bar charts: each bar grows while its number counts up ($0 → $179),
+//   rows one after another; a dashed "unknown" row fades in last.
+// - .ps-stats tiles: tiles rise in and numbers count up ($0 → $30M). Dates
+//   ("Nov 19") just fade in.
+// - .ps-timeline: dates appear one by one, the line drawing down to the next.
+// Without JS, or with reduced motion, everything shows at its final state.
 (() => {
-  const charts = document.querySelectorAll('.ps-gap');
-  if (!charts.length || !('IntersectionObserver' in window)) return;
+  const groups = document.querySelectorAll('.ps-gap, .ps-stats, .ps-timeline');
+  if (!groups.length || !('IntersectionObserver' in window)) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const DURATION = 1200, STAGGER = 220;
+  const DURATION = 1200;
   const ease = (t) => 1 - Math.pow(1 - t, 3);
 
-  const prep = (chart) => chart.querySelectorAll('.ps-gap-row').forEach((row) => {
-    const bar = row.querySelector('.ps-gap-bar');
-    const val = row.querySelector('.ps-gap-val');
-    const m = val && val.textContent.trim().match(/^(\D*?)([\d,]+(?:\.\d+)?)(.*)$/);
-    row._bar = bar;
-    if (row.classList.contains('is-unknown')) { bar.style.opacity = 0; return; }
-    row._width = parseFloat(bar.style.width) || 0;
-    bar.style.width = '0%';
-    if (!m) return;
-    // the number counts on screen; screen readers get the final value
+  // Turns "$79.99" into a counter: the visible text counts, screen readers get
+  // the final value. Returns null for text that isn't a plain number ("Nov 19").
+  const counter = (el) => {
+    const m = el.textContent.trim().match(/^([^\d\sA-Za-z]*)([\d,]+(?:\.\d+)?)(\s?[A-Za-z%″]{0,5})$/);
+    if (!m) return null;
     const [, pre, num, post] = m;
     const target = parseFloat(num.replace(/,/g, ''));
     const decimals = (num.split('.')[1] || '').length;
-    const fmt = (n) => pre + (num.includes(',') ? n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : n.toFixed(decimals)) + post;
-    val.textContent = '';
+    const fmt = (n) => pre + (num.includes(',')
+      ? n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+      : n.toFixed(decimals)) + post;
+    el.textContent = '';
     const shown = document.createElement('span');
     shown.setAttribute('aria-hidden', 'true');
     shown.textContent = fmt(0);
     const real = document.createElement('span');
     real.className = 'ps-sr';
     real.textContent = fmt(target);
-    val.append(shown, real);
-    row._count = (p) => { shown.textContent = fmt(target * p); };
-  });
-
-  const play = (chart) => {
-    const rows = [...chart.querySelectorAll('.ps-gap-row')];
-    rows.forEach((row, i) => {
-      const delay = i * STAGGER;
-      if (row.classList.contains('is-unknown')) {
-        setTimeout(() => {
-          row._bar.style.transition = 'opacity .6s';
-          row._bar.style.opacity = 1;
-        }, delay + DURATION * .6);
-        return;
-      }
-      let start = null;
-      const step = (t) => {
-        if (start === null) start = t + delay;
-        const p = ease(Math.min(1, Math.max(0, (t - start) / DURATION)));
-        row._bar.style.width = (row._width * p) + '%';
-        if (row._count) row._count(p);
-        if (t - start < DURATION) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
+    el.append(shown, real);
+    return (p) => { shown.textContent = fmt(target * p); };
   };
 
+  // runs fn(progress 0..1) over DURATION after a delay
+  const tween = (delay, fn) => {
+    let start = null;
+    const step = (t) => {
+      if (start === null) start = t + delay;
+      fn(ease(Math.min(1, Math.max(0, (t - start) / DURATION))));
+      if (t - start < DURATION) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  const setup = {
+    'ps-gap': (chart) => {
+      const rows = [...chart.querySelectorAll('.ps-gap-row')].map((row) => {
+        const bar = row.querySelector('.ps-gap-bar');
+        if (row.classList.contains('is-unknown')) { bar.style.opacity = 0; return { bar, unknown: true }; }
+        const width = parseFloat(bar.style.width) || 0;
+        bar.style.width = '0%';
+        const val = row.querySelector('.ps-gap-val');
+        return { bar, width, count: val && counter(val) };
+      });
+      return () => rows.forEach((r, i) => {
+        if (r.unknown) {
+          setTimeout(() => { r.bar.style.transition = 'opacity .6s'; r.bar.style.opacity = 1; }, i * 220 + DURATION * .6);
+          return;
+        }
+        tween(i * 220, (p) => { r.bar.style.width = (r.width * p) + '%'; if (r.count) r.count(p); });
+      });
+    },
+    'ps-stats': (box) => {
+      box.classList.add('is-anim');
+      const tiles = [...box.children].map((tile) => ({ tile, count: tile.querySelector('b') && counter(tile.querySelector('b')) }));
+      return () => tiles.forEach((t, i) => {
+        setTimeout(() => t.tile.classList.add('is-in'), i * 150);
+        if (t.count) tween(i * 150, t.count);
+      });
+    },
+    'ps-timeline': (list) => {
+      list.classList.add('is-anim');
+      return () => [...list.children].forEach((li, i) => setTimeout(() => li.classList.add('is-in'), i * 380));
+    },
+  };
+
+  const plays = new Map();
   const io = new IntersectionObserver((entries) => entries.forEach((e) => {
     if (!e.isIntersecting) return;
     io.unobserve(e.target);
-    play(e.target);
+    plays.get(e.target)();
   }), { threshold: .4 });
-  charts.forEach((c) => { prep(c); io.observe(c); });
+  groups.forEach((g) => {
+    const kind = ['ps-gap', 'ps-stats', 'ps-timeline'].find((k) => g.classList.contains(k));
+    plays.set(g, setup[kind](g));
+    io.observe(g);
+  });
 })();
 
 /*===== BLOG POSTS: touchscreen demo =====*/
