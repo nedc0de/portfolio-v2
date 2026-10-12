@@ -197,9 +197,12 @@ document.querySelectorAll('.footer-year').forEach((el) => {
   // A short note on the right of each item, and the newest post above
   // "Let's talk". The counts are read from the pages themselves the first
   // time the menu opens, so they stay right without being typed anywhere.
-  const NOTES = { 'index.html': 'start here', 'about.html': "who's Ned", 'contact.html': 'say hi' };
+  // pages by name: "about.html", "/about" and "./about" are all "about"
+  // (Netlify serves the pages without ".html"), and "/" is "index"
+  const pageName = (href) => (href || '').split('/').pop().replace(/\.html$/, '') || 'index';
+  const NOTES = { index: 'start here', about: "who's Ned", contact: 'say hi' };
   navMenu.querySelectorAll('.nav-link').forEach((a) => {
-    const page = (a.getAttribute('href') || '').split('/').pop();
+    const page = pageName(a.getAttribute('href'));
     const note = document.createElement('span');
     note.className = 'menu-note';
     note.dataset.page = page;
@@ -225,7 +228,7 @@ document.querySelectorAll('.footer-year').forEach((el) => {
     if (blog) {
       const doc = parse(blog);
       const posts = doc.querySelectorAll('a.bl-feature, a.bl-row');
-      setNote('blog.html', `${posts.length} posts`);
+      setNote('blog', `${posts.length} posts`);
       const top = doc.querySelector('a.bl-feature');
       if (top) {
         const img = top.querySelector('img')?.getAttribute('src');
@@ -235,9 +238,9 @@ document.querySelectorAll('.footer-year').forEach((el) => {
         latest.hidden = false;
       }
     }
-    if (favs) setNote('favorites.html', `${(favs.match(/type: '(book|movie|tv)'/g) || []).length} picks`);
-    if (projects) setNote('projects.html', `${parse(projects).querySelectorAll('.hl-row').length} builds`);
-    if (lab) setNote('lab.html', `${parse(lab).querySelectorAll('.lab-item-title').length} experiments`);
+    if (favs) setNote('favorites', `${(favs.match(/type: '(book|movie|tv)'/g) || []).length} picks`);
+    if (projects) setNote('projects', `${parse(projects).querySelectorAll('.hl-row').length} builds`);
+    if (lab) setNote('lab', `${parse(lab).querySelectorAll('.lab-item-title').length} experiments`);
   };
   navToggle?.addEventListener('click', fill);
   navMenu.querySelector('.menu-close').addEventListener('click', closeMenu);
