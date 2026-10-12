@@ -49,6 +49,20 @@
         transition: none;
       }
     }
+    /* Staggered reveal for How I work rows */
+    html.js .ab-row {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    html.js .ab-row.in {
+      opacity: 1;
+      transform: none;
+      transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.js .ab-row { opacity: 1; transform: none; }
+      html.js .ab-row.in { transition: none; }
+    }
   </style>
 </head>
 
