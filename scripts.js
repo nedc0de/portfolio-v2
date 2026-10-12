@@ -1894,24 +1894,28 @@ document.addEventListener('DOMContentLoaded', () => {
   marks.forEach((m) => io.observe(m));
 })();
 
-/* About page: staggered reveal for How I work rows */
+/* About page: staggered reveal for How I work rows (container-triggered sequence) */
 (() => {
-  const rows = document.querySelectorAll('.ab-row');
-  if (!rows.length) return;
+  const lists = document.querySelectorAll('.ab-list');
+  if (!lists.length) return;
   document.documentElement.classList.add('js');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveal = (list) => {
+    list.querySelectorAll('.ab-row').forEach((r, i) => {
+      if (!reduceMotion) r.style.transitionDelay = (i * 220) + 'ms';
+      r.classList.add('in');
+    });
+  };
   if (!('IntersectionObserver' in window) || reduceMotion) {
-    rows.forEach((r) => r.classList.add('in'));
+    lists.forEach(reveal);
     return;
   }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      const el = entry.target;
-      el.style.transitionDelay = (Array.prototype.indexOf.call(rows, el) * 140) + 'ms';
-      el.classList.add('in');
-      io.unobserve(el);
+      reveal(entry.target);
+      io.unobserve(entry.target);
     });
-  }, { threshold: 0.35 });
-  rows.forEach((r) => io.observe(r));
+  }, { threshold: 0.2 });
+  lists.forEach((l) => io.observe(l));
 })();
