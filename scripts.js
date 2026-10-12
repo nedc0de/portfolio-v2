@@ -1501,7 +1501,9 @@ document.addEventListener('DOMContentLoaded', () => {
       '<div class="egg-win"><div class="egg-win-top"><i></i><i></i><i></i><span>nedcode.exe</span></div>' +
       '<div class="egg-win-body"><b data-text="ACCESS GRANTED">ACCESS GRANTED</b>' +
       '<div class="egg-win-bar"><i></i></div><span class="egg-win-pct">BREACH <em>0</em>%</span></div></div>';
-    document.body.append(layer);
+    // on <html>, not <body>: the shake transforms body, which would pin this
+    // "fixed" layer to the top of the page instead of the screen once scrolled
+    document.documentElement.append(layer);
     document.documentElement.classList.add('is-cyber');
     // count the breach up to 100% alongside the bar
     const pct = layer.querySelector('.egg-win-pct em');
@@ -1545,8 +1547,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const crash = document.createElement('div');
       crash.className = 'egg-crash';
       crash.innerHTML = '<div class="egg-pop-top"><i></i><i></i><i></i><span>fatal_error</span></div>' +
-        '<div class="egg-crash-body"><b>SYSTEM FROZEN</b><p>Refresh the page to reboot.</p></div>';
+        '<div class="egg-crash-body"><b>SYSTEM FROZEN</b><p>Reboot to bring nedcode back online.</p>' +
+        '<button type="button" class="egg-reboot">REBOOT</button></div>';
       layer.append(crash);
+      const reboot = crash.querySelector('.egg-reboot');
+      reboot.addEventListener('click', () => {
+        reboot.disabled = true;
+        reboot.textContent = 'REBOOTING...';
+        location.reload();
+      });
+      reboot.focus();
       document.documentElement.classList.add('is-frozen');
       layer.setAttribute('aria-hidden', 'false');
       crash.setAttribute('role', 'alert');

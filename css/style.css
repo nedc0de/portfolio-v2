@@ -5727,6 +5727,9 @@ html.is-cyber h3 {
   inset: 0;
   z-index: 9999;
   pointer-events: none;
+  /* sits on <html>, outside body, so take the site font from here */
+  font-family: var(--body-font);
+  color: #fff;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .25) 0 1px, transparent 1px 3px);
   transition: opacity .6s;
 }
@@ -5956,6 +5959,26 @@ html.is-frozen .egg-crash * {
   margin: .6rem 0 0;
   font-size: .85rem;
   color: rgba(255, 255, 255, .8);
+}
+
+.egg-reboot {
+  margin-top: 1rem;
+  padding: .55rem 1.6rem;
+  border: 2px solid #ff2a3d;
+  border-radius: 6px;
+  background: rgba(255, 42, 61, .12);
+  color: #fff;
+  font: 700 .9rem monospace;
+  letter-spacing: .18em;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 42, 61, .45);
+}
+
+.egg-reboot:hover,
+.egg-reboot:focus-visible {
+  background: #ff2a3d;
+  outline: none;
+  box-shadow: 0 0 20px rgba(255, 42, 61, .8);
 }
 
 @keyframes egg-fill {
