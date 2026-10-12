@@ -2388,10 +2388,15 @@ details>summary {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: .3rem .6rem;
-  margin-bottom: 1rem;
+  gap: .55rem 1.25rem;
+  max-width: 19rem; /* phones: two even rows, 4 then 3 */
+  margin: 0 auto 1rem;
   font-size: .9rem;
   font-weight: 600;
+}
+
+@media screen and (min-width: 768px) {
+  .footer-links { max-width: none; } /* desktop: one line */
 }
 
 .footer-links a {
@@ -2404,10 +2409,6 @@ details>summary {
 .footer-links a[aria-current="page"] {
   color: var(--fifteenth-color);
   text-shadow: 0 0 10px rgba(255, 220, 22, .5);
-}
-
-.footer-links span {
-  color: var(--second-color);
 }
 
 /*===== MEDIA QUERIES =====*/

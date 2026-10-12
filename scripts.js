@@ -167,12 +167,12 @@ navLink.forEach((n) => n.addEventListener('click', linkAction));
 // the pages don't each need it. The current page's link is highlighted.
 document.querySelectorAll('.footer').forEach((footer) => {
   const here = location.pathname.split('/').pop().replace(/\.html$/, '') || 'index';
-  const LINKS = [['blog', 'Blog'], ['favorites', 'Favorites'], ['lab', 'Lab'], ['contact', 'Contact']];
+  const LINKS = [['index', 'Home'], ['about', 'About'], ['blog', 'Blog'], ['favorites', 'Favorites'], ['projects', 'Projects'], ['lab', 'Lab'], ['contact', 'Contact']];
   const nav = document.createElement('nav');
   nav.className = 'footer-links';
   nav.setAttribute('aria-label', 'Quick links');
   nav.innerHTML = LINKS.map(([page, label]) =>
-    `<a href="/${page}.html"${page === here ? ' aria-current="page"' : ''}>${label}</a>`).join('<span aria-hidden="true">·</span>');
+    `<a href="/${page}.html"${page === here ? ' aria-current="page"' : ''}>${label}</a>`).join('');
   footer.prepend(nav);
 });
 
