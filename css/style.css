@@ -4646,41 +4646,38 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Explore tiles (About, Favorites, Lab): soft grey smoke in the site's charcoal
-   (img/smoke/, made with tools/smoke-tiles.py) that drifts slowly, with a light
-   dark layer on top so the hand, icons and clock stand out. */
+/* Explore tiles (About, Favorites, Lab): original comic-panel sunset scenes
+   (img/explore/, drawn by tools/explore-tiles.py), with the hand, icons and
+   clock on top like stickers: black outline and a hard drop shadow. */
 .hm-board,
 .hm-faves,
 .hm-hello {
   position: relative;
   overflow: hidden;
-  background: #1d1d1d center / 135% auto no-repeat;
+  background: #0b0b0b center / cover no-repeat;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
-  animation: hm-smoke 18s ease-in-out infinite alternate;
 }
 
-.hm-hello { background-image: url(../img/smoke/about.jpg); }
-.hm-faves { background-image: url(../img/smoke/favorites.jpg); }
-.hm-board { background-image: url(../img/smoke/lab.jpg); }
+.hm-hello { background-image: url(../img/explore/about.svg); }
+.hm-faves { background-image: url(../img/explore/favorites.svg); }
+.hm-board { background-image: url(../img/explore/lab.svg); }
 
-@keyframes hm-smoke {
-  from { background-position: 30% 40%; }
-  to { background-position: 70% 60%; }
+.hm-hello img,
+.hm-faves i {
+  filter: drop-shadow(1px 0 0 #0b0b0b) drop-shadow(-1px 0 0 #0b0b0b) drop-shadow(0 1px 0 #0b0b0b) drop-shadow(0 -1px 0 #0b0b0b) drop-shadow(2px 2px 0 #0b0b0b);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hm-board, .hm-faves, .hm-hello { animation: none; }
+.hm-faves i {
+  color: #ffe14d;
 }
 
-.hm-board::after,
-.hm-faves::after,
-.hm-hello::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(29, 29, 29, .2);
-  pointer-events: none;
+/* the clock sits on its own little black departure board */
+.hm-clock-box {
+  display: flex;
+  padding: .2rem .45rem;
+  border-radius: 4px;
+  background: #0b0b0b;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .55);
 }
 
 /* keep the hand, icons and clock above the dark layer */
