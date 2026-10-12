@@ -27,6 +27,29 @@
   <meta name="twitter:title" content="About Ned, Frontend Developer in Montreal | NEDCODE">
   <meta name="twitter:description" content="Ned is a frontend developer in Montreal who solves problems with design and code. How he works, and what he’s into off the clock.">
   <meta name="twitter:image" content="https://nedcode.com/img/og-nedcode.jpg">
+  <style>
+    /* Marker-sweep highlight animation (progressive enhancement: needs html.js) */
+    html.js .ab-lead mark {
+      background-color: transparent;
+      background-image: linear-gradient(var(--fifteenth-color), var(--fifteenth-color));
+      background-repeat: no-repeat;
+      background-size: 0% 100%;
+      color: inherit;
+    }
+    html.js .ab-lead mark.swept {
+      background-size: 100% 100%;
+      color: var(--eleventh-color);
+      transition: background-size .7s cubic-bezier(.22,.61,.36,1), color .3s ease .35s;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.js .ab-lead mark,
+      html.js .ab-lead mark.swept {
+        background-size: 100% 100%;
+        color: var(--eleventh-color);
+        transition: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
