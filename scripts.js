@@ -1564,6 +1564,109 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
+/*===== BLOG POSTS: touchscreen demo =====*/
+// A grid of row/column sensor lines. Each finger changes the reading at the
+// crossings near it (brighter dot = bigger change) and the "controller" works
+// out where the touch is. Tap or drag to try it, with two fingers for multi-touch.
+// When nobody is touching, a demo finger taps around on its own.
+(() => {
+  const pad = document.querySelector('.ps-touch-pad');
+  if (!pad) return;
+  const W = 300, H = 200, COLS = 12, ROWS = 8;
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('aria-hidden', 'true');
+  const make = (tag, attrs) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return svg.appendChild(n);
+  };
+  const xs = Array.from({ length: COLS }, (_, i) => (i + .5) * W / COLS);
+  const ys = Array.from({ length: ROWS }, (_, i) => (i + .5) * H / ROWS);
+  const cols = xs.map(x => make('line', { x1: x, y1: 0, x2: x, y2: H }));
+  const rows = ys.map(y => make('line', { x1: 0, y1: y, x2: W, y2: y }));
+  const nodes = ys.map(y => xs.map(x => make('circle', { class: 'node', cx: x, cy: y, r: 0 })));
+  const fingers = [0, 1].map(() => make('circle', { class: 'finger', r: 14, cx: -50, cy: -50 }));
+  pad.append(svg);
+
+  const readout = pad.parentElement.querySelector('.ps-touch-read');
+  const out = readout && readout.querySelector('b');
+  const count = readout && readout.querySelector('span');
+
+  // finger positions in SVG units; user touches win over the demo finger
+  const touches = new Map();
+  let demo = { x: W * .3, y: H * .4 }, demoTo = { x: W * .3, y: H * .4 };
+
+  const render = (points) => {
+    const SIGMA = 26;
+    let hotCols = new Set(), hotRows = new Set();
+    nodes.forEach((row, r) => row.forEach((node, c) => {
+      let s = 0;
+      for (const p of points) {
+        const d2 = (xs[c] - p.x) ** 2 + (ys[r] - p.y) ** 2;
+        s = Math.max(s, Math.exp(-d2 / (SIGMA * SIGMA)));
+      }
+      node.setAttribute('r', s > .05 ? (1 + s * 4.5).toFixed(2) : 1);
+      node.style.opacity = (.12 + s * .88).toFixed(2);
+      if (s > .45) { hotCols.add(c); hotRows.add(r); }
+    }));
+    cols.forEach((l, i) => l.classList.toggle('is-hot', hotCols.has(i)));
+    rows.forEach((l, i) => l.classList.toggle('is-hot', hotRows.has(i)));
+    fingers.forEach((f, i) => {
+      const p = points[i];
+      f.setAttribute('cx', p ? p.x : -50);
+      f.setAttribute('cy', p ? p.y : -50);
+    });
+    if (out) {
+      out.textContent = points.map(p => `x ${Math.round(p.x / W * 100)}% · y ${Math.round(p.y / H * 100)}%`).join('  |  ');
+      count.textContent = points.length > 1 ? `${points.length} touches` : '1 touch';
+    }
+  };
+
+  const toSvg = (e) => {
+    const r = pad.getBoundingClientRect();
+    return {
+      x: Math.min(W, Math.max(0, (e.clientX - r.left) / r.width * W)),
+      y: Math.min(H, Math.max(0, (e.clientY - r.top) / r.height * H)),
+    };
+  };
+  pad.addEventListener('pointerdown', (e) => {
+    if (touches.size >= 2) return;
+    pad.setPointerCapture(e.pointerId);
+    touches.set(e.pointerId, toSvg(e));
+    render([...touches.values()]);
+  });
+  pad.addEventListener('pointermove', (e) => {
+    if (!touches.has(e.pointerId)) return;
+    touches.set(e.pointerId, toSvg(e));
+    render([...touches.values()]);
+  });
+  const lift = (e) => { touches.delete(e.pointerId); lastUser = performance.now(); };
+  pad.addEventListener('pointerup', lift);
+  pad.addEventListener('pointercancel', lift);
+
+  // demo finger: glide to a new spot every so often, only while on screen
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let visible = false, lastUser = -Infinity, nextHop = 0;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(pad);
+  render([demo]);
+  if (still) return;
+  const tick = (t) => {
+    if (visible && !touches.size && t - lastUser > 2500) {
+      if (t > nextHop) {
+        demoTo = { x: 30 + Math.random() * (W - 60), y: 25 + Math.random() * (H - 50) };
+        nextHop = t + 1600;
+      }
+      demo.x += (demoTo.x - demo.x) * .08;
+      demo.y += (demoTo.y - demo.y) * .08;
+      render([demo]);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
+
 /*===== BLOG POSTS: reading progress bar =====*/
 // A thin neon line across the top that fills as you read the article.
 (() => {

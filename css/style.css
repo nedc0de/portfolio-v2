@@ -5661,6 +5661,62 @@ a.tk-item:hover,
   color: #8a8a8a;
 }
 
+/* Blog post: touchscreen demo (a grid of sensor lines you can tap) */
+.ps-touch-pad {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border: 1px solid rgba(255, 220, 22, .25);
+  border-radius: 12px;
+  background: #1b1b1b;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ps-touch-pad svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ps-touch-pad line {
+  stroke: rgba(255, 255, 255, .1);
+  stroke-width: 1;
+  transition: stroke .15s;
+}
+
+.ps-touch-pad line.is-hot {
+  stroke: rgba(255, 220, 22, .55);
+}
+
+.ps-touch-pad .node {
+  fill: var(--fifteenth-color);
+}
+
+.ps-touch-pad .finger {
+  fill: rgba(255, 59, 59, .18);
+  stroke: #ff3b3b;
+  stroke-width: 1.5;
+}
+
+.ps-touch-read {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: .7rem 0 0 !important;
+  font-family: monospace;
+  font-size: .8rem;
+  color: var(--fourteenth-color);
+}
+
+.ps-touch-read b {
+  color: var(--fifteenth-color);
+  font-weight: 700;
+}
+
 /* Blog post: speaker card (who said it + their quote) */
 .ps-speaker {
   margin: 1.5rem 0 1.75rem;
