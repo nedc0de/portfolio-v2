@@ -4609,9 +4609,7 @@ a.tk-item:hover,
 }
 
 .hm-row img,
-.hm-board,
-.hm-faves,
-.hm-hello {
+.hm-tile {
   width: 96px;
   height: auto;
   aspect-ratio: 4 / 3;
@@ -4646,63 +4644,84 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Explore tiles (About, Favorites, Lab): the blog cover background (tools/blog-cover.html)
-   without its yellow glow. The dot grid scales with the tile like the cover does
-   (14px on a 940px cover = 1.49cqw), with a dark grey layer on top to soften it. */
-.hm-board,
-.hm-faves,
-.hm-hello {
+/* Explore tiles (About, Favorites, Lab): same look as the Selected work
+   thumbnails. A dark tile tinted per section, a bold two-line label with a
+   short accent bar, and an icon on the right. Sizes use cqw so the tile
+   scales from the 96px phone thumbnail to the wide desktop card. */
+.hm-tile {
   position: relative;
   container-type: inline-size;
-  background: #1d1d1d radial-gradient(circle, #2b2b2b .14cqw, transparent .19cqw) 0 0 / 1.49cqw 1.49cqw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  background: var(--tile-bg) radial-gradient(circle at 80% 28%, var(--tile-glow), transparent 62%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
 }
 
-.hm-board::after,
-.hm-faves::after,
-.hm-hello::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(18, 18, 18, .25);
-  pointer-events: none;
-}
-
-/* keep the hand, icons and clock above the dark layer */
-.hm-board > *,
-.hm-faves > *,
-.hm-hello > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Favorites row: movie, TV and book icons */
-.hm-faves {
+/* spacing lives on the children: padding on .hm-tile would shrink the box
+   the cqw sizes are measured from */
+.hm-tile-txt {
+  margin-left: 9cqw;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .35rem;
-  font-size: 1.35rem;
-  color: var(--fifteenth-color);
+  flex-direction: column;
+  font-family: Anton, Impact, 'Arial Narrow', sans-serif;
+  line-height: .95;
+  white-space: nowrap;
 }
 
-/* Mini departure board for the Lab row */
-.hm-board {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hm-tile-txt b {
+  font-weight: 400;
+  font-size: 17cqw;
+  letter-spacing: .02em;
+  color: #f2f2f2;
 }
 
-.hm-clock {
+.hm-tile-txt b + b {
+  color: var(--tile-accent);
+}
+
+.hm-tile-txt i {
+  width: 16cqw;
+  height: 2.6cqw;
+  margin-top: 4.5cqw;
+  border-radius: 2cqw;
+  background: var(--tile-bar);
+}
+
+.hm-tile > img,
+.hm-tile > .uil {
+  flex: none;
+  margin-right: 9cqw;
+}
+
+.hm-tile > .uil {
+  font-size: 26cqw;
+  line-height: 1;
+  color: var(--tile-accent);
+}
+
+.hm-row .hm-tile > img {
+  width: 25cqw !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 0;
+}
+
+.hm-tile-about { --tile-bg: #221c06; --tile-glow: rgba(255, 220, 22, .3); --tile-accent: #ffdc16; --tile-bar: #ffdc16; }
+.hm-tile-fav { --tile-bg: #2a1015; --tile-glow: rgba(255, 90, 110, .35); --tile-accent: #ff6b7d; --tile-bar: #ffdc16; }
+.hm-tile-lab { --tile-bg: #0c2129; --tile-glow: rgba(0, 220, 255, .28); --tile-accent: #ffdc16; --tile-bar: #3fd8f0; }
+.hm-tile-lab > .uil { color: #3fd8f0; }
+
+/* the Lab label's second line is the live clock, drawn as a dot-matrix board */
+.hm-tile-txt .hm-clock {
   font-family: ui-monospace, 'Courier New', monospace;
   font-weight: 800;
-  font-size: 1.25rem;
-  letter-spacing: .05em;
-  color: var(--fifteenth-color);
-  -webkit-mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 2.6px 2.6px;
-  mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 2.6px 2.6px;
-  text-shadow: 0 0 6px rgba(255, 220, 22, .5);
+  font-size: 16cqw;
+  letter-spacing: .04em;
+  -webkit-mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 1.9cqw 1.9cqw;
+  mask: radial-gradient(circle, #000 62%, transparent 66%) 0 0 / 1.9cqw 1.9cqw;
+  text-shadow: 0 0 2cqw rgba(255, 220, 22, .6);
 }
 
 /* Desktop: cards side by side, like the Latest posts row above.
@@ -4710,8 +4729,7 @@ a.tk-item:hover,
 @media screen and (min-width: 768px) {
   .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
-  .hm-row img, .hm-board, .hm-faves, .hm-hello { width: 100%; aspect-ratio: 16 / 9; }
-  .hm-faves { gap: .6rem; font-size: 1.9rem; }
+  .hm-row img, .hm-tile { width: 100%; aspect-ratio: 16 / 9; }
   /* same text sizes as the Latest posts cards, and even card lengths */
   .hm-row h3 { font-size: .98rem; line-height: 1.3; }
   .hm-row p {
@@ -4721,21 +4739,11 @@ a.tk-item:hover,
     -webkit-line-clamp: 3;
     overflow: hidden;
   }
-  .hm-clock { font-size: 2.1rem; }
-  .hm-row .hm-hello img { width: 38px !important; }
-}
-
-/* About row: the waving hand from the intro (no animation) */
-.hm-hello {
-  display: grid;
-  place-items: center;
-}
-
-.hm-hello img {
-  width: 34px !important;
-  height: auto !important;
-  aspect-ratio: auto !important;
-  border-radius: 0;
+  .hm-tile-txt { margin-left: 7cqw; }
+  .hm-tile > img, .hm-tile > .uil { margin-right: 8cqw; }
+  .hm-tile-txt b, .hm-tile-txt .hm-clock { font-size: 12cqw; }
+  .hm-tile > .uil { font-size: 18cqw; }
+  .hm-row .hm-tile > img { width: 17cqw !important; }
 }
 
 /* Selected work: a compact version of the Projects page hover list */
