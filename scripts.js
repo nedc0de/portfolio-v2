@@ -218,23 +218,27 @@ document.querySelectorAll('.footer-year').forEach((el) => {
   latest.hidden = true;
   navMenu.querySelector('.menu-foot').prepend(latest);
 
-  let filled = false;
+  // Read fresh every time the menu opens (never a cached copy), so the card
+  // and the counts always show the newest post.
+  const blogUrl = new URL('/blog.html', location.origin);
   const fill = async () => {
-    if (filled) return;
-    filled = true;
-    const get = (url) => fetch(url).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+    const get = (url) => fetch(url, { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).catch(() => '');
     const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
-    const [blog, favs, projects, lab] = await Promise.all([get('/blog.html'), get('/favorites.js'), get('/projects.html'), get('/lab.html')]);
+    const [blog, favs, projects, lab] = await Promise.all([get(blogUrl), get('/favorites.js'), get('/projects.html'), get('/lab.html')]);
     if (blog) {
       const doc = parse(blog);
       const posts = doc.querySelectorAll('a.bl-feature, a.bl-row');
       setNote('blog', `${posts.length} posts`);
-      const top = doc.querySelector('a.bl-feature');
+      // newest post first; if you're already reading it, show the one before
+      const same = (a) => new URL(a.getAttribute('href'), blogUrl).pathname.replace(/\.html$/, '') === location.pathname.replace(/\.html$/, '');
+      const top = [...posts].find((a) => !same(a));
       if (top) {
+        // links in blog.html are relative to it: turn them into full addresses
+        const link = new URL(top.getAttribute('href'), blogUrl).href;
         const img = top.querySelector('img')?.getAttribute('src');
-        latest.href = '/' + top.getAttribute('href');
-        latest.innerHTML = `${img ? `<img src="/${img}" alt="" width="940" height="788">` : ''}<span><small>New on the blog</small><b></b></span>`;
-        latest.querySelector('b').textContent = top.querySelector('h2')?.textContent.trim() || '';
+        latest.href = link;
+        latest.innerHTML = `${img ? `<img src="${new URL(img, blogUrl).href}" alt="" width="940" height="788">` : ''}<span><small>New on the blog</small><b></b></span>`;
+        latest.querySelector('b').textContent = top.querySelector('h2, h3')?.textContent.trim() || '';
         latest.hidden = false;
       }
     }
@@ -242,7 +246,14 @@ document.querySelectorAll('.footer-year').forEach((el) => {
     if (projects) setNote('projects', `${parse(projects).querySelectorAll('.hl-row').length} builds`);
     if (lab) setNote('lab', `${parse(lab).querySelectorAll('.lab-item-title').length} experiments`);
   };
-  navToggle?.addEventListener('click', fill);
+  navToggle?.addEventListener('click', () => { if (navMenu.classList.contains('show-menu')) fill(); });
+  // open the post on tap, even if a browser is slow to treat the card as a link
+  latest.addEventListener('click', (e) => {
+    if (!latest.href || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    closeMenu();
+    location.assign(latest.href);
+  });
   navMenu.querySelector('.menu-close').addEventListener('click', closeMenu);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && navMenu.classList.contains('show-menu')) closeMenu();

@@ -8,6 +8,9 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Show a sample first (screenshot at phone size), then apply on a branch,
   test in a browser, push the branch, and **ask before merging into `main`**.
 - Ned reads on his phone: keep updates short and send screenshots.
+- Test every change for real before asking to merge: tap through it on a
+  phone-size browser on every page it touches, including Netlify-style pretty
+  URLs (`/about` instead of `/about.html`), and check links actually open.
 - Never change the logo, the home hero ("Hi, I'm Ned 👋 / Frontend Dev /
   Based out of Montreal") or the Lab's own buttons unless asked.
 - This environment usually can't reach rockstargames.com or reddit.com. If you
