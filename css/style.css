@@ -4646,13 +4646,35 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Explore tiles (About, Favorites, Lab): the blog cover background (tools/blog-cover.html),
-   same colors and dot grid scaled down to tile size, without the yellow glow */
+/* Explore tiles (About, Favorites, Lab): the blog cover background (tools/blog-cover.html)
+   without its yellow glow. The dot grid scales with the tile like the cover does
+   (14px on a 940px cover = 1.49cqw), with a dark grey layer on top to soften it. */
 .hm-board,
 .hm-faves,
 .hm-hello {
-  background: #1d1d1d radial-gradient(circle, #2b2b2b 1px, transparent 1.4px) 0 0 / 6px 6px;
+  position: relative;
+  container-type: inline-size;
+  background: #1d1d1d radial-gradient(circle, #2b2b2b .14cqw, transparent .19cqw) 0 0 / 1.49cqw 1.49cqw;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+.hm-board::after,
+.hm-faves::after,
+.hm-hello::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(18, 18, 18, .25);
+  pointer-events: none;
+}
+
+/* keep the hand, icons and clock above the dark layer */
+.hm-board > *,
+.hm-faves > *,
+.hm-hello > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Favorites row: movie, TV and book icons */
