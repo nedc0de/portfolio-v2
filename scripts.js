@@ -162,6 +162,20 @@ function linkAction() {
 
 navLink.forEach((n) => n.addEventListener('click', linkAction));
 
+/*===== FOOTER: quick links =====*/
+// A small row of links above the copyright line, added on every page here so
+// the pages don't each need it. The current page's link is highlighted.
+document.querySelectorAll('.footer').forEach((footer) => {
+  const here = location.pathname.split('/').pop().replace(/\.html$/, '') || 'index';
+  const LINKS = [['blog', 'Blog'], ['favorites', 'Favorites'], ['lab', 'Lab'], ['contact', 'Contact']];
+  const nav = document.createElement('nav');
+  nav.className = 'footer-links';
+  nav.setAttribute('aria-label', 'Quick links');
+  nav.innerHTML = LINKS.map(([page, label]) =>
+    `<a href="/${page}.html"${page === here ? ' aria-current="page"' : ''}>${label}</a>`).join('<span aria-hidden="true">·</span>');
+  footer.prepend(nav);
+});
+
 /*===== FOOTER YEAR =====*/
 // Keeps the copyright year current; the year written in the HTML is the fallback.
 document.querySelectorAll('.footer-year').forEach((el) => {

@@ -2382,6 +2382,34 @@ details>summary {
   color: var(--fifteenth-color);
 }
 
+/* quick links above the Threads icon */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: .3rem .6rem;
+  margin-bottom: 1rem;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.footer-links a {
+  color: var(--fourteenth-color);
+  transition: color .2s, text-shadow .2s;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible,
+.footer-links a[aria-current="page"] {
+  color: var(--fifteenth-color);
+  text-shadow: 0 0 10px rgba(255, 220, 22, .5);
+}
+
+.footer-links span {
+  color: var(--second-color);
+}
+
 /*===== MEDIA QUERIES =====*/
 @media screen and (min-width: 320px) {
   .section-title {
