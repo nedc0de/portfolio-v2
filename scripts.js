@@ -1871,3 +1871,25 @@ document.addEventListener('DOMContentLoaded', () => {
   addEventListener('scroll', () => { if (!holding && Math.abs(scrollY - openedAt) > 60) close(); }, { passive: true });
   addEventListener('resize', () => { if (shown) place(); });
 })();
+
+/* About page: marker-sweep highlight animation */
+(() => {
+  const marks = document.querySelectorAll('.ab-lead mark');
+  if (!marks.length) return;
+  document.documentElement.classList.add('js');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!('IntersectionObserver' in window) || reduceMotion) {
+    marks.forEach((m) => m.classList.add('swept'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      setTimeout(() => el.classList.add('swept'),
+        Array.prototype.indexOf.call(marks, el) * 200);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+  marks.forEach((m) => io.observe(m));
+})();
