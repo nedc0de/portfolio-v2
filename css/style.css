@@ -4627,6 +4627,9 @@ a.tk-item:hover,
   text-transform: uppercase;
   color: #8a8a8a;
   margin-bottom: .2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hm-row h3 {
@@ -4650,7 +4653,8 @@ a.tk-item:hover,
   place-items: center;
   overflow: hidden;
   border-radius: 6px;
-  background: #242424;
+  /* same dotted tile as the Lab and About rows, shown until the poster loads */
+  background: #141414 radial-gradient(circle, #2a2a2a 1px, transparent 1.4px) 0 0 / 4px 4px;
   box-shadow: inset 0 0 0 1px #333;
 }
 
@@ -4712,11 +4716,20 @@ a.tk-item:hover,
   .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
   .hm-row img, .hm-board, .hm-poster, .hm-hello { width: 100%; aspect-ratio: 16 / 9; }
+  /* same text sizes as the Latest posts cards, and even card lengths */
+  .hm-row h3 { font-size: .98rem; line-height: 1.3; }
+  .hm-row p {
+    font-size: .82rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
   .hm-clock { font-size: 2.1rem; }
-  .hm-row .hm-hello img { width: 46px !important; }
+  .hm-row .hm-hello img { width: 38px !important; }
 }
 
-/* About row: the waving hand from the intro on a dark dotted tile; it waves on hover */
+/* About row: the waving hand from the intro on a dark dotted tile (no animation) */
 .hm-hello {
   display: grid;
   place-items: center;
@@ -4729,11 +4742,6 @@ a.tk-item:hover,
   height: auto !important;
   aspect-ratio: auto !important;
   border-radius: 0;
-  transform-origin: 70% 80%;
-}
-
-.hm-row:hover .hm-hello img {
-  animation: wave-animation 2.1s infinite;
 }
 
 /* Selected work: a compact version of the Projects page hover list */

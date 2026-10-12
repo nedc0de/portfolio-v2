@@ -16,8 +16,35 @@ const preloadGifs = () => rows.forEach(row => { new Image().src = row.dataset.im
 if (document.readyState === "complete") preloadGifs();
 else addEventListener("load", preloadGifs, { once: true });
 
-/*===== DESKTOP: cursor-following preview (shared, in scripts.js) =====*/
-initHoverPreview(rows, preview, touchMode);
+/*===== DESKTOP: cursor-following preview =====*/
+let x = 0, y = 0, cx = 0, cy = 0;
+
+rows.forEach(row => {
+  row.addEventListener("mouseenter", () => {
+    if (touchMode.matches) return;
+    previewImg.src = row.dataset.img;
+    preview.classList.add("is-on");
+  });
+  row.addEventListener("mouseleave", () => {
+    if (!touchMode.matches) preview.classList.remove("is-on");
+  });
+});
+
+window.addEventListener("mousemove", e => {
+  // Flip to the left of the cursor near the right edge
+  x = e.clientX + (e.clientX > innerWidth - 420 ? -200 : 200);
+  y = e.clientY;
+});
+
+(function follow() {
+  if (!touchMode.matches) {
+    cx += (x - cx) * .15; // eased trailing motion
+    cy += (y - cy) * .15;
+    preview.style.left = cx + "px";
+    preview.style.top = cy + "px";
+  }
+  requestAnimationFrame(follow);
+})();
 
 /*===== PHONE: scroll-driven active row =====*/
 let active = null;
