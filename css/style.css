@@ -4704,14 +4704,14 @@ a.tk-item:hover,
   .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
   .hm-row img, .hm-cover { width: 100%; aspect-ratio: 16 / 9; }
-  /* wider card: the icon is as big as the tile's height allows (16:9 = 56cqw
-     tall), untilted so no corner gets cut, and reaches toward the word with a
-     shorter fade, so there's no empty band between them */
+  /* wider card: the icon is tilted like on phone and as big as the tile's
+     height allows once tilted (48cqw turned 8deg needs ~54cqw of the 56cqw),
+     reaching toward the word with a shorter fade so there's no empty band */
   .hm-cover-art {
-    right: 1cqw;
-    width: 54cqw;
-    height: 54cqw;
-    transform: translateY(-50%);
+    right: 2cqw;
+    width: 48cqw;
+    height: 48cqw;
+    transform: translateY(-50%) rotate(-8deg);
     -webkit-mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
     mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
   }
