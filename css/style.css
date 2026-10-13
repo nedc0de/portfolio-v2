@@ -4669,8 +4669,12 @@ a.tk-item:hover,
   color: var(--fifteenth-color);
 }
 
+/* display:flex + line-height 1 so the word's box is just the word (an inline
+   box inherits the page's taller line and leaves a gap under the icon) */
 .hm-cover-txt {
-  margin-top: 3cqw;
+  display: flex;
+  margin-top: 1.5cqw;
+  line-height: 1;
 }
 
 .hm-cover-txt b {
@@ -4694,7 +4698,7 @@ a.tk-item:hover,
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
   .hm-row img, .hm-cover { width: 100%; aspect-ratio: 16 / 9; }
   .hm-cover-art { width: 22cqw; height: 22cqw; }
-  .hm-cover-txt { margin-top: 2cqw; }
+  .hm-cover-txt { margin-top: 1cqw; }
   .hm-cover-txt b { font-size: 6.5cqw; }
   /* same text sizes as the Latest posts cards, and even card lengths */
   .hm-row h3 { font-size: .98rem; line-height: 1.3; }
