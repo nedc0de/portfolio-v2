@@ -4670,10 +4670,10 @@ a.tk-item:hover,
   height: 82cqw;
   transform: translateY(-50%) rotate(-8deg);
   color: var(--fifteenth-color);
-  opacity: .16;
-  /* fade out toward the word so the edge never looks cut */
-  -webkit-mask: linear-gradient(90deg, transparent 5%, #000 55%);
-  mask: linear-gradient(90deg, transparent 5%, #000 55%);
+  opacity: .34;
+  /* fade out toward the word so the edge never looks cut; the right half stays clear */
+  -webkit-mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .35) 30%, #000 50%);
+  mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .35) 30%, #000 50%);
 }
 
 /* display:flex + line-height 1 so the word's box is just the word */
