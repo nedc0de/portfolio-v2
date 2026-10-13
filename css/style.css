@@ -4645,7 +4645,7 @@ a.tk-item:hover,
 }
 
 /* Explore tiles (About, Favorites, Lab): same family as the blog covers
-   (charcoal dot grid, yellow line art with a red accent) but icon-first, so
+   (charcoal dot grid, yellow) but icon-first (Phosphor duotone icons), so
    they read as places to go rather than more posts: a big centred icon with a
    small yellow word under it, and no corner glow. Sizes use cqw so the tile
    scales from the phone thumbnail to the desktop card; spacing sits on the
@@ -4665,6 +4665,7 @@ a.tk-item:hover,
 .hm-cover-art {
   width: 34cqw;
   height: 34cqw;
+  color: var(--fifteenth-color);
 }
 
 .hm-cover-txt {
