@@ -4705,16 +4705,19 @@ a.tk-item:hover,
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
   .hm-row img, .hm-cover { width: 100%; aspect-ratio: 16 / 9; }
   /* wider card: the icon is tilted like on phone and as big as the tile's
-     height allows once tilted (48cqw turned 8deg needs ~54cqw of the 56cqw),
+     height allows once tilted (the drawing fills ~81% of the 60cqw box; turned
+     8deg it needs ~55cqw of the tile's 56cqw),
      reaching toward the word with a shorter fade so there's no empty band */
   .hm-cover-art {
-    right: 2cqw;
-    width: 48cqw;
-    height: 48cqw;
+    right: -2cqw;
+    width: 60cqw;
+    height: 60cqw;
     transform: translateY(-50%) rotate(-8deg);
     -webkit-mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
     mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
   }
+  /* the popcorn drawing sits high in its frame: nudge it down so its top clears */
+  .hm-fav .hm-cover-art { top: calc(50% + 2cqw); }
   .hm-cover-txt { margin-left: 8cqw; }
   .hm-cover-txt b { font-size: 12cqw; }
   /* same text sizes as the Latest posts cards, and even card lengths */
