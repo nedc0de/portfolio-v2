@@ -4704,12 +4704,12 @@ a.tk-item:hover,
   .hm-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; }
   .hm-row { grid-template-columns: 1fr; align-content: start; gap: .6rem; padding: .6rem; }
   .hm-row img, .hm-cover { width: 100%; aspect-ratio: 16 / 9; }
-  /* wider card: a bigger icon that reaches in toward the word, with a shorter
-     fade, so there's no empty band between them */
+  /* wider card: the whole icon fits the tile's height and moves in toward the
+     word, with a shorter fade, so there's no empty band between them */
   .hm-cover-art {
-    right: -10cqw;
-    width: 74cqw;
-    height: 74cqw;
+    right: 9cqw;
+    width: 48cqw;
+    height: 48cqw;
     -webkit-mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
     mask: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .55) 18%, #000 38%);
   }
