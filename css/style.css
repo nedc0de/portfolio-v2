@@ -2873,7 +2873,6 @@ details>summary {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.6rem, 2.5vw, 1.25rem) 0.75rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .flap-screen {
@@ -5045,7 +5044,6 @@ a.tk-item:hover,
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .vs-tiles {
