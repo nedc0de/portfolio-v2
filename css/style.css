@@ -314,8 +314,8 @@ position: relative;
 
 
 
-/* The cables are dark until a snake of orange laser light runs along them
-   (16s loop, drawn by scripts.js): an even orange line with a
+/* The cables are dark until a snake of yellow laser light runs along them
+   (16s loop, drawn by scripts.js): an even yellow line with a
    white-hot tip in a soft glow, and little sparks, like a laser cutter.
    No blur filters: the glow is just wider, fainter strokes, so it stays
    smooth on phones. */
@@ -336,27 +336,27 @@ position: relative;
 .nav-logo-spark .spark-rail { stroke: none; }
 
 /* a snake: one even laser line, same length and width end to end */
-.nav-logo-spark .spark-body { stroke: #ff6a1f; stroke-width: 7; }
-.nav-logo-spark .spark-core { stroke: #ffd0a8; stroke-width: 2.5; }
+.nav-logo-spark .spark-body { stroke: #ffdc16; stroke-width: 7; }
+.nav-logo-spark .spark-core { stroke: #fff3b0; stroke-width: 2.5; }
 /* the line heats up toward its head: faint white dashes stack into a smooth
    fade from orange to white-hot at the very front */
-.nav-logo-spark .spark-heat { stroke: #fff6e6; stroke-width: 4.4; opacity: .34; }
+.nav-logo-spark .spark-heat { stroke: #fffbe6; stroke-width: 4.4; opacity: .34; }
 
 /* the little loop on top glows once a cycle (or when tapped) */
 .nav-logo-spark .spark-loop {
-  stroke: #ff6a1f;
+  stroke: #ffdc16;
   stroke-width: 7;
   opacity: 0;
-  filter: drop-shadow(0 0 6px rgba(255, 106, 31, .8));
+  filter: drop-shadow(0 0 6px rgba(255, 220, 22, .8));
 }
 
 /* the tip: a soft orange halo around a white-hot point (moved by scripts.js) */
 .nav-logo-spark .spark-head { opacity: 0; }
 .nav-logo-spark .spark-halo { fill: url(#spark-halo); }
 .nav-logo-spark .spark-glow { fill: url(#spark-core); }
-.nav-logo-spark .spark-rays path { fill: #fff6e8; opacity: .85; }
+.nav-logo-spark .spark-rays path { fill: #fffbe8; opacity: .85; }
 .nav-logo-spark .spark-dot { fill: #fff; }
-.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 1.6; stroke-linecap: round; opacity: 0; }
+.nav-logo-spark .spark-bit { stroke: #fff9d6; stroke-width: 1.6; stroke-linecap: round; opacity: 0; }
 
 /* light flowing into a letter from where its cable meets it: a glow masked
    to the letter's own shape (scripts.js sets --mask and plays it) */
@@ -380,7 +380,7 @@ position: relative;
   border-radius: 50%;
   opacity: 0;
   transform: translate(-50%, -50%) scale(.05);
-  background: radial-gradient(circle, #fff3e6 0, #ffb070 18%, #ff7a2e 38%, rgba(255, 106, 31, .55) 55%, rgba(255, 106, 31, 0) 72%);
+  background: radial-gradient(circle, #fffbe6 0, #fff09a 18%, #ffe23a 38%, rgba(255, 220, 22, .55) 55%, rgba(255, 220, 22, 0) 72%);
 }
 
 /* a letter the spark reaches gives a quick electric flicker */

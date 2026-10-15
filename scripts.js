@@ -1402,11 +1402,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ff8a3d" stop-opacity=".2"/>'
-    + '<stop offset=".3" stop-color="#ff7a2e" stop-opacity=".1"/><stop offset=".6" stop-color="#ff6a1f" stop-opacity=".035"/>'
-    + '<stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
-    + '<radialGradient id="spark-core"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".22" stop-color="#ffe0b8" stop-opacity=".9"/>'
-    + '<stop offset=".5" stop-color="#ff8a3d" stop-opacity=".35"/><stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/></radialGradient>'
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffe45c" stop-opacity=".2"/>'
+    + '<stop offset=".3" stop-color="#ffdf3a" stop-opacity=".1"/><stop offset=".6" stop-color="#ffdc16" stop-opacity=".035"/>'
+    + '<stop offset="1" stop-color="#f5c800" stop-opacity="0"/></radialGradient>'
+    + '<radialGradient id="spark-core"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".22" stop-color="#fff3b8" stop-opacity=".9"/>'
+    + '<stop offset=".5" stop-color="#ffe45c" stop-opacity=".35"/><stop offset="1" stop-color="#ffdc16" stop-opacity="0"/></radialGradient>'
     + '</defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
@@ -1561,7 +1561,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const bits = Array.from({ length: 110 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
   let free = 0;
-  const HOT = [255, 244, 222], COOL = [255, 106, 31];
+  const HOT = [255, 250, 225], COOL = [255, 220, 22];
   const spark = (x, y, a, v, ember) => {
     const b = bits[free];
     free = (free + 1) % bits.length;
