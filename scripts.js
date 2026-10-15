@@ -1722,6 +1722,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const GLYPHS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789';
   const glyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
   let cols = 0, rows = 0, cell = 0, grid = [], drops = [];
+  const SIDE = 4; // how many columns at each edge can surge to the top
 
   const setup = () => {
     const r = cv.getBoundingClientRect();
@@ -1752,7 +1753,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       grid = Array.from({ length: cols * rows }, () => ({ ch: glyph(), a: 0 }));
       drops = Array.from({ length: cols }, (_, x) => ({
-        top: Math.round(rows * (1 - reach(x))), // the highest row it reaches
+        base: Math.round(rows * (1 - reach(x))), // the highest row it normally reaches
+        top: Math.round(rows * (1 - reach(x))),
         y: rows + Math.floor(Math.random() * 4), // starts just below the bottom
         every: 260 + Math.random() * 520,
         t: 0,
@@ -1791,8 +1793,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (d.t < d.every) return;
       d.t = 0;
       d.y -= 1; // rising
-      // past its top: wait a moment below the bottom, then rise again
-      if (d.y < d.top - Math.random() * rows * 2) { d.y = rows + Math.floor(Math.random() * 3); d.every = 260 + Math.random() * 520; }
+      // past its top: wait a moment below the bottom, then rise again. Now
+      // and then a column near either side surges all the way to the top for
+      // one run before going back to its usual height.
+      if (d.y < d.top - Math.random() * rows * 2) {
+        d.y = rows + Math.floor(Math.random() * 3);
+        d.every = 260 + Math.random() * 520;
+        const side = x < SIDE || x >= cols - SIDE;
+        d.top = side && Math.random() < 0.3 ? 0 : d.base;
+      }
       const y = Math.floor(d.y);
       if (y < d.top) return;
       if (y >= 0 && y < rows) { const c = grid[y * cols + x]; c.a = 1; c.ch = glyph(); }
@@ -1805,7 +1814,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!setup()) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     // a still, faint scatter in the same shape instead
-    grid.forEach((c, i) => { c.a = Math.floor(i / cols) >= drops[i % cols].top ? Math.random() * 0.25 : 0; });
+    grid.forEach((c, i) => { c.a = Math.floor(i / cols) >= drops[i % cols].base ? Math.random() * 0.25 : 0; });
     draw();
     return;
   }
