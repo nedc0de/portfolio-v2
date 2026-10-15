@@ -49,7 +49,7 @@
   --thirteenth-color: #151515; /* page background (was #1d1d1d) */
   --fourteenth-color: #b3b3b3;
   --fifteenth-color: #ffdc16;
-  --sixteenth-color: #232323;
+  --sixteenth-color: #1c1c1c; /* card gray: one step above the page (#151515) */
 }
 
 @media screen and (min-width: 968px) {
