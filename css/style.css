@@ -392,7 +392,7 @@ position: relative;
   background: radial-gradient(circle, #fff 0, rgba(255, 255, 255, .95) 16%, rgba(255, 248, 210, .8) 32%, rgba(255, 236, 140, .45) 50%, rgba(255, 220, 22, 0) 70%);
 }
 
-/* Matrix rain inside the logo's window, behind the letters: dark green,
+/* Matrix rain inside the logo's window, behind the letters: site yellow,
    very faded and very slow (drawn by scripts.js). The box matches the
    window in the 1125x450 artwork below its title bar (x 207-990, y 180-349). */
 .nav-logo-matrix {
