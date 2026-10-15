@@ -6941,12 +6941,16 @@ html.is-frozen .egg-crash * {
   word-break: break-all;
 }
 
-/* Lists (Home's Selected work, Projects, About's How I work): a soft clearing
-   in the dot grid behind them, so the text reads easily but the grid melts
-   away around it instead of stopping at a hard edge. */
+/* Lists (Home's Selected work, Projects, About's How I work) and every blog
+   post's article: a soft clearing in the dot grid behind them, so the text
+   reads easily but the grid melts away around it instead of stopping at a
+   hard edge. */
+.ps-article { position: relative; /* anchors the soft backdrop (::before) */ }
+
 .hw-list::before,
 .hl-list::before,
-.ab-list::before {
+.ab-list::before,
+.ps-article::before {
   content: "";
   position: absolute;
   inset: -80px -150px;
