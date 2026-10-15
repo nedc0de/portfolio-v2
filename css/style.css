@@ -78,14 +78,16 @@
 /* Background: a fine dot grid with small + marks every few cells and a
    faint warm glow, like an engineering drawing. It's on the page itself (not
    a layer on top of it) so it also fills the strips behind the phone's status
-   bar and Safari's toolbar, and the overscroll bounce. Faded maths notes are
-   laid over it by scripts.js (.bg-math). */
+   bar and Safari's toolbar, and the overscroll bounce. Every 6th dot (dots
+   are 24px apart, centred at 12px) is replaced by a small x centred exactly
+   where that dot would be (arms from 7.5 to 16.5). Dots and x's are one
+   144px tile, so there's never a dot under an x. Faded maths notes are laid
+   over it by scripts.js (.bg-math). */
 html {
   scroll-behavior: smooth;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M0 6V-6M-6 0H6M144 6V-6M138 0H150M0 150V138M-6 144H6M144 150V138M138 144H150' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") -1px -1px / 144px 144px,
-    radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
-    radial-gradient(ellipse 70% 55% at 85% 30%, rgba(255, 106, 31, .03), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.07'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' stroke='%23fff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
+    radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
     var(--thirteenth-color);
 }
 
@@ -99,8 +101,10 @@ body {
 }
 
 .bg-math {
-  position: fixed;
-  inset: 0;
+  position: absolute; /* scrolls with the page, like the grid; scripts.js sets its height */
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
@@ -113,11 +117,10 @@ body {
 .bg-math > div { position: absolute; }
 .bg-math b { font-weight: 400; color: rgba(255, 106, 31, .18); }
 .bg-math i { font: italic 20px/1 Georgia, "Times New Roman", serif; color: rgba(255, 255, 255, .11); margin-right: 10px; }
-.bg-math .rule { border-top: 1px solid rgba(255, 255, 255, .05); padding-top: 4px; }
+.bg-math .rule { display: inline-block; border-top: 1px solid rgba(255, 255, 255, .05); padding-top: 4px; }
 
-/* phones and tablets: fewer, fainter notes so they never crowd the text */
+/* phones and tablets: fainter notes (scripts.js already keeps them off the text) */
 @media (max-width: 1100px) {
-  .bg-math .wide { display: none; }
   .bg-math { color: rgba(255, 255, 255, .05); }
   .bg-math b { color: rgba(255, 106, 31, .13); }
 }
@@ -2860,7 +2863,7 @@ details>summary {
 }
 
 .flap {
-  background: rgba(255, 255, 255, 0.03);
+  background: #242424 /* = 3% white over the page, solid so the grid stays out */;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.6rem, 2.5vw, 1.25rem) 0.75rem;
@@ -3134,10 +3137,11 @@ details>summary {
   padding: 0.45rem 0.85rem;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .fav-filter {
-  background: transparent;
+  background: var(--thirteenth-color);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #9a9a9a;
 }
@@ -3157,7 +3161,7 @@ details>summary {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: transparent;
+  background: var(--thirteenth-color);
   border: 1px dashed rgba(255, 220, 22, 0.5);
   color: var(--fifteenth-color);
 }
@@ -3502,6 +3506,7 @@ details>summary {
   border-radius: 8px;
   font-weight: 600;
   color: var(--fifteenth-color);
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 /* Off the clock */
@@ -3643,6 +3648,7 @@ details>summary {
   font-weight: 600;
   color: var(--fourth-color);
   transition: border-color .2s, background .2s, color .2s;
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .ct-topics input:checked + span {
@@ -3867,7 +3873,7 @@ details>summary {
 
 .fav-filter,
 .ct-topics span {
-  background: transparent;
+  background: var(--thirteenth-color);
   border: 2px solid var(--third-color);
   color: var(--fourth-color);
 }
@@ -3886,7 +3892,7 @@ details>summary {
 
 /* "Pick for me" keeps its dashed outline as its special look */
 .fav-pick {
-  background: transparent;
+  background: var(--thirteenth-color);
   border: 2px dashed var(--fifteenth-color);
   color: var(--fifteenth-color);
 }
@@ -5025,10 +5031,11 @@ a.tk-item:hover,
   text-transform: uppercase;
   vertical-align: middle;
   color: var(--fifteenth-color);
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .vs {
-  background: rgba(255, 255, 255, 0.03);
+  background: #242424 /* = 3% white over the page, solid so the grid stays out */;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 1rem;
@@ -5424,6 +5431,7 @@ a.tk-item:hover,
 .ps-table-wrap {
   overflow-x: auto;
   margin-bottom: 1.25rem;
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .ps-table {
@@ -5583,6 +5591,7 @@ a.tk-item:hover,
   color: var(--fifteenth-color) !important;
   font-weight: 700;
   transition: box-shadow .3s, background .3s, color .3s;
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .ps-buy:hover {
@@ -6810,7 +6819,7 @@ html.is-frozen .egg-crash * {
   padding: 0 .9rem;
   border: 2px solid #3a3a3a;
   border-radius: 8px;
-  background: transparent;
+  background: var(--thirteenth-color);
   color: var(--fourth-color);
   font: 600 1rem var(--body-font);
 }
@@ -6852,7 +6861,7 @@ html.is-frozen .egg-crash * {
   padding: 0 .9rem;
   border: 2px solid var(--fifteenth-color);
   border-radius: 8px;
-  background: none;
+  background: var(--thirteenth-color);
   color: var(--fifteenth-color);
   font: 700 .8rem var(--body-font);
   white-space: nowrap;
@@ -6870,7 +6879,7 @@ html.is-frozen .egg-crash * {
 
 .neon-fonts,
 .neon-code-tabs {
-  background: transparent;
+  background: var(--thirteenth-color);
 }
 
 /* copy-paste code for the current sign */
@@ -6878,6 +6887,7 @@ html.is-frozen .egg-crash * {
   border: 1px solid #3a3a3a;
   border-radius: 8px;
   overflow: hidden;
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
 }
 
 .neon-code-bar {
@@ -6893,7 +6903,7 @@ html.is-frozen .egg-crash * {
   padding: .35rem .85rem;
   border: 1px solid var(--fifteenth-color);
   border-radius: 999px;
-  background: none;
+  background: var(--thirteenth-color);
   color: var(--fifteenth-color);
   font: 600 12px var(--body-font);
   letter-spacing: .04em;

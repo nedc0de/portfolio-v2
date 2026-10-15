@@ -2295,33 +2295,72 @@ document.addEventListener('DOMContentLoaded', () => {
 /*===== BACKGROUND: faded maths notes =====*/
 // Scattered over the dot grid like notes on an engineering drawing, all
 // maths this site actually uses (easing, the logo's laser, the charts).
-// A few values tick now and then, like a live readout.
+// They scroll with the page, sit on the grid's rows, alternate between the
+// left and right edges all the way down, and any note that would touch text,
+// an image or a button is left out. A few values tick now and then.
 (() => {
-  // [side, distance from that edge (%), top (%), note, shown on phones too?]
   const NOTES = [
-    ['left', 4, 14, '<i>a</i>ease(t) = 1 − (1 − t)<sup>3</sup>'],
-    ['right', 4, 21, '<i>b</i>p( next | Ned ) <b>.58</b>', 1],
-    ['left', 6, 31, 'lerp(a, b, t) = a + (b − a)·t'],
-    ['right', 5, 38, 'θ = atan2(dy, dx)'],
-    ['left', 3, 47, '<div class="rule">t = <b data-tick="t">0.42</b> s · 60 fps → 16.7 ms</div>', 1],
-    ['right', 4, 55, '√(x² + y²) = <b data-tick="d">24.0</b>'],
-    ['left', 5, 64, 'Σ 1125 × 450'],
-    ['right', 6, 72, 'σ(x) = 1 / (1 + e<sup>−x</sup>)', 1],
-    ['left', 4, 81, 'temperature=0.7  top_p=0.95  prior=<b data-tick="p">0.049</b>'],
-    ['right', 4, 90, 'f(x) = ∫₀¹ x² dx = ⅓', 1],
+    '<i>a</i>ease(t) = 1 − (1 − t)<sup>3</sup>',
+    '<i>b</i>p( next | Ned ) <b>.58</b>',
+    'lerp(a, b, t) = a + (b − a)·t',
+    'θ = atan2(dy, dx)',
+    '<span class="rule">t = <b data-tick="t">0.42</b> s · 60 fps → 16.7 ms</span>',
+    '√(x² + y²) = <b data-tick="d">24.0</b>',
+    'Σ 1125 × 450',
+    'σ(x) = 1 / (1 + e<sup>−x</sup>)',
+    'temperature=0.7  top_p=0.95  prior=<b data-tick="p">0.049</b>',
+    'f(x) = ∫₀¹ x² dx = ⅓',
   ];
+  const GRID = 24; // dot spacing, see the html background in style.css
+  const GAP = GRID * 9; // one note about every 216px down the page
+  const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
   const layer = document.createElement('div');
   layer.className = 'bg-math';
   layer.setAttribute('aria-hidden', 'true');
-  layer.innerHTML = NOTES.map(([side, x, y, html, phone]) => `<div${phone ? '' : ' class="wide"'} style="${side}:${x}%;top:${y}%">${html}</div>`).join('');
   document.body.prepend(layer);
 
+  const layout = () => {
+    layer.style.height = '0';
+    layer.innerHTML = '';
+    const height = document.documentElement.scrollHeight;
+    const width = document.documentElement.clientWidth;
+    const pad = 14;
+    const blocks = [...document.querySelectorAll(CONTENT)]
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width && r.height)
+      .map((r) => ({ l: r.left - pad, r: r.right + pad, t: r.top + scrollY - pad, b: r.bottom + scrollY + pad }));
+    const clear = (l, t, w, h) => !blocks.some((b) => l < b.r && l + w > b.l && t < b.b && t + h > b.t);
+    let n = 0;
+    for (let row = 1; (row * GAP) < height - GRID * 2; row++) {
+      const note = document.createElement('div');
+      note.innerHTML = NOTES[n % NOTES.length];
+      layer.append(note);
+      const w = note.offsetWidth, h = note.offsetHeight;
+      const top = row * GAP + GRID / 2 - h / 2; // centred on a row of dots
+      // left edge on a dot column, or the right edge lined up with one
+      const sides = [GRID + GRID / 2 - 4, Math.floor((width - GRID - w) / GRID) * GRID + GRID / 2 + 4];
+      if (row % 2) sides.reverse();
+      const left = sides.find((x) => x > 0 && x + w < width && clear(x, top, w, h));
+      if (left === undefined) { note.remove(); continue; }
+      note.style.left = left + 'px';
+      note.style.top = top + 'px';
+      n++;
+    }
+    layer.style.height = height + 'px';
+  };
+  // lay out once the page has settled, and again when its size changes
+  // (late images, the home page's blog rows, rotating the phone)
+  let timer;
+  const later = () => { clearTimeout(timer); timer = setTimeout(layout, 250); };
+  if (document.readyState === 'complete') later(); else addEventListener('load', later);
+  if ('ResizeObserver' in window) new ResizeObserver(later).observe(document.body);
+  else addEventListener('resize', later);
+
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const ticks = [...layer.querySelectorAll('[data-tick]')];
   const next = { d: () => (20 + Math.random() * 10).toFixed(1), t: () => Math.random().toFixed(2), p: () => (0.03 + Math.random() * 0.04).toFixed(3) };
   setInterval(() => {
+    const ticks = layer.querySelectorAll('[data-tick]');
     const el = ticks[Math.floor(Math.random() * ticks.length)];
-    el.textContent = next[el.dataset.tick]();
+    if (el) el.textContent = next[el.dataset.tick]();
   }, 2200);
 })();
-
