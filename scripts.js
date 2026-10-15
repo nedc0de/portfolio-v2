@@ -2495,27 +2495,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
-/*===== HOME: Selected work cables =====*/
+/*===== CABLE LISTS: Home's Selected work and the Projects list =====*/
 // Each number's cable runs down and along under its project's description,
 // ending in a dot. They're sized to each row (and again if the layout
 // changes), and draw themselves in one after another the first time the
 // list scrolls into view. No JS: no cables; reduced motion: no drawing in.
-(() => {
-  const list = document.querySelector('.hw-list');
+[['.hw-list', '.hw-row', '.hw-name', '.hw-desc', 9], ['.hl-list', '.hl-row', '.hl-name', '.hl-desc', 16]].forEach(([L, R, N, D, GAP]) => {
+  const list = document.querySelector(L);
   if (!list) return;
-  const rows = [...list.querySelectorAll('.hw-row')];
+  const rows = [...list.querySelectorAll(R)].filter((row) => row.querySelector('.hw-cable'));
+  if (!rows.length) return;
   // all cables end at the same point: 60% across the narrowest title column
   const width = () => Math.min(...rows.map((row) => {
-    const name = row.querySelector('.hw-name');
+    const name = row.querySelector(N);
     return Math.round(name.getBoundingClientRect().left - row.getBoundingClientRect().left + name.offsetWidth * 0.6);
   }));
   const size = () => { const w = width(); rows.forEach((row) => {
     const svg = row.querySelector('.hw-cable');
-    const desc = row.querySelector('.hw-desc') || row.querySelector('.hw-name');
-    if (!svg) return;
+    const desc = row.querySelector(D) || row.querySelector(N);
     const r = row.getBoundingClientRect();
     const top = svg.getBoundingClientRect().top - r.top;
-    const h = Math.max(16, Math.round(desc.getBoundingClientRect().bottom - r.top - top + 9));
+    const h = Math.max(16, Math.round(desc.getBoundingClientRect().bottom - r.top - top + GAP)); // GAP: room under the description
     svg.setAttribute('width', w);
     svg.setAttribute('height', h);
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
@@ -2529,12 +2529,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.fonts) document.fonts.ready.then(size);
 
   if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  rows.forEach((row, i) => row.style.setProperty('--i', i));
+  // each row draws in as it scrolls into view; rows arriving together are
+  // staggered so the cables follow one another
   list.classList.add('will-draw');
-  const io = new IntersectionObserver(([e]) => {
-    if (!e.isIntersecting) return;
-    io.disconnect();
-    requestAnimationFrame(() => list.classList.add('is-drawn'));
-  }, { threshold: .35 });
-  io.observe(list);
-})();
+  const io = new IntersectionObserver((entries) => {
+    entries.filter((e) => e.isIntersecting).forEach((e, i) => {
+      io.unobserve(e.target);
+      e.target.style.setProperty('--i', i);
+      requestAnimationFrame(() => e.target.classList.add('is-drawn'));
+    });
+  }, { threshold: .6 });
+  rows.forEach((row) => io.observe(row));
+});
