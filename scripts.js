@@ -1492,12 +1492,10 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem(T0_KEY, String(t0)); } catch (e) {}
   }
   const phase = () => (Date.now() - t0) % CYCLE;
-  // [cable, from, to (ms into the cycle), letter it lights]; the top loop glows at 10.7s
-  const LOOP = [[0, 0, 2240, 'nav-logo5'], [2, 3520, 8800, 'nav-logo1']];
-  LOOP.forEach(([, , at, cls]) => {
-    const next = () => setTimeout(() => { charge(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
-    next();
-  });
+  // [cable, from, to (ms into the cycle)]; the top loop glows at 10.7s. Each
+  // letter charges up the very frame its laser reaches it (see frame()), so
+  // the flash, the sparks and the light flowing in always land together.
+  const LOOP = [[0, 0, 2240], [2, 3520, 8800]];
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
   next();
 
@@ -1546,7 +1544,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const c = cables[i];
     if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
     taps.push({ ...snake(c), from, speed, start: performance.now() });
-    setTimeout(() => charge(LETTER[i]), ((c.len - from) / speed) * 1000);
   };
   // the N-E-D secret: fast snakes down every cable at once
   group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
@@ -1639,7 +1636,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // the moment a laser reaches the end of its cable: a burst of sparks,
     // and its light flows into the letter
     heads.forEach(([c, l, s]) => {
-      if (s.last !== undefined && s.last < c.len && l >= c.len) { burst(c, cables.indexOf(c)); flowIn(c); }
+      if (s.last !== undefined && s.last < c.len && l >= c.len) {
+        const i = cables.indexOf(c);
+        charge(LETTER[i]);
+        burst(c, i);
+        flowIn(c);
+      }
       s.last = l;
     });
     let n = 0;
