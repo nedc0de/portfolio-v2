@@ -22,7 +22,9 @@ exports.handler = async (event) => {
 
   const apiKey = process.env.BEEHIIV_API_KEY;
   const publication = process.env.BEEHIIV_PUBLICATION_ID;
-  if (!apiKey || !publication) return json(500, { error: 'Newsletter is not configured' });
+  // name (never the value) of anything missing, to make setup easy to check
+  const missing = [!apiKey && 'BEEHIIV_API_KEY', !publication && 'BEEHIIV_PUBLICATION_ID'].filter(Boolean);
+  if (missing.length) return json(500, { error: 'Newsletter is not configured', missing });
 
   let email = '';
   let website = '';
