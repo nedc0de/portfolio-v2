@@ -1736,8 +1736,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.font = `${Math.round(cell * 0.9)}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    grid = Array.from({ length: cols * rows }, () => ({ ch: glyph(), a: Math.random() * 0.25 }));
-    drops = Array.from({ length: cols }, () => ({ y: Math.random() * rows * 2 - rows, every: 260 + Math.random() * 520, t: 0 }));
+    // every page load starts with an empty window: each column's drop starts
+    // just above the top, a few rows apart, so the rain falls in from the top
+    // (a resize keeps whatever is already falling)
+    if (!grid.length || grid.length !== cols * rows) {
+      grid = Array.from({ length: cols * rows }, () => ({ ch: glyph(), a: 0 }));
+      drops = Array.from({ length: cols }, () => ({ y: -1 - Math.floor(Math.random() * 5), every: 260 + Math.random() * 520, t: 0 }));
+    }
     return true;
   };
 
@@ -1780,7 +1785,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const stop = () => { running = false; cancelAnimationFrame(raf); };
 
   if (!setup()) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(); return; }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    grid.forEach((c) => { c.a = Math.random() * 0.25; }); // a still, faint scatter instead
+    draw();
+    return;
+  }
   let visible = true;
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }).observe(box);
