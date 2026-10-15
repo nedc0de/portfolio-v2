@@ -1451,9 +1451,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
   next();
 
-  // A snake is one clean, even laser line: an orange body with a pale core
-  // and a faint glow, all the same length so both ends stay crisp.
-  const LAYERS = [['glow', 120], ['body', 120], ['core', 120]];
+  // A snake is one clean, even laser line: an orange body with a pale core,
+  // the same length so both ends stay crisp, and no glow around it.
+  const LAYERS = [['body', 120], ['core', 120]];
   const TAIL = 135; // a snake is gone once its head is this far past the end
   const snake = (c) => {
     const g = make('g', 'spark-snake', svg);

@@ -292,7 +292,6 @@ position: relative;
 .nav-logo-spark .spark-rail { stroke: none; }
 
 /* a snake: one even laser line, same length and width end to end */
-.nav-logo-spark .spark-glow { stroke: #ff5a14; stroke-width: 16; opacity: .18; }
 .nav-logo-spark .spark-body { stroke: #ff6a1f; stroke-width: 7; }
 .nav-logo-spark .spark-core { stroke: #ffd0a8; stroke-width: 2.5; }
 
