@@ -1402,8 +1402,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#fff1dc" stop-opacity="1"/>'
-    + '<stop offset=".3" stop-color="#ff8a3d" stop-opacity=".75"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient>'
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffe2c2" stop-opacity=".6"/>'
+    + '<stop offset=".18" stop-color="#ff9a52" stop-opacity=".34"/><stop offset=".4" stop-color="#ff7a2e" stop-opacity=".14"/>'
+    + '<stop offset=".65" stop-color="#ff6a1f" stop-opacity=".05"/><stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
     + '<linearGradient id="spark-flare"><stop offset="0" stop-color="#ff6a1f" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/>'
     + '<stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/></linearGradient></defs>';
   const cables = CABLES.map((raw) => {
@@ -1543,7 +1544,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const g = make('g', 'spark-head', tipsLayer);
       // a laser cutter's tip: a tight, hot orange spot, a thin horizontal
       // flare of light through it and a tiny white-hot point
-      g.innerHTML = '<circle class="spark-halo" r="13"/>'
+      g.innerHTML = '<circle class="spark-halo" r="34"/>'
         + '<rect class="spark-flare" x="-34" y="-1" width="68" height="2" rx="1"/>'
         + '<rect class="spark-flare spark-flare-v" x="-0.8" y="-11" width="1.6" height="22" rx="0.8"/>'
         + '<circle class="spark-tip" r="3.2"/>';
@@ -1587,10 +1588,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const g = tip(n++);
       g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
-      // the beam flickers: the flare stretches and the hot spot pulses
-      const fl = calm.matches ? 1 : 0.7 + Math.random() * 0.6;
-      g.firstChild.setAttribute('transform', `scale(${(0.85 + (fl - 0.7) * 0.4).toFixed(2)})`);
-      g.querySelector('.spark-flare').setAttribute('transform', `scale(${fl.toFixed(2)} 1)`);
+      // the glow breathes slowly and the flare gently stretches: smooth, no flicker
+      const t = calm.matches ? 0 : now / 1000;
+      g.firstChild.setAttribute('transform', `scale(${(1 + 0.06 * Math.sin(t * 5)).toFixed(3)})`);
+      g.querySelector('.spark-flare').setAttribute('transform', `scale(${(0.95 + 0.12 * Math.sin(t * 7)).toFixed(3)} 1)`);
       if (calm.matches) return;
       for (let s = 110 * dt; s > 0; s--) { // about 110 sparks a second
         if (s < 1 && Math.random() > s) break;
