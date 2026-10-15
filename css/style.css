@@ -271,8 +271,10 @@ position: relative;
 
 
 /* The cables are dark until a snake of orange laser light runs along them
-   (16s loop, see scripts.js): a hot orange line with a white-hot tip that
-   glows and throws off little sparks, like a laser cutter */
+   (16s loop, drawn by scripts.js): an orange line whose tail fades out, a
+   white-hot tip in a soft glow, and little sparks, like a laser cutter.
+   No blur filters: the glow is just wider, fainter strokes, so it stays
+   smooth on phones. */
 .nav-logo-spark {
   position: absolute;
   inset: 0;
@@ -280,52 +282,35 @@ position: relative;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 0 2px #ff6a1f) drop-shadow(0 0 6px rgba(255, 106, 31, .85)) drop-shadow(0 0 14px rgba(255, 80, 10, .55));
 }
 
 .nav-logo-spark path {
   fill: none;
-  stroke: #ff5e14;
-  stroke-width: 7;
   stroke-linecap: round;
 }
 
-/* the hot centre of the laser line */
-.nav-logo-spark .spark-core {
-  stroke: #ffc79a;
-  stroke-width: 2.5;
+.nav-logo-spark .spark-rail { stroke: none; }
+
+/* a snake, back to front: each dash ends at the head, so the tail fades */
+.nav-logo-spark .spark-glow { stroke: #ff5a14; stroke-width: 22; opacity: .16; }
+.nav-logo-spark .spark-tail { stroke: #ff5e14; stroke-width: 5; opacity: .35; }
+.nav-logo-spark .spark-mid  { stroke: #ff6a1f; stroke-width: 6.5; opacity: .7; }
+.nav-logo-spark .spark-body { stroke: #ff7a2e; stroke-width: 8; }
+.nav-logo-spark .spark-core { stroke: #ffd0a8; stroke-width: 2.5; }
+
+/* the little loop on top glows once a cycle (or when tapped) */
+.nav-logo-spark .spark-loop {
+  stroke: #ff6a1f;
+  stroke-width: 7;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgba(255, 106, 31, .8));
 }
 
 /* the tip: a soft orange halo around a white-hot point (moved by scripts.js) */
 .nav-logo-spark .spark-head { opacity: 0; }
 .nav-logo-spark .spark-halo { fill: url(#spark-halo); }
 .nav-logo-spark .spark-tip { fill: #fff; }
-.nav-logo-spark .spark-bit { fill: #ffd2a6; }
-
-/* the snake is a 120-unit dash; each path is parked just before its start
-   until its turn and ends just past its end, so no dot is left behind.
-   Two separate cables, each with its own spark (no jumping between them):
-   1: right cable into the O (311 long), 3: left cable into the N (876).
-   2: the little loop on top just glows once on its own. */
-.nav-logo-spark .spark-1 { stroke-dasharray: 120 2000; animation: spark-1 16s linear infinite; }
-.nav-logo-spark .spark-2 { opacity: 0; animation: spark-2 16s ease-in-out infinite; }
-.nav-logo-spark .spark-3 { stroke-dasharray: 120 2000; animation: spark-3 16s linear infinite; }
-
-@keyframes spark-1 {
-  0% { stroke-dashoffset: 125; }
-  14%, 100% { stroke-dashoffset: -325; }
-}
-
-@keyframes spark-2 {
-  0%, 64% { opacity: 0; }
-  67% { opacity: .9; }
-  71%, 100% { opacity: 0; }
-}
-
-@keyframes spark-3 {
-  0%, 22% { stroke-dashoffset: 125; }
-  55%, 100% { stroke-dashoffset: -890; }
-}
+.nav-logo-spark .spark-bit { stroke: #ffd2a6; stroke-width: 3; stroke-linecap: round; opacity: 0; }
 
 /* a letter the spark reaches gives a quick electric flicker */
 .nav-logo-group .nav-logo-layer.is-zap {
