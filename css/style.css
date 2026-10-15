@@ -399,8 +399,7 @@ position: relative;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 2; /* above the window, below the letters */
-  width: 100%;
+  width: 100%; /* sits inside the base logo layer: above the window, below the laser and the letters */
   aspect-ratio: 1125 / 450;
   pointer-events: none;
 }
@@ -412,6 +411,9 @@ position: relative;
   width: calc(783 / 1125 * 100%);
   height: calc(169 / 450 * 100%);
   border-radius: 4px;
+  /* the cables crossing the window are cut out, so the rain runs behind them */
+  -webkit-mask: url("../img/logo-matrix-mask.png") 0 0 / 100% 100% no-repeat;
+  mask: url("../img/logo-matrix-mask.png") 0 0 / 100% 100% no-repeat;
   opacity: 1;
   transition: opacity .6s;
 }
