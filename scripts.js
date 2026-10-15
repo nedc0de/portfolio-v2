@@ -1402,8 +1402,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".95"/>'
-    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>';
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ff8a3d" stop-opacity=".2"/>'
+    + '<stop offset=".3" stop-color="#ff7a2e" stop-opacity=".1"/><stop offset=".6" stop-color="#ff6a1f" stop-opacity=".035"/>'
+    + '<stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
+    + '</defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
     const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
@@ -1486,7 +1488,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // A snake is one clean, even laser line: an orange body with a pale core,
   // the same length so both ends stay crisp, and no glow around it.
-  const LAYERS = [['body', 120], ['core', 120]];
+  // the head heats up smoothly: several faint white dashes, each shorter
+  // than the last, stack up so the line whitens gradually toward its head
+  const LAYERS = [['body', 120], ['core', 120], ...[70, 54, 40, 28, 18, 10].map((len) => ['heat', len])];
   const TAIL = 135; // a snake is gone once its head is this far past the end
   const snake = (c) => {
     const g = make('g', 'spark-snake', snakesLayer);
@@ -1539,12 +1543,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const tip = (n) => {
     while (tips.length <= n) {
       const g = make('g', 'spark-head', tipsLayer);
-      g.innerHTML = '<circle class="spark-halo" r="55"/><circle class="spark-tip" r="7"/>';
+      // just a wide, faint warm haze around the head; the line itself
+      // gets whiter toward its head (the warm and hot dashes)
+      g.innerHTML = '<circle class="spark-halo" r="70"/>';
       tips.push(g);
     }
     return tips[n];
   };
-  const bits = Array.from({ length: 40 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
+  const bits = Array.from({ length: 60 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
   let free = 0;
   const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
@@ -1578,17 +1584,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (off || l < 0 || l > c.len) return;
       const p = c.rail.getPointAtLength(l);
       const g = tip(n++);
-      const flick = calm.matches ? 1 : 0.85 + Math.random() * 0.3; // the hot point never sits still
-      g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${flick.toFixed(2)})`);
+      g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
+      // the haze breathes slowly: smooth, no flicker
+      const t = calm.matches ? 0 : now / 1000;
+      g.firstChild.setAttribute('transform', `scale(${(1 + 0.05 * Math.sin(t * 4)).toFixed(3)})`);
       if (calm.matches) return;
-      for (let s = 70 * dt; s > 0; s--) { // about 70 sparks a second
+      for (let s = 22 * dt; s > 0; s--) { // a few tiny sparks, about 22 a second
         if (s < 1 && Math.random() > s) break;
         const b = bits[free];
         free = (free + 1) % bits.length;
         const a = Math.random() * Math.PI * 2;
-        const v = 250 + Math.random() * 550;
-        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 200, life: 0, max: 0.2 + Math.random() * 0.3 });
+        const v = 120 + Math.random() * 260;
+        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, life: 0, max: 0.15 + Math.random() * 0.25 });
       }
     });
     for (let k = n; k < shown; k++) tips[k].style.opacity = 0;
@@ -1602,8 +1610,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // a short streak behind the spark, pointing the way it flies
       b.el.setAttribute('x1', b.x.toFixed(1));
       b.el.setAttribute('y1', b.y.toFixed(1));
-      b.el.setAttribute('x2', (b.x - b.vx * 0.02).toFixed(1));
-      b.el.setAttribute('y2', (b.y - b.vy * 0.02).toFixed(1));
+      b.el.setAttribute('x2', (b.x - b.vx * 0.008).toFixed(1));
+      b.el.setAttribute('y2', (b.y - b.vy * 0.008).toFixed(1));
       b.el.style.opacity = Math.max(0, 1 - b.life / b.max).toFixed(2);
     });
     requestAnimationFrame(frame);
