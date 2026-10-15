@@ -2291,3 +2291,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.2 });
   lists.forEach((l) => io.observe(l));
 })();
+
+/*===== BACKGROUND: faded maths notes =====*/
+// Scattered over the dot grid like notes on an engineering drawing, all
+// maths this site actually uses (easing, the logo's laser, the charts).
+// A few values tick now and then, like a live readout.
+(() => {
+  // [side, distance from that edge (%), top (%), note, shown on phones too?]
+  const NOTES = [
+    ['left', 4, 14, '<i>a</i>ease(t) = 1 − (1 − t)<sup>3</sup>'],
+    ['right', 4, 21, '<i>b</i>p( next | Ned ) <b>.58</b>', 1],
+    ['left', 6, 31, 'lerp(a, b, t) = a + (b − a)·t'],
+    ['right', 5, 38, 'θ = atan2(dy, dx)'],
+    ['left', 3, 47, '<div class="rule">t = <b data-tick="t">0.42</b> s · 60 fps → 16.7 ms</div>', 1],
+    ['right', 4, 55, '√(x² + y²) = <b data-tick="d">24.0</b>'],
+    ['left', 5, 64, 'Σ 1125 × 450'],
+    ['right', 6, 72, 'σ(x) = 1 / (1 + e<sup>−x</sup>)', 1],
+    ['left', 4, 81, 'temperature=0.7  top_p=0.95  prior=<b data-tick="p">0.049</b>'],
+    ['right', 4, 90, 'f(x) = ∫₀¹ x² dx = ⅓', 1],
+  ];
+  const layer = document.createElement('div');
+  layer.className = 'bg-math';
+  layer.setAttribute('aria-hidden', 'true');
+  layer.innerHTML = NOTES.map(([side, x, y, html, phone]) => `<div${phone ? '' : ' class="wide"'} style="${side}:${x}%;top:${y}%">${html}</div>`).join('');
+  document.body.prepend(layer);
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ticks = [...layer.querySelectorAll('[data-tick]')];
+  const next = { d: () => (20 + Math.random() * 10).toFixed(1), t: () => Math.random().toFixed(2), p: () => (0.03 + Math.random() * 0.04).toFixed(3) };
+  setInterval(() => {
+    const el = ticks[Math.floor(Math.random() * ticks.length)];
+    el.textContent = next[el.dataset.tick]();
+  }, 2200);
+})();
+
