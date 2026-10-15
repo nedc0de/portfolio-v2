@@ -5051,6 +5051,55 @@ a.tk-item:hover,
    contact form; it says "You're in" once the email is added */
 .hm-fav-star { color: var(--fifteenth-color); }
 
+/* Selected work: a small arrow after each name, since they open other sites */
+.hw-out {
+  display: inline-block;
+  margin-left: .35rem;
+  font-size: .75em;
+  font-weight: 600;
+  color: var(--fifteenth-color);
+  opacity: .7;
+  transition: transform .25s, opacity .25s;
+}
+
+.hw-row:hover .hw-out { opacity: 1; transform: translate(2px, -2px); }
+
+/* Contact nudge before the newsletter: one clear way to reach Ned */
+.hm-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding: 1.1rem 1.2rem;
+  border: 2px solid var(--third-color);
+  border-radius: 10px;
+  background: var(--thirteenth-color);
+  color: var(--fourth-color);
+  font-weight: 600;
+  text-align: left;
+  transition: border-color .25s;
+}
+
+.hm-cta b {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  color: var(--fifteenth-color);
+}
+
+.hm-cta b i { transition: transform .25s; }
+.hm-cta:hover { border-color: var(--fifteenth-color); }
+.hm-cta:hover b i { transform: translateX(3px); }
+
+/* Phones: less empty space between the logo and the hero, so more of the
+   page shows on the first screen */
+@media (max-width: 768px) {
+  .hm-home .home-data { margin-top: .25rem; }
+  .hm-home .home-title { margin-top: 0; }
+}
+
 .hm-news-form {
   display: grid;
   grid-template-columns: 1fr auto;
