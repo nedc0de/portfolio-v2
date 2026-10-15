@@ -1448,11 +1448,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const flowIn = (c) => {
     if (!c.flow || group.classList.contains('is-power-off')) return;
+    // a white-hot glow rises from where the cable meets the letter and
+    // sweeps up through it, then fades as the letter charges up
     c.flow.animate([
       { transform: 'translate(-50%, -50%) scale(.05)', opacity: 1 },
-      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.55 },
-      { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0 },
-    ], { duration: 900, easing: 'ease-out' });
+      { transform: 'translate(-50%, -62%) scale(.75)', opacity: .95, offset: 0.4 },
+      { transform: 'translate(-50%, -75%) scale(1.15)', opacity: 0 },
+    ], { duration: 1000, easing: 'cubic-bezier(.22, .61, .36, 1)' });
   };
 
   // flicker a letter when the snake arrives; a letter that was tapped off
@@ -1464,6 +1466,17 @@ document.addEventListener('DOMContentLoaded', () => {
     void letter.offsetWidth;
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
+  };
+  // the laser arriving at its letter: instead of a flicker, the letter
+  // charges up (flares white-hot and glows, then settles back to its yellow)
+  const charge = (cls) => {
+    const letter = group.querySelector('.' + cls);
+    if (!letter || letter.classList.contains('is-relight') || group.classList.contains('is-power-off')) return;
+    letter.classList.remove('is-off', 'is-zap', 'is-charge');
+    void letter.offsetWidth;
+    letter.classList.add('is-charge');
+    clearTimeout(letter.chargeTimer);
+    letter.chargeTimer = setTimeout(() => letter.classList.remove('is-charge'), 1200);
   };
   const glowLoop = () => loop.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 });
 
@@ -1482,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // [cable, from, to (ms into the cycle), letter it lights]; the top loop glows at 10.7s
   const LOOP = [[0, 0, 2240, 'nav-logo5'], [2, 3520, 8800, 'nav-logo1']];
   LOOP.forEach(([, , at, cls]) => {
-    const next = () => setTimeout(() => { zap(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
+    const next = () => setTimeout(() => { charge(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
     next();
   });
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
@@ -1533,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const c = cables[i];
     if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
     taps.push({ ...snake(c), from, speed, start: performance.now() });
-    setTimeout(() => zap(LETTER[i]), ((c.len - from) / speed) * 1000);
+    setTimeout(() => charge(LETTER[i]), ((c.len - from) / speed) * 1000);
   };
   // the N-E-D secret: fast snakes down every cable at once
   group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
