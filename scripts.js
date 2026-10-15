@@ -1572,21 +1572,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return tips[n];
   };
-  const bits = Array.from({ length: 110 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
+  // sparks are drawn in their own layer in front of the letters, so a burst
+  // can crackle over the N or the O instead of hiding behind it
+  const front = make('svg', 'nav-logo-spark nav-logo-spark-front');
+  front.setAttribute('viewBox', '0 0 1125 450');
+  front.setAttribute('aria-hidden', 'true');
+  const frontFx = make('g', 'spark-fx', front);
+  group.append(front);
+  const bits = Array.from({ length: 170 }, () => ({ el: make('line', 'spark-bit', frontFx), life: 1, max: 0 }));
   let free = 0;
   const HOT = [255, 250, 225], COOL = [255, 220, 22];
-  const spark = (x, y, a, v, ember) => {
+  const spark = (x, y, a, v, ember, big) => {
     const b = bits[free];
     free = (free + 1) % bits.length;
-    Object.assign(b, { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, ember,
-      max: ember ? 0.55 + Math.random() * 0.6 : 0.1 + Math.random() * 0.18 });
-    b.el.style.strokeWidth = ember ? (1.6 + Math.random() * 1.4).toFixed(1) : '1.6';
+    Object.assign(b, { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, ember, big,
+      max: ember ? 0.55 + Math.random() * 0.6 : (big ? 0.25 : 0.1) + Math.random() * 0.2 });
+    // burst sparks are thicker so they read on top of the glowing letter
+    b.el.style.strokeWidth = ember ? ((big ? 2.8 : 1.6) + Math.random() * 1.4).toFixed(1) : (big ? '3.2' : '1.6');
   };
-  // the end of a run: a quick burst of sparks where the cable meets the letter
-  const burst = (c) => {
-    if (calm.matches || group.classList.contains('is-power-off')) return;
+  // The end of a run: a burst of sparks at the letter, a different one each
+  // time: all over the letter, sprayed out sideways, a fountain above it, or
+  // a mix of the three. Boxes are each letter's area in the artwork.
+  const LETTER_BOX = [[605, 150, 830, 370], null, [205, 150, 420, 370]]; // O, (loop), N
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const PATTERNS = {
+    over: (p, box, n) => { // crackling across the whole letter
+      for (let i = 0; i < n; i++) spark(rnd(box[0], box[2]), rnd(box[1], box[3]), rnd(0, Math.PI * 2), rnd(90, 320), i % 3 === 0, true);
+    },
+    side: (p, box, n) => { // sprayed out to both sides
+      for (let i = 0; i < n; i++) spark(p.x, p.y - rnd(0, 30), (i % 2 ? 0 : Math.PI) + rnd(-0.45, 0.25) * (i % 2 ? 1 : -1), rnd(300, 680), i % 4 === 0, true);
+    },
+    up: (p, box, n) => { // a fountain shooting up over the letter
+      for (let i = 0; i < n; i++) spark(p.x + rnd(-10, 10), p.y, -Math.PI / 2 + rnd(-0.6, 0.6), rnd(500, 950), i % 3 === 0, true);
+    },
+  };
+  const burst = (c, i) => {
+    if (calm.matches || group.classList.contains('is-power-off') || !LETTER_BOX[i]) return;
     const p = c.rail.getPointAtLength(c.len);
-    for (let i = 0; i < 26; i++) spark(p.x, p.y, -Math.PI * Math.random(), 160 + Math.random() * 420, i % 3 === 0);
+    const box = LETTER_BOX[i];
+    const pick = ['over', 'side', 'up', 'mix'][Math.floor(Math.random() * 4)];
+    if (pick === 'mix') { PATTERNS.over(p, box, 16); PATTERNS.side(p, box, 12); PATTERNS.up(p, box, 12); }
+    else PATTERNS[pick](p, box, 36);
   };
   const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
@@ -1613,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // the moment a laser reaches the end of its cable: a burst of sparks,
     // and its light flows into the letter
     heads.forEach(([c, l, s]) => {
-      if (s.last !== undefined && s.last < c.len && l >= c.len) { burst(c); flowIn(c); }
+      if (s.last !== undefined && s.last < c.len && l >= c.len) { burst(c, cables.indexOf(c)); flowIn(c); }
       s.last = l;
     });
     let n = 0;
@@ -1656,7 +1682,7 @@ document.addEventListener('DOMContentLoaded', () => {
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       // streaks: a short line pointing the way they fly; embers: a dot that cools
-      const tail = b.ember ? 0.004 : 0.01;
+      const tail = b.ember ? 0.004 : (b.big ? 0.03 : 0.01);
       b.el.setAttribute('x1', b.x.toFixed(1));
       b.el.setAttribute('y1', b.y.toFixed(1));
       b.el.setAttribute('x2', (b.x - b.vx * tail).toFixed(1));

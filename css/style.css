@@ -356,6 +356,14 @@ position: relative;
 .nav-logo-spark .spark-glow { fill: url(#spark-core); }
 .nav-logo-spark .spark-rays path { fill: #fffbe8; opacity: .85; }
 .nav-logo-spark .spark-dot { fill: #fff; }
+/* the sparks' own layer, in front of the letters (same box as the artwork) */
+.nav-logo-spark-front {
+  z-index: 5;
+  bottom: auto;
+  height: auto;
+  aspect-ratio: 1125 / 450;
+}
+
 .nav-logo-spark .spark-bit { stroke: #fff9d6; stroke-width: 1.6; stroke-linecap: round; opacity: 0; }
 
 /* light flowing into a letter from where its cable meets it: a glow masked
@@ -392,7 +400,7 @@ position: relative;
 
 @keyframes neon-charge {
   0% { filter: brightness(1); }
-  22% { filter: brightness(1.55) drop-shadow(0 0 4px rgba(255, 245, 200, .9)) drop-shadow(0 0 14px rgba(255, 220, 22, .85)); }
+  22% { filter: brightness(1.32) drop-shadow(0 0 3px rgba(255, 245, 200, .8)) drop-shadow(0 0 12px rgba(255, 220, 22, .8)); }
   100% { filter: brightness(1) drop-shadow(0 0 0 rgba(255, 245, 200, 0)) drop-shadow(0 0 0 rgba(255, 220, 22, 0)); }
 }
 
