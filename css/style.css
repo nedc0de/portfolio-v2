@@ -3540,7 +3540,15 @@ details>summary {
   border-radius: 8px;
   font-weight: 600;
   color: var(--fifteenth-color);
-  background: var(--thirteenth-color); /* solid, so the dot grid doesn't show through */
+  /* a small dot in each corner, like the screws on a panel; the page colour
+     underneath keeps the dot grid from showing through */
+  --corner-dot: radial-gradient(circle, rgba(255, 220, 22, .55) 1.5px, transparent 2.1px);
+  background:
+    var(--corner-dot) 5px 5px / 6px 6px no-repeat,
+    var(--corner-dot) calc(100% - 5px) 5px / 6px 6px no-repeat,
+    var(--corner-dot) 5px calc(100% - 5px) / 6px 6px no-repeat,
+    var(--corner-dot) calc(100% - 5px) calc(100% - 5px) / 6px 6px no-repeat,
+    var(--thirteenth-color);
 }
 
 /* Off the clock */
