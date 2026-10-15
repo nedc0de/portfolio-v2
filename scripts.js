@@ -1352,11 +1352,13 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== LOGO: current running through the cables =====*/
-// A spark of light runs along each yellow cable in turn: the right cable into
-// the O, then a moment later out of the window and around the left cable into
-// the N. Each letter flickers as its spark arrives, and the little loop on top
-// glows once on its own. The paths were
-// traced from the 1125×450 logo artwork; timings match the 16s CSS loop.
+// A laser snake runs along each cable in turn, like a laser cutter: the right
+// cable into the O, then a moment later out of the window and around the left
+// cable into the N. It's an orange line with a tail that fades out, a
+// white-hot tip in a soft glow, and little sparks that fly off and fall. Each
+// letter flickers as its snake arrives, and the little loop on top glows once
+// on its own. The paths were traced from the 1125×450 logo artwork and are
+// smoothed into curves here. Everything runs on one 16s clock in JS.
 (() => {
   const group = document.querySelector('.nav-logo-group');
   const base = group && group.querySelector('.nav-logo');
@@ -1366,15 +1368,57 @@ document.addEventListener('DOMContentLoaded', () => {
     'M789 160 789 160 784 160 779 157 774 155 769 154 764 153 759 153 754 153 749 155 744 158 739 161',
     'M445 161 445 161 440 160 435 159 430 157 425 152 420 147 417 142 414 137 413 132 411 127 411 122 411 117 411 112 412 107 414 102 416 97 418 92 421 87 423 82 424 77 425 72 426 67 425 62 425 57 422 52 417 47 412 44 407 42 402 40 397 40 392 40 387 40 382 42 377 44 372 46 367 49 362 52 357 56 352 59 347 63 342 67 337 71 332 74 327 77 322 79 317 82 312 84 307 85 302 86 297 87 292 88 287 87 282 87 277 86 272 84 267 81 262 77 257 72 252 68 247 63 242 58 237 55 232 52 227 50 222 48 217 46 212 45 207 45 202 45 197 45 192 46 187 47 182 49 177 50 172 53 167 55 162 58 157 63 152 67 147 72 144 77 141 82 138 87 136 92 134 97 133 102 131 107 130 112 130 117 129 122 129 127 130 132 130 137 130 142 131 147 132 152 134 157 136 162 138 167 140 172 142 177 144 182 147 187 149 192 152 197 154 202 156 207 158 212 160 217 161 222 162 227 163 232 164 237 165 242 165 247 165 252 165 257 165 262 165 267 164 272 163 277 162 282 161 287 160 292 159 297 158 302 158 307 158 312 158 317 160 322 162 327 164 332 168 337 172 342 177 347 182 351 187 356 192 359 197 363 202 365 207 367 212 368 217 369 222 369 227 368 232 367 237 365 242 362 247 359 252 354 257 349 261 344 264 339 267 334 269 329 272 324 274 319 277 314 280 309',
   ];
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('class', 'nav-logo-spark');
+  const NS = 'http://www.w3.org/2000/svg';
+  const make = (tag, cls, parent) => {
+    const el = document.createElementNS(NS, tag);
+    if (cls) el.setAttribute('class', cls);
+    if (parent) parent.append(el);
+    return el;
+  };
+
+  // The traced points are a little jagged, so even them out (a short moving
+  // average) and run a Catmull-Rom curve through them.
+  const smooth = (d) => {
+    const n = d.slice(1).trim().split(/\s+/).map(Number);
+    let pts = [];
+    for (let i = 0; i < n.length; i += 2) {
+      const last = pts[pts.length - 1];
+      if (!last || last[0] !== n[i] || last[1] !== n[i + 1]) pts.push([n[i], n[i + 1]]);
+    }
+    pts = pts.map((p, i) => {
+      if (i < 2 || i > pts.length - 3) return p;
+      const w = pts.slice(i - 2, i + 3);
+      return [w.reduce((s, q) => s + q[0], 0) / 5, w.reduce((s, q) => s + q[1], 0) / 5];
+    });
+    let out = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c = (a, b, s) => (a + (b * s) / 6).toFixed(1);
+      out += ` C${c(p1[0], p2[0] - p0[0], 1)} ${c(p1[1], p2[1] - p0[1], 1)} ${c(p2[0], p3[0] - p1[0], -1)} ${c(p2[1], p3[1] - p1[1], -1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    return out;
+  };
+
+  const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  // each snake is a neon tube: a yellow tube with a pale, white-hot core
-  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/><path class="spark-${i + 1} spark-core" d="${d}"/>`).join('');
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".95"/>'
+    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>';
+  const cables = CABLES.map((raw) => {
+    const d = smooth(raw);
+    const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
+    rail.setAttribute('d', d);
+    const len = rail.getTotalLength();
+    const pts = [];
+    for (let l = 0; l <= len; l += 4) { const q = rail.getPointAtLength(l); pts.push([l, q.x, q.y]); }
+    return { d, rail, len, pts };
+  });
+  // the little loop on top only glows, it never carries a snake
+  const loop = make('path', 'spark-loop', svg);
+  loop.setAttribute('d', cables[1].d);
   base.append(svg);
 
-  // flicker a letter when the spark arrives; a letter that was tapped off
+  // flicker a letter when the snake arrives; a letter that was tapped off
   // gets switched straight back on by it
   const zap = (cls) => {
     const letter = group.querySelector('.' + cls);
@@ -1384,6 +1428,8 @@ document.addEventListener('DOMContentLoaded', () => {
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
   };
+  const glowLoop = () => loop.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 });
+
   // The loop keeps going from page to page instead of starting over: the
   // moment it first started is remembered for the visit, and every page picks
   // the snakes up from wherever they'd be by now.
@@ -1396,27 +1442,43 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem(T0_KEY, String(t0)); } catch (e) {}
   }
   const phase = () => (Date.now() - t0) % CYCLE;
-  svg.querySelectorAll('path').forEach((p) => { p.style.animationDelay = `-${phase()}ms`; });
-
-  // each letter flickers as its snake reaches it, on the same clock
-  const ARRIVALS = [['nav-logo5', 2240], ['nav-logo1', 8800]]; // the O, then the N
-  ARRIVALS.forEach(([cls, at]) => {
+  // [cable, from, to (ms into the cycle), letter it lights]; the top loop glows at 10.7s
+  const LOOP = [[0, 0, 2240, 'nav-logo5'], [2, 3520, 8800, 'nav-logo1']];
+  LOOP.forEach(([, , at, cls]) => {
     const next = () => setTimeout(() => { zap(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
     next();
   });
+  const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
+  next();
+
+  // A snake is a few dashes stacked so they all end at its head: long, faint
+  // and thin at the back, short, bright and thick at the front, so the tail
+  // fades out. Plus a pale core and a wide, faint glow.
+  const LAYERS = [['glow', 130], ['tail', 130], ['mid', 75], ['body', 38], ['core', 55]];
+  const TAIL = 135; // a snake is gone once its head is this far past the end
+  const snake = (c) => {
+    const g = make('g', 'spark-snake', svg);
+    const parts = LAYERS.map(([cls, len]) => {
+      const p = make('path', 'spark-' + cls, g);
+      p.setAttribute('d', c.d);
+      p.style.strokeDasharray = `${len} 5000`;
+      return [p, len];
+    });
+    return { c, g, parts };
+  };
+  const draw = (s, head) => {
+    if (s.head === head) return; // parked: nothing to repaint
+    s.head = head;
+    s.parts.forEach(([p, len]) => { p.style.strokeDashoffset = len - head; });
+  };
 
   // Home page: tap a cable and a snake sets off from that exact spot towards
   // its letter (right cable to the O, left cable to the N); the little loop on
   // top just lights up. The letter switch code calls this for taps that don't
   // land on a letter or the window's dots.
-  const cables = [...svg.querySelectorAll('path:not(.spark-core)')].map((p) => {
-    const len = p.getTotalLength();
-    const pts = [];
-    for (let l = 0; l <= len; l += 4) { const q = p.getPointAtLength(l); pts.push([l, q.x, q.y]); }
-    return { d: p.getAttribute('d'), len, pts };
-  });
   const LETTER = ['nav-logo5', null, 'nav-logo1'];
   const SPEED = 140; // units per second, same pace as the loop
+  const taps = [];
   group.sendSpark = (x, y) => {
     if (group.classList.contains('is-power-off')) return false;
     let best = null;
@@ -1429,25 +1491,87 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   };
   // one snake on cable i, its head starting at `from`, then a flicker at its letter
-  const glowLoop = () => svg.querySelectorAll('.spark-2').forEach((p) => p.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 }));
   const run = (i, from, speed) => {
     const c = cables[i];
     if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
-    const ms = ((c.len - from) / speed) * 1000;
-    ['', ' spark-core'].forEach((core) => {
-      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      p.setAttribute('class', 'spark-tap' + core);
-      p.setAttribute('d', c.d);
-      p.style.strokeDasharray = '120 3000';
-      svg.append(p);
-      // the dash's head starts at `from` and runs off the end of the cable
-      p.animate([{ strokeDashoffset: 120 - from }, { strokeDashoffset: -(c.len + 10) }],
-        { duration: ms + (130 / speed) * 1000, easing: 'linear' }).onfinish = () => p.remove();
-    });
-    setTimeout(() => zap(LETTER[i]), ms);
+    taps.push({ ...snake(c), from, speed, start: performance.now() });
+    setTimeout(() => zap(LETTER[i]), ((c.len - from) / speed) * 1000);
   };
   // the N-E-D secret: fast snakes down every cable at once
   group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
+
+  // The laser tip and its sparks. Sparks come from a small pool of short
+  // streaks, so nothing is created or thrown away while it runs.
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const tips = [];
+  const tip = (n) => {
+    while (tips.length <= n) {
+      const g = make('g', 'spark-head', svg);
+      g.innerHTML = '<circle class="spark-halo" r="55"/><circle class="spark-tip" r="7"/>';
+      tips.push(g);
+    }
+    return tips[n];
+  };
+  const bits = Array.from({ length: 40 }, () => ({ el: make('line', 'spark-bit', svg), life: 1, max: 0 }));
+  let free = 0;
+  const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
+  let last = performance.now();
+  let shown = 0;
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const off = group.classList.contains('is-power-off');
+    const heads = [];
+    const t = phase();
+    loops.forEach((s) => {
+      const p = (t - s.from) / (s.to - s.from);
+      const head = p >= 0 && p < 1 ? -5 + (s.c.len + TAIL + 5) * p : -200;
+      draw(s, head);
+      heads.push([s.c, head]);
+    });
+    for (let k = taps.length - 1; k >= 0; k--) {
+      const s = taps[k];
+      const head = s.from + s.speed * ((now - s.start) / 1000);
+      if (head > s.c.len + TAIL) { s.g.remove(); taps.splice(k, 1); continue; }
+      draw(s, head);
+      heads.push([s.c, head]);
+    }
+    let n = 0;
+    heads.forEach(([c, l]) => {
+      if (off || l < 0 || l > c.len) return;
+      const p = c.rail.getPointAtLength(l);
+      const g = tip(n++);
+      const flick = calm.matches ? 1 : 0.85 + Math.random() * 0.3; // the hot point never sits still
+      g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${flick.toFixed(2)})`);
+      g.style.opacity = 1;
+      if (calm.matches) return;
+      for (let s = 70 * dt; s > 0; s--) { // about 70 sparks a second
+        if (s < 1 && Math.random() > s) break;
+        const b = bits[free];
+        free = (free + 1) % bits.length;
+        const a = Math.random() * Math.PI * 2;
+        const v = 250 + Math.random() * 550;
+        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 200, life: 0, max: 0.2 + Math.random() * 0.3 });
+      }
+    });
+    for (let k = n; k < shown; k++) tips[k].style.opacity = 0;
+    shown = n;
+    bits.forEach((b) => {
+      if (b.life >= b.max) { if (b.max) { b.el.style.opacity = 0; b.max = 0; } return; }
+      b.life += dt;
+      b.vy += 1600 * dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      // a short streak behind the spark, pointing the way it flies
+      b.el.setAttribute('x1', b.x.toFixed(1));
+      b.el.setAttribute('y1', b.y.toFixed(1));
+      b.el.setAttribute('x2', (b.x - b.vx * 0.02).toFixed(1));
+      b.el.setAttribute('y2', (b.y - b.vy * 0.02).toFixed(1));
+      b.el.style.opacity = Math.max(0, 1 - b.life / b.max).toFixed(2);
+    });
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
 })();
 
 /*===== EASTER EGG: Konami code =====*/
