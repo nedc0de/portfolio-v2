@@ -1352,13 +1352,12 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== LOGO: current running through the cables =====*/
-// A laser snake runs along each cable in turn, like a laser cutter: the right
-// cable into the O, then a moment later out of the window and around the left
-// cable into the N. It's an even orange line with a
-// white-hot tip in a soft glow, and little sparks that fly off and fall. Each
-// letter flickers as its snake arrives, and the little loop on top glows once
-// on its own. The paths were traced from the 1125×450 logo artwork and are
-// smoothed into curves here. Everything runs on one 26s clock in JS.
+// Once a cycle each cable flashes along its whole length with an electric
+// flicker, a few sparks crackle off it, and its letter sparks and charges up
+// (right cable and the O, then the left cable and the N). The little loop on
+// top glows once on its own. Tapping a cable flashes it. The paths were
+// traced from the 1125×450 logo artwork and are smoothed into curves here.
+// Everything runs on one 26s clock in JS.
 (() => {
   const group = document.querySelector('.nav-logo-group');
   const base = group && group.querySelector('.nav-logo');
@@ -1492,10 +1491,15 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem(T0_KEY, String(t0)); } catch (e) {}
   }
   const phase = () => (Date.now() - t0) % CYCLE;
-  // [cable, from, to (ms into the cycle)]; the top loop glows at 10.7s. Each
-  // letter charges up the very frame its laser reaches it (see frame()), so
-  // the flash, the sparks and the light flowing in always land together.
-  const LOOP = [[0, 0, 2240], [2, 3520, 8800]];
+  // Instead of a laser travelling along them, each cable flashes along its
+  // whole length once a cycle, and in that instant its letter sparks and
+  // charges up: the right cable and the O at 2.2s, the left cable and the N
+  // at 8.8s. The little loop on top glows at 10.7s.
+  const FLASHES = [[0, 2240], [2, 8800]]; // [cable, ms into the cycle]
+  FLASHES.forEach(([i, at]) => {
+    const next = () => setTimeout(() => { flash(i); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
+    next();
+  });
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
   next();
 
@@ -1526,7 +1530,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // top just lights up. The letter switch code calls this for taps that don't
   // land on a letter or the window's dots.
   const LETTER = ['nav-logo5', null, 'nav-logo1'];
-  const SPEED = 140; // units per second, same pace as the loop
   const taps = [];
   group.sendSpark = (x, y) => {
     if (group.classList.contains('is-power-off')) return false;
@@ -1536,17 +1539,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (dist < 40 && (!best || dist < best.dist)) best = { i, l, dist };
     }));
     if (!best) return false;
-    run(best.i, best.l, SPEED);
+    run(best.i);
     return true;
   };
-  // one snake on cable i, its head starting at `from`, then a flicker at its letter
-  const run = (i, from, speed) => {
+  // a tapped cable flashes too (the top loop just glows)
+  const run = (i) => (LETTER[i] ? flash(i) : glowLoop());
+
+  // A flash: the whole cable lights up with an electric flicker, a few sparks
+  // crackle off it, and on the first bright beat its letter sparks and
+  // charges up (with the light flowing in).
+  const flash = (i) => {
+    if (group.classList.contains('is-power-off')) return;
     const c = cables[i];
-    if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
-    taps.push({ ...snake(c), from, speed, start: performance.now() });
+    const g = make('g', 'spark-flash', snakesLayer);
+    ['body', 'core'].forEach((cls) => make('path', 'spark-' + cls, g).setAttribute('d', c.d));
+    const calmNow = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    g.animate(calmNow
+      ? [{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0 }]
+      : [{ opacity: 0 }, { opacity: 1, offset: 0.06 }, { opacity: 0.2, offset: 0.12 }, { opacity: 1, offset: 0.2 },
+        { opacity: 0.45, offset: 0.3 }, { opacity: 1, offset: 0.38 }, { opacity: 0 }],
+    { duration: 900, easing: 'linear' }).onfinish = () => g.remove();
+    setTimeout(() => {
+      charge(LETTER[i]);
+      burst(c, i);
+      flowIn(c);
+      if (calmNow) return;
+      for (let k = 0; k < 14; k++) { // sparks crackling off the cable
+        const p = c.rail.getPointAtLength(Math.random() * c.len);
+        spark(p.x, p.y, Math.random() * Math.PI * 2, 120 + Math.random() * 280, k % 3 === 0);
+      }
+    }, 55);
   };
-  // the N-E-D secret: fast snakes down every cable at once
-  group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
+  // the N-E-D secret: every cable flashes at once
+  group.raceSparks = () => { run(0); run(2); glowLoop(); };
 
   // The laser tip, like a welding/cutting spark: a white-hot core in a tight
   // glow, a starburst of thin rays that shimmer, and two kinds of sparks:
@@ -1611,7 +1636,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pick === 'mix') { PATTERNS.over(p, box, 16); PATTERNS.side(p, box, 12); PATTERNS.up(p, box, 12); }
     else PATTERNS[pick](p, box, 36);
   };
-  const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
   let shown = 0;
   const frame = (now) => {
@@ -1619,13 +1643,6 @@ document.addEventListener('DOMContentLoaded', () => {
     last = now;
     const off = group.classList.contains('is-power-off');
     const heads = [];
-    const t = phase();
-    loops.forEach((s) => {
-      const p = (t - s.from) / (s.to - s.from);
-      const head = p >= 0 && p < 1 ? -5 + (s.c.len + TAIL + 5) * p : -200;
-      draw(s, head);
-      heads.push([s.c, head, s]);
-    });
     for (let k = taps.length - 1; k >= 0; k--) {
       const s = taps[k];
       const head = s.from + s.speed * ((now - s.start) / 1000);
