@@ -4815,28 +4815,76 @@ a.tk-item:hover,
 
 /* Selected work: a compact version of the Projects page hover list */
 .hw-list {
-  border-top: 1px solid var(--third-color);
   position: relative; /* anchors the soft backdrop (::before) */
+  --node: 1.9rem;
+  --pad: 1rem;
 }
 
+/* No divider lines: from each number a yellow cable runs down and along
+   under the project's description, ending in a dot, like a trace on a
+   circuit board. scripts.js sizes each cable to its row and draws them in
+   one after another when the list scrolls into view (.is-drawn). */
 .hw-row {
+  position: relative;
   display: grid;
-  grid-template-columns: 2.2rem 1fr auto;
-  align-items: center;
-  gap: .8rem;
-  padding: 1rem .25rem;
-  border-bottom: 1px solid var(--third-color);
+  grid-template-columns: var(--node) 1fr auto;
+  align-items: start; /* the title lines up with its number */
+  gap: 1rem;
+  padding: var(--pad) 0 calc(var(--pad) + .5rem);
   color: var(--fourth-color);
   text-align: left;
-  transition: padding .35s ease;
 }
 
+.hw-name { padding-top: .05rem; }
+.hw-meta { padding-top: .15rem; }
+
 .hw-num {
-  font-size: .75rem;
-  font-weight: 600;
-  color: var(--second-color);
-  transition: color .35s;
+  padding-top: .45rem;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
 }
+
+.hw-cable {
+  position: absolute;
+  left: 7px;
+  top: calc(var(--pad) + 1.6rem);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hw-cable path {
+  fill: none;
+  stroke: var(--fifteenth-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .75;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: opacity .3s;
+}
+
+.hw-cable circle {
+  fill: var(--fifteenth-color);
+  opacity: .9;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hw-list.will-draw .hw-cable path { stroke-dashoffset: 1; }
+.hw-list.will-draw .hw-cable circle { opacity: 0; transform: scale(0); }
+.hw-list.is-drawn .hw-cable path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .7s cubic-bezier(.22, .61, .36, 1) calc(var(--i, 0) * .3s), opacity .3s;
+}
+.hw-list.is-drawn .hw-cable circle {
+  opacity: .9;
+  transform: none;
+  transition: opacity .2s calc(var(--i, 0) * .3s + .6s), transform .35s cubic-bezier(.34, 1.56, .64, 1) calc(var(--i, 0) * .3s + .6s);
+}
+
+.hw-row:hover .hw-cable path { opacity: 1; }
 
 .hw-name {
   min-width: 0; /* lets the one-line description truncate instead of widening the row */
@@ -4891,12 +4939,8 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-.hw-row:hover {
-  padding-left: 1rem;
-}
-
 .hw-row:hover .hw-num {
-  color: var(--fifteenth-color);
+  color: var(--seventh-color);
 }
 
 .hw-row:hover .hw-desc {
@@ -4921,28 +4965,21 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-/* Phones: no hover, so each row shows its number in yellow (like About's
-   How I work) and its description right away */
+/* Phones: no hover, so each row shows its description right away */
 @media (hover: none), (max-width: 768px) {
-  .hw-row {
-    grid-template-columns: 2rem 1fr auto;
-    padding: .85rem 0;
+  .hw-list {
+    --node: 1.75rem;
+    --pad: .85rem;
   }
 
-  .hw-row:hover {
-    padding-left: 0;
+  .hw-row {
+    gap: .85rem;
   }
 
   .hw-list:hover .hw-name {
     color: inherit;
   }
 
-  .hw-num {
-    align-self: start;
-    padding-top: .3rem;
-    font-size: .8rem;
-    color: var(--fifteenth-color);
-  }
 
   .hw-name {
     font-size: 1.05rem;
