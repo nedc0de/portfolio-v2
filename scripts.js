@@ -1402,8 +1402,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".95"/>'
-    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>';
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".5"/>'
+    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".18"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
     const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
@@ -1539,12 +1539,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const tip = (n) => {
     while (tips.length <= n) {
       const g = make('g', 'spark-head', tipsLayer);
-      g.innerHTML = '<circle class="spark-halo" r="55"/><circle class="spark-tip" r="7"/>';
+      // a small, faint glow, a twinkling four-point star and a hot white point
+      g.innerHTML = '<circle class="spark-halo" r="24"/>'
+        + '<path class="spark-star" d="M0-17 1.6-1.6 17 0 1.6 1.6 0 17-1.6 1.6-17 0-1.6-1.6Z"/>'
+        + '<circle class="spark-tip" r="4"/>';
       tips.push(g);
     }
     return tips[n];
   };
-  const bits = Array.from({ length: 40 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
+  const bits = Array.from({ length: 60 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
   let free = 0;
   const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
@@ -1578,17 +1581,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (off || l < 0 || l > c.len) return;
       const p = c.rail.getPointAtLength(l);
       const g = tip(n++);
-      const flick = calm.matches ? 1 : 0.85 + Math.random() * 0.3; // the hot point never sits still
-      g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${flick.toFixed(2)})`);
+      g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
+      // the star twinkles: it turns slowly and flickers in size
+      const tw = calm.matches ? 0.8 : 0.45 + Math.random() * 0.75;
+      g.querySelector('.spark-star').setAttribute('transform', `rotate(${((now / 8) % 90).toFixed(1)}) scale(${tw.toFixed(2)})`);
       if (calm.matches) return;
-      for (let s = 70 * dt; s > 0; s--) { // about 70 sparks a second
+      for (let s = 110 * dt; s > 0; s--) { // about 110 sparks a second
         if (s < 1 && Math.random() > s) break;
         const b = bits[free];
         free = (free + 1) % bits.length;
         const a = Math.random() * Math.PI * 2;
-        const v = 250 + Math.random() * 550;
-        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 200, life: 0, max: 0.2 + Math.random() * 0.3 });
+        const v = 200 + Math.random() * 450;
+        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 150, life: 0, max: 0.12 + Math.random() * 0.2 });
       }
     });
     for (let k = n; k < shown; k++) tips[k].style.opacity = 0;
@@ -1602,8 +1607,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // a short streak behind the spark, pointing the way it flies
       b.el.setAttribute('x1', b.x.toFixed(1));
       b.el.setAttribute('y1', b.y.toFixed(1));
-      b.el.setAttribute('x2', (b.x - b.vx * 0.02).toFixed(1));
-      b.el.setAttribute('y2', (b.y - b.vy * 0.02).toFixed(1));
+      b.el.setAttribute('x2', (b.x - b.vx * 0.012).toFixed(1));
+      b.el.setAttribute('y2', (b.y - b.vy * 0.012).toFixed(1));
       b.el.style.opacity = Math.max(0, 1 - b.life / b.max).toFixed(2);
     });
     requestAnimationFrame(frame);

@@ -351,7 +351,8 @@ position: relative;
 .nav-logo-spark .spark-head { opacity: 0; }
 .nav-logo-spark .spark-halo { fill: url(#spark-halo); }
 .nav-logo-spark .spark-tip { fill: #fff; }
-.nav-logo-spark .spark-bit { stroke: #ffd2a6; stroke-width: 3; stroke-linecap: round; opacity: 0; }
+.nav-logo-spark .spark-star { fill: #fff6e6; }
+.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
 
 /* light flowing into a letter from where its cable meets it: a glow masked
    to the letter's own shape (scripts.js sets --mask and plays it) */
