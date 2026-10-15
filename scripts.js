@@ -1402,8 +1402,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".5"/>'
-    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".18"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>';
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#fff1dc" stop-opacity="1"/>'
+    + '<stop offset=".3" stop-color="#ff8a3d" stop-opacity=".75"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient>'
+    + '<linearGradient id="spark-flare"><stop offset="0" stop-color="#ff6a1f" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/>'
+    + '<stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/></linearGradient></defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
     const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
@@ -1539,10 +1541,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const tip = (n) => {
     while (tips.length <= n) {
       const g = make('g', 'spark-head', tipsLayer);
-      // a small, faint glow, a twinkling four-point star and a hot white point
-      g.innerHTML = '<circle class="spark-halo" r="24"/>'
-        + '<path class="spark-star" d="M0-17 1.6-1.6 17 0 1.6 1.6 0 17-1.6 1.6-17 0-1.6-1.6Z"/>'
-        + '<circle class="spark-tip" r="4"/>';
+      // a laser cutter's tip: a tight, hot orange spot, a thin horizontal
+      // flare of light through it and a tiny white-hot point
+      g.innerHTML = '<circle class="spark-halo" r="13"/>'
+        + '<rect class="spark-flare" x="-34" y="-1" width="68" height="2" rx="1"/>'
+        + '<rect class="spark-flare spark-flare-v" x="-0.8" y="-11" width="1.6" height="22" rx="0.8"/>'
+        + '<circle class="spark-tip" r="3.2"/>';
       tips.push(g);
     }
     return tips[n];
@@ -1583,9 +1587,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const g = tip(n++);
       g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
-      // the star twinkles: it turns slowly and flickers in size
-      const tw = calm.matches ? 0.8 : 0.45 + Math.random() * 0.75;
-      g.querySelector('.spark-star').setAttribute('transform', `rotate(${((now / 8) % 90).toFixed(1)}) scale(${tw.toFixed(2)})`);
+      // the beam flickers: the flare stretches and the hot spot pulses
+      const fl = calm.matches ? 1 : 0.7 + Math.random() * 0.6;
+      g.firstChild.setAttribute('transform', `scale(${(0.85 + (fl - 0.7) * 0.4).toFixed(2)})`);
+      g.querySelector('.spark-flare').setAttribute('transform', `scale(${fl.toFixed(2)} 1)`);
       if (calm.matches) return;
       for (let s = 110 * dt; s > 0; s--) { // about 110 sparks a second
         if (s < 1 && Math.random() > s) break;
