@@ -1717,6 +1717,48 @@ document.addEventListener('DOMContentLoaded', () => {
   requestAnimationFrame(frame);
 })();
 
+/*===== BACKGROUND: grid spotlight =====*/
+// The dot grid lights up yellow in a soft circle around the cursor, or
+// around a finger while it's on the screen, and fades back when the cursor
+// leaves or the finger lifts.
+(() => {
+  const spot = document.createElement('div');
+  spot.className = 'grid-spot';
+  spot.setAttribute('aria-hidden', 'true');
+  document.body.prepend(spot);
+  const fit = () => { spot.style.height = '0'; spot.style.height = document.documentElement.scrollHeight + 'px'; };
+  fit();
+  addEventListener('load', fit);
+  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(document.body);
+
+  let x = 0, y = 0, queued = false, hide = 0;
+  const move = (px, py) => {
+    x = px; y = py;
+    spot.classList.add('is-on');
+    clearTimeout(hide);
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      spot.style.setProperty('--x', x + 'px');
+      spot.style.setProperty('--y', y + 'px');
+    });
+  };
+  const off = (delay) => { clearTimeout(hide); hide = setTimeout(() => spot.classList.remove('is-on'), delay); };
+  // keep it under the cursor while the page scrolls under a still mouse
+  let mouse = null;
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    mouse = [e.clientX, e.clientY];
+    move(e.pageX, e.pageY);
+  }, { passive: true });
+  addEventListener('scroll', () => { if (mouse && spot.classList.contains('is-on')) move(mouse[0] + scrollX, mouse[1] + scrollY); }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { mouse = null; off(0); });
+  addEventListener('touchstart', (e) => move(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
+  addEventListener('touchmove', (e) => move(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
+  addEventListener('touchend', () => off(700), { passive: true });
+})();
+
 /*===== EASTER EGG: Konami code =====*/
 // Keyboard: ↑ ↑ ↓ ↓ ← → ← → B A. Phone: swipe up, up, down, down, left,
 // right, left, right, then tap twice. Glitches the site, Cyberpunk style, for a few seconds.
