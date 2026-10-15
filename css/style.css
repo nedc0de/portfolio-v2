@@ -79,13 +79,14 @@
    faint warm glow, like an engineering drawing. It's on the page itself (not
    a layer on top of it) so it also fills the strips behind the phone's status
    bar and Safari's toolbar, and the overscroll bounce. Every 6th dot (dots
-   are 24px apart, centred at 12px) is framed by small crop corners, centred
-   exactly on it: the corners run from 6.5 to 17.5, so 5.5px each side. Faded maths notes are laid
+   are 24px apart, centred at 12px) is framed by small crop corners with a
+   little x through it, all centred exactly on the dot: the corners run from
+   6.5 to 17.5 and the x from 9.5 to 14.5, the same distance each side. Faded maths notes are laid
    over it by scripts.js (.bg-math). */
 html {
   scroll-behavior: smooth;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M6.5 10V6.5H10M14 6.5H17.5V10M17.5 14V17.5H14M10 17.5H6.5V14' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M6.5 10V6.5H10M14 6.5H17.5V10M17.5 14V17.5H14M10 17.5H6.5V14M9.5 9.5L14.5 14.5M14.5 9.5L9.5 14.5' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
     radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
     radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
     var(--thirteenth-color);
