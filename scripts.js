@@ -1402,11 +1402,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffe2c2" stop-opacity=".6"/>'
-    + '<stop offset=".18" stop-color="#ff9a52" stop-opacity=".34"/><stop offset=".4" stop-color="#ff7a2e" stop-opacity=".14"/>'
-    + '<stop offset=".65" stop-color="#ff6a1f" stop-opacity=".05"/><stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
-    + '<linearGradient id="spark-flare"><stop offset="0" stop-color="#ff6a1f" stop-opacity="0"/><stop offset=".5" stop-color="#fff"/>'
-    + '<stop offset="1" stop-color="#ff6a1f" stop-opacity="0"/></linearGradient></defs>';
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ff8a3d" stop-opacity=".2"/>'
+    + '<stop offset=".3" stop-color="#ff7a2e" stop-opacity=".1"/><stop offset=".6" stop-color="#ff6a1f" stop-opacity=".035"/>'
+    + '<stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
+    + '</defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
     const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
@@ -1489,7 +1488,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // A snake is one clean, even laser line: an orange body with a pale core,
   // the same length so both ends stay crisp, and no glow around it.
-  const LAYERS = [['body', 120], ['core', 120]];
+  // the head heats up smoothly: several faint white dashes, each shorter
+  // than the last, stack up so the line whitens gradually toward its head
+  const LAYERS = [['body', 120], ['core', 120], ...[70, 54, 40, 28, 18, 10].map((len) => ['heat', len])];
   const TAIL = 135; // a snake is gone once its head is this far past the end
   const snake = (c) => {
     const g = make('g', 'spark-snake', snakesLayer);
@@ -1542,12 +1543,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const tip = (n) => {
     while (tips.length <= n) {
       const g = make('g', 'spark-head', tipsLayer);
-      // a laser cutter's tip: a tight, hot orange spot, a thin horizontal
-      // flare of light through it and a tiny white-hot point
-      g.innerHTML = '<circle class="spark-halo" r="34"/>'
-        + '<rect class="spark-flare" x="-34" y="-1" width="68" height="2" rx="1"/>'
-        + '<rect class="spark-flare spark-flare-v" x="-0.8" y="-11" width="1.6" height="22" rx="0.8"/>'
-        + '<circle class="spark-tip" r="3.2"/>';
+      // just a wide, faint warm haze around the head; the line itself
+      // gets whiter toward its head (the warm and hot dashes)
+      g.innerHTML = '<circle class="spark-halo" r="70"/>';
       tips.push(g);
     }
     return tips[n];
@@ -1588,18 +1586,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const g = tip(n++);
       g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
-      // the glow breathes slowly and the flare gently stretches: smooth, no flicker
+      // the haze breathes slowly: smooth, no flicker
       const t = calm.matches ? 0 : now / 1000;
-      g.firstChild.setAttribute('transform', `scale(${(1 + 0.06 * Math.sin(t * 5)).toFixed(3)})`);
-      g.querySelector('.spark-flare').setAttribute('transform', `scale(${(0.95 + 0.12 * Math.sin(t * 7)).toFixed(3)} 1)`);
+      g.firstChild.setAttribute('transform', `scale(${(1 + 0.05 * Math.sin(t * 4)).toFixed(3)})`);
       if (calm.matches) return;
-      for (let s = 110 * dt; s > 0; s--) { // about 110 sparks a second
+      for (let s = 22 * dt; s > 0; s--) { // a few tiny sparks, about 22 a second
         if (s < 1 && Math.random() > s) break;
         const b = bits[free];
         free = (free + 1) % bits.length;
         const a = Math.random() * Math.PI * 2;
-        const v = 200 + Math.random() * 450;
-        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 150, life: 0, max: 0.12 + Math.random() * 0.2 });
+        const v = 120 + Math.random() * 260;
+        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, life: 0, max: 0.15 + Math.random() * 0.25 });
       }
     });
     for (let k = n; k < shown; k++) tips[k].style.opacity = 0;
@@ -1613,8 +1610,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // a short streak behind the spark, pointing the way it flies
       b.el.setAttribute('x1', b.x.toFixed(1));
       b.el.setAttribute('y1', b.y.toFixed(1));
-      b.el.setAttribute('x2', (b.x - b.vx * 0.012).toFixed(1));
-      b.el.setAttribute('y2', (b.y - b.vy * 0.012).toFixed(1));
+      b.el.setAttribute('x2', (b.x - b.vx * 0.008).toFixed(1));
+      b.el.setAttribute('y2', (b.y - b.vy * 0.008).toFixed(1));
       b.el.style.opacity = Math.max(0, 1 - b.life / b.max).toFixed(2);
     });
     requestAnimationFrame(frame);

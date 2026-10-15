@@ -338,6 +338,9 @@ position: relative;
 /* a snake: one even laser line, same length and width end to end */
 .nav-logo-spark .spark-body { stroke: #ff6a1f; stroke-width: 7; }
 .nav-logo-spark .spark-core { stroke: #ffd0a8; stroke-width: 2.5; }
+/* the line heats up toward its head: faint white dashes stack into a smooth
+   fade from orange to white-hot at the very front */
+.nav-logo-spark .spark-heat { stroke: #fff6e6; stroke-width: 4.4; opacity: .34; }
 
 /* the little loop on top glows once a cycle (or when tapped) */
 .nav-logo-spark .spark-loop {
@@ -350,10 +353,7 @@ position: relative;
 /* the tip: a soft orange halo around a white-hot point (moved by scripts.js) */
 .nav-logo-spark .spark-head { opacity: 0; }
 .nav-logo-spark .spark-halo { fill: url(#spark-halo); }
-.nav-logo-spark .spark-tip { fill: #fff; }
-.nav-logo-spark .spark-flare { fill: url(#spark-flare); }
-.nav-logo-spark .spark-flare-v { opacity: .55; }
-.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
+.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 1.8; stroke-linecap: round; opacity: 0; }
 
 /* light flowing into a letter from where its cable meets it: a glow masked
    to the letter's own shape (scripts.js sets --mask and plays it) */
