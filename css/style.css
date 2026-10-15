@@ -5049,6 +5049,8 @@ a.tk-item:hover,
 
 /* the sign-up form: a dark field and a yellow button in one bar, like the
    contact form; it says "You're in" once the email is added */
+.hm-fav-star { color: var(--fifteenth-color); }
+
 .hm-news-form {
   display: grid;
   grid-template-columns: 1fr auto;
