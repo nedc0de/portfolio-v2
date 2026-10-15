@@ -1708,13 +1708,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // frame.
 (() => {
   const group = document.querySelector('.nav-logo-group');
-  if (!group) return;
+  const base = group && group.querySelector('.nav-logo');
+  if (!base) return;
   const box = document.createElement('div');
   box.className = 'nav-logo-matrix';
   box.setAttribute('aria-hidden', 'true');
   const cv = document.createElement('canvas');
   box.append(cv);
-  group.append(box);
+  // inside the base logo, under the laser: the window art, then the rain
+  // (with the cables cut out of it), then the laser on top
+  base.insertBefore(box, base.querySelector('.nav-logo-spark'));
   const ctx = cv.getContext('2d');
   const GLYPHS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789';
   const glyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
