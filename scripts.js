@@ -1402,9 +1402,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const svg = make('svg', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ff8a3d" stop-opacity=".2"/>'
-    + '<stop offset=".3" stop-color="#ff7a2e" stop-opacity=".1"/><stop offset=".6" stop-color="#ff6a1f" stop-opacity=".035"/>'
-    + '<stop offset="1" stop-color="#ff5a14" stop-opacity="0"/></radialGradient>'
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffe45c" stop-opacity=".2"/>'
+    + '<stop offset=".3" stop-color="#ffdf3a" stop-opacity=".1"/><stop offset=".6" stop-color="#ffdc16" stop-opacity=".035"/>'
+    + '<stop offset="1" stop-color="#f5c800" stop-opacity="0"/></radialGradient>'
+    + '<radialGradient id="spark-core"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".22" stop-color="#fff3b8" stop-opacity=".9"/>'
+    + '<stop offset=".5" stop-color="#ffe45c" stop-opacity=".35"/><stop offset="1" stop-color="#ffdc16" stop-opacity="0"/></radialGradient>'
     + '</defs>';
   const cables = CABLES.map((raw) => {
     const d = smooth(raw);
@@ -1446,11 +1448,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const flowIn = (c) => {
     if (!c.flow || group.classList.contains('is-power-off')) return;
+    // a white-hot glow rises from where the cable meets the letter and
+    // sweeps up through it, then fades as the letter charges up
     c.flow.animate([
       { transform: 'translate(-50%, -50%) scale(.05)', opacity: 1 },
-      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.55 },
-      { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0 },
-    ], { duration: 900, easing: 'ease-out' });
+      { transform: 'translate(-50%, -62%) scale(.75)', opacity: .95, offset: 0.4 },
+      { transform: 'translate(-50%, -75%) scale(1.15)', opacity: 0 },
+    ], { duration: 1000, easing: 'cubic-bezier(.22, .61, .36, 1)' });
   };
 
   // flicker a letter when the snake arrives; a letter that was tapped off
@@ -1462,6 +1466,17 @@ document.addEventListener('DOMContentLoaded', () => {
     void letter.offsetWidth;
     letter.classList.add('is-zap');
     setTimeout(() => letter.classList.remove('is-zap'), 1100);
+  };
+  // the laser arriving at its letter: instead of a flicker, the letter
+  // charges up (flares white-hot and glows, then settles back to its yellow)
+  const charge = (cls) => {
+    const letter = group.querySelector('.' + cls);
+    if (!letter || letter.classList.contains('is-relight') || group.classList.contains('is-power-off')) return;
+    letter.classList.remove('is-off', 'is-zap', 'is-charge');
+    void letter.offsetWidth;
+    letter.classList.add('is-charge');
+    clearTimeout(letter.chargeTimer);
+    letter.chargeTimer = setTimeout(() => letter.classList.remove('is-charge'), 1200);
   };
   const glowLoop = () => loop.animate([{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 900 });
 
@@ -1480,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // [cable, from, to (ms into the cycle), letter it lights]; the top loop glows at 10.7s
   const LOOP = [[0, 0, 2240, 'nav-logo5'], [2, 3520, 8800, 'nav-logo1']];
   LOOP.forEach(([, , at, cls]) => {
-    const next = () => setTimeout(() => { zap(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
+    const next = () => setTimeout(() => { charge(cls); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
     next();
   });
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
@@ -1531,27 +1546,74 @@ document.addEventListener('DOMContentLoaded', () => {
     const c = cables[i];
     if (!LETTER[i]) { glowLoop(); return; } // the top loop: a quick glow
     taps.push({ ...snake(c), from, speed, start: performance.now() });
-    setTimeout(() => zap(LETTER[i]), ((c.len - from) / speed) * 1000);
+    setTimeout(() => charge(LETTER[i]), ((c.len - from) / speed) * 1000);
   };
   // the N-E-D secret: fast snakes down every cable at once
   group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
 
-  // The laser tip and its sparks. Sparks come from a small pool of short
-  // streaks, so nothing is created or thrown away while it runs.
+  // The laser tip, like a welding/cutting spark: a white-hot core in a tight
+  // glow, a starburst of thin rays that shimmer, and two kinds of sparks:
+  // fast bright streaks that spray off behind the head, and slower embers
+  // that fall, cool from white to orange and fade. When the laser reaches
+  // its letter it ends in a short burst. Everything comes from fixed pools,
+  // so nothing is created or thrown away while it runs.
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const RAYS = [[0, 30], [90, 30], [45, 13], [135, 13], [20, 9], [160, 9], [70, 7], [110, 7]]; // angle, length
+  const ray = (len) => `M${-len} 0 0 -.9 ${len} 0 0 .9Z`; // thin, pointed at both ends
   const tips = [];
   const tip = (n) => {
     while (tips.length <= n) {
       const g = make('g', 'spark-head', tipsLayer);
-      // just a wide, faint warm haze around the head; the line itself
-      // gets whiter toward its head (the warm and hot dashes)
-      g.innerHTML = '<circle class="spark-halo" r="70"/>';
+      g.innerHTML = '<circle class="spark-halo" r="70"/><circle class="spark-glow" r="20"/>'
+        + '<g class="spark-rays">' + RAYS.map(([a, len]) => `<path transform="rotate(${a})" d="${ray(len)}"/>`).join('') + '</g>'
+        + '<circle class="spark-dot" r="3.4"/>';
+      g.rays = [...g.querySelectorAll('.spark-rays path')].map((el, i) => ({ el, a: RAYS[i][0], len: RAYS[i][1], k: 1, to: 1 }));
       tips.push(g);
     }
     return tips[n];
   };
-  const bits = Array.from({ length: 60 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
+  // sparks are drawn in their own layer in front of the letters, so a burst
+  // can crackle over the N or the O instead of hiding behind it
+  const front = make('svg', 'nav-logo-spark nav-logo-spark-front');
+  front.setAttribute('viewBox', '0 0 1125 450');
+  front.setAttribute('aria-hidden', 'true');
+  const frontFx = make('g', 'spark-fx', front);
+  group.append(front);
+  const bits = Array.from({ length: 170 }, () => ({ el: make('line', 'spark-bit', frontFx), life: 1, max: 0 }));
   let free = 0;
+  const HOT = [255, 250, 225], COOL = [255, 220, 22];
+  const spark = (x, y, a, v, ember, big) => {
+    const b = bits[free];
+    free = (free + 1) % bits.length;
+    Object.assign(b, { x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, ember, big,
+      max: ember ? 0.55 + Math.random() * 0.6 : (big ? 0.25 : 0.1) + Math.random() * 0.2 });
+    // burst sparks are thicker so they read on top of the glowing letter
+    b.el.style.strokeWidth = ember ? ((big ? 2.8 : 1.6) + Math.random() * 1.4).toFixed(1) : (big ? '3.2' : '1.6');
+  };
+  // The end of a run: a burst of sparks at the letter, a different one each
+  // time: all over the letter, sprayed out sideways, a fountain above it, or
+  // a mix of the three. Boxes are each letter's area in the artwork.
+  const LETTER_BOX = [[605, 150, 830, 370], null, [205, 150, 420, 370]]; // O, (loop), N
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const PATTERNS = {
+    over: (p, box, n) => { // crackling across the whole letter
+      for (let i = 0; i < n; i++) spark(rnd(box[0], box[2]), rnd(box[1], box[3]), rnd(0, Math.PI * 2), rnd(90, 320), i % 3 === 0, true);
+    },
+    side: (p, box, n) => { // sprayed out to both sides
+      for (let i = 0; i < n; i++) spark(p.x, p.y - rnd(0, 30), (i % 2 ? 0 : Math.PI) + rnd(-0.45, 0.25) * (i % 2 ? 1 : -1), rnd(300, 680), i % 4 === 0, true);
+    },
+    up: (p, box, n) => { // a fountain shooting up over the letter
+      for (let i = 0; i < n; i++) spark(p.x + rnd(-10, 10), p.y, -Math.PI / 2 + rnd(-0.6, 0.6), rnd(500, 950), i % 3 === 0, true);
+    },
+  };
+  const burst = (c, i) => {
+    if (calm.matches || group.classList.contains('is-power-off') || !LETTER_BOX[i]) return;
+    const p = c.rail.getPointAtLength(c.len);
+    const box = LETTER_BOX[i];
+    const pick = ['over', 'side', 'up', 'mix'][Math.floor(Math.random() * 4)];
+    if (pick === 'mix') { PATTERNS.over(p, box, 16); PATTERNS.side(p, box, 12); PATTERNS.up(p, box, 12); }
+    else PATTERNS[pick](p, box, 36);
+  };
   const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
   let shown = 0;
@@ -1574,29 +1636,39 @@ document.addEventListener('DOMContentLoaded', () => {
       draw(s, head);
       heads.push([s.c, head, s]);
     }
-    // the moment a laser reaches the end of its cable, its light flows into the letter
+    // the moment a laser reaches the end of its cable: a burst of sparks,
+    // and its light flows into the letter
     heads.forEach(([c, l, s]) => {
-      if (s.last !== undefined && s.last < c.len && l >= c.len) flowIn(c);
+      if (s.last !== undefined && s.last < c.len && l >= c.len) { burst(c, cables.indexOf(c)); flowIn(c); }
       s.last = l;
     });
     let n = 0;
     heads.forEach(([c, l]) => {
       if (off || l < 0 || l > c.len) return;
       const p = c.rail.getPointAtLength(l);
+      const q = c.rail.getPointAtLength(Math.max(0, l - 6));
+      const dir = Math.atan2(p.y - q.y, p.x - q.x); // the way the head is travelling
       const g = tip(n++);
       g.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
       g.style.opacity = 1;
-      // the haze breathes slowly: smooth, no flicker
-      const t = calm.matches ? 0 : now / 1000;
-      g.firstChild.setAttribute('transform', `scale(${(1 + 0.05 * Math.sin(t * 4)).toFixed(3)})`);
       if (calm.matches) return;
-      for (let s = 22 * dt; s > 0; s--) { // a few tiny sparks, about 22 a second
-        if (s < 1 && Math.random() > s) break;
-        const b = bits[free];
-        free = (free + 1) % bits.length;
-        const a = Math.random() * Math.PI * 2;
-        const v = 120 + Math.random() * 260;
-        Object.assign(b, { x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, life: 0, max: 0.15 + Math.random() * 0.25 });
+      // the rays shimmer: each eases toward a new random length, and the
+      // whole star turns slowly, so it sparkles without jittering
+      const spin = (now / 30) % 360;
+      g.rays.forEach((r) => {
+        if (Math.abs(r.k - r.to) < 0.05) r.to = 0.45 + Math.random() * 0.9;
+        r.k += (r.to - r.k) * Math.min(1, dt * 14);
+        r.el.setAttribute('transform', `rotate(${(r.a + spin).toFixed(1)}) scale(${r.k.toFixed(2)} 1)`);
+      });
+      g.children[1].setAttribute('transform', `scale(${(0.9 + 0.15 * Math.sin(now / 90)).toFixed(3)})`);
+      // fast streaks spray off behind the head; embers drop away and fall
+      for (let k = 45 * dt; k > 0; k--) {
+        if (k < 1 && Math.random() > k) break;
+        spark(p.x, p.y, dir + Math.PI + (Math.random() - 0.5) * 2.6, 220 + Math.random() * 380, false);
+      }
+      for (let k = 12 * dt; k > 0; k--) {
+        if (k < 1 && Math.random() > k) break;
+        spark(p.x, p.y, -Math.PI / 2 + (Math.random() - 0.5) * 2.4, 60 + Math.random() * 140, true);
       }
     });
     for (let k = n; k < shown; k++) tips[k].style.opacity = 0;
@@ -1604,15 +1676,22 @@ document.addEventListener('DOMContentLoaded', () => {
     bits.forEach((b) => {
       if (b.life >= b.max) { if (b.max) { b.el.style.opacity = 0; b.max = 0; } return; }
       b.life += dt;
-      b.vy += 1600 * dt;
+      const f = b.life / b.max;
+      b.vy += (b.ember ? 520 : 1500) * dt;
+      if (b.ember) { b.vx *= 1 - 1.5 * dt; } // embers drift and slow down
       b.x += b.vx * dt;
       b.y += b.vy * dt;
-      // a short streak behind the spark, pointing the way it flies
+      // streaks: a short line pointing the way they fly; embers: a dot that cools
+      const tail = b.ember ? 0.004 : (b.big ? 0.03 : 0.01);
       b.el.setAttribute('x1', b.x.toFixed(1));
       b.el.setAttribute('y1', b.y.toFixed(1));
-      b.el.setAttribute('x2', (b.x - b.vx * 0.008).toFixed(1));
-      b.el.setAttribute('y2', (b.y - b.vy * 0.008).toFixed(1));
-      b.el.style.opacity = Math.max(0, 1 - b.life / b.max).toFixed(2);
+      b.el.setAttribute('x2', (b.x - b.vx * tail).toFixed(1));
+      b.el.setAttribute('y2', (b.y - b.vy * tail).toFixed(1));
+      if (b.ember) {
+        const c = HOT.map((h, i) => Math.round(h + (COOL[i] - h) * Math.min(1, f * 1.6)));
+        b.el.style.stroke = `rgb(${c})`;
+      } else b.el.style.stroke = '';
+      b.el.style.opacity = Math.max(0, b.ember ? 1 - f * f : 1 - f).toFixed(2);
     });
     requestAnimationFrame(frame);
   };
