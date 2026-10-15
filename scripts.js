@@ -2337,8 +2337,10 @@ document.addEventListener('DOMContentLoaded', () => {
       layer.append(note);
       const w = note.offsetWidth, h = note.offsetHeight;
       const top = row * GAP + GRID / 2 - h / 2; // centred on a row of dots
-      // left edge on a dot column, or the right edge lined up with one
-      const sides = [GRID + GRID / 2 - 4, Math.floor((width - GRID - w) / GRID) * GRID + GRID / 2 + 4];
+      // a little in from each edge (the grid fades out right at the edges),
+      // the left edge on a dot column or the right edge lined up with one
+      const inset = Math.max(GRID, Math.round((width * 0.08) / GRID) * GRID);
+      const sides = [inset + GRID / 2 - 4, Math.floor((width - inset - w) / GRID) * GRID + GRID / 2 + 4];
       if (row % 2) sides.reverse();
       const left = sides.find((x) => x > 0 && x + w < width && clear(x, top, w, h));
       if (left === undefined) { note.remove(); continue; }
