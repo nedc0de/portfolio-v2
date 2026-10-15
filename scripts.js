@@ -1358,7 +1358,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // white-hot tip in a soft glow, and little sparks that fly off and fall. Each
 // letter flickers as its snake arrives, and the little loop on top glows once
 // on its own. The paths were traced from the 1125×450 logo artwork and are
-// smoothed into curves here. Everything runs on one 16s clock in JS.
+// smoothed into curves here. Everything runs on one 26s clock in JS.
 (() => {
   const group = document.querySelector('.nav-logo-group');
   const base = group && group.querySelector('.nav-logo');
@@ -1483,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // The loop keeps going from page to page instead of starting over: the
   // moment it first started is remembered for the visit, and every page picks
   // the snakes up from wherever they'd be by now.
-  const CYCLE = 16000;
+  const CYCLE = 26000; // one laser run on each cable every 26s (was 16s)
   const T0_KEY = 'nedcode-snake-t0';
   let t0 = NaN;
   try { t0 = Number(sessionStorage.getItem(T0_KEY)); } catch (e) {}
