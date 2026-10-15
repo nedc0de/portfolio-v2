@@ -353,7 +353,10 @@ position: relative;
 /* the tip: a soft orange halo around a white-hot point (moved by scripts.js) */
 .nav-logo-spark .spark-head { opacity: 0; }
 .nav-logo-spark .spark-halo { fill: url(#spark-halo); }
-.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 1.8; stroke-linecap: round; opacity: 0; }
+.nav-logo-spark .spark-glow { fill: url(#spark-core); }
+.nav-logo-spark .spark-rays path { fill: #fff6e8; opacity: .85; }
+.nav-logo-spark .spark-dot { fill: #fff; }
+.nav-logo-spark .spark-bit { stroke: #fff2d6; stroke-width: 1.6; stroke-linecap: round; opacity: 0; }
 
 /* light flowing into a letter from where its cable meets it: a glow masked
    to the letter's own shape (scripts.js sets --mask and plays it) */
