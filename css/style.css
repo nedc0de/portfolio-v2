@@ -1885,6 +1885,7 @@ ul li:before {
 
 .hl-list {
   border-top: 1px solid var(--third-color);
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
 }
 
 .hl-row {
@@ -3461,6 +3462,7 @@ details>summary {
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--third-color);
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
 }
 
 .ab-row {
@@ -4779,6 +4781,7 @@ a.tk-item:hover,
 /* Selected work: a compact version of the Projects page hover list */
 .hw-list {
   border-top: 1px solid var(--third-color);
+  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
 }
 
 .hw-row {
