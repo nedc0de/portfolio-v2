@@ -1418,28 +1418,38 @@ document.addEventListener('DOMContentLoaded', () => {
   loop.setAttribute('d', cables[1].d);
   base.append(svg);
 
-  // Layers, back to front: snakes, the laser tip and its sparks, then the
-  // sockets the cables plug into, so the laser runs into a socket and is gone.
+  // Layers, back to front: the snakes, then the laser tip and its sparks.
   const snakesLayer = make('g', 'spark-fx', svg);
   const tipsLayer = make('g', 'spark-fx', svg);
-  const socketsLayer = make('g', 'spark-sockets', svg);
 
-  // Where each cable meets its letter (right cable into the O, left into the
-  // N) it plugs into a small socket under the letter's bottom edge, like the
-  // electrode cap at the end of a neon tube. It sits behind the letters so
-  // their glow washes over it, and stands straight up from the letter; the
-  // left cable comes in at an angle and simply runs into its bottom.
-  svg.querySelector('defs').insertAdjacentHTML('beforeend', '<linearGradient id="socket-shade">'
-    + '<stop offset="0" stop-color="#191919"/><stop offset=".45" stop-color="#3d3d3d"/><stop offset="1" stop-color="#161616"/></linearGradient>');
-  const SOCKETS = [[0, 708], [2, 277]]; // cable, x of its socket
-  SOCKETS.forEach(([i, x]) => {
-    const c = cables[i];
-    const g = make('g', 'socket', socketsLayer);
-    g.insertAdjacentHTML('beforeend', `<g transform="translate(${x} 0)">`
-      + '<rect class="socket-body" x="-10" y="294" width="20" height="30" rx="3.5"/>'
-      + '<rect class="socket-ring" x="-11.5" y="317" width="23" height="7" rx="3.5"/></g>');
-    c.socket = g;
+  // Where a cable meets its letter (right cable into the O, left into the N)
+  // the laser doesn't just vanish: its light flows up into the letter from
+  // that exact spot and spreads through it, like current filling a neon tube,
+  // before the letter flickers. The light is a glow masked to the letter's
+  // own shape, so it only ever shows inside the letter.
+  const FLOWS = [[0, 'nav-logo5', 708, 306], [2, 'nav-logo1', 280, 306]]; // cable, letter, entry point
+  FLOWS.forEach(([i, cls, x, y]) => {
+    const img = group.querySelector(`.${cls} img`);
+    if (!img) return;
+    const flow = document.createElement('div');
+    flow.className = 'nav-logo-flow';
+    flow.setAttribute('aria-hidden', 'true');
+    flow.style.setProperty('--mask', `url("${img.src}")`);
+    const blob = document.createElement('span');
+    blob.style.left = (x / 11.25) + '%';
+    blob.style.top = (y / 4.5) + '%';
+    flow.append(blob);
+    group.append(flow);
+    cables[i].flow = blob;
   });
+  const flowIn = (c) => {
+    if (!c.flow || group.classList.contains('is-power-off')) return;
+    c.flow.animate([
+      { transform: 'translate(-50%, -50%) scale(.05)', opacity: 1 },
+      { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.55 },
+      { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0 },
+    ], { duration: 900, easing: 'ease-out' });
+  };
 
   // flicker a letter when the snake arrives; a letter that was tapped off
   // gets switched straight back on by it
@@ -1549,18 +1559,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const p = (t - s.from) / (s.to - s.from);
       const head = p >= 0 && p < 1 ? -5 + (s.c.len + TAIL + 5) * p : -200;
       draw(s, head);
-      heads.push([s.c, head]);
+      heads.push([s.c, head, s]);
     });
     for (let k = taps.length - 1; k >= 0; k--) {
       const s = taps[k];
       const head = s.from + s.speed * ((now - s.start) / 1000);
       if (head > s.c.len + TAIL) { s.g.remove(); taps.splice(k, 1); continue; }
       draw(s, head);
-      heads.push([s.c, head]);
+      heads.push([s.c, head, s]);
     }
-    // a socket glows while the laser runs into it and just after
-    const hot = new Set(off ? [] : heads.filter(([c, l]) => c.socket && l > c.len - 40 && l < c.len + 80).map(([c]) => c.socket));
-    cables.forEach((c) => { if (c.socket) c.socket.classList.toggle('is-hot', hot.has(c.socket)); });
+    // the moment a laser reaches the end of its cable, its light flows into the letter
+    heads.forEach(([c, l, s]) => {
+      if (s.last !== undefined && s.last < c.len && l >= c.len) flowIn(c);
+      s.last = l;
+    });
     let n = 0;
     heads.forEach(([c, l]) => {
       if (off || l < 0 || l > c.len) return;
