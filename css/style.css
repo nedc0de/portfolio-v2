@@ -99,7 +99,7 @@ body::before {
   pointer-events: none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M0 6V-6M-6 0H6M144 6V-6M138 0H150M0 150V138M-6 144H6M144 150V138M138 144H150' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") -1px -1px / 144px 144px,
-    radial-gradient(circle, rgba(255, 255, 255, .1) 1px, transparent 1.5px) 0 0 / 24px 24px,
+    radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
     radial-gradient(ellipse 70% 55% at 85% 30%, rgba(255, 106, 31, .03), transparent 70%);
 }
 
