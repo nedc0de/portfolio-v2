@@ -309,6 +309,30 @@ position: relative;
 .nav-logo-spark .spark-tip { fill: #fff; }
 .nav-logo-spark .spark-bit { stroke: #ffd2a6; stroke-width: 3; stroke-linecap: round; opacity: 0; }
 
+/* the plugs where the cables go into the N and the O: dark, like the
+   cables, with a small light that turns orange when the laser arrives */
+.nav-logo-plugs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1125 / 450; /* same box as the logo artwork */
+  overflow: visible;
+  pointer-events: none;
+}
+
+.nav-logo-plugs .plug-body,
+.nav-logo-plugs .plug-boot { fill: #2a2a2a; stroke: #5b5b5b; stroke-width: 3; }
+.nav-logo-plugs .plug-tip { fill: #8d8d8d; }
+.nav-logo-plugs .plug-grip { fill: none; stroke: #454545; stroke-width: 2.5; stroke-linecap: round; }
+.nav-logo-plugs .plug-led { fill: #444; transition: fill .25s; }
+.nav-logo-plugs .plug-body { transition: stroke .25s; }
+.nav-logo-plugs .is-hot .plug-led { fill: #ff7a2e; }
+.nav-logo-plugs .is-hot .plug-body { stroke: #ff6a1f; }
+
 /* a letter the spark reaches gives a quick electric flicker */
 .nav-logo-group .nav-logo-layer.is-zap {
   animation: neon-zap 1s steps(1, end) var(--d, 0s) both !important;

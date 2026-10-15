@@ -1418,6 +1418,30 @@ document.addEventListener('DOMContentLoaded', () => {
   loop.setAttribute('d', cables[1].d);
   base.append(svg);
 
+  // A little plug where each cable meets its letter (right cable into the O,
+  // left cable into the N), so the cable looks plugged in instead of just
+  // vanishing behind the letter. It sits above the letters, its metal tip
+  // against the letter's bottom edge, lined up with the end of the cable. Its
+  // light turns orange as the laser runs into it.
+  const plugs = make('svg', 'nav-logo-plugs');
+  plugs.setAttribute('viewBox', '0 0 1125 450');
+  plugs.setAttribute('aria-hidden', 'true');
+  [0, 2].forEach((i) => {
+    const c = cables[i];
+    const end = c.rail.getPointAtLength(c.len);
+    const back = c.rail.getPointAtLength(c.len - 30);
+    const angle = (Math.atan2(end.y - back.y, end.x - back.x) * 180) / Math.PI + 90; // plug points along the cable
+    const g = make('g', 'plug', plugs);
+    g.setAttribute('transform', `translate(${end.x.toFixed(1)} ${end.y.toFixed(1)}) rotate(${angle.toFixed(1)})`);
+    g.innerHTML = '<rect class="plug-tip" x="-9" y="-3" width="18" height="7" rx="1.5"/>'
+      + '<rect class="plug-body" x="-14" y="3" width="28" height="34" rx="6"/>'
+      + '<path class="plug-grip" d="M-7 22h14M-7 28h14"/>'
+      + '<rect class="plug-boot" x="-8" y="36" width="16" height="13" rx="5"/>'
+      + '<circle class="plug-led" cy="12" r="3.5"/>';
+    c.plug = g;
+  });
+  group.append(plugs);
+
   // flicker a letter when the snake arrives; a letter that was tapped off
   // gets switched straight back on by it
   const zap = (cls) => {
@@ -1535,6 +1559,9 @@ document.addEventListener('DOMContentLoaded', () => {
       draw(s, head);
       heads.push([s.c, head]);
     }
+    // a plug glows while the laser runs into it and just after
+    const hot = new Set(off ? [] : heads.filter(([c, l]) => c.plug && l > c.len - 60 && l < c.len + 60).map(([c]) => c.plug));
+    cables.forEach((c) => { if (c.plug) c.plug.classList.toggle('is-hot', hot.has(c.plug)); });
     let n = 0;
     heads.forEach(([c, l]) => {
       if (off || l < 0 || l > c.len) return;
