@@ -79,14 +79,14 @@
    faint warm glow, like an engineering drawing. It's on the page itself (not
    a layer on top of it) so it also fills the strips behind the phone's status
    bar and Safari's toolbar, and the overscroll bounce. Every 6th dot (dots
-   are 24px apart, centred at 12px) carries a small x centred exactly on the
-   dot: its arms run from 7.5 to 16.5, the same distance each side. Faded maths notes are laid
+   are 24px apart, centred at 12px) is replaced by a small x centred exactly
+   where that dot would be (arms from 7.5 to 16.5). Dots and x's are one
+   144px tile, so there's never a dot under an x. Faded maths notes are laid
    over it by scripts.js (.bg-math). */
 html {
   scroll-behavior: smooth;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
-    radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.07'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' stroke='%23fff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
     radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
     var(--thirteenth-color);
 }
