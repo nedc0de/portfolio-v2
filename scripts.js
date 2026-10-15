@@ -2374,3 +2374,42 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.textContent = next[el.dataset.tick]();
   }, 2200);
 })();
+
+/*===== BLOG POSTS: smooth FAQ =====*/
+// Each FAQ answer slides open and closed (height and fade) instead of
+// snapping, and the arrow turns with it. Without JS, or with reduced motion,
+// the plain <details> open/close still works.
+(() => {
+  const items = document.querySelectorAll('.ps-faq');
+  if (!items.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const EASE = 'cubic-bezier(.22, .61, .36, 1)';
+  items.forEach((d) => {
+    const summary = d.querySelector('summary');
+    let anim = null;
+    summary.addEventListener('click', (e) => {
+      e.preventDefault();
+      const from = d.offsetHeight;
+      if (anim) anim.cancel();
+      const closing = d.open && !d.classList.contains('is-closing');
+      d.style.overflow = 'hidden';
+      if (closing) {
+        d.classList.add('is-closing');
+        d.classList.remove('is-open');
+        anim = d.animate([{ height: from + 'px' }, { height: summary.offsetHeight + 'px' }], { duration: 280, easing: EASE });
+      } else {
+        d.classList.remove('is-closing');
+        d.classList.add('is-open');
+        d.open = true;
+        const to = d.offsetHeight;
+        anim = d.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 320, easing: EASE });
+        const answer = d.querySelector(':scope > :not(summary)');
+        if (answer) answer.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 320, easing: EASE });
+      }
+      anim.onfinish = () => {
+        if (closing) { d.open = false; d.classList.remove('is-closing'); }
+        d.style.overflow = '';
+        anim = null;
+      };
+    });
+  });
+})();
