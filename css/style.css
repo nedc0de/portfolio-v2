@@ -5476,15 +5476,43 @@ a.tk-item:hover,
 }
 
 .ps-faq summary {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
   padding: .9rem 1.1rem;
   font-weight: 600;
   color: var(--fourth-color);
   cursor: pointer;
+  list-style: none;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .2s;
 }
 
-.ps-faq summary::marker {
-  color: var(--fifteenth-color);
+.ps-faq summary::-webkit-details-marker { display: none; }
+
+/* our own arrow, so it can turn smoothly (scripts.js adds .is-open as the
+   answer starts to open; [open] covers it without JS) */
+.ps-faq summary::before {
+  content: "";
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 8px solid var(--fifteenth-color);
+  border-top: 5.5px solid transparent;
+  border-bottom: 5.5px solid transparent;
+  transform: translateY(-1px);
+  transition: transform .3s cubic-bezier(.22, .61, .36, 1);
 }
+
+.ps-faq[open] summary::before,
+.ps-faq.is-open summary::before { transform: translateY(-1px) rotate(90deg); }
+.ps-faq.is-closing summary::before { transform: translateY(-1px); }
+.ps-faq summary:hover { color: var(--seventh-color); }
+
+/* no outline after a tap or click; keyboard users still get one */
+.ps-faq summary:focus { outline: none; }
+.ps-faq summary:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: 2px; }
 
 .ps-faq p {
   margin: 0 !important;
