@@ -270,8 +270,9 @@ position: relative;
 
 
 
-/* The cables are dark until a snake of yellow neon light runs along them
-   (16s loop, see scripts.js) */
+/* The cables are dark until a snake of orange laser light runs along them
+   (16s loop, see scripts.js): a hot orange line with a white-hot tip that
+   glows and throws off little sparks, like a laser cutter */
 .nav-logo-spark {
   position: absolute;
   inset: 0;
@@ -279,21 +280,27 @@ position: relative;
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 0 2px #ffdc16) drop-shadow(0 0 7px #ffdc16) drop-shadow(0 0 16px rgba(255, 220, 22, .7));
+  filter: drop-shadow(0 0 2px #ff6a1f) drop-shadow(0 0 6px rgba(255, 106, 31, .85)) drop-shadow(0 0 14px rgba(255, 80, 10, .55));
 }
 
 .nav-logo-spark path {
   fill: none;
-  stroke: #ffdc16;
-  stroke-width: 10;
+  stroke: #ff5e14;
+  stroke-width: 7;
   stroke-linecap: round;
 }
 
-/* the bright centre of the neon tube, same glow as the letters */
+/* the hot centre of the laser line */
 .nav-logo-spark .spark-core {
-  stroke: #fff8cc;
-  stroke-width: 4;
+  stroke: #ffc79a;
+  stroke-width: 2.5;
 }
+
+/* the tip: a soft orange halo around a white-hot point (moved by scripts.js) */
+.nav-logo-spark .spark-head { opacity: 0; }
+.nav-logo-spark .spark-halo { fill: url(#spark-halo); }
+.nav-logo-spark .spark-tip { fill: #fff; }
+.nav-logo-spark .spark-bit { fill: #ffd2a6; }
 
 /* the snake is a 120-unit dash; each path is parked just before its start
    until its turn and ends just past its end, so no dot is left behind.

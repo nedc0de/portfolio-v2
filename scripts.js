@@ -1370,8 +1370,11 @@ document.addEventListener('DOMContentLoaded', () => {
   svg.setAttribute('class', 'nav-logo-spark');
   svg.setAttribute('viewBox', '0 0 1125 450');
   svg.setAttribute('aria-hidden', 'true');
-  // each snake is a neon tube: a yellow tube with a pale, white-hot core
-  svg.innerHTML = CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/><path class="spark-${i + 1} spark-core" d="${d}"/>`).join('');
+  // each snake is a laser line: a hot orange line with a pale core. The halo
+  // gradient is for the white-hot tip drawn further down.
+  svg.innerHTML = '<defs><radialGradient id="spark-halo"><stop offset="0" stop-color="#ffb070" stop-opacity=".95"/>'
+    + '<stop offset=".35" stop-color="#ff6a1f" stop-opacity=".45"/><stop offset="1" stop-color="#ff4d00" stop-opacity="0"/></radialGradient></defs>'
+    + CABLES.map((d, i) => `<path class="spark-${i + 1}" d="${d}"/><path class="spark-${i + 1} spark-core" d="${d}"/>`).join('');
   base.append(svg);
 
   // flicker a letter when the spark arrives; a letter that was tapped off
@@ -1417,6 +1420,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const LETTER = ['nav-logo5', null, 'nav-logo1'];
   const SPEED = 140; // units per second, same pace as the loop
+  const taps = []; // snakes sent by a tap, so the laser tip can follow them too
   group.sendSpark = (x, y) => {
     if (group.classList.contains('is-power-off')) return false;
     let best = null;
@@ -1436,6 +1440,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ms = ((c.len - from) / speed) * 1000;
     ['', ' spark-core'].forEach((core) => {
       const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      if (!core) taps.push({ c, p });
       p.setAttribute('class', 'spark-tap' + core);
       p.setAttribute('d', c.d);
       p.style.strokeDasharray = '120 3000';
@@ -1446,6 +1451,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     setTimeout(() => zap(LETTER[i]), ms);
   };
+
+  // The laser tip: wherever a snake's head is right now, a white-hot point in
+  // a soft orange halo, throwing off little sparks that arc down and fade.
+  // Each snake is a 120-long dash, so its head sits at 120 - dashoffset.
+  const NS = 'http://www.w3.org/2000/svg';
+  const loops = [0, 2].map((i) => ({ c: cables[i], p: svg.querySelector(`.spark-${i + 1}:not(.spark-core)`) }));
+  const heads = [];
+  const bits = [];
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  cables.forEach((c, i) => { c.el = svg.querySelectorAll('path:not(.spark-core)')[i]; });
+  const head = (n) => {
+    while (heads.length <= n) {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'spark-head');
+      g.innerHTML = '<circle class="spark-halo" r="55"/><circle class="spark-tip" r="8"/>';
+      svg.append(g);
+      heads.push(g);
+    }
+    return heads[n];
+  };
+  let last = performance.now();
+  let shown = 0;
+  const frame = (now) => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    for (let k = taps.length - 1; k >= 0; k--) if (!taps[k].p.isConnected) taps.splice(k, 1);
+    const live = loops.concat(taps).map(({ c, p }) => [c, 120 - parseFloat(getComputedStyle(p).strokeDashoffset)]);
+    const off = group.classList.contains('is-power-off');
+    let n = 0;
+    live.forEach(([c, l]) => {
+      if (off || l < 0 || l > c.len) return;
+      const p = c.el.getPointAtLength(l);
+      const g = head(n++);
+      g.setAttribute('transform', `translate(${p.x} ${p.y})`);
+      g.style.opacity = 1;
+      if (calm.matches) return;
+      // a few sparks a frame, flung out and pulled down
+      for (let s = 70 * dt; s > 0; s--) { // about 70 sparks a second
+        if (s < 1 && Math.random() > s) break;
+        const a = Math.random() * Math.PI * 2;
+        const v = 250 + Math.random() * 550;
+        const el = document.createElementNS(NS, 'circle');
+        el.setAttribute('class', 'spark-bit');
+        el.setAttribute('r', (2 + Math.random() * 2.5).toFixed(1));
+        svg.append(el);
+        bits.push({ el, x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 200, life: 0, max: 0.2 + Math.random() * 0.3 });
+      }
+    });
+    for (let k = n; k < shown; k++) heads[k].style.opacity = 0;
+    shown = n;
+    for (let k = bits.length - 1; k >= 0; k--) {
+      const b = bits[k];
+      b.life += dt;
+      if (b.life >= b.max) { b.el.remove(); bits.splice(k, 1); continue; }
+      b.vy += 1600 * dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.el.setAttribute('cx', b.x.toFixed(1));
+      b.el.setAttribute('cy', b.y.toFixed(1));
+      b.el.style.opacity = (1 - b.life / b.max).toFixed(2);
+    }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
   // the N-E-D secret: fast snakes down every cable at once
   group.raceSparks = () => { run(0, 0, 450); run(2, 0, 700); glowLoop(); };
 })();
