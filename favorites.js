@@ -1125,9 +1125,13 @@
   if (!grid) {
     const pick = FAVORITES.find((f) => f.type === 'movie');
     if (!pick) return;
-    const stars = '★'.repeat(Math.floor(pick.rating)) + (pick.rating % 1 ? '½' : '');
     homeCard.querySelector('h3').textContent = `${pick.title}${pick.year ? ` (${pick.year})` : ''}`;
-    homeCard.querySelector('p').textContent = `${stars} · 1 of ${FAVORITES.length} picks I'd defend in an argument`;
+    // the rating like the badge on the Favorites cards: a yellow star and the number
+    const p = homeCard.querySelector('p');
+    const star = document.createElement('span');
+    star.className = 'hm-fav-star';
+    star.textContent = '★';
+    p.replaceChildren(star, ` ${pick.rating} · 1 of ${FAVORITES.length} picks I'd defend in an argument`);
     homeCard.hidden = false;
     return;
   }
