@@ -392,6 +392,33 @@ position: relative;
   background: radial-gradient(circle, #fff 0, rgba(255, 255, 255, .95) 16%, rgba(255, 248, 210, .8) 32%, rgba(255, 236, 140, .45) 50%, rgba(255, 220, 22, 0) 70%);
 }
 
+/* Matrix rain inside the logo's window, behind the letters: dark green,
+   very faded and very slow (drawn by scripts.js). The box matches the
+   window in the 1125x450 artwork below its title bar (x 207-990, y 180-349). */
+.nav-logo-matrix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2; /* above the window, below the letters */
+  width: 100%;
+  aspect-ratio: 1125 / 450;
+  pointer-events: none;
+}
+
+.nav-logo-matrix canvas {
+  position: absolute;
+  left: calc(207 / 1125 * 100%);
+  top: calc(180 / 450 * 100%); /* below the title bar (it ends at 174) */
+  width: calc(783 / 1125 * 100%);
+  height: calc(169 / 450 * 100%);
+  border-radius: 4px;
+  opacity: 1;
+  transition: opacity .6s;
+}
+
+.nav-logo-group.is-power-off .nav-logo-matrix canvas { opacity: 0; }
+.nav-logo-group.is-dim .nav-logo-matrix canvas { opacity: .4; }
+
 /* the laser arriving charges its letter up: it flares white-hot with a
    wide yellow glow, then settles back to normal */
 .nav-logo-group .nav-logo-layer.is-charge {

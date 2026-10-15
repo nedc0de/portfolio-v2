@@ -1700,6 +1700,92 @@ document.addEventListener('DOMContentLoaded', () => {
   requestAnimationFrame(frame);
 })();
 
+/*===== LOGO: matrix rain in the window =====*/
+// Dark green characters trickle down the logo's window behind the letters,
+// very faded and very slow. Each column drips at its own pace; a character
+// lights up as the drip passes and slowly fades. It pauses when the logo is
+// off screen or the tab is hidden; with reduced motion it shows one still
+// frame.
+(() => {
+  const group = document.querySelector('.nav-logo-group');
+  if (!group) return;
+  const box = document.createElement('div');
+  box.className = 'nav-logo-matrix';
+  box.setAttribute('aria-hidden', 'true');
+  const cv = document.createElement('canvas');
+  box.append(cv);
+  group.append(box);
+  const ctx = cv.getContext('2d');
+  const GLYPHS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789';
+  const glyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+  let cols = 0, rows = 0, cell = 0, grid = [], drops = [];
+
+  const setup = () => {
+    const r = cv.getBoundingClientRect();
+    if (!r.width) return false;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    cell = Math.max(5, r.height / 7); // about 7 rows of characters in the window
+    cols = Math.ceil(r.width / cell);
+    rows = Math.ceil(r.height / cell);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = `${Math.round(cell * 0.9)}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    grid = Array.from({ length: cols * rows }, () => ({ ch: glyph(), a: Math.random() * 0.25 }));
+    drops = Array.from({ length: cols }, () => ({ y: Math.random() * rows * 2 - rows, every: 260 + Math.random() * 520, t: 0 }));
+    return true;
+  };
+
+  const draw = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const c = grid[y * cols + x];
+        if (c.a < 0.03) continue;
+        // the newest characters are a lighter green, older ones darker
+        ctx.fillStyle = c.a > 0.85 ? `rgba(120, 255, 160, ${c.a * 0.55})` : `rgba(40, 190, 95, ${c.a * 0.45})`;
+        ctx.fillText(c.ch, x * cell + cell / 2, y * cell + cell / 2);
+      }
+    }
+  };
+
+  let last = 0, raf = 0, running = false;
+  const tick = (now) => {
+    raf = requestAnimationFrame(tick);
+    const dt = Math.min(200, now - (last || now));
+    if (dt < 80) return; // about 12 frames a second is plenty for something this slow
+    last = now;
+    grid.forEach((c) => {
+      c.a = Math.max(0, c.a - dt / 3200); // characters fade over about 3 seconds
+      if (Math.random() < 0.002) c.ch = glyph(); // the odd one flickers to a new character
+    });
+    drops.forEach((d, x) => {
+      d.t += dt;
+      if (d.t < d.every) return;
+      d.t = 0;
+      d.y += 1;
+      if (d.y >= rows + Math.random() * rows * 3) { d.y = -Math.floor(Math.random() * rows); d.every = 260 + Math.random() * 520; }
+      const y = Math.floor(d.y);
+      if (y >= 0 && y < rows) { const c = grid[y * cols + x]; c.a = 1; c.ch = glyph(); }
+    });
+    draw();
+  };
+  const start = () => { if (!running && !document.hidden) { running = true; last = 0; raf = requestAnimationFrame(tick); } };
+  const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+  if (!setup()) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(); return; }
+  let visible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }).observe(box);
+  }
+  document.addEventListener('visibilitychange', () => (document.hidden || !visible ? stop() : start()));
+  if ('ResizeObserver' in window) new ResizeObserver(() => { setup(); draw(); }).observe(cv);
+  start();
+})();
+
 /*===== EASTER EGG: Konami code =====*/
 // Keyboard: ↑ ↑ ↓ ↓ ← → ← → B A. Phone: swipe up, up, down, down, left,
 // right, left, right, then tap twice. Glitches the site, Cyberpunk style, for a few seconds.
