@@ -1095,9 +1095,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initSiteStats();
 });
 
-/*===== HOME: BLOG TICKER =====*/
-// Montreal time + a scrolling loop of Ned's latest blog posts, read from blog.html
-// (so a new post shows up here automatically once it's on the blog page)
+/*===== HOME: TICKER =====*/
+// Montreal time + a scrolling loop of what's new on the site: the latest blog
+// posts (read from blog.html), the latest Favorites pick and the latest project.
+// All three update by themselves when blog.html, favorites.js or the Selected
+// work list change.
 (() => {
   const ZONE = 'America/Toronto';
   const boardClock = document.querySelector('.hm-clock');
@@ -1147,6 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const a = document.createElement('a');
         a.className = 'tk-link';
         a.href = n.link;
+        if (n.external) { a.target = '_blank'; a.rel = 'noopener'; }
         if (copy) { item.setAttribute('aria-hidden', 'true'); a.tabIndex = -1; }
         const tag = document.createElement('span');
         tag.className = 'tk-tag';
@@ -1194,23 +1197,64 @@ document.addEventListener('DOMContentLoaded', () => {
     if (box.contains(document.activeElement)) document.activeElement.blur();
   };
   track.addEventListener('click', (e) => { if (e.target.closest('a')) { save(); setTimeout(release, 0); } });
+
+  // Hold a finger on it to pause, so a post can be read and tapped
+  const hold = (on) => box.classList.toggle('is-held', on);
+  const win = box.querySelector('.tk-window');
+  win.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') hold(true); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => win.addEventListener(t, () => hold(false)));
+  window.addEventListener('pageshow', () => hold(false));
+
+  // The newest Favorites pick (favorites.js runs before DOMContentLoaded) and the
+  // first project in Selected work, slotted in between the posts
+  const extras = () => {
+    const out = {};
+    const pick = window.nedcodePick;
+    if (pick) out.pick = { link: 'favorites.html', topic: 'Just watched', title: pick.title, read: `★ ${pick.rating}` };
+    const row = document.querySelector('.hw-row');
+    const name = row?.querySelector('.hw-name')?.firstChild?.textContent.trim();
+    if (row && name) out.project = { link: row.getAttribute('href'), topic: 'Latest project', title: name, read: row.querySelector('.hw-year')?.textContent.trim() || '', external: row.target === '_blank' };
+    return out;
+  };
+  const mix = (posts) => {
+    const { pick, project } = extras();
+    const items = posts.slice();
+    if (pick) items.splice(Math.min(1, items.length), 0, pick);
+    if (project) items.splice(Math.min(3, items.length), 0, project);
+    return items;
+  };
+  const ready = new Promise((ok) => {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ok, { once: true });
+    else ok();
+  });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) release(); });
   window.addEventListener('pageshow', release);
 
   fetch('blog.html')
     .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
-    .then((html) => { const posts = readPosts(html); build(posts); latest(posts); })
-    .catch(() => build([]));
+    .then((html) => ready.then(() => { const posts = readPosts(html); build(mix(posts)); latest(posts); }))
+    .catch(() => ready.then(() => build(mix([]))));
 
-  // "Latest posts": the 3 newest posts as swipeable cover cards
+  // "Latest posts": the next 3 posts as swipeable cover cards. The newest one
+  // already leads the ticker, so the cards start from the one before it.
+  // Posts the visitor has opened get a small "Read" mark (see BLOG: READ MARKS).
   const latestBox = document.querySelector('.hm-latest');
   const latest = (posts) => {
     if (!latestBox || !posts.length) return;
     const list = latestBox.querySelector('.hm-cards');
-    posts.slice(0, 3).forEach((n) => {
+    const seen = readPostsSeen();
+    const cards = posts.length > 3 ? posts.slice(1, 4) : posts.slice(0, 3);
+    cards.forEach((n) => {
       const a = document.createElement('a');
       a.className = 'hm-card';
       a.href = n.link;
+      if (seen.includes(postSlug(n.link))) {
+        a.classList.add('is-read');
+        const mark = document.createElement('span');
+        mark.className = 'hm-card-read';
+        mark.textContent = '✓ Read';
+        a.append(mark);
+      }
       if (n.img) {
         const img = document.createElement('img');
         img.src = n.img; img.alt = ''; img.width = 940; img.height = 788; img.loading = 'lazy';
@@ -1225,7 +1269,39 @@ document.addEventListener('DOMContentLoaded', () => {
       list.append(a);
     });
     latestBox.hidden = false;
+
+    // Phones: one dot per card, the current one lit, so it's clear they swipe
+    const dots = latestBox.querySelector('.hm-dots');
+    if (!dots) return;
+    const all = [...list.children];
+    all.forEach(() => dots.append(document.createElement('span')));
+    const light = () => {
+      const step = all[1] ? all[1].offsetLeft - all[0].offsetLeft : 1;
+      const atEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
+      const i = atEnd ? all.length - 1 : Math.round(list.scrollLeft / step);
+      [...dots.children].forEach((d, k) => d.classList.toggle('is-on', k === i));
+    };
+    list.addEventListener('scroll', light, { passive: true });
+    light();
   };
+})();
+
+/*===== BLOG: READ MARKS =====*/
+// Opening a blog post remembers it on this device only (localStorage), so the
+// home page cards can show which posts the visitor has already read.
+const READ_KEY = 'nedcode-read-posts';
+function postSlug(href) {
+  return decodeURIComponent((href || '').split(/[?#]/)[0].split('/').pop().replace(/\.html$/, '')).toLowerCase();
+}
+function readPostsSeen() {
+  try { return JSON.parse(localStorage.getItem(READ_KEY)) || []; } catch (e) { return []; }
+}
+(() => {
+  if (!/\/blog\/[^/]+$/.test(location.pathname)) return;
+  const slug = postSlug(location.pathname);
+  const seen = readPostsSeen();
+  if (!slug || seen.includes(slug)) return;
+  try { localStorage.setItem(READ_KEY, JSON.stringify([slug, ...seen].slice(0, 100))); } catch (e) {}
 })();
   
 

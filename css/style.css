@@ -4640,6 +4640,7 @@ a.bl-row:hover {
   }
 }
 
+.tk.is-running.is-held .tk-track,
 .tk.is-running:has(:focus-visible) .tk-track {
   animation-play-state: paused;
 }
@@ -5226,8 +5227,49 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
+/* Posts this visitor already opened: a small mark, cover a touch dimmer */
+.hm-card { position: relative; }
+
+.hm-card.is-read img,
+.hm-card.is-read h3 { opacity: .6; }
+
+.hm-card-read {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  padding: .15rem .5rem;
+  border-radius: 6px;
+  background: rgba(21, 21, 21, .85);
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
+}
+
+/* Swipe dots under the cards (phones only, the cards all fit on bigger screens) */
+.hm-dots {
+  display: flex;
+  justify-content: center;
+  gap: .4rem;
+  margin-top: .7rem;
+}
+
+.hm-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #3a3a3a;
+  transition: width .25s, background .25s;
+}
+
+.hm-dots span.is-on {
+  width: 16px;
+  background: var(--fifteenth-color);
+}
+
 @media screen and (min-width: 768px) {
   .hm-cards { grid-auto-columns: calc((100% - 1.6rem) / 3); overflow: visible; }
+  .hm-dots { display: none; }
 }
 
 /* The new blocks set their own spacing */

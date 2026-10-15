@@ -1133,6 +1133,8 @@
     star.textContent = '★';
     p.replaceChildren(star, ` ${pick.rating} · 1 of ${FAVORITES.length} picks I'd defend in an argument`);
     homeCard.hidden = false;
+    // the home ticker shows the same pick
+    window.nedcodePick = { title: pick.title, rating: pick.rating };
     return;
   }
 
