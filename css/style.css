@@ -75,8 +75,18 @@
   color: #000000;
 }
 
+/* Background: a fine dot grid with small + marks every few cells and a
+   faint warm glow, like an engineering drawing. It's on the page itself (not
+   a layer on top of it) so it also fills the strips behind the phone's status
+   bar and Safari's toolbar, and the overscroll bounce. Faded maths notes are
+   laid over it by scripts.js (.bg-math). */
 html {
   scroll-behavior: smooth;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M0 6V-6M-6 0H6M144 6V-6M138 0H150M0 150V138M-6 144H6M144 150V138M138 144H150' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") -1px -1px / 144px 144px,
+    radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
+    radial-gradient(ellipse 70% 55% at 85% 30%, rgba(255, 106, 31, .03), transparent 70%),
+    var(--thirteenth-color);
 }
 
 body {
@@ -85,22 +95,7 @@ body {
   font-family: var(--body-font);
   font-size: var(--normal-font-size);
   color: var(--second-color);
-  background-color: var(--thirteenth-color);
-}
-
-/* Background: a fine dot grid with small + marks every few cells and a
-   faint warm glow, like an engineering drawing. Faded maths notes are laid
-   on top of it by scripts.js (.bg-math). Both sit behind everything. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cpath d='M0 6V-6M-6 0H6M144 6V-6M138 0H150M0 150V138M-6 144H6M144 150V138M138 144H150' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1'/%3E%3C/svg%3E") -1px -1px / 144px 144px,
-    radial-gradient(circle, rgba(255, 255, 255, .07) 1px, transparent 1.5px) 0 0 / 24px 24px,
-    radial-gradient(ellipse 70% 55% at 85% 30%, rgba(255, 106, 31, .03), transparent 70%);
+  background-color: transparent; /* the grid lives on html, see above */
 }
 
 .bg-math {
