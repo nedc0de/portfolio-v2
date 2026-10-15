@@ -1754,7 +1754,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let last = 0, raf = 0, running = false;
   const tick = (now) => {
     raf = requestAnimationFrame(tick);
-    const dt = Math.min(200, now - (last || now));
+    if (!last) { last = now; return; } // first frame: just start the clock
+    const dt = Math.min(200, now - last);
     if (dt < 80) return; // about 12 frames a second is plenty for something this slow
     last = now;
     grid.forEach((c) => {
