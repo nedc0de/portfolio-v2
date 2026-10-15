@@ -2495,10 +2495,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
-/*===== HOME: Selected work circuit line =====*/
-// The line joining the numbered nodes draws itself down, node by node, the
-// first time the list scrolls into view. No JS or reduced motion: it's
-// simply there.
+/*===== HOME: Selected work cables =====*/
+// Each number's little cable draws itself in toward its title, one after
+// another, the first time the list scrolls into view. No JS or reduced
+// motion: they're simply there.
 (() => {
   const list = document.querySelector('.hw-list');
   if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;

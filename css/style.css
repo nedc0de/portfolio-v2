@@ -4820,63 +4820,63 @@ a.tk-item:hover,
   --pad: 1rem;
 }
 
-/* No divider lines: each number sits in a small node, and a thin "circuit"
-   line runs from node to node down the left. It draws itself in when the
-   list scrolls into view (scripts.js adds .is-drawn). */
+/* No divider lines: from each number a short yellow cable runs down, curves
+   along the bottom and turns up to point at the project's title. The cables
+   draw themselves in one after another when the list scrolls into view
+   (scripts.js adds .is-drawn). */
 .hw-row {
   position: relative;
   display: grid;
   grid-template-columns: var(--node) 1fr auto;
-  align-items: start; /* the title lines up with its node */
+  align-items: start; /* the title lines up with its number */
   gap: 1rem;
   padding: var(--pad) 0;
   color: var(--fourth-color);
   text-align: left;
 }
 
-.hw-name { padding-top: calc((var(--node) - 1.55rem) / 2); }
+.hw-name { padding-top: .05rem; }
 .hw-meta { padding-top: .15rem; }
 
-.hw-row:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  left: calc(var(--node) / 2 - 1px);
-  top: calc(var(--pad) + var(--node) / 2);
-  width: 2px;
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(rgba(255, 220, 22, .55), rgba(255, 220, 22, .15));
-  transform-origin: top;
-}
-
-.hw-list.will-draw .hw-row::after { transform: scaleY(0); }
-.hw-list.will-draw .hw-num { opacity: 0; transform: scale(.6); }
-.hw-list.is-drawn .hw-row::after {
-  transform: none;
-  transition: transform .45s cubic-bezier(.22, .61, .36, 1) calc(var(--i, 0) * .35s + .2s);
-}
-.hw-list.is-drawn .hw-num {
-  opacity: 1;
-  transform: none;
-  transition: opacity .3s calc(var(--i, 0) * .35s), transform .3s cubic-bezier(.34, 1.56, .64, 1) calc(var(--i, 0) * .35s), background .3s, color .3s;
-}
-
 .hw-num {
-  position: relative;
-  z-index: 1;
-  align-self: start;
-  display: grid;
-  place-items: center;
-  width: var(--node);
-  height: var(--node);
-  border: 1.5px solid rgba(255, 220, 22, .6);
-  border-radius: 50%;
-  background: var(--thirteenth-color);
-  font-size: .72rem;
+  padding-top: .45rem;
+  font-size: .8rem;
   font-weight: 700;
   color: var(--fifteenth-color);
-  transition: background .3s, color .3s;
 }
+
+.hw-cable {
+  position: absolute;
+  left: .35rem;
+  top: calc(var(--pad) + 1.8rem);
+  /* reaches across to just before the title, ending in an upward sweep
+     that points at it */
+  width: calc(var(--node) + 1rem - .7rem);
+  height: 1.45rem;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hw-cable path {
+  fill: none;
+  stroke: var(--fifteenth-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: .75;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: opacity .3s;
+}
+
+.hw-list.will-draw .hw-cable path { stroke-dashoffset: 1; }
+.hw-list.is-drawn .hw-cable path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .6s cubic-bezier(.22, .61, .36, 1) calc(var(--i, 0) * .3s), opacity .3s;
+}
+
+.hw-row:hover .hw-cable path { opacity: 1; }
 
 .hw-name {
   min-width: 0; /* lets the one-line description truncate instead of widening the row */
@@ -4932,8 +4932,7 @@ a.tk-item:hover,
 }
 
 .hw-row:hover .hw-num {
-  background: var(--fifteenth-color);
-  color: var(--thirteenth-color);
+  color: var(--seventh-color);
 }
 
 .hw-row:hover .hw-desc {
@@ -4962,7 +4961,7 @@ a.tk-item:hover,
 @media (hover: none), (max-width: 768px) {
   .hw-list {
     --node: 1.75rem;
-    --pad: .8rem;
+    --pad: .85rem;
   }
 
   .hw-row {
