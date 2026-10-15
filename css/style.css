@@ -104,6 +104,7 @@ body {
   font-size: var(--normal-font-size);
   color: var(--second-color);
   background-color: transparent; /* the grid lives on html, see above */
+  overflow-x: clip; /* soft list backdrops reach past the screen edge on phones */
 }
 
 .bg-math {
@@ -1885,7 +1886,7 @@ ul li:before {
 
 .hl-list {
   border-top: 1px solid var(--third-color);
-  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
+  position: relative; /* anchors the soft backdrop (::before) */
 }
 
 .hl-row {
@@ -3462,7 +3463,7 @@ details>summary {
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--third-color);
-  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
+  position: relative; /* anchors the soft backdrop (::before) */
 }
 
 .ab-row {
@@ -4781,7 +4782,7 @@ a.tk-item:hover,
 /* Selected work: a compact version of the Projects page hover list */
 .hw-list {
   border-top: 1px solid var(--third-color);
-  background: var(--thirteenth-color); /* solid, so the dot grid doesn't run under the text */
+  position: relative; /* anchors the soft backdrop (::before) */
 }
 
 .hw-row {
@@ -6936,4 +6937,22 @@ html.is-frozen .egg-crash * {
   font: 12px/1.6 Consolas, Menlo, monospace;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* Lists (Home's Selected work, Projects, About's How I work): a soft clearing
+   in the dot grid behind them, so the text reads easily but the grid melts
+   away around it instead of stopping at a hard edge. */
+.hw-list::before,
+.hl-list::before,
+.ab-list::before {
+  content: "";
+  position: absolute;
+  inset: -80px -160px;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--thirteenth-color);
+  /* an oval that's solid behind the text and fades out gradually, so
+     there's no box shape, just the grid thinning out around the list */
+  -webkit-mask: radial-gradient(closest-side, #000 72%, transparent);
+  mask: radial-gradient(closest-side, #000 72%, transparent);
 }
