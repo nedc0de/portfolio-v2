@@ -2496,13 +2496,40 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== HOME: Selected work cables =====*/
-// Each number's little cable draws itself in toward its title, one after
-// another, the first time the list scrolls into view. No JS or reduced
-// motion: they're simply there.
+// Each number's cable runs down and along under its project's description,
+// ending in a dot. They're sized to each row (and again if the layout
+// changes), and draw themselves in one after another the first time the
+// list scrolls into view. No JS: no cables; reduced motion: no drawing in.
 (() => {
   const list = document.querySelector('.hw-list');
-  if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  list.querySelectorAll('.hw-row').forEach((row, i) => row.style.setProperty('--i', i));
+  if (!list) return;
+  const rows = [...list.querySelectorAll('.hw-row')];
+  // all cables end at the same point: 60% across the narrowest title column
+  const width = () => Math.min(...rows.map((row) => {
+    const name = row.querySelector('.hw-name');
+    return Math.round(name.getBoundingClientRect().left - row.getBoundingClientRect().left + name.offsetWidth * 0.6);
+  }));
+  const size = () => { const w = width(); rows.forEach((row) => {
+    const svg = row.querySelector('.hw-cable');
+    const desc = row.querySelector('.hw-desc') || row.querySelector('.hw-name');
+    if (!svg) return;
+    const r = row.getBoundingClientRect();
+    const top = svg.getBoundingClientRect().top - r.top;
+    const h = Math.max(16, Math.round(desc.getBoundingClientRect().bottom - r.top - top + 9));
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.querySelector('path').setAttribute('d', `M2 0V${h - 12}Q2 ${h - 2} 12 ${h - 2}H${w - 6}`);
+    const dot = svg.querySelector('circle');
+    dot.setAttribute('cx', w - 3);
+    dot.setAttribute('cy', h - 2);
+  }); };
+  size();
+  if ('ResizeObserver' in window) new ResizeObserver(size).observe(list);
+  if (document.fonts) document.fonts.ready.then(size);
+
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  rows.forEach((row, i) => row.style.setProperty('--i', i));
   list.classList.add('will-draw');
   const io = new IntersectionObserver(([e]) => {
     if (!e.isIntersecting) return;
@@ -2511,4 +2538,3 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: .35 });
   io.observe(list);
 })();
-
