@@ -1911,28 +1911,34 @@ ul li:before {
 }
 
 .hl-list {
-  border-top: 1px solid var(--third-color);
   position: relative; /* anchors the soft backdrop (::before) */
+  --pad: 1.6rem;
+  --num-top: clamp(.55rem, 1.7vw, 1.15rem); /* lines the number up with the big title */
 }
 
+/* Same cables as Home's Selected work: no divider lines, a yellow trace
+   from each number runs down and along under the description to a dot */
 .hl-row {
   display: grid;
   grid-template-columns: 3rem 1fr auto;
-  align-items: center;
+  align-items: start;
   gap: 1rem;
-  padding: 1.6rem .5rem;
-  border-bottom: 1px solid var(--third-color);
+  padding: var(--pad) 0 calc(var(--pad) + .9rem);
   color: var(--fourth-color);
   position: relative;
-  transition: padding .35s ease, color .35s;
+  transition: color .35s;
 }
 
 .hl-num {
+  padding-top: var(--num-top);
   font-size: .8rem;
-  font-weight: 600;
-  color: var(--second-color);
+  font-weight: 700;
+  color: var(--fifteenth-color);
   transition: color .35s;
 }
+
+.hl-row .hw-cable { top: calc(var(--pad) + var(--num-top) + 1.35rem); }
+.hl-meta { padding-top: calc(var(--num-top) - .2rem); }
 
 .hl-name {
   font-size: clamp(1.6rem, 5vw, 3.2rem);
@@ -1988,12 +1994,8 @@ ul li:before {
   color: var(--seventh-color);
 }
 
-.hl-row:hover {
-  padding-left: 1.5rem;
-}
-
 .hl-row:hover .hl-num {
-  color: var(--fifteenth-color);
+  color: var(--seventh-color);
 }
 
 .hl-row:hover .hl-desc {
@@ -2052,14 +2054,13 @@ ul li:before {
     padding-bottom: 2.5rem;
   }
 
+  .hl-list {
+    --pad: 1.3rem;
+  }
+
   .hl-row {
     grid-template-columns: 2rem 1fr auto;
     gap: .6rem;
-    padding: 1.4rem 0;
-  }
-
-  .hl-row:hover {
-    padding-left: 0;
   }
 
   .hl-list:hover .hl-row .hl-name {
@@ -2074,12 +2075,8 @@ ul li:before {
     color: var(--seventh-color);
   }
 
-  .hl-row.is-active {
-    padding-left: .75rem;
-  }
-
   .hl-row.is-active .hl-num {
-    color: var(--fifteenth-color);
+    color: var(--seventh-color);
   }
 
   .hl-row.is-active .hl-desc {
@@ -4822,8 +4819,8 @@ a.tk-item:hover,
 
 /* No divider lines: from each number a yellow cable runs down and along
    under the project's description, ending in a dot, like a trace on a
-   circuit board. scripts.js sizes each cable to its row and draws them in
-   one after another when the list scrolls into view (.is-drawn). */
+   circuit board. scripts.js sizes each cable to its row and draws each one
+   in as its row scrolls into view (.is-drawn on the row). */
 .hw-row {
   position: relative;
   display: grid;
@@ -4872,19 +4869,21 @@ a.tk-item:hover,
   transform-origin: center;
 }
 
-.hw-list.will-draw .hw-cable path { stroke-dashoffset: 1; }
-.hw-list.will-draw .hw-cable circle { opacity: 0; transform: scale(0); }
-.hw-list.is-drawn .hw-cable path {
+:is(.hw-list, .hl-list).will-draw .hw-cable path { stroke-dashoffset: 1; }
+:is(.hw-list, .hl-list).will-draw .hw-cable circle { opacity: 0; transform: scale(0); }
+:is(.hw-list, .hl-list) .is-drawn .hw-cable path {
   stroke-dashoffset: 0;
   transition: stroke-dashoffset .7s cubic-bezier(.22, .61, .36, 1) calc(var(--i, 0) * .3s), opacity .3s;
 }
-.hw-list.is-drawn .hw-cable circle {
+:is(.hw-list, .hl-list) .is-drawn .hw-cable circle {
   opacity: .9;
   transform: none;
   transition: opacity .2s calc(var(--i, 0) * .3s + .6s), transform .35s cubic-bezier(.34, 1.56, .64, 1) calc(var(--i, 0) * .3s + .6s);
 }
 
-.hw-row:hover .hw-cable path { opacity: 1; }
+.hw-row:hover .hw-cable path,
+.hl-row:hover .hw-cable path,
+.hl-row.is-active .hw-cable path { opacity: 1; }
 
 .hw-name {
   min-width: 0; /* lets the one-line description truncate instead of widening the row */
