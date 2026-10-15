@@ -4921,11 +4921,12 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-/* Phones: no hover, so each row shows its GIF as a small thumbnail */
+/* Phones: no hover, so each row shows its number in yellow (like About's
+   How I work) and its description right away */
 @media (hover: none), (max-width: 768px) {
   .hw-row {
-    grid-template-columns: 72px 1fr auto;
-    padding: .7rem 0;
+    grid-template-columns: 2rem 1fr auto;
+    padding: .85rem 0;
   }
 
   .hw-row:hover {
@@ -4937,21 +4938,10 @@ a.tk-item:hover,
   }
 
   .hw-num {
-    display: none;
-  }
-
-  .hw-thumb {
-    display: block;
-    width: 72px;
-    aspect-ratio: 4 / 3;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .hw-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    align-self: start;
+    padding-top: .3rem;
+    font-size: .8rem;
+    color: var(--fifteenth-color);
   }
 
   .hw-name {
