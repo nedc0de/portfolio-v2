@@ -309,12 +309,30 @@ position: relative;
 .nav-logo-spark .spark-tip { fill: #fff; }
 .nav-logo-spark .spark-bit { stroke: #ffd2a6; stroke-width: 3; stroke-linecap: round; opacity: 0; }
 
-/* the sockets the cables plug into under the N and the O: a small dark cap
-   like the end of a neon tube, behind the letters so their glow washes over
-   it. Its ring turns orange as the laser runs in. */
-.nav-logo-spark .socket-body { fill: url(#socket-shade); }
-.nav-logo-spark .socket-ring { fill: #565656; transition: fill .3s; }
-.nav-logo-spark .is-hot .socket-ring { fill: #ff6a1f; }
+/* light flowing into a letter from where its cable meets it: a glow masked
+   to the letter's own shape (scripts.js sets --mask and plays it) */
+.nav-logo-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 100%;
+  aspect-ratio: 1125 / 450; /* same box as the logo artwork */
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: var(--mask) 0 0 / 100% 100% no-repeat;
+  mask: var(--mask) 0 0 / 100% 100% no-repeat;
+}
+
+.nav-logo-flow span {
+  position: absolute;
+  width: 40%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.05);
+  background: radial-gradient(circle, #fff3e6 0, #ffb070 18%, #ff7a2e 38%, rgba(255, 106, 31, .55) 55%, rgba(255, 106, 31, 0) 72%);
+}
 
 /* a letter the spark reaches gives a quick electric flicker */
 .nav-logo-group .nav-logo-layer.is-zap {
@@ -355,7 +373,7 @@ position: relative;
 }
 
 /* no power, no current in the cables either; dimmed, it runs faintly */
-.nav-logo-group.is-power-off .nav-logo-spark :is(.spark-fx, .spark-loop) { opacity: 0; } /* the sockets stay */
+.nav-logo-group.is-power-off .nav-logo-spark :is(.spark-fx, .spark-loop) { opacity: 0; }
 .nav-logo-group.is-dim .nav-logo-spark .spark-fx { opacity: .35; }
 
 /* a glow over whichever dot is "pressed" (positions from the 1125×450 artwork) */
