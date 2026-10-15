@@ -1701,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== LOGO: matrix rain in the window =====*/
-// Faint yellow characters trickle down the logo's window behind the letters,
+// Faint yellow characters rise up the logo's window behind the letters,
 // very faded and very slow. Each column drips at its own pace; a character
 // lights up as the drip passes and slowly fades. It pauses when the logo is
 // off screen or the tab is hidden; with reduced motion it shows one still
@@ -1736,12 +1736,28 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.font = `${Math.round(cell * 0.9)}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    // every page load starts with an empty window: each column's drop starts
-    // just above the top, a few rows apart, so the rain falls in from the top
-    // (a resize keeps whatever is already falling)
+    // Every page load starts with an empty window and the rain rises from the
+    // bottom, each column only up to its own height. The heights follow one
+    // of four patterns, picked at random per load: about half the window
+    // everywhere, full on the left fading to half on the right, the mirror of
+    // that, or a mix of random heights. (A resize keeps what's running.)
     if (!grid.length || grid.length !== cols * rows) {
+      const pattern = ['half', 'left', 'right', 'mix'][Math.floor(Math.random() * 4)];
+      const reach = (x) => { // share of the window this column climbs
+        const t = cols > 1 ? x / (cols - 1) : 0;
+        if (pattern === 'left') return 1 - 0.5 * t;
+        if (pattern === 'right') return 0.5 + 0.5 * t;
+        if (pattern === 'mix') return 0.35 + Math.random() * 0.65;
+        return 0.42 + Math.random() * 0.16;
+      };
       grid = Array.from({ length: cols * rows }, () => ({ ch: glyph(), a: 0 }));
-      drops = Array.from({ length: cols }, () => ({ y: -1 - Math.floor(Math.random() * 5), every: 260 + Math.random() * 520, t: 0 }));
+      drops = Array.from({ length: cols }, (_, x) => ({
+        top: Math.round(rows * (1 - reach(x))), // the highest row it reaches
+        y: rows + Math.floor(Math.random() * 4), // starts just below the bottom
+        every: 260 + Math.random() * 520,
+        t: 0,
+      }));
+      cv.dataset.pattern = pattern;
     }
     return true;
   };
@@ -1774,9 +1790,11 @@ document.addEventListener('DOMContentLoaded', () => {
       d.t += dt;
       if (d.t < d.every) return;
       d.t = 0;
-      d.y += 1;
-      if (d.y >= rows + Math.random() * rows * 3) { d.y = -Math.floor(Math.random() * rows); d.every = 260 + Math.random() * 520; }
+      d.y -= 1; // rising
+      // past its top: wait a moment below the bottom, then rise again
+      if (d.y < d.top - Math.random() * rows * 2) { d.y = rows + Math.floor(Math.random() * 3); d.every = 260 + Math.random() * 520; }
       const y = Math.floor(d.y);
+      if (y < d.top) return;
       if (y >= 0 && y < rows) { const c = grid[y * cols + x]; c.a = 1; c.ch = glyph(); }
     });
     draw();
@@ -1786,7 +1804,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!setup()) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    grid.forEach((c) => { c.a = Math.random() * 0.25; }); // a still, faint scatter instead
+    // a still, faint scatter in the same shape instead
+    grid.forEach((c, i) => { c.a = Math.floor(i / cols) >= drops[i % cols].top ? Math.random() * 0.25 : 0; });
     draw();
     return;
   }
