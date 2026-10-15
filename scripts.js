@@ -1701,7 +1701,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /*===== LOGO: matrix rain in the window =====*/
-// Dark green characters trickle down the logo's window behind the letters,
+// Faint yellow characters trickle down the logo's window behind the letters,
 // very faded and very slow. Each column drips at its own pace; a character
 // lights up as the drip passes and slowly fades. It pauses when the logo is
 // off screen or the tab is hidden; with reduced motion it shows one still
@@ -1747,8 +1747,8 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let x = 0; x < cols; x++) {
         const c = grid[y * cols + x];
         if (c.a < 0.03) continue;
-        // the newest characters are a lighter green, older ones darker
-        ctx.fillStyle = c.a > 0.85 ? `rgba(120, 255, 160, ${c.a * 0.55})` : `rgba(40, 190, 95, ${c.a * 0.45})`;
+        // the newest characters are a pale yellow, older ones the site yellow, fainter
+        ctx.fillStyle = c.a > 0.85 ? `rgba(255, 240, 150, ${c.a * 0.5})` : `rgba(255, 220, 22, ${c.a * 0.32})`;
         ctx.fillText(c.ch, x * cell + cell / 2, y * cell + cell / 2);
       }
     }
