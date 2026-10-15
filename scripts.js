@@ -1354,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /*===== LOGO: current running through the cables =====*/
 // A laser snake runs along each cable in turn, like a laser cutter: the right
 // cable into the O, then a moment later out of the window and around the left
-// cable into the N. It's an orange line with a tail that fades out, a
+// cable into the N. It's an even orange line with a
 // white-hot tip in a soft glow, and little sparks that fly off and fall. Each
 // letter flickers as its snake arrives, and the little loop on top glows once
 // on its own. The paths were traced from the 1125×450 logo artwork and are
@@ -1451,10 +1451,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
   next();
 
-  // A snake is a few dashes stacked so they all end at its head: long, faint
-  // and thin at the back, short, bright and thick at the front, so the tail
-  // fades out. Plus a pale core and a wide, faint glow.
-  const LAYERS = [['glow', 130], ['tail', 130], ['mid', 75], ['body', 38], ['core', 55]];
+  // A snake is one clean, even laser line: an orange body with a pale core,
+  // the same length so both ends stay crisp, and no glow around it.
+  const LAYERS = [['body', 120], ['core', 120]];
   const TAIL = 135; // a snake is gone once its head is this far past the end
   const snake = (c) => {
     const g = make('g', 'spark-snake', svg);
