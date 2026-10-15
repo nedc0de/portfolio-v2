@@ -315,7 +315,7 @@ position: relative;
 
 
 /* The cables are dark until a snake of yellow laser light runs along them
-   (16s loop, drawn by scripts.js): an even yellow line with a
+   (26s loop, drawn by scripts.js): an even yellow line with a
    white-hot tip in a soft glow, and little sparks, like a laser cutter.
    No blur filters: the glow is just wider, fainter strokes, so it stays
    smooth on phones. */
