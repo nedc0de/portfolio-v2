@@ -5038,9 +5038,80 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-.hm-news iframe {
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* the sign-up form: a dark field and a yellow button in one bar, like the
+   contact form; it says "You're in" once the email is added */
+.hm-news-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .5rem;
+}
+
+.hm-news-field input {
   width: 100%;
+  height: 100%;
+  font-family: var(--body-font);
+  font-size: 1rem;
+  padding: .85rem 1rem;
   border-radius: 8px;
+  border: 2px solid var(--third-color);
+  background: var(--sixteenth-color);
+  color: var(--fourth-color);
+  outline: none;
+  transition: border-color .2s;
+}
+
+.hm-news-field input:focus { border-color: var(--fifteenth-color); }
+.hm-news-field input::placeholder { color: var(--second-color); }
+
+.hm-news-form button {
+  min-width: 8.5rem; /* "Subscribing…" fits without the field shrinking */
+  padding: 0 1.4rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--fifteenth-color);
+  color: var(--eleventh-color);
+  font-family: var(--body-font);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .2s, opacity .2s;
+}
+
+.hm-news-form button:hover { transform: translateY(-1px); }
+.hm-news-form button:disabled { background: #9a8510; cursor: default; transform: none; }
+
+.hm-news-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+.hm-news-msg {
+  grid-column: 1 / -1;
+  min-height: 1.3em;
+  margin: .1rem 0 0;
+  font-size: .85rem;
+  color: var(--fourteenth-color);
+}
+
+.hm-news-msg.is-error { color: #ff6b6b; }
+
+/* signed up: the form turns into a short confirmation */
+.hm-news-form.is-done .hm-news-field,
+.hm-news-form.is-done button { display: none; }
+.hm-news-form.is-done .hm-news-msg {
+  padding: .9rem 1rem;
+  border: 2px solid var(--fifteenth-color);
+  border-radius: 8px;
+  background: var(--thirteenth-color);
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--fifteenth-color);
 }
 
 /* Latest posts: swipe through the 3 newest covers */

@@ -1759,6 +1759,40 @@ document.addEventListener('DOMContentLoaded', () => {
   addEventListener('touchend', () => off(700), { passive: true });
 })();
 
+/*===== HOME: newsletter sign-up =====*/
+// Sends the email to the subscribe function (which adds it to Beehiiv) and
+// shows the result in place, without leaving the page.
+(() => {
+  const form = document.querySelector('.hm-news-form');
+  if (!form) return;
+  const input = form.querySelector('input[name="email"]');
+  const button = form.querySelector('button');
+  const msg = form.querySelector('.hm-news-msg');
+  const say = (text, error) => { msg.textContent = text; msg.classList.toggle('is-error', !!error); };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = input.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { say('That email doesn\u2019t look right.', true); input.focus(); return; }
+    button.disabled = true;
+    button.textContent = 'Subscribing\u2026';
+    say('');
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, website: form.website.value }),
+      });
+      if (!res.ok) throw new Error(res.status);
+      form.classList.add('is-done');
+      say('You\u2019re in. Thanks for subscribing!');
+    } catch (err) {
+      say('Couldn\u2019t sign you up right now. Try again in a bit.', true);
+      button.disabled = false;
+      button.textContent = 'Subscribe';
+    }
+  });
+})();
+
 /*===== EASTER EGG: Konami code =====*/
 // Keyboard: ↑ ↑ ↓ ↓ ← → ← → B A. Phone: swipe up, up, down, down, left,
 // right, left, right, then tap twice. Glitches the site, Cyberpunk style, for a few seconds.
