@@ -309,6 +309,13 @@ position: relative;
 .nav-logo-spark .spark-tip { fill: #fff; }
 .nav-logo-spark .spark-bit { stroke: #ffd2a6; stroke-width: 3; stroke-linecap: round; opacity: 0; }
 
+/* the sockets the cables plug into under the N and the O: a small dark cap
+   like the end of a neon tube, behind the letters so their glow washes over
+   it. Its ring turns orange as the laser runs in. */
+.nav-logo-spark .socket-body { fill: url(#socket-shade); }
+.nav-logo-spark .socket-ring { fill: #565656; transition: fill .3s; }
+.nav-logo-spark .is-hot .socket-ring { fill: #ff6a1f; }
+
 /* a letter the spark reaches gives a quick electric flicker */
 .nav-logo-group .nav-logo-layer.is-zap {
   animation: neon-zap 1s steps(1, end) var(--d, 0s) both !important;
@@ -348,8 +355,8 @@ position: relative;
 }
 
 /* no power, no current in the cables either; dimmed, it runs faintly */
-.nav-logo-group.is-power-off .nav-logo-spark { opacity: 0; }
-.nav-logo-group.is-dim .nav-logo-spark { opacity: .35; }
+.nav-logo-group.is-power-off .nav-logo-spark :is(.spark-fx, .spark-loop) { opacity: 0; } /* the sockets stay */
+.nav-logo-group.is-dim .nav-logo-spark .spark-fx { opacity: .35; }
 
 /* a glow over whichever dot is "pressed" (positions from the 1125×450 artwork) */
 .nav-dots {

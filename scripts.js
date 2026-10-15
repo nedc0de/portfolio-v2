@@ -1418,6 +1418,29 @@ document.addEventListener('DOMContentLoaded', () => {
   loop.setAttribute('d', cables[1].d);
   base.append(svg);
 
+  // Layers, back to front: snakes, the laser tip and its sparks, then the
+  // sockets the cables plug into, so the laser runs into a socket and is gone.
+  const snakesLayer = make('g', 'spark-fx', svg);
+  const tipsLayer = make('g', 'spark-fx', svg);
+  const socketsLayer = make('g', 'spark-sockets', svg);
+
+  // Where each cable meets its letter (right cable into the O, left into the
+  // N) it plugs into a small socket under the letter's bottom edge, like the
+  // electrode cap at the end of a neon tube. It sits behind the letters so
+  // their glow washes over it, and stands straight up from the letter; the
+  // left cable comes in at an angle and simply runs into its bottom.
+  svg.querySelector('defs').insertAdjacentHTML('beforeend', '<linearGradient id="socket-shade">'
+    + '<stop offset="0" stop-color="#191919"/><stop offset=".45" stop-color="#3d3d3d"/><stop offset="1" stop-color="#161616"/></linearGradient>');
+  const SOCKETS = [[0, 708], [2, 277]]; // cable, x of its socket
+  SOCKETS.forEach(([i, x]) => {
+    const c = cables[i];
+    const g = make('g', 'socket', socketsLayer);
+    g.insertAdjacentHTML('beforeend', `<g transform="translate(${x} 0)">`
+      + '<rect class="socket-body" x="-10" y="294" width="20" height="30" rx="3.5"/>'
+      + '<rect class="socket-ring" x="-11.5" y="317" width="23" height="7" rx="3.5"/></g>');
+    c.socket = g;
+  });
+
   // flicker a letter when the snake arrives; a letter that was tapped off
   // gets switched straight back on by it
   const zap = (cls) => {
@@ -1456,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const LAYERS = [['body', 120], ['core', 120]];
   const TAIL = 135; // a snake is gone once its head is this far past the end
   const snake = (c) => {
-    const g = make('g', 'spark-snake', svg);
+    const g = make('g', 'spark-snake', snakesLayer);
     const parts = LAYERS.map(([cls, len]) => {
       const p = make('path', 'spark-' + cls, g);
       p.setAttribute('d', c.d);
@@ -1505,13 +1528,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const tips = [];
   const tip = (n) => {
     while (tips.length <= n) {
-      const g = make('g', 'spark-head', svg);
+      const g = make('g', 'spark-head', tipsLayer);
       g.innerHTML = '<circle class="spark-halo" r="55"/><circle class="spark-tip" r="7"/>';
       tips.push(g);
     }
     return tips[n];
   };
-  const bits = Array.from({ length: 40 }, () => ({ el: make('line', 'spark-bit', svg), life: 1, max: 0 }));
+  const bits = Array.from({ length: 40 }, () => ({ el: make('line', 'spark-bit', tipsLayer), life: 1, max: 0 }));
   let free = 0;
   const loops = LOOP.map(([i, from, to]) => ({ ...snake(cables[i]), from, to }));
   let last = performance.now();
@@ -1535,6 +1558,9 @@ document.addEventListener('DOMContentLoaded', () => {
       draw(s, head);
       heads.push([s.c, head]);
     }
+    // a socket glows while the laser runs into it and just after
+    const hot = new Set(off ? [] : heads.filter(([c, l]) => c.socket && l > c.len - 40 && l < c.len + 80).map(([c]) => c.socket));
+    cables.forEach((c) => { if (c.socket) c.socket.classList.toggle('is-hot', hot.has(c.socket)); });
     let n = 0;
     heads.forEach(([c, l]) => {
       if (off || l < 0 || l > c.len) return;
