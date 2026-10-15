@@ -4815,27 +4815,67 @@ a.tk-item:hover,
 
 /* Selected work: a compact version of the Projects page hover list */
 .hw-list {
-  border-top: 1px solid var(--third-color);
   position: relative; /* anchors the soft backdrop (::before) */
+  --node: 1.9rem;
+  --pad: 1rem;
 }
 
+/* No divider lines: each number sits in a small node, and a thin "circuit"
+   line runs from node to node down the left. It draws itself in when the
+   list scrolls into view (scripts.js adds .is-drawn). */
 .hw-row {
+  position: relative;
   display: grid;
-  grid-template-columns: 2.2rem 1fr auto;
-  align-items: center;
-  gap: .8rem;
-  padding: 1rem .25rem;
-  border-bottom: 1px solid var(--third-color);
+  grid-template-columns: var(--node) 1fr auto;
+  align-items: start; /* the title lines up with its node */
+  gap: 1rem;
+  padding: var(--pad) 0;
   color: var(--fourth-color);
   text-align: left;
-  transition: padding .35s ease;
+}
+
+.hw-name { padding-top: calc((var(--node) - 1.55rem) / 2); }
+.hw-meta { padding-top: .15rem; }
+
+.hw-row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 1px);
+  top: calc(var(--pad) + var(--node) / 2);
+  width: 2px;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(rgba(255, 220, 22, .55), rgba(255, 220, 22, .15));
+  transform-origin: top;
+}
+
+.hw-list.will-draw .hw-row::after { transform: scaleY(0); }
+.hw-list.will-draw .hw-num { opacity: 0; transform: scale(.6); }
+.hw-list.is-drawn .hw-row::after {
+  transform: none;
+  transition: transform .45s cubic-bezier(.22, .61, .36, 1) calc(var(--i, 0) * .35s + .2s);
+}
+.hw-list.is-drawn .hw-num {
+  opacity: 1;
+  transform: none;
+  transition: opacity .3s calc(var(--i, 0) * .35s), transform .3s cubic-bezier(.34, 1.56, .64, 1) calc(var(--i, 0) * .35s), background .3s, color .3s;
 }
 
 .hw-num {
-  font-size: .75rem;
-  font-weight: 600;
-  color: var(--second-color);
-  transition: color .35s;
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: var(--node);
+  height: var(--node);
+  border: 1.5px solid rgba(255, 220, 22, .6);
+  border-radius: 50%;
+  background: var(--thirteenth-color);
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
+  transition: background .3s, color .3s;
 }
 
 .hw-name {
@@ -4891,12 +4931,9 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-.hw-row:hover {
-  padding-left: 1rem;
-}
-
 .hw-row:hover .hw-num {
-  color: var(--fifteenth-color);
+  background: var(--fifteenth-color);
+  color: var(--thirteenth-color);
 }
 
 .hw-row:hover .hw-desc {
@@ -4921,28 +4958,21 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-/* Phones: no hover, so each row shows its number in yellow (like About's
-   How I work) and its description right away */
+/* Phones: no hover, so each row shows its description right away */
 @media (hover: none), (max-width: 768px) {
-  .hw-row {
-    grid-template-columns: 2rem 1fr auto;
-    padding: .85rem 0;
+  .hw-list {
+    --node: 1.75rem;
+    --pad: .8rem;
   }
 
-  .hw-row:hover {
-    padding-left: 0;
+  .hw-row {
+    gap: .85rem;
   }
 
   .hw-list:hover .hw-name {
     color: inherit;
   }
 
-  .hw-num {
-    align-self: start;
-    padding-top: .3rem;
-    font-size: .8rem;
-    color: var(--fifteenth-color);
-  }
 
   .hw-name {
     font-size: 1.05rem;

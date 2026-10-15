@@ -2494,3 +2494,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 })();
+
+/*===== HOME: Selected work circuit line =====*/
+// The line joining the numbered nodes draws itself down, node by node, the
+// first time the list scrolls into view. No JS or reduced motion: it's
+// simply there.
+(() => {
+  const list = document.querySelector('.hw-list');
+  if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  list.querySelectorAll('.hw-row').forEach((row, i) => row.style.setProperty('--i', i));
+  list.classList.add('will-draw');
+  const io = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    requestAnimationFrame(() => list.classList.add('is-drawn'));
+  }, { threshold: .35 });
+  io.observe(list);
+})();
+
