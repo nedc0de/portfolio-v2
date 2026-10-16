@@ -1108,7 +1108,6 @@ whenIdle(() => {
 // work list change.
 (() => {
   const ZONE = 'America/Toronto';
-  const boardClock = document.querySelector('.hm-clock');
   const box = document.querySelector('.tk');
   if (!box) return;
   const clock = box.querySelector('.tk-clock');
@@ -1116,11 +1115,9 @@ whenIdle(() => {
 
   // made once: building a time formatter is slow, using one is quick
   const TIME_12 = new Intl.DateTimeFormat('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit' });
-  const TIME_24 = new Intl.DateTimeFormat('en-GB', { timeZone: ZONE, hour: '2-digit', minute: '2-digit' });
   const tickClock = () => {
     const now = new Date();
     clock.textContent = TIME_12.format(now);
-    if (boardClock) boardClock.textContent = TIME_24.format(now);
   };
   tickClock(); setInterval(tickClock, 30000);
 
@@ -2751,6 +2748,114 @@ function readPostsSeen() {
       };
     });
   });
+})();
+
+/*===== HOME: Explore (live previews) =====*/
+// About: Ned's six words roll by one at a time. Lab: a small flip board with
+// the live time, tap it to flip to another city. Favorites: the poster leans
+// toward the mouse. The three cards come in one after another when scrolled
+// to. With reduced motion everything still works, just without movement.
+(() => {
+  const box = document.querySelector('.xb');
+  if (!box) return;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // About: one word at a time, rolling up like a slot machine
+  const about = box.querySelector('.xb-ab');
+  if (about) {
+    const words = about.dataset.words.split(',');
+    const word = about.querySelector('.xb-word');
+    const dots = about.querySelector('.xb-dots');
+    words.forEach(() => dots.append(document.createElement('i')));
+    let i = 0;
+    // long words ("responsible.") shrink just enough to fit small phones
+    const fit = () => {
+      word.style.fontSize = '';
+      const room = word.parentElement.clientWidth;
+      const w = word.getBoundingClientRect().width;
+      if (w > room) word.style.fontSize = `${(parseFloat(getComputedStyle(word).fontSize) * room * .97) / w}px`;
+    };
+    const show = () => {
+      [...dots.children].forEach((d, k) => d.classList.toggle('is-on', k === i));
+      if (still) { word.textContent = words[i]; fit(); return; }
+      word.classList.add('is-out');
+      setTimeout(() => {
+        word.textContent = words[i];
+        fit();
+        word.classList.remove('is-out');
+        word.classList.add('is-in');
+        requestAnimationFrame(() => requestAnimationFrame(() => word.classList.remove('is-in')));
+      }, 260);
+    };
+    word.textContent = words[0];
+    fit();
+    addEventListener('resize', fit);
+    if (document.fonts) document.fonts.ready.then(fit); // measure again with the real font
+    [...dots.children][0].classList.add('is-on');
+    let timer = 0;
+    const start = () => { clearInterval(timer); timer = setInterval(() => { i = (i + 1) % words.length; show(); }, 2600); };
+    // only roll while it's on screen
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => (e.isIntersecting ? start() : clearInterval(timer))).observe(about);
+    } else start();
+  }
+
+  // Lab: the live time on split flaps; each tap flips to the next city
+  const board = box.querySelector('.xb-board');
+  if (board) {
+    const CITIES = [
+      ['Montreal', 'America/Toronto'], ['Tokyo', 'Asia/Tokyo'], ['London', 'Europe/London'],
+      ['Dubai', 'Asia/Dubai'], ['Sydney', 'Australia/Sydney'], ['Los Angeles', 'America/Los_Angeles'],
+    ];
+    const flaps = [...board.querySelectorAll('.xb-flap')];
+    const label = box.querySelector('.xb-city');
+    let city = 0;
+    const formats = CITIES.map(([, zone]) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }));
+    const set = (flap, ch) => {
+      if (flap.textContent === ch) return;
+      if (still) { flap.textContent = ch; return; }
+      flap.classList.remove('is-flip');
+      void flap.offsetWidth;
+      flap.classList.add('is-flip');
+      setTimeout(() => { flap.textContent = ch; }, 140); // swap at the halfway point of the flip
+    };
+    const tick = () => {
+      const t = formats[city].format(new Date()).replace(':', '');
+      flaps.forEach((f, k) => set(f, t[k]));
+    };
+    flaps.forEach((f, k) => { f.textContent = formats[0].format(new Date()).replace(':', '')[k]; });
+    setInterval(tick, 5000);
+    board.addEventListener('click', () => {
+      city = (city + 1) % CITIES.length;
+      label.textContent = city ? CITIES[city][0] : 'Montreal · live';
+      board.setAttribute('aria-label', `Time in ${CITIES[city][0]}. Tap for another city`);
+      tick();
+    });
+  }
+
+  // Favorites: on a computer the poster leans a little toward the mouse
+  const movie = box.querySelector('.xb-mv');
+  if (movie && !still && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const poster = movie.querySelector('.xb-poster');
+    movie.addEventListener('pointermove', (e) => {
+      const r = movie.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      poster.style.transform = `perspective(600px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg)`;
+    });
+    movie.addEventListener('pointerleave', () => { poster.style.transform = ''; });
+  }
+
+  // the cards come in one after another the first time they're scrolled to
+  if (!still && 'IntersectionObserver' in window) {
+    box.classList.add('will-show');
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting && e.intersectionRatio >= .25)) return;
+      io.disconnect();
+      requestAnimationFrame(() => box.classList.add('is-shown'));
+    }, { threshold: .25 });
+    io.observe(box);
+  }
 })();
 
 /*===== CIRCUIT LISTS light up (home Selected work, Projects page) =====*/

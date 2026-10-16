@@ -197,23 +197,38 @@
         <div class="hm-dots"></div>
       </div>
 
-      <!--===== EXPLORE =====-->
-      <!-- Tile icons: Phosphor Icons duotone (phosphoricons.com), MIT License, (c) 2023 Phosphor Icons -->
+      <!--===== EXPLORE: live previews of the other pages =====-->
+      <!-- Favorites: the latest pick's real poster and rating (filled by favorites.js).
+           About: Ned's six words, one at a time. Lab: a working flip board,
+           tap it to flip through cities (scripts.js). -->
       <div class="hm-block">
         <p class="hm-label">Explore</p>
-        <div class="hm-list">
-          <a class="hm-row" href="about.html">
-            <span class="hm-cover" aria-hidden="true"><svg class="hm-cover-art" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a95.76,95.76,0,0,1-31.8,71.37A72,72,0,0,0,128,160a40,40,0,1,0-40-40,40,40,0,0,0,40,40,72,72,0,0,0-64.2,39.37h0A96,96,0,1,1,224,128Z" opacity="0.2"/><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"/></svg><span class="hm-cover-txt"><b>Ned</b></span></span>
-            <div><span class="hm-kicker">About</span><h3>Get to know me</h3><p>Who I am, how I work and what I do off the clock.</p></div>
+        <div class="xb">
+          <a class="xb-card xb-mv" href="favorites.html" hidden>
+            <span class="xb-bg" aria-hidden="true"></span>
+            <span class="xb-poster" aria-hidden="true"><img alt="" width="342" height="513"></span>
+            <span class="xb-mv-body">
+              <span class="xb-k">Just watched</span>
+              <h3 class="xb-title"></h3>
+              <span class="xb-rate"><span class="xb-stars" aria-hidden="true"><span class="xb-stars-on"></span></span><b></b></span>
+              <span class="xb-sub"></span>
+              <span class="xb-go">See all picks <span aria-hidden="true">→</span></span>
+            </span>
           </a>
-          <a class="hm-row hm-fav" href="favorites.html" hidden>
-            <span class="hm-cover" aria-hidden="true"><svg class="hm-cover-art" viewBox="0 0 256 256" fill="currentColor"><path d="M88,96l16,120H70.34a8,8,0,0,1-7.79-6.17L32,80Zm80,0L152,216h33.66a8,8,0,0,0,7.79-6.17L224,80Z" opacity="0.2"/><path d="M229.52,74.21a8,8,0,0,0-7.13-2A44,44,0,0,0,168,41.67a44,44,0,0,0-80,0,44,44,0,0,0-54.4,30.51,8,8,0,0,0-9.4,9.65L54.76,211.67A16,16,0,0,0,70.34,224H185.66a16,16,0,0,0,15.58-12.33L231.79,81.83A8,8,0,0,0,229.52,74.21ZM76,56a27.68,27.68,0,0,1,13.11,3.26,8,8,0,0,0,11.56-5.34,28,28,0,0,1,54.66,0,8,8,0,0,0,11.56,5.34A28,28,0,0,1,207,76.54l-38.56,11-34.49-13.8a16,16,0,0,0-11.88,0L87.57,87.56,49,76.54A28,28,0,0,1,76,56Zm83.25,45.11L145,208H111L96.75,101.11,128,88.62ZM42.91,91.44l37.85,10.81L94.86,208H70.34ZM185.66,208H161.14l14.1-105.75,37.85-10.81Z"/></svg><span class="hm-cover-txt"><b>Picks</b></span></span>
-            <div><span class="hm-kicker">Favorites</span><h3>&nbsp;</h3><p>&nbsp;</p></div>
+          <a class="xb-card xb-ab" href="about.html" data-words="responsible,driven,diligent,ambitious,creative,patient">
+            <span class="xb-k">About</span>
+            <span class="xb-is">Ned is <span class="xb-word-win"><span class="xb-word">responsible</span></span></span>
+            <span class="xb-dots" aria-hidden="true"></span>
+            <span class="xb-go">Get to know me <span aria-hidden="true">→</span></span>
           </a>
-          <a class="hm-row" href="lab.html">
-            <span class="hm-cover" aria-hidden="true"><svg class="hm-cover-art" viewBox="0 0 256 256" fill="currentColor"><path d="M208,216H48a8,8,0,0,1-6.86-12.12l30.48-50.8h0c13.23-2.48,32-1.41,56.37,10.92,32.25,16.33,54.75,12.91,67.5,7.65h0l19.34,32.23A8,8,0,0,1,208,216Z" opacity="0.2"/><path d="M221.69,199.77,160,96.92V40h8a8,8,0,0,0,0-16H88a8,8,0,0,0,0,16h8V96.92L34.31,199.77A16,16,0,0,0,48,224H208a16,16,0,0,0,13.72-24.23ZM110.86,103.25A7.93,7.93,0,0,0,112,99.14V40h32V99.14a7.93,7.93,0,0,0,1.14,4.11L183.36,167c-12,2.37-29.07,1.37-51.75-10.11-15.91-8.05-31.05-12.32-45.22-12.81ZM48,208l28.54-47.58c14.25-1.73,30.31,1.85,47.82,10.72,19,9.61,35,12.88,48,12.88a69.89,69.89,0,0,0,19.55-2.7L208,208Z"/></svg><span class="hm-cover-txt"><b class="hm-clock">00:00</b></span></span>
-            <div><span class="hm-kicker">Lab</span><h3>Departure board</h3><p>A flip-board world clock you can play with.</p></div>
-          </a>
+          <div class="xb-card xb-lb">
+            <span class="xb-k">Lab</span>
+            <button class="xb-board" type="button" aria-label="Time in Montreal. Tap for another city">
+              <span class="xb-flap">0</span><span class="xb-flap">0</span><span class="xb-colon">:</span><span class="xb-flap">0</span><span class="xb-flap">0</span>
+            </button>
+            <span class="xb-city">Montreal · live</span>
+            <a class="xb-lb-link" href="lab.html"><h3>Departure board</h3><span class="xb-go">Play with it <span aria-hidden="true">→</span></span></a>
+          </div>
         </div>
       </div>
 

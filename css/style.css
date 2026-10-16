@@ -7475,3 +7475,311 @@ html.is-frozen .egg-crash * {
   transform: none;
   transition: opacity .25s var(--node-delay), transform .35s cubic-bezier(.34, 1.56, .64, 1) var(--node-delay), box-shadow .3s;
 }
+
+/*===== HOME: Explore, live previews of the other pages =====*/
+/* Favorites (the latest pick's poster) runs full width on top; About (six
+   words rolling by) and Lab (a working flip board) sit side by side below */
+.xb {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  text-align: left;
+}
+
+.xb-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: .95rem;
+  border-radius: 16px;
+  background: var(--sixteenth-color);
+  color: var(--fourth-color);
+  overflow: hidden;
+}
+
+.xb-k {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #9a9a9a;
+}
+
+.xb-go {
+  margin-top: auto;
+  padding-top: .7rem;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
+}
+
+.xb-go span { display: inline-block; transition: transform .25s; }
+
+@media (hover: hover) {
+  .xb-card:hover .xb-go span,
+  .xb-lb-link:hover .xb-go span { transform: translateX(3px); }
+}
+
+/* Favorites: poster on the left, its own scene blurred behind the card */
+.xb-mv {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 1rem;
+  align-items: center;
+  isolation: isolate;
+}
+
+.xb-mv[hidden] { display: none; }
+
+.xb-bg {
+  position: absolute;
+  inset: -20px;
+  z-index: -2;
+  background: var(--poster) center 30% / cover;
+  filter: blur(14px) saturate(1.1);
+  opacity: 0;
+  transition: opacity .6s;
+  animation: xb-drift 26s ease-in-out infinite alternate;
+}
+
+.xb-mv.has-poster .xb-bg { opacity: .5; }
+
+.xb-mv::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(21, 21, 21, .9), rgba(21, 21, 21, .72) 60%, rgba(21, 21, 21, .55));
+}
+
+@keyframes xb-drift {
+  from { transform: scale(1.08) translate(-2%, -1%); }
+  to { transform: scale(1.16) translate(2%, 1%); }
+}
+
+.xb-poster {
+  display: block;
+  width: 92px;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  /* until the poster arrives: a dark tile with a popcorn bucket */
+  background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256' fill='%23ffdc16' fill-opacity='.35'%3E%3Cpath d='M229.52 74.21a8 8 0 0 0-7.13-2A44 44 0 0 0 168 41.67a44 44 0 0 0-80 0 44 44 0 0 0-54.4 30.51 8 8 0 0 0-9.4 9.65l30.56 129.84A16 16 0 0 0 70.34 224h115.32a16 16 0 0 0 15.58-12.33l30.55-129.84a8 8 0 0 0-2.27-7.62ZM159.25 101.11 145 208h-34l-14.25-106.89L128 88.62Z'/%3E%3C/svg%3E") center / 50% no-repeat;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .07);
+  transition: transform .3s ease-out;
+}
+
+.xb-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .5s;
+}
+
+.xb-mv.has-poster .xb-poster img { opacity: 1; }
+
+.xb-mv-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.xb-title {
+  margin: .35rem 0 .3rem;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: #f2f2f2;
+}
+
+.xb-year {
+  font-weight: 500;
+  color: #9a9a9a;
+}
+
+.xb-rate {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.xb-rate b {
+  font-size: .82rem;
+  color: #eee;
+}
+
+/* five stars, filled to the exact rating (4.8 = four and most of a fifth) */
+.xb-stars {
+  position: relative;
+  display: inline-block;
+  font-size: .9rem;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: #444;
+}
+
+.xb-stars::before { content: "★★★★★"; }
+
+.xb-stars-on {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--fifteenth-color);
+}
+
+.xb-stars-on::before { content: "★★★★★"; }
+
+.xb-sub {
+  margin-top: .4rem;
+  font-size: .74rem;
+  line-height: 1.4;
+  color: #aaa;
+}
+
+/* About: "Ned is" + one of the six words, rolling up to the next */
+.xb-ab { min-height: 168px; }
+
+.xb-is {
+  margin-top: .8rem;
+  font-size: .85rem;
+  color: #9a9a9a;
+}
+
+.xb-word-win {
+  display: block;
+  overflow: hidden;
+  margin-top: .15rem;
+}
+
+.xb-word {
+  display: inline-block;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #f2f2f2;
+  transition: transform .26s cubic-bezier(.5, 0, .75, 0), opacity .26s;
+}
+
+.xb-word::after {
+  content: ".";
+  color: var(--fifteenth-color);
+}
+
+.xb-word.is-out { transform: translateY(-100%); opacity: 0; }
+.xb-word.is-in { transform: translateY(100%); opacity: 0; transition: none; }
+
+.xb-dots {
+  display: flex;
+  gap: 4px;
+  margin-top: .55rem;
+}
+
+.xb-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: #3a3a3a;
+  transition: width .3s, background .3s;
+}
+
+.xb-dots i.is-on {
+  width: 14px;
+  background: var(--fifteenth-color);
+}
+
+/* Lab: a working flip board */
+.xb-board {
+  display: flex;
+  gap: 3px;
+  margin: .8rem 0 .4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.xb-flap {
+  position: relative;
+  flex: 1;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: linear-gradient(#121212 50%, #0b0b0b 50%);
+  font: 700 1.4rem var(--body-font);
+  color: var(--fifteenth-color);
+  perspective: 200px;
+}
+
+.xb-flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #000;
+}
+
+.xb-flap.is-flip { animation: xb-flip .28s ease-in-out; }
+
+@keyframes xb-flip {
+  50% { transform: rotateX(90deg); }
+}
+
+.xb-colon {
+  align-self: center;
+  flex: .45;
+  text-align: center;
+  font: 700 1.2rem var(--body-font);
+  color: var(--fifteenth-color);
+}
+
+.xb-city {
+  font: 600 .58rem ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.xb-lb-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  color: inherit;
+}
+
+.xb-lb-link h3 {
+  margin: .55rem 0 0;
+  font-size: .92rem;
+  color: #eee;
+}
+
+@media screen and (min-width: 768px) {
+  .xb { gap: .9rem; }
+  .xb-card { padding: 1.2rem; }
+  .xb-mv { grid-template-columns: 112px 1fr; gap: 1.3rem; }
+  .xb-poster { width: 112px; }
+  .xb-title { font-size: 1.4rem; }
+  .xb-word { font-size: 1.9rem; }
+  .xb-flap { height: 58px; font-size: 1.8rem; }
+}
+
+/* coming in: one card after another */
+.xb.will-show .xb-card { opacity: 0; transform: translateY(14px); }
+.xb.will-show.is-shown .xb-card {
+  opacity: 1;
+  transform: none;
+  transition: opacity .5s, transform .5s cubic-bezier(.22, .61, .36, 1);
+}
+.xb.will-show.is-shown .xb-card:nth-child(2) { transition-delay: .12s; }
+.xb.will-show.is-shown .xb-card:nth-child(3) { transition-delay: .24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .xb-bg { animation: none; }
+}

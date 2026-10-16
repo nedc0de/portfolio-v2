@@ -10,7 +10,7 @@
 //   tmdbId: 12345                 -> force the exact TMDB title if the search picks the wrong one (optional)
 (() => {
   const grid = document.getElementById('favGrid');
-  const homeCard = document.querySelector('.hm-fav'); // the "latest pick" card on the home page
+  const homeCard = document.querySelector('.xb-mv'); // the "just watched" card on the home page
   if (!grid && !homeCard) return;
 
   /*---------- settings ----------*/
@@ -1120,19 +1120,36 @@
   }
 
   /*---------- home page: latest pick ----------*/
-  // The newest movie on the list (they're added at the top) and its rating,
-  // so the home page stays up to date by itself.
+  // The newest movie on the list (they're added at the top): its real poster
+  // (same cover lookup and cache as this page), title, rating and stars, so
+  // the home page stays up to date by itself.
   if (!grid) {
     const pick = FAVORITES.find((f) => f.type === 'movie');
     if (!pick) return;
-    homeCard.querySelector('h3').textContent = `${pick.title}${pick.year ? ` (${pick.year})` : ''}`;
-    // the rating like the badge on the Favorites cards: a yellow star and the number
-    const p = homeCard.querySelector('p');
-    const star = document.createElement('span');
-    star.className = 'hm-fav-star';
-    star.textContent = '★';
-    p.replaceChildren(star, ` ${pick.rating} · 1 of ${FAVORITES.length} picks I'd defend in an argument`);
+    homeCard.querySelector('.xb-title').textContent = pick.title;
+    if (pick.year) {
+      const yr = document.createElement('span');
+      yr.className = 'xb-year';
+      yr.textContent = ` (${pick.year})`;
+      homeCard.querySelector('.xb-title').append(yr);
+    }
+    homeCard.querySelector('.xb-rate b').textContent = pick.rating;
+    homeCard.querySelector('.xb-stars-on').style.width = `${(pick.rating / 5) * 100}%`;
+    homeCard.querySelector('.xb-sub').textContent = `1 of ${FAVORITES.length} picks I'd defend in an argument`;
+    homeCard.setAttribute('aria-label', `Just watched: ${pick.title}, rated ${pick.rating} out of 5. See all picks`);
     homeCard.hidden = false;
+    // poster: until it arrives (or if it can't be found) the card shows a popcorn tile
+    const img = homeCard.querySelector('.xb-poster img');
+    coverFor(pick)
+      .then((url) => {
+        if (!url) return;
+        img.onload = () => {
+          homeCard.style.setProperty('--poster', `url("${url}")`);
+          homeCard.classList.add('has-poster');
+        };
+        img.src = url;
+      })
+      .catch(() => {});
     // the home ticker shows the same pick
     window.nedcodePick = { title: pick.title, rating: pick.rating };
     return;
