@@ -3691,18 +3691,18 @@ details>summary {
 .ab-cta .ab-cta-alt {
   display: inline;
   min-height: 0;
-  padding: 0;
+  padding: 0 0 .04em;
   border-radius: 0;
-  background: none;
   font-size: inherit;
-  font-weight: 600;
-  color: var(--fourth-color);
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 220, 22, .5);
-  text-underline-offset: 3px;
+  font-weight: 700;
+  /* the same yellow marker as the highlighted words on the site */
+  color: var(--fifteenth-color);
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+  text-decoration: none;
+  transition: background-size .25s;
 }
 
-.ab-cta .ab-cta-alt:hover { color: var(--fifteenth-color); transform: none; }
+.ab-cta .ab-cta-alt:hover { background-size: 100% 100%; transform: none; }
 
 .ab-cta-go > a {
   display: inline-flex;
