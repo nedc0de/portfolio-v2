@@ -2742,6 +2742,9 @@ function readPostsSeen() {
   const GLYPHS = 'abcdefghijklmnopqrstuvwxyzθλσμπΣ∇∂ε'.split('');
   const WORDS = ['gradient', 'softmax', 'tensor', 'entropy', 'sigmoid', 'attention', 'backprop', 'epoch',
     'vector', 'matrix', 'bayes', 'argmax', 'token', 'embedding', 'neural net', 'dot product', '∇ loss', 'ReLU', 'logits', 'weights'];
+  const PHRASES = ['attention is all you need', 'minimize the loss', 'predict the next token', 'learning rate 0.001',
+    'y=wx+b', 'garbage in, garbage out', 'all models are wrong', 'gradient descent', 'p(word|context)',
+    'hello, world', 'train, test, repeat', 'overfit? add data', 'softmax(QK^T)V', 'one more epoch'];
   const GRID = 24; // dot spacing, see the html background in style.css
   const GAP = GRID * 9; // one note about every 216px down the page
   const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
@@ -2797,18 +2800,77 @@ function readPostsSeen() {
       return el;
     };
     const rows = Math.floor((height - GRID * 3) / GRID);
-    for (let row = 3; row < rows; row += 2) {
-      // a word every ~10 rows, written along the row
-      if (row % 10 === 5) {
-        const word = WORDS[Math.floor(Math.random() * WORDS.length)];
-        const start = edge + Math.floor(Math.random() * Math.max(1, cols - edge * 2 - word.length));
-        const fits = [...word].every((ch, i) => ch === ' ' || clear((start + i) * GRID, row * GRID, GRID, GRID));
-        if (fits) { [...word].forEach((ch, i) => { if (ch !== ' ') cell(start + i, row, ch, 'bg-l bg-w'); }); continue; }
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    const used = new Set(); // dots already holding a letter
+    const put = (col, row, ch, cls) => {
+      const key = col + ',' + row;
+      if (used.has(key) || col < 1 || col >= cols - 1) return false;
+      if (!cell(col, row, ch, cls)) return false;
+      used.add(key);
+      return true;
+    };
+    // a chunk: a block of random letters a few rows tall, with one of its
+    // rows spelling a word or phrase in yellow, like a line found in a matrix.
+    // It fills whatever empty space it finds (side margins on a computer,
+    // gaps between sections on a phone) and picks text that fits there.
+    const freeCol = (col, top, h) => {
+      for (let r = 0; r < h; r++) if (!clear(col * GRID, (top + r) * GRID, GRID, GRID)) return false;
+      return true;
+    };
+    // a phrase broken into lines of at most n letters (on whole words)
+    const wrap = (text, n) => text.split(' ').reduce((lines, word) => {
+      const last = lines[lines.length - 1];
+      if (last && (last + ' ' + word).length <= n) lines[lines.length - 1] = last + ' ' + word;
+      else lines.push(word);
+      return lines;
+    }, []);
+    // phones have little empty space between sections: chunks there are 3 rows
+    const NEED = width < 700 ? 3 : 6;
+    const chunk = (from, to) => {
+      for (let top = from; top < to; top++) {
+        // runs of empty columns across the next 6 rows
+        const runs = [];
+        let run = null;
+        for (let c = edge; c < cols - edge; c++) {
+          if (freeCol(c, top, NEED)) { if (!run) run = { start: c, len: 0 }; run.len++; } else if (run) { runs.push(run); run = null; }
+        }
+        if (run) runs.push(run);
+        const room = runs.filter((r) => r.len >= 7);
+        if (!room.length) continue;
+        const spot = pick(room);
+        const max = spot.len - 2;
+        // phrases most of the time, wrapped to the room; single words otherwise
+        const pool = NEED > 3 && Math.random() < 0.65 ? PHRASES : [...WORDS, ...PHRASES];
+        const options = pool.filter((t) => t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2);
+        if (!options.length) continue;
+        const lines = wrap(pick(options), max);
+        const h = lines.length + 2;
+        const longest = Math.max(...lines.map((l) => l.length));
+        const w = Math.min(spot.len, longest + 2 + Math.floor(Math.random() * 5));
+        const left = spot.start + Math.floor(Math.random() * (spot.len - w + 1));
+        const start = 1 + Math.floor(Math.random() * Math.max(1, w - longest - 1));
+        for (let r = 0; r < h; r++) {
+          const line = lines[r - 1];
+          for (let c = 0; c < w; c++) {
+            if (line && c >= start && c < start + line.length) {
+              const ch = line[c - start];
+              if (ch !== ' ') put(left + c, top + r, ch, 'bg-l bg-w');
+              continue;
+            }
+            if (Math.random() < 0.55) put(left + c, top + r, pick(GLYPHS), 'bg-l');
+          }
+        }
+        return top + h;
       }
-      // otherwise one or two lone letters on random dots
-      for (let k = Math.random() < 0.5 ? 1 : 2; k > 0; k--) {
-        const col = edge + Math.floor(Math.random() * Math.max(1, cols - edge * 2));
-        cell(col, row, GLYPHS[Math.floor(Math.random() * GLYPHS.length)], 'bg-l');
+      return to;
+    };
+    const BAND = width < 700 ? 14 : 9; // rows per chunk (phones get fewer)
+    for (let top = 3; top < rows - 5; ) top = Math.max(top + BAND, chunk(top, Math.min(rows - 5, top + BAND)) + 3);
+    // and scattered lone letters everywhere else
+    const per = width < 700 ? 1 : 3;
+    for (let row = 3; row < rows; row++) {
+      for (let k = Math.floor(Math.random() * (per + 1)); k > 0; k--) {
+        put(edge + Math.floor(Math.random() * Math.max(1, cols - edge * 2)), row, pick(GLYPHS), 'bg-l');
       }
     }
     layer.style.height = height + 'px';
