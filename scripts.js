@@ -1348,10 +1348,61 @@ whenIdle(() => {
   };
 })();
 
+const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
+
+/*===== BLOG PAGE: topic chips and read marks =====*/
+// Chips for each topic (built from the posts themselves, so new topics show
+// up by themselves) filter the list; GTA 6 and GTA RP share one "GTA" chip.
+// Posts the visitor has already opened get a small "Read" mark.
+(() => {
+  const chips = document.querySelector('.bl-topics');
+  if (!chips) return;
+  const posts = [...document.querySelectorAll('a.bl-feature, a.bl-row')];
+  const soon = [...document.querySelectorAll('.bl-row.is-soon')];
+  const group = (t) => (/^GTA/.test(t) ? 'GTA' : t);
+  posts.forEach((a) => {
+    const topic = (a.querySelector('.bl-meta')?.textContent.split('·')[1] || '').trim();
+    a.dataset.topic = group(topic);
+  });
+
+  // read marks
+  const seen = readPostsSeen();
+  posts.forEach((a) => {
+    if (!seen.includes(postSlug(a.getAttribute('href')))) return;
+    a.classList.add('is-read');
+    const mark = document.createElement('span');
+    mark.className = 'bl-read-mark';
+    mark.textContent = '✓ Read';
+    (a.querySelector('.bl-meta') || a).after(mark);
+  });
+
+  // topics, most posts first
+  const count = {};
+  posts.forEach((a) => { if (a.dataset.topic) count[a.dataset.topic] = (count[a.dataset.topic] || 0) + 1; });
+  const topics = Object.keys(count).sort((x, y) => count[y] - count[x]);
+  if (topics.length < 2) return;
+  ['All', ...topics].forEach((t, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = t;
+    b.dataset.topic = t;
+    b.setAttribute('aria-pressed', String(i === 0));
+    chips.append(b);
+  });
+  chips.hidden = false;
+  chips.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const t = b.dataset.topic;
+    chips.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    posts.forEach((a) => { a.hidden = t !== 'All' && a.dataset.topic !== t; });
+    soon.forEach((r) => { r.hidden = t !== 'All'; });
+  });
+})();
+
 /*===== BLOG: READ MARKS =====*/
 // Opening a blog post remembers it on this device only (localStorage), so the
 // home page cards can show which posts the visitor has already read.
-const READ_KEY = 'nedcode-read-posts';
 function postSlug(href) {
   return decodeURIComponent((href || '').split(/[?#]/)[0].split('/').pop().replace(/\.html$/, '')).toLowerCase();
 }

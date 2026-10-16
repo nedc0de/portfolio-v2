@@ -8164,3 +8164,78 @@ html.is-frozen .egg-crash * {
 
 /* no gap at the bottom of the card until there's a message to show */
 .hm-news-card .hm-news-msg:empty { display: none; }
+
+/*===== BLOG PAGE: grounded cards, compact list, topics =====*/
+/* Cards sit on the page like the rest of the site (hairline edge, soft
+   shadow). On phones "More posts" are compact rows: a small cover on the
+   left, the title and topic on the right. */
+.bl-feature,
+.bl-row {
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
+}
+
+.bl-feature[hidden],
+.bl-row[hidden] { display: none; }
+
+.bl-topics {
+  display: flex;
+  gap: .45rem;
+  margin: 0 0 1.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: .2rem;
+}
+
+.bl-topics::-webkit-scrollbar { display: none; }
+
+.bl-topics button {
+  flex: none;
+  padding: .45rem .95rem;
+  border: 1px solid #333;
+  border-radius: 999px;
+  background: none;
+  font: 600 .82rem var(--body-font);
+  color: var(--fourth-color);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bl-topics button[aria-pressed="true"] {
+  border-color: var(--fifteenth-color);
+  background: var(--fifteenth-color);
+  color: var(--eleventh-color);
+}
+
+.bl-read-mark {
+  display: inline-block;
+  margin-top: .35rem;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
+}
+
+.bl-row.is-read img,
+.bl-feature.is-read img { opacity: .65; }
+
+@media screen and (max-width: 767px) {
+  .bl-row {
+    grid-template-columns: 104px 1fr;
+    align-items: center;
+    gap: .9rem;
+    padding: .6rem;
+  }
+
+  .bl-row img { border-radius: 8px; }
+
+  .bl-row h3 {
+    margin-bottom: .25rem;
+    font-size: .95rem;
+  }
+
+  .bl-row p { display: none; } /* the title says enough at this size */
+
+  .bl-row .bl-meta { font-size: .74rem; }
+  .bl-list { gap: .6rem; }
+}
