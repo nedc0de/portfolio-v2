@@ -30,21 +30,24 @@ rows.forEach(row => {
   });
 });
 
+// The trailing motion only runs while the mouse moves on a desktop, then
+// stops by itself once the card has caught up (no endless loop on phones)
+let following = false;
+function follow() {
+  cx += (x - cx) * .15; // eased trailing motion
+  cy += (y - cy) * .15;
+  preview.style.left = cx + "px";
+  preview.style.top = cy + "px";
+  if (Math.abs(x - cx) + Math.abs(y - cy) > .5) requestAnimationFrame(follow);
+  else following = false;
+}
+
 window.addEventListener("mousemove", e => {
   // Flip to the left of the cursor near the right edge
   x = e.clientX + (e.clientX > innerWidth - 420 ? -200 : 200);
   y = e.clientY;
+  if (!touchMode.matches && !following) { following = true; requestAnimationFrame(follow); }
 });
-
-(function follow() {
-  if (!touchMode.matches) {
-    cx += (x - cx) * .15; // eased trailing motion
-    cy += (y - cy) * .15;
-    preview.style.left = cx + "px";
-    preview.style.top = cy + "px";
-  }
-  requestAnimationFrame(follow);
-})();
 
 /*===== PHONE: scroll-driven active row =====*/
 let active = null;

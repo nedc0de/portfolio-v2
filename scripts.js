@@ -1090,7 +1090,13 @@ async function initSiteStats() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Firebase (live visitors, view counts) is about 150KB of script, so it starts
+// only once the page has loaded and the browser is idle: the page shows first.
+const whenIdle = (fn) => {
+  const go = () => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 300));
+  if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true });
+};
+whenIdle(() => {
   initFirebaseAndData();
   initSiteStats();
 });
@@ -1108,10 +1114,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const clock = box.querySelector('.tk-clock');
   const track = box.querySelector('.tk-track');
 
+  // made once: building a time formatter is slow, using one is quick
+  const TIME_12 = new Intl.DateTimeFormat('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit' });
+  const TIME_24 = new Intl.DateTimeFormat('en-GB', { timeZone: ZONE, hour: '2-digit', minute: '2-digit' });
   const tickClock = () => {
     const now = new Date();
-    clock.textContent = now.toLocaleTimeString('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit' });
-    if (boardClock) boardClock.textContent = now.toLocaleTimeString('en-GB', { timeZone: ZONE, hour: '2-digit', minute: '2-digit' });
+    clock.textContent = TIME_12.format(now);
+    if (boardClock) boardClock.textContent = TIME_24.format(now);
   };
   tickClock(); setInterval(tickClock, 30000);
 
@@ -1354,8 +1363,9 @@ function readPostsSeen() {
   const logo = document.querySelector('.nav-logo-group');
   if (!logo) return;
   const forced = new URLSearchParams(location.search).has('late');
+  const HOUR = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Montreal', hour: 'numeric', hourCycle: 'h23' });
   const check = () => {
-    const hour = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Montreal', hour: 'numeric', hourCycle: 'h23' }).format(new Date()));
+    const hour = Number(HOUR.format(new Date()));
     logo.classList.toggle('is-late', forced || hour < 6);
   };
   check();
@@ -1529,9 +1539,19 @@ function readPostsSeen() {
     const rail = make('path', 'spark-rail', svg); // invisible: used to measure the cable
     rail.setAttribute('d', d);
     const len = rail.getTotalLength();
-    const pts = [];
-    for (let l = 0; l <= len; l += 4) { const q = rail.getPointAtLength(l); pts.push([l, q.x, q.y]); }
-    return { d, rail, len, pts };
+    // Points along the cable, only used to find a tapped spot (home page), so
+    // they're measured on the first tap instead of slowing down every page load
+    let pts = null;
+    return {
+      d, rail, len,
+      get pts() {
+        if (!pts) {
+          pts = [];
+          for (let l = 0; l <= len; l += 4) { const q = rail.getPointAtLength(l); pts.push([l, q.x, q.y]); }
+        }
+        return pts;
+      },
+    };
   });
   // the little loop on top only glows, it never carries a snake
   const loop = make('path', 'spark-loop', svg);
@@ -1843,7 +1863,9 @@ function readPostsSeen() {
   spot.className = 'grid-spot';
   spot.setAttribute('aria-hidden', 'true');
   document.body.prepend(spot);
-  const fit = () => { spot.style.height = '0'; spot.style.height = document.documentElement.scrollHeight + 'px'; };
+  // as tall as the page: the page's own height (the spotlight is absolutely
+  // positioned, so it doesn't count), measured without forcing extra layouts
+  const fit = () => { spot.style.height = Math.max(document.documentElement.offsetHeight, innerHeight) + 'px'; };
   fit();
   addEventListener('load', fit);
   if ('ResizeObserver' in window) new ResizeObserver(fit).observe(document.body);

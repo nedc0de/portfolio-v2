@@ -1,0 +1,5 @@
+# Images rarely change: let browsers keep them for a day without re-checking,
+# and keep showing the saved copy for up to a week while a fresh one loads.
+# (If an image is replaced under the same name, visitors get it within a day.)
+/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
