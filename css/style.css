@@ -5161,35 +5161,6 @@ a.tk-item:hover,
   .hw-row:hover .hw-out { opacity: 1; transform: translate(2px, -2px); }
 }
 
-/* Contact nudge before the newsletter: one clear way to reach Ned */
-.hm-cta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 3rem;
-  padding: 1.1rem 1.2rem;
-  border: 2px solid var(--third-color);
-  border-radius: 10px;
-  background: var(--thirteenth-color);
-  color: var(--fourth-color);
-  font-weight: 600;
-  text-align: left;
-  transition: border-color .25s;
-}
-
-.hm-cta b {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: .3rem;
-  color: var(--fifteenth-color);
-}
-
-.hm-cta b i { transition: transform .25s; }
-.hm-cta:hover { border-color: var(--fifteenth-color); }
-.hm-cta:hover b i { transform: translateX(3px); }
-
 /* Phones: less empty space between the logo and the hero, so more of the
    page shows on the first screen */
 @media (max-width: 768px) {
@@ -8129,3 +8100,51 @@ html.is-frozen .egg-crash * {
 @media screen and (min-width: 768px) {
   .fav-lead { max-width: 38rem; }
 }
+
+/*===== HOME: sign-off and newsletter =====*/
+/* The sign-off reuses the About page's card (.ab-cta); the newsletter sits
+   in the same kind of grounded card, with the punchline marked */
+.hm-signoff { margin-top: 3rem; }
+
+.hm-news-card {
+  padding: 1.3rem 1.1rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  background: var(--sixteenth-color);
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
+}
+
+.hm-news-card .hm-news-text {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  color: var(--fourth-color);
+}
+
+.hm-news-text em {
+  font-style: normal;
+  color: var(--fifteenth-color);
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+}
+
+.hm-news-card .hm-news-field input {
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  background: #121212;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.hm-news-card .hm-news-field input:focus {
+  border-color: var(--fifteenth-color);
+  box-shadow: 0 0 0 3px rgba(255, 220, 22, .15);
+  outline: none;
+}
+
+.hm-news-card .hm-news-form button { border-radius: 10px; }
+
+/* Explore: About's word sits in the middle of its card, not stuck at the top */
+.xb-ab .xb-is { margin-top: auto; }
+.xb-ab .xb-dots { margin-bottom: auto; }
+
+/* no gap at the bottom of the card until there's a message to show */
+.hm-news-card .hm-news-msg:empty { display: none; }

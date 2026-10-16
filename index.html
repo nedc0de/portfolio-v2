@@ -234,14 +234,22 @@
       </div>
 
       <!--===== NEWSLETTER =====-->
-      <a class="hm-cta" href="contact.html">
-        <span>Got a project in mind?</span>
-        <b>Say hi <i class="uil uil-arrow-right"></i></b>
-      </a>
+      <!-- same sign-off card as the About page -->
+      <div class="hm-block hm-signoff">
+        <section class="ab-cta">
+          <span class="ab-cta-k">Your move</span>
+          <p>Got a <em>project</em> in mind?</p>
+          <div class="ab-cta-go">
+            <a href="contact.html">Say hi <i class="uil uil-arrow-right"></i></a>
+            <span>or DM me on Threads, <a class="ab-cta-alt" href="https://www.threads.com/@nedcodev/" target="_blank" rel="noopener">@nedcodev</a></span>
+          </div>
+        </section>
+      </div>
 
       <div class="hm-news">
         <p class="hm-label">Newsletter</p>
-        <p class="hm-news-text">97% of subscribers never got a single email. The other 3% are lying.</p>
+        <div class="hm-news-card">
+        <p class="hm-news-text">97% of subscribers never got a single email. The other 3% are <em>lying</em>.</p>
         <form class="hm-news-form" action="/.netlify/functions/subscribe" method="post" novalidate>
           <label class="hm-news-field">
             <span class="sr-only">Email address</span>
@@ -251,6 +259,7 @@
           <button type="submit">Subscribe</button>
           <p class="hm-news-msg" role="status" aria-live="polite"></p>
         </form>
+        </div>
       </div>
     </section>
   </main>
