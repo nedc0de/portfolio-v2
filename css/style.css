@@ -8416,23 +8416,53 @@ html.is-frozen .egg-crash * {
    the page itself. Only things that are pictures keep a frame (post covers,
    the movie poster card, the Lab board). */
 
-/* Explore: About and Lab sit side by side without boxes, split by a line */
+/* Explore: About and Lab without boxes, stacked full width under the movie
+   card, each a big line of type with its link, split by thin rules */
 .xb-ab,
 .xb-lb {
-  padding: .4rem 0 0;
+  grid-column: 1 / -1;
+  min-height: 0;
+  padding: 1.3rem 0;
   border: 0;
+  border-bottom: 1px solid #262626;
   border-radius: 0;
   background: none;
   box-shadow: none;
 }
 
-.xb-lb {
-  padding-left: 1.1rem;
-  border-left: 1px solid #2a2a2a;
+.xb-ab { margin-top: .4rem; }
+
+/* About: "Ned is driven." as one big line, the dots beside the label */
+.xb-ab .xb-is {
+  margin-top: .5rem;
+  font-size: clamp(1.9rem, 8.6vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--fourth-color);
 }
 
-.xb-ab { padding-right: .3rem; }
-.xb-ab .xb-word { font-size: 1.6rem; }
+.xb-ab .xb-word-win { display: inline-block; vertical-align: bottom; margin: 0; }
+.xb-ab .xb-word { font-size: 1em; color: var(--fifteenth-color); }
+.xb-ab .xb-dots { margin: .7rem 0 0; }
+.xb-ab .xb-go { margin-top: 0; padding-top: .9rem; }
+
+/* Lab: the board takes the width, title and link on one line under it */
+.xb-lb .xb-led {
+  margin-top: .7rem;
+  font-size: 1.35rem;
+  padding: .7rem .9rem;
+}
+
+.xb-lb .xb-lb-link {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: .8rem;
+}
+
+.xb-lb .xb-lb-link h3 { margin: 0; font-size: 1.05rem; }
+.xb-lb .xb-lb-link .xb-go { margin: 0; padding: 0; }
 
 /* Sign-off: a big statement on the page, no card */
 .hm-signoff .ab-cta {
