@@ -8549,7 +8549,7 @@ html.is-frozen .egg-crash * {
 .tk3-layer {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 8px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
