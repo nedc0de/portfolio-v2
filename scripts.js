@@ -2788,9 +2788,21 @@ function readPostsSeen() {
     // word along a row of dots. All kept off the content like the notes.
     const cols = Math.floor(width / GRID);
     const edge = Math.max(2, Math.round((width * 0.06) / GRID));
+    // Letters only ever go in the side margins, outside the column the
+    // site's content sits in (with room to spare), so they can never sit
+    // next to a word, a button or anything else on the page. Phones have
+    // no side margins, so they get none.
+    const spans = [...document.querySelectorAll(CONTENT)]
+      .map((el) => el.getBoundingClientRect())
+      // skip what's scrolled out of view sideways (the ticker, swipe rows): it
+      // reaches past the screen edges but isn't really there
+      .filter((r) => r.width && r.height && r.width < width * 0.98 && r.left >= 0 && r.right <= width);
+    const colL = Math.min(...spans.map((r) => r.left)) - GRID * 1.5;
+    const colR = Math.max(...spans.map((r) => r.right)) + GRID * 1.5;
+    const side = (x) => x + 8 < colL || x - 8 > colR;
     const cell = (col, row, ch, cls) => {
       const x = col * GRID + GRID / 2, y = row * GRID + GRID / 2;
-      if (!clear(x - 6, y - 8, 12, 16)) return false;
+      if (!side(x) || !clear(x - 6, y - 8, 12, 16)) return false;
       const el = document.createElement('span');
       el.className = cls;
       el.textContent = ch;
@@ -2832,7 +2844,7 @@ function readPostsSeen() {
         const runs = [];
         let run = null;
         for (let c = edge; c < cols - edge; c++) {
-          if (freeCol(c, top, NEED)) { if (!run) run = { start: c, len: 0 }; run.len++; } else if (run) { runs.push(run); run = null; }
+          if (side(c * GRID + GRID / 2) && freeCol(c, top, NEED)) { if (!run) run = { start: c, len: 0 }; run.len++; } else if (run) { runs.push(run); run = null; }
         }
         if (run) runs.push(run);
         const room = runs.filter((r) => r.len >= 7);
