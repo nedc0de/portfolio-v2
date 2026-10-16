@@ -1903,15 +1903,25 @@ function readPostsSeen() {
   addEventListener('scroll', () => { if (spot.classList.contains('is-on') && !queued) { queued = true; requestAnimationFrame(place); } }, { passive: true });
   document.documentElement.addEventListener('pointerleave', () => { mouse = false; off(0); });
 
-  // finger: follow it while it's down, except on the swipeable rows
-  let tracking = false;
+  // finger: it only lights up once the finger actually moves (dragging or
+  // scrolling), never on a plain tap. iPhone treats anything that appears
+  // the moment you touch down as a "hover" and swallows that first tap, so
+  // buttons like Back to top needed two taps. Swipeable rows never light it.
+  let tracking = false, sx = 0, sy = 0, lit = false;
   addEventListener('touchstart', (e) => {
     tracking = !e.target.closest?.(SWIPES);
-    if (tracking) move(e.touches[0].clientX, e.touches[0].clientY);
-    else off(0);
+    lit = false;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    if (!tracking) off(0);
   }, { passive: true });
-  addEventListener('touchmove', (e) => { if (tracking) move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-  addEventListener('touchend', () => { if (tracking) off(700); tracking = false; }, { passive: true });
+  addEventListener('touchmove', (e) => {
+    if (!tracking) return;
+    const t = e.touches[0];
+    if (!lit && Math.hypot(t.clientX - sx, t.clientY - sy) < 12) return;
+    lit = true;
+    move(t.clientX, t.clientY);
+  }, { passive: true });
+  addEventListener('touchend', () => { if (lit) off(700); tracking = lit = false; }, { passive: true });
 })();
 
 /*===== HOME: newsletter sign-up =====*/

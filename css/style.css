@@ -780,7 +780,9 @@ width: 40px;
   opacity: 0.8;
 }
 
-.unfiltered-carousel-btn:hover { opacity: 1; }
+@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
+  .unfiltered-carousel-btn:hover { opacity: 1; }
+}
 .unfiltered-carousel-btn.prev { left: 10px; }
 .unfiltered-carousel-btn.next { right: 10px; }
 .unfiltered-carousel-btn.hidden { display: none; }
@@ -2049,14 +2051,12 @@ ul li:before {
   color: var(--seventh-color);
 }
 
-.hl-row:hover .hl-desc {
-  opacity: 1;
-  transform: none;
-}
-
-.hl-row:hover .hl-meta i {
-  opacity: 1;
-  transform: none;
+@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
+  .hl-row:hover .hl-desc,
+  .hl-row:hover .hl-meta i {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Floating preview that follows the cursor */
@@ -5007,9 +5007,11 @@ a.tk-item:hover,
   color: var(--seventh-color);
 }
 
-.hw-row:hover .hw-desc {
-  opacity: 1;
-  transform: none;
+@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
+  .hw-row:hover .hw-desc {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .hw-more {
@@ -5097,7 +5099,9 @@ a.tk-item:hover,
   transition: transform .25s, opacity .25s;
 }
 
-.hw-row:hover .hw-out { opacity: 1; transform: translate(2px, -2px); }
+@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
+  .hw-row:hover .hw-out { opacity: 1; transform: translate(2px, -2px); }
+}
 
 /* Contact nudge before the newsletter: one clear way to reach Ned */
 .hm-cta {
@@ -5531,9 +5535,12 @@ a.tk-item:hover,
 .vs-col:first-child::after { left: 0; transform: none; }
 .vs-col:last-child::after { left: auto; right: 0; transform: none; }
 
-.vs-col:hover::after,
 .vs-col:focus-visible::after {
   opacity: 1;
+}
+
+@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
+  .vs-col:hover::after { opacity: 1; }
 }
 
 .vs-sr {
@@ -6996,8 +7003,8 @@ html.is-frozen .egg-crash * {
   transition: opacity .15s ease;
 }
 
-.ps-react-fan button:hover .ps-react-tip,
-.ps-react-fan button.is-hot .ps-react-tip {
+.ps-react-fan button.is-hot .ps-react-tip,
+.ps-react-fan button:focus-visible .ps-react-tip {
   opacity: 1;
 }
 
