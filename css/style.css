@@ -5058,6 +5058,36 @@ a.tk-item:hover,
     margin-top: .15rem;
     font-size: .78rem;
   }
+
+  /* Cleaner rows on phones: number, title and year share one line, the
+     description sits under the title with room to breathe, and the tech list
+     (still on desktop and the Projects page) is dropped so the right side
+     isn't crowded */
+  .hw-row {
+    align-items: baseline;
+    padding-bottom: calc(var(--pad) + .35rem);
+  }
+
+  .hw-num { padding-top: 0; }
+  .hw-name,
+  .hw-meta { padding-top: 0; }
+
+  .hw-meta {
+    font-size: 0; /* hides the tech list text, keeps the year */
+  }
+
+  .hw-year {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--fourteenth-color);
+  }
+
+  .hw-desc {
+    margin-top: .3rem;
+    font-size: .8rem;
+    line-height: 1.45;
+    text-wrap: balance; /* two even lines instead of one word left on its own */
+  }
 }
 
 /* Newsletter card */
@@ -7286,3 +7316,5 @@ html.is-frozen .egg-crash * {
     font-size: min(50px, calc((100vw - 34px) / 6.9));
   }
 }
+
+.nowrap { white-space: nowrap; }
