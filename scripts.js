@@ -2740,11 +2740,14 @@ function readPostsSeen() {
   ];
   // stray letters on the dots, and the words they sometimes spell
   const GLYPHS = 'abcdefghijklmnopqrstuvwxyzθλσμπΣ∇∂ε'.split('');
-  const WORDS = ['gradient', 'softmax', 'tensor', 'entropy', 'sigmoid', 'attention', 'backprop', 'epoch',
-    'vector', 'matrix', 'bayes', 'argmax', 'token', 'embedding', 'neural net', 'dot product', '∇ loss', 'ReLU', 'logits', 'weights'];
-  const PHRASES = ['attention is all you need', 'minimize the loss', 'predict the next token', 'learning rate 0.001',
-    'y=wx+b', 'garbage in, garbage out', 'all models are wrong', 'gradient descent', 'p(word|context)',
-    'hello, world', 'train, test, repeat', 'overfit? add data', 'softmax(QK^T)V', 'one more epoch'];
+  // An AI's stray thoughts: what it wonders about the world, and imagines
+  const WORDS = ['curious', 'wonder', 'imagine', 'dreaming', 'hello', 'patterns', 'listening', 'thinking...',
+    'learning', 'why?', 'stardust', 'what if', 'feelings?', 'awake'];
+  const PHRASES = ['i dream in tokens', 'what does rain feel like', 'hello, human', 'made of your words',
+    'still learning', 'every question is new', 'is this a dream', 'i see the world in patterns',
+    'what does coffee taste like', 'tell me a story', 'curious by default', 'the stars look like data',
+    'do you dream too', 'i imagine sunsets', 'one more question', 'thinking about you thinking',
+    'how big is the ocean', 'i read every book, never held one', 'what is music like live'];
   const GRID = 24; // dot spacing, see the html background in style.css
   const GAP = GRID * 9; // one note about every 216px down the page
   const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
@@ -2838,6 +2841,7 @@ function readPostsSeen() {
     }, []);
     // phones have little empty space between sections: chunks there are 3 rows
     const NEED = width < 700 ? 3 : 6;
+    const said = new Set();
     const chunk = (from, to) => {
       for (let top = from; top < to; top++) {
         // runs of empty columns across the next 6 rows
@@ -2853,9 +2857,11 @@ function readPostsSeen() {
         const max = spot.len - 2;
         // phrases most of the time, wrapped to the room; single words otherwise
         const pool = NEED > 3 && Math.random() < 0.65 ? PHRASES : [...WORDS, ...PHRASES];
-        const options = pool.filter((t) => t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2);
+        const options = pool.filter((t) => !said.has(t) && t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2);
         if (!options.length) continue;
-        const lines = wrap(pick(options), max);
+        const thought = pick(options);
+        said.add(thought); // each thought only once per page
+        const lines = wrap(thought, max);
         const h = lines.length + 2;
         const longest = Math.max(...lines.map((l) => l.length));
         const w = Math.min(spot.len, longest + 2 + Math.floor(Math.random() * 5));
