@@ -3695,14 +3695,13 @@ details>summary {
   border-radius: 0;
   font-size: inherit;
   font-weight: 700;
-  /* the same yellow marker as the highlighted words on the site */
   color: var(--fifteenth-color);
-  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+  background: none;
   text-decoration: none;
-  transition: background-size .25s;
+  transition: opacity .2s;
 }
 
-.ab-cta .ab-cta-alt:hover { background-size: 100% 100%; transform: none; }
+.ab-cta .ab-cta-alt:hover { opacity: .8; transform: none; }
 
 .ab-cta-go > a {
   display: inline-flex;
