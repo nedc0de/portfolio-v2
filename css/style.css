@@ -588,9 +588,8 @@ position: relative;
   margin-top: 1.2rem;
 }
 
-.hamRotate.active {
-  transform: rotate(45deg);
-}
+/* The menu icon is three plain lines: the phone menu opens as a full sheet
+   with its own close button, so the icon doesn't need to turn into an X */
 
 .hamRotate180.active {
   transform: rotate(180deg);
@@ -598,27 +597,11 @@ position: relative;
 
 .line {
   fill: none;
-  transition: stroke-dasharray 400ms, stroke-dashoffset 400ms;
   stroke: #525252;
   stroke-width: 5.5;
   stroke-linecap: round;
 }
 
-.ham1 .top {
-  stroke-dasharray: 40 139;
-}
-
-.ham1 .bottom {
-  stroke-dasharray: 40 180;
-}
-
-.ham1.active .top {
-  stroke-dashoffset: -98px;
-}
-
-.ham1.active .bottom {
-  stroke-dashoffset: -138px;
-}
 
 /*=== ACTIVE MENU ===*/
 .active::after {
