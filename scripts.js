@@ -3043,19 +3043,23 @@ function readPostsSeen() {
     led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
-  // Favorites: a 3D card you can spin all the way round. Drag sideways (or
-  // use the arrow keys) to turn it; let go and it keeps spinning a little,
-  // then settles on whichever side faces you, swaying gently. It spins in
-  // once the first time it's scrolled to. A light sheen slides across it as
-  // it turns, like a holographic card.
+  // Favorites: a 3D card you can spin all the way round. Tap it to flip it,
+  // or drag sideways (or use the arrow keys) to turn it; let go and it keeps
+  // spinning a little, then settles on whichever side faces you, swaying
+  // gently. It spins in once the first time it's scrolled to. A light sheen
+  // slides across it as it turns, like a holographic card; with a mouse it
+  // also leans toward the pointer and the sheen follows it.
   const movie = box.querySelector('.xb-mv');
   const tk = movie && movie.querySelector('.tk3');
   if (tk) {
     let angle = 0, tilt = 0, vel = 0, drag = null, running = false, visible = false, last = 0, intro = false;
+    let goal = null; // the side a tap flips it to
+    let lean = null, leanX = 0, leanY = 0; // mouse position over the card (-.5 to .5) and the eased lean
     const paint = () => {
-      tk.style.transform = `rotateX(${tilt.toFixed(2)}deg) rotateY(${angle.toFixed(2)}deg)`;
+      const ry = angle + leanX * 22, rx = tilt - leanY * 16;
+      tk.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
       const turn = ((angle % 360) + 360) % 360;
-      tk.style.setProperty('--sheen', `${(turn / 360) * 200 - 50}%`);
+      tk.style.setProperty('--sheen', `${(turn / 360) * 200 - 50 - leanX * 60}%`);
       const back = turn > 90 && turn < 270;
       tk.classList.toggle('is-back', back);
       // each time it lands on the back, the score counts up as the meter fills
@@ -3086,13 +3090,22 @@ function readPostsSeen() {
         if (Math.abs(vel) > 30) {
           angle += vel * dt;
           vel *= Math.pow(0.12, dt); // friction
+        } else if (goal !== null) {
+          vel = 0;
+          // a tap: flip over to the other side
+          angle += (goal - angle) * Math.min(1, dt * 9);
+          if (Math.abs(goal - angle) < 6) goal = null;
         } else {
           vel = 0;
-          // settle on the nearest side, with a slow sway (none with reduced motion)
+          // settle on the nearest side, with a slow sway (none with reduced
+          // motion, or while the mouse is leaning it)
           const face = Math.round(angle / 180) * 180;
-          const sway = still ? 0 : Math.sin(now / 1400) * 9;
+          const sway = still || lean ? 0 : Math.sin(now / 1400) * 9;
           angle += (face + sway - angle) * Math.min(1, dt * 4);
         }
+        const ease = Math.min(1, dt * 8);
+        leanX += ((lean ? lean.x : 0) - leanX) * ease;
+        leanY += ((lean ? lean.y : 0) - leanY) * ease;
         tilt += ((still ? 0 : Math.sin(now / 1900) * 3) - tilt) * Math.min(1, dt * 4);
       }
       paint();
@@ -3103,11 +3116,17 @@ function readPostsSeen() {
 
     // drag: sideways turns it, the page still scrolls up and down (touch-action)
     tk.addEventListener('pointerdown', (e) => {
-      drag = { x: e.clientX, y: e.clientY, t: performance.now(), moved: false, id: e.pointerId };
+      drag = { x: e.clientX, y: e.clientY, t: performance.now(), t0: performance.now(), moved: false, id: e.pointerId };
       vel = 0;
+      goal = null;
       run();
     });
     tk.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'mouse' && !drag && !still) {
+        const r = tk.getBoundingClientRect();
+        lean = { x: (e.clientX - r.left) / r.width - .5, y: (e.clientY - r.top) / r.height - .5 };
+        run();
+      }
       if (!drag || e.pointerId !== drag.id) return;
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
       if (!drag.moved && Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; tk.setPointerCapture(e.pointerId); tk.classList.add('is-grabbed'); }
@@ -3119,8 +3138,20 @@ function readPostsSeen() {
       vel = step / Math.max(0.008, (now - drag.t) / 1000);
       drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
     });
-    const release = () => {
+    const flip = () => {
+      vel = 0;
+      goal = (goal !== null ? goal : Math.round(angle / 180) * 180) + 180;
+      if (still) { angle = goal; goal = null; }
+      run();
+    };
+    const release = (e) => {
       if (!drag) return;
+      // a quick tap without moving: flip it over
+      if (!drag.moved && e.type === 'pointerup' && performance.now() - drag.t0 < 400) {
+        drag = null;
+        flip();
+        return;
+      }
       if (performance.now() - drag.t > 80) vel = 0; // held still before letting go
       vel = Math.max(-1400, Math.min(1400, vel));
       drag = null;
@@ -3129,10 +3160,19 @@ function readPostsSeen() {
     };
     tk.addEventListener('pointerup', release);
     tk.addEventListener('pointercancel', release);
+    tk.addEventListener('pointerleave', () => { lean = null; });
     tk.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); return; }
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
       vel = (e.key === 'ArrowRight' ? 1 : -1) * 520;
+      run();
+    });
+    // another movie came to the front (favorites.js): face it, poster side
+    tk.addEventListener('tk3:reset', () => {
+      angle = 0; vel = 0; goal = null;
+      tk.classList.remove('is-scored');
+      paint();
       run();
     });
 

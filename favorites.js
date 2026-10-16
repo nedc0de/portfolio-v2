@@ -1154,49 +1154,114 @@
     pump();
   }
 
-  /*---------- home page: latest pick ----------*/
-  // The newest movie on the list (they're added at the top): its real poster
-  // (same cover lookup and cache as this page) on the front of the card and
-  // its details and rating on the back, so the home page stays up to date by
-  // itself.
+  /*---------- home page: the movie deck ----------*/
+  // The newest movies on the list (they're added at the top) as a small deck:
+  // the latest one is the 3D card (poster on the front, details, take and
+  // rating on the back), the two before it fan out behind. Tapping one of
+  // those brings it to the front. Posters use the same lookup and cache as
+  // this page, so the home page stays up to date by itself.
   if (!grid) {
-    const pick = FAVORITES.find((f) => f.type === 'movie');
-    if (!pick) return;
-    // the card's back: details and score
+    const deck = FAVORITES.filter((f) => f.type === 'movie').slice(0, 3);
+    if (!deck.length) return;
+    const tk = homeCard.querySelector('.tk3');
+    const hold = homeCard.querySelector('.tk3-hold');
     const back = homeCard.querySelector('.tk3-back');
-    if (back) {
+    const img = homeCard.querySelector('.xb-poster img');
+    const peeks = [...homeCard.querySelectorAll('.tk3-peek')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const verdict = (r) => (r >= 4.5 ? 'Must watch' : r >= 4 ? 'Really good' : r >= 3 ? 'Worth a watch' : 'Skip it');
+    const covers = deck.map((f) => coverFor(f).catch(() => ''));
+    let at = 0;
+
+    // a poster into an <img>, sharp on every screen; ok() runs once it shows
+    const setPoster = (el, url, sizes, ok) => {
+      el.onload = ok || null;
+      el.removeAttribute('srcset');
+      const set = coverSrcset(url);
+      if (set) {
+        el.sizes = sizes;
+        el.srcset = set;
+      }
+      el.src = url;
+    };
+
+    const show = (i) => {
+      at = i;
+      const pick = deck[i];
+      homeCard.querySelector('.tk3-tag').textContent = i === 0 ? 'Just watched' : 'Recently watched';
       back.querySelector('.tk3-bt').textContent = pick.title;
       back.querySelector('.tk3-by').textContent = pick.year || '';
       back.querySelector('.tk3-genre').textContent = pick.genre || '—';
       back.querySelector('.tk3-dir').textContent = pick.by || '—';
-      back.querySelector('.tk3-num b').textContent = pick.rating;
-      back.querySelector('.tk3-num b').dataset.score = pick.rating;
-      back.querySelector('.tk3-verdict').textContent =
-        pick.rating >= 4.5 ? 'Must watch' : pick.rating >= 4 ? 'Really good' : pick.rating >= 3 ? 'Worth a watch' : 'Skip it';
+      const take = back.querySelector('.tk3-take');
+      take.textContent = pick.take ? `“${pick.take}”` : '';
+      take.hidden = !pick.take;
+      back.querySelector('.tk3-panel').classList.toggle('has-take', !!pick.take);
+      const num = back.querySelector('.tk3-num b');
+      num.textContent = pick.rating;
+      num.dataset.score = pick.rating;
+      back.querySelector('.tk3-verdict').textContent = verdict(pick.rating);
       back.querySelector('.tk3-meter').style.setProperty('--p', pick.rating / 5);
       back.querySelector('.tk3-bstars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars tk3-bstars');
-    }
-    homeCard.setAttribute('aria-label', `Just watched: ${pick.title}, rated ${pick.rating} out of 5. See all picks`);
+      homeCard.setAttribute('aria-label', `${i === 0 ? 'Just watched' : 'Recently watched'}: ${pick.title}, rated ${pick.rating} out of 5`);
+
+      // front poster: a soft shimmer until it arrives, popcorn if there's none
+      tk.classList.remove('has-poster', 'no-poster');
+      tk.style.removeProperty('--poster');
+      img.removeAttribute('srcset');
+      img.removeAttribute('src');
+      covers[i].then((url) => {
+        if (at !== i) return;
+        if (!url) { tk.classList.add('no-poster'); return; }
+        setPoster(img, url, '250px', () => {
+          if (at !== i) return;
+          tk.style.setProperty('--poster', `url("${url}")`);
+          tk.classList.add('has-poster');
+        });
+      });
+
+      // the other movies fan out behind, in order
+      peeks.forEach((peek, k) => {
+        const j = (i + 1 + k) % deck.length;
+        peek.hidden = deck.length < 2 + k;
+        peek.dataset.i = j;
+        peek.setAttribute('aria-label', `Show ${deck[j].title}`);
+        const pimg = peek.querySelector('img');
+        peek.classList.remove('has-poster');
+        covers[j].then((url) => {
+          if (url && peek.dataset.i === String(j)) setPoster(pimg, url, '120px', () => peek.classList.add('has-poster'));
+        });
+      });
+    };
+
+    // bring another movie to the front: the card drops back, then the new one
+    // comes forward (scripts.js turns it to face you again)
+    const deal = (i) => {
+      if (i === at || hold.classList.contains('is-dealing')) return;
+      const swap = () => {
+        show(i);
+        tk.dispatchEvent(new CustomEvent('tk3:reset'));
+      };
+      if (still) { swap(); return; }
+      hold.classList.add('is-dealing');
+      setTimeout(() => {
+        swap();
+        hold.classList.remove('is-dealing');
+        hold.classList.add('is-dealt');
+        setTimeout(() => hold.classList.remove('is-dealt'), 400);
+      }, 220);
+    };
+    peeks.forEach((peek) => peek.addEventListener('click', () => deal(Number(peek.dataset.i))));
+    tk.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      deal((at + (e.key === 'ArrowDown' ? 1 : deck.length - 1)) % deck.length);
+    });
+
+    show(0);
     homeCard.hidden = false;
-    // poster: until it arrives (or if it can't be found) the card shows a popcorn tile
-    const img = homeCard.querySelector('.xb-poster img');
-    coverFor(pick)
-      .then((url) => {
-        if (!url) return;
-        img.onload = () => {
-          homeCard.style.setProperty('--poster', `url("${url}")`);
-          homeCard.classList.add('has-poster');
-        };
-        const set = coverSrcset(url);
-        if (set) {
-          img.sizes = '250px'; // the card's width, so iPhones get the 780px poster
-          img.srcset = set;
-        }
-        img.src = url;
-      })
-      .catch(() => {});
-    // the home ticker shows the same pick
-    window.nedcodePick = { title: pick.title, rating: pick.rating };
+    // the home ticker shows the latest pick
+    window.nedcodePick = { title: deck[0].title, rating: deck[0].rating };
     return;
   }
 

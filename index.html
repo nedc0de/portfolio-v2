@@ -206,29 +206,37 @@
         <p class="hm-label">Explore</p>
         <div class="xb">
           <!-- Just watched: a 3D movie card you can grab and spin all the way
-               round (scripts.js). Front: the poster; back: the movie's details and Ned's score. -->
+               round, or tap to flip (scripts.js). Front: the poster; back: the
+               movie's details, Ned's take and score. The two cards fanned out
+               behind are the movies before it: tap one to bring it to the front
+               (favorites.js fills them all). -->
           <div class="xb-card xb-mv" role="group" hidden>
             <div class="tk3-scene">
-              <div class="tk3" tabindex="0" role="img" aria-roledescription="3D card" aria-label="Movie card. Drag, or use the arrow keys, to turn it around">
-                <span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span>
-                <div class="tk3-face tk3-front">
-                  <span class="xb-poster"><img alt="" width="780" height="1170" draggable="false"></span>
-                  <span class="tk3-tag" aria-hidden="true">Just watched</span>
-                </div>
-                <div class="tk3-face tk3-back" aria-hidden="true">
-                  <div class="tk3-panel">
-                    <span class="tk3-corner">Ned's picks</span>
-                    <span class="tk3-bt"></span>
-                    <span class="tk3-by"></span>
-                    <dl class="tk3-facts">
-                      <div><dt>Genre</dt><dd class="tk3-genre"></dd></div>
-                      <div><dt>Director</dt><dd class="tk3-dir"></dd></div>
-                    </dl>
-                    <div class="tk3-rating">
-                      <span class="tk3-num"><b></b><small>/5</small></span>
-                      <span class="tk3-rate-side"><span class="tk3-bstars"></span><span class="tk3-verdict"></span></span>
+              <button class="tk3-peek tk3-peek-l" type="button"><span class="tk3-peek-img"><img alt="" width="342" height="513" draggable="false"></span></button>
+              <button class="tk3-peek tk3-peek-r" type="button"><span class="tk3-peek-img"><img alt="" width="342" height="513" draggable="false"></span></button>
+              <div class="tk3-hold">
+                <div class="tk3" tabindex="0" role="img" aria-roledescription="3D card" aria-label="Movie card. Tap to flip, drag or use the arrow keys to turn it">
+                  <span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span>
+                  <div class="tk3-face tk3-front">
+                    <span class="xb-poster"><img alt="" width="780" height="1170" draggable="false"></span>
+                    <span class="tk3-tag" aria-hidden="true">Just watched</span>
+                  </div>
+                  <div class="tk3-face tk3-back" aria-hidden="true">
+                    <div class="tk3-panel">
+                      <span class="tk3-corner">Ned's picks</span>
+                      <span class="tk3-bt"></span>
+                      <span class="tk3-by"></span>
+                      <dl class="tk3-facts">
+                        <div><dt>Genre</dt><dd class="tk3-genre"></dd></div>
+                        <div><dt>Director</dt><dd class="tk3-dir"></dd></div>
+                      </dl>
+                      <p class="tk3-take" hidden></p>
+                      <div class="tk3-rating">
+                        <span class="tk3-num"><b></b><small>/5</small></span>
+                        <span class="tk3-rate-side"><span class="tk3-bstars"></span><span class="tk3-verdict"></span></span>
+                      </div>
+                      <span class="tk3-meter"><i></i></span>
                     </div>
-                    <span class="tk3-meter"><i></i></span>
                   </div>
                 </div>
               </div>

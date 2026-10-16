@@ -8523,14 +8523,82 @@ html.is-frozen .egg-crash * {
 .xb-mv::after { display: none; }
 
 .tk3-scene {
-  perspective: 1100px;
+  --w: 230px;
+  position: relative;
+  display: grid;
+  place-items: center;
   touch-action: pan-y; /* sideways drags turn the card, the page still scrolls */
   -webkit-user-select: none;
   user-select: none;
 }
 
+.tk3-hold {
+  position: relative;
+  z-index: 1;
+  perspective: 1100px;
+}
+
+/* swapping movies: the card drops back into the deck, the next one comes up */
+.tk3-hold.is-dealing {
+  opacity: 0;
+  transform: translateY(14px) scale(.9) rotate(-3deg);
+  transition: opacity .22s ease-in, transform .22s ease-in;
+}
+
+.tk3-hold.is-dealt { animation: tk3-deal .4s cubic-bezier(.2, .8, .2, 1.15); }
+
+@keyframes tk3-deal {
+  from { opacity: 0; transform: translateY(-10px) scale(.94); }
+}
+
+/* the movies before it, fanned out behind; tap one to bring it forward */
+.tk3-peek {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--w) * .92);
+  aspect-ratio: 5 / 7;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 8px;
+  background: #1c1c1c;
+  box-shadow: 0 16px 30px -16px rgba(0, 0, 0, .9);
+  cursor: pointer;
+  filter: brightness(.5) saturate(.8);
+  transform: translate(-50%, -50%) translateX(var(--x)) rotate(var(--r));
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), filter .3s;
+}
+
+.tk3-peek-l { --x: -38px; --r: -8deg; }
+.tk3-peek-r { --x: 38px; --r: 8deg; }
+
+.tk3-peek:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: 2px; }
+
+@media (hover: hover) {
+  .tk3-peek:hover { filter: brightness(.8); }
+  .tk3-peek-l:hover { --x: -52px; --r: -11deg; }
+  .tk3-peek-r:hover { --x: 52px; --r: 11deg; }
+}
+
+.tk3-peek-img,
+.tk3-peek-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tk3-peek-img img {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .4s;
+  pointer-events: none;
+}
+
+.tk3-peek.has-poster img { opacity: 1; }
+
 .tk3 {
-  --w: 230px;
   position: relative;
   width: var(--w);
   aspect-ratio: 5 / 7;
@@ -8594,7 +8662,40 @@ html.is-frozen .egg-crash * {
   box-shadow: none;
 }
 
-.tk3 .xb-poster img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.tk3 .xb-poster img { position: relative; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+
+.tk3.has-poster .xb-poster img { opacity: 1; }
+
+/* while the poster loads: a soft light sweeps across (the popcorn tile
+   underneath shows if there's no poster at all) */
+.tk3 .xb-poster::before,
+.tk3-peek-img::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .07) 50%, transparent 65%) 0 0 / 250% 100% no-repeat,
+    #1c1c1c;
+  animation: tk3-shimmer 1.3s linear infinite;
+  transition: opacity .4s;
+}
+
+.tk3-peek-img { position: relative; }
+.tk3-peek-img img { position: relative; }
+
+.tk3.has-poster .xb-poster::before,
+.tk3.no-poster .xb-poster::before,
+.tk3-peek.has-poster .tk3-peek-img::before { opacity: 0; animation: none; }
+
+@keyframes tk3-shimmer {
+  from { background-position: 100% 0, 0 0; }
+  to { background-position: -50% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk3 .xb-poster::before,
+  .tk3-peek-img::before { animation: none; }
+}
 
 .tk3-tag {
   position: absolute;
@@ -8682,6 +8783,27 @@ html.is-frozen .egg-crash * {
   color: #ddd;
 }
 
+/* Ned's own one-line take, when he's written one; genre and director sit
+   side by side then to make room */
+.tk3-take {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  margin: .85rem 0 0;
+  padding-left: .6rem;
+  border-left: 2px solid var(--fifteenth-color);
+  font-size: .8rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: #d6d6d6;
+}
+
+.tk3-take[hidden] { display: none; }
+
+.tk3-panel.has-take .tk3-facts { grid-template-columns: 1fr 1fr; gap: .6rem; }
+.tk3-panel.has-take .tk3-facts dd { font-size: .82rem; }
+
 /* Ned's score: big number, stars and a one-word verdict, over a meter */
 .tk3-rating {
   display: flex;
@@ -8755,5 +8877,5 @@ html.is-frozen .egg-crash * {
 .tk3-go { margin-top: 1.2rem; padding: 0; }
 
 @media screen and (min-width: 768px) {
-  .tk3 { --w: 250px; }
+  .tk3-scene { --w: 250px; }
 }
