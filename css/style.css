@@ -8633,13 +8633,20 @@ html.is-frozen .egg-crash * {
   color: #f2f2f2;
 }
 
-/* back: the movie's details fill the card, the score sits at the bottom */
-.tk3-back {
-  background:
-    radial-gradient(120% 55% at 50% 0%, rgba(255, 220, 22, .1), transparent 62%),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, .02) 0 2px, transparent 2px 9px),
-    #1a1a1a;
+/* back: the movie's details fill the card over its own poster, blurred
+   and darkened (--poster is set once the poster loads); the score sits at
+   the bottom */
+.tk3-back { background: #121212; }
+
+.tk3-back::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  background: var(--poster, none) center / cover;
+  filter: blur(18px) brightness(.32) saturate(1.2);
 }
+
+.tk3-back::after { opacity: .35; }
 
 .tk3-panel {
   position: absolute;
@@ -8655,7 +8662,7 @@ html.is-frozen .egg-crash * {
   margin-bottom: 1rem;
   padding: .22rem .45rem;
   border-radius: 5px;
-  background: #262626;
+  background: rgba(255, 255, 255, .08);
   font: 700 .54rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .14em;
   text-transform: uppercase;
