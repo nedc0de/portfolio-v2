@@ -1169,7 +1169,9 @@
     const img = homeCard.querySelector('.xb-poster img');
     const peeks = [...homeCard.querySelectorAll('.tk3-peek')];
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const verdict = (r) => (r >= 4.5 ? 'Must watch' : r >= 4 ? 'Really good' : r >= 3 ? 'Worth a watch' : 'Skip it');
+    // a one-word verdict from Ned's rating
+    const verdict = (r) =>
+      r >= 4.5 ? 'Must watch' : r >= 4 ? 'Really good' : r >= 3.5 ? 'Worth a watch' : r >= 3 ? 'Just okay' : r >= 2 ? 'Skip it' : 'Avoid';
     const covers = deck.map((f) => coverFor(f).catch(() => ''));
     let at = 0;
 
