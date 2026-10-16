@@ -102,6 +102,14 @@
     // ----- Movies -----
     {
       type: 'movie',
+      title: 'Animals',
+      year: 2026,
+      by: 'Ben Affleck',
+      genre: 'Thriller',
+      rating: 3,
+    },
+    {
+      type: 'movie',
       title: 'The Housemaid',
       year: 2025,
       by: 'Paul Feig',
