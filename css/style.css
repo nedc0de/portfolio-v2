@@ -3405,22 +3405,25 @@ details>summary {
 .fav-stars {
   margin-top: 0.25rem;
   font-size: 13px;
-  letter-spacing: 1px;
 }
 
+/* gaps as margins, not letter-spacing, so each star's fill is measured on the star itself */
+.fav-star { margin-right: 1px; }
+
+/* each star is grey with a yellow copy on top, cut to its share of the
+   rating (--f, set by favorites.js): 4.8 = four full stars + 80% of the fifth */
 .fav-star {
+  position: relative;
   color: #444;
 }
 
-.fav-star.is-full {
+.fav-star::before {
+  content: "★";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--f, 0%);
+  overflow: hidden;
   color: var(--fifteenth-color);
-}
-
-.fav-star.is-half {
-  background: linear-gradient(90deg, var(--fifteenth-color) 50%, #444 50%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .fav-take {
@@ -7620,27 +7623,18 @@ html.is-frozen .egg-crash * {
   color: #eee;
 }
 
-/* five stars, filled to the exact rating (4.8 = four and most of a fifth) */
+/* the same exact-fill stars as the Favorites page (.fav-star) */
 .xb-stars {
-  position: relative;
-  display: inline-block;
+  margin: 0;
   font-size: .9rem;
-  letter-spacing: 2px;
   line-height: 1;
-  color: #444;
 }
 
-.xb-stars::before { content: "★★★★★"; }
-
-.xb-stars-on {
-  position: absolute;
-  inset: 0 auto 0 0;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--fifteenth-color);
+.xb-stars .fav-star {
+  margin-right: 2px;
+  opacity: 1;
+  transform: none;
 }
-
-.xb-stars-on::before { content: "★★★★★"; }
 
 .xb-sub {
   margin-top: .4rem;

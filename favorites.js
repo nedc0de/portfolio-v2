@@ -825,12 +825,23 @@
   }
 
   /*---------- cards ----------*/
+  // Five stars filled to the exact rating: each star is filled by how much of
+  // it the rating covers, so 4.8 is four stars and 80% of the fifth, and 3.2
+  // is three stars and a sliver (no rounding to halves)
+  // The fill is cut by how much of the star's shape is covered, not just its
+  // width: a star's tips are thin, so cutting 80% of the width still looks
+  // like a full star. (Inverse of a smoothstep, a close match for a star's
+  // area; the glyph's ink spans about 4% to 96% of its box.)
+  function starFill(rating, i) {
+    const f = Math.max(0, Math.min(1, rating - (i - 1)));
+    if (f === 0 || f === 1) return f * 100;
+    const x = 0.5 - Math.sin(Math.asin(1 - 2 * f) / 3);
+    return Math.round(4 + 92 * x);
+  }
   function starsHTML(rating) {
-    const r = Math.round(rating * 2) / 2; // nearest half star
     let html = '';
     for (let i = 1; i <= 5; i++) {
-      const cls = r >= i ? 'is-full' : r >= i - 0.5 ? 'is-half' : '';
-      html += `<span class="fav-star ${cls}" aria-hidden="true">★</span>`;
+      html += `<span class="fav-star" style="--f:${starFill(rating, i)}%" aria-hidden="true">★</span>`;
     }
     return `<span class="fav-stars" title="${rating} out of 5">${html}</span>`;
   }
@@ -1134,7 +1145,7 @@
       homeCard.querySelector('.xb-title').append(yr);
     }
     homeCard.querySelector('.xb-rate b').textContent = pick.rating;
-    homeCard.querySelector('.xb-stars-on').style.width = `${(pick.rating / 5) * 100}%`;
+    homeCard.querySelector('.xb-stars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars');
     homeCard.querySelector('.xb-sub').textContent = `1 of ${FAVORITES.length} picks I'd defend in an argument`;
     homeCard.setAttribute('aria-label', `Just watched: ${pick.title}, rated ${pick.rating} out of 5. See all picks`);
     homeCard.hidden = false;
