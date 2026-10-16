@@ -1146,7 +1146,16 @@
     }
     homeCard.querySelector('.xb-rate b').textContent = pick.rating;
     homeCard.querySelector('.xb-stars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars');
-    homeCard.querySelector('.xb-sub').textContent = `1 of ${FAVORITES.length} picks I'd defend in an argument`;
+    // the card's back: details and score
+    const back = homeCard.querySelector('.tk3-back');
+    if (back) {
+      back.querySelector('.tk3-bt').textContent = pick.title;
+      back.querySelector('.tk3-by').textContent = pick.year || '';
+      back.querySelector('.tk3-genre').textContent = pick.genre || '—';
+      back.querySelector('.tk3-dir').textContent = pick.by || '—';
+      back.querySelector('.tk3-score b').textContent = pick.rating;
+      back.querySelector('.tk3-bstars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars tk3-bstars');
+    }
     homeCard.setAttribute('aria-label', `Just watched: ${pick.title}, rated ${pick.rating} out of 5. See all picks`);
     homeCard.hidden = false;
     // poster: until it arrives (or if it can't be found) the card shows a popcorn tile

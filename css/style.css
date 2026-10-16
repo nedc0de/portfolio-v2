@@ -8644,65 +8644,92 @@ html.is-frozen .egg-crash * {
   color: #f2f2f2;
 }
 
-/* back */
+/* back: a yellow playing-card back with the movie's details on a dark panel */
 .tk3-back {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: .45rem;
-  text-align: center;
-  background:
-    radial-gradient(110% 60% at 50% 0%, rgba(255, 220, 22, .18), transparent 62%),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, .025) 0 6px, transparent 6px 12px),
-    #1a1a1a;
-}
-
-/* a big monogram in a yellow ring */
-.tk3-mark {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  margin-bottom: .5rem;
-  border: 2px solid var(--fifteenth-color);
-  border-radius: 50%;
-  font-size: 1.9rem;
-  font-weight: 800;
-  color: var(--fifteenth-color);
-  box-shadow: 0 0 24px rgba(255, 220, 22, .25), inset 0 0 18px rgba(255, 220, 22, .15);
+  border-color: #151515;
+  background:
+    repeating-linear-gradient(45deg, rgba(21, 21, 21, .12) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgba(21, 21, 21, .12) 0 2px, transparent 2px 9px),
+    radial-gradient(circle, #151515 1.6px, transparent 2px) 0 0 / 14px 14px,
+    var(--fifteenth-color);
 }
 
-.tk3-brand {
-  font-size: 1.45rem;
-  font-weight: 800;
-  letter-spacing: .02em;
+.tk3-back::before { border-color: #151515; }
+
+.tk3-corner {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: .2rem .4rem;
+  border-radius: 5px;
+  background: #151515;
+  font: 700 .5rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .14em;
+  color: var(--fifteenth-color);
+}
+
+.tk3-corner-end {
+  inset: auto 16px 16px auto;
+  transform: rotate(180deg);
+}
+
+.tk3-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: calc(100% - 44px);
+  padding: 1rem 1rem .95rem;
+  border-radius: 12px;
+  background: #151515;
+  box-shadow: 0 0 0 4px var(--fifteenth-color), 0 0 0 6px #151515;
+  text-align: left;
+}
+
+.tk3-bt {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.15;
   color: #f2f2f2;
 }
 
-.tk3-brand b { color: var(--fifteenth-color); font-weight: 800; }
-
-.tk3-big {
-  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  letter-spacing: .5em;
-  color: #9a9a9a;
+.tk3-by {
+  margin-top: .1rem;
+  font-size: .72rem;
+  color: #888;
 }
 
-.tk3-back .xb-sub {
-  max-width: 78%;
-  margin: .6rem 0 0;
-  font-size: .8rem;
-  color: #c9c9c9;
+.tk3-facts {
+  display: grid;
+  gap: .5rem;
+  margin: .8rem 0 0;
 }
 
-.tk3-url {
-  position: absolute;
-  bottom: 18px;
-  font: 700 .56rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+.tk3-facts dt {
+  font: 700 .5rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .14em;
   text-transform: uppercase;
+  color: #777;
+}
+
+.tk3-facts dd {
+  margin: .05rem 0 0;
+  font-size: .78rem;
+  color: #ddd;
+}
+
+.tk3-score { color: #aaa; }
+
+.tk3-score b {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
   color: var(--fifteenth-color);
 }
+
+.tk3-bstars { margin-top: .35rem; font-size: 1rem; }
 
 .tk3-go { margin-top: 1.2rem; padding: 0; }
 

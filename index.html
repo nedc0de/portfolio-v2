@@ -206,7 +206,7 @@
         <p class="hm-label">Explore</p>
         <div class="xb">
           <!-- Just watched: a 3D movie card you can grab and spin all the way
-               round (scripts.js). Front: the poster and rating; back: the pick count. -->
+               round (scripts.js). Front: the poster and rating; back: the movie's details and Ned's score. -->
           <div class="xb-card xb-mv" role="group" hidden>
             <div class="tk3-scene">
               <div class="tk3" tabindex="0" role="img" aria-roledescription="3D card" aria-label="Movie card. Drag, or use the arrow keys, to turn it around">
@@ -220,11 +220,17 @@
                   </div>
                 </div>
                 <div class="tk3-face tk3-back" aria-hidden="true">
-                  <span class="tk3-mark">N</span>
-                  <span class="tk3-brand">NED<b>CODE</b></span>
-                  <span class="tk3-big">PICKS</span>
-                  <span class="xb-sub"></span>
-                  <span class="tk3-url">nedcode.com</span>
+                  <span class="tk3-corner">PICKS</span><span class="tk3-corner tk3-corner-end">PICKS</span>
+                  <div class="tk3-panel">
+                    <span class="tk3-bt"></span>
+                    <span class="tk3-by"></span>
+                    <dl class="tk3-facts">
+                      <div><dt>Genre</dt><dd class="tk3-genre"></dd></div>
+                      <div><dt>Director</dt><dd class="tk3-dir"></dd></div>
+                      <div><dt>Ned's score</dt><dd class="tk3-score"><b></b> / 5</dd></div>
+                    </dl>
+                    <span class="tk3-bstars"></span>
+                  </div>
                 </div>
               </div>
             </div>
