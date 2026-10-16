@@ -597,7 +597,7 @@ position: relative;
 
 .line {
   fill: none;
-  stroke: #525252;
+  stroke: var(--fourth-color); /* same light grey as the menu's close X */
   stroke-width: 5.5;
   stroke-linecap: round;
 }
