@@ -8571,17 +8571,6 @@ html.is-frozen .egg-crash * {
 .tk3-front { transform: translateZ(2px); }
 .tk3-back { transform: rotateY(180deg) translateZ(2px); }
 
-/* thin inner frame, like a trading card */
-.tk3-face::before {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  z-index: 2;
-  border: 1px solid rgba(255, 220, 22, .28);
-  border-radius: 12px;
-  pointer-events: none;
-}
-
 /* holographic sheen that slides across as the card turns */
 .tk3-face::after {
   content: "";
@@ -8718,16 +8707,75 @@ html.is-frozen .egg-crash * {
   color: #ddd;
 }
 
-.tk3-score { color: #aaa; }
-
-.tk3-score b {
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--fifteenth-color);
+/* Ned's score: big number, stars and a one-word verdict, over a meter */
+.tk3-rating {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin-top: .9rem;
+  padding-top: .8rem;
+  border-top: 1px solid rgba(255, 255, 255, .08);
 }
 
-.tk3-bstars { margin-top: .35rem; font-size: 1rem; }
+.tk3-num {
+  display: flex;
+  align-items: baseline;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tk3-num b {
+  font-size: 2.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--fifteenth-color);
+  text-shadow: 0 0 22px rgba(255, 220, 22, .3);
+}
+
+.tk3-num small {
+  margin-left: .1rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #777;
+}
+
+.tk3-rate-side {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+.tk3-bstars { margin: 0; font-size: .74rem; white-space: nowrap; }
+.tk3-bstars .fav-star { margin-right: 1px; }
+
+.tk3-verdict {
+  font: 700 .52rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #bbb;
+}
+
+.tk3-meter {
+  display: block;
+  height: 5px;
+  margin-top: .7rem;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #2a2a2a;
+}
+
+.tk3-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255, 220, 22, .55), var(--fifteenth-color));
+  transform: scaleX(var(--p, 1));
+  transform-origin: left;
+}
+
+/* with motion: the meter fills when the card lands on its back */
+.tk3-anim .tk3-meter i { transform: scaleX(0); transition: transform .7s cubic-bezier(.2, .7, .2, 1); }
+.tk3-anim.is-scored .tk3-meter i { transform: scaleX(var(--p, 1)); }
 
 .tk3-go { margin-top: 1.2rem; padding: 0; }
 

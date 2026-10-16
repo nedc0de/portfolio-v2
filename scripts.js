@@ -3058,6 +3058,26 @@ function readPostsSeen() {
       tk.style.setProperty('--sheen', `${(turn / 360) * 200 - 50}%`);
       const back = turn > 90 && turn < 270;
       tk.classList.toggle('is-back', back);
+      // each time it lands on the back, the score counts up as the meter fills
+      const landed = back && !drag && vel === 0;
+      if (landed && !tk.classList.contains('is-scored')) score();
+      if (!back) tk.classList.remove('is-scored');
+    };
+    const num = tk.querySelector('.tk3-num b');
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!still) tk.classList.add('tk3-anim');
+    const score = () => {
+      tk.classList.add('is-scored');
+      const end = parseFloat(num && num.dataset.score);
+      if (still || !num || !end) return;
+      const t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 700);
+        num.textContent = k < 1 ? (end * (1 - Math.pow(1 - k, 3))).toFixed(1) : num.dataset.score;
+        if (k < 1 && tk.classList.contains('is-scored')) requestAnimationFrame(step);
+        else num.textContent = num.dataset.score;
+      };
+      requestAnimationFrame(step);
     };
     const loop = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000 || 0.016);

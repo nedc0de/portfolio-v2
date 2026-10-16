@@ -1153,7 +1153,11 @@
       back.querySelector('.tk3-by').textContent = pick.year || '';
       back.querySelector('.tk3-genre').textContent = pick.genre || '—';
       back.querySelector('.tk3-dir').textContent = pick.by || '—';
-      back.querySelector('.tk3-score b').textContent = pick.rating;
+      back.querySelector('.tk3-num b').textContent = pick.rating;
+      back.querySelector('.tk3-num b').dataset.score = pick.rating;
+      back.querySelector('.tk3-verdict').textContent =
+        pick.rating >= 4.5 ? 'Must watch' : pick.rating >= 4 ? 'Really good' : pick.rating >= 3 ? 'Worth a watch' : 'Skip it';
+      back.querySelector('.tk3-meter').style.setProperty('--p', pick.rating / 5);
       back.querySelector('.tk3-bstars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars tk3-bstars');
     }
     homeCard.setAttribute('aria-label', `Just watched: ${pick.title}, rated ${pick.rating} out of 5. See all picks`);
