@@ -3638,22 +3638,73 @@ details>summary {
 }
 
 /* Call to action */
+/* Sign-off card: same marker style as the rest of the page, a warm glow in
+   the corner, the button and a quieter second way to reach Ned */
 .ab-cta {
-  text-align: center;
-  padding: 2.5rem 1rem;
-  border-radius: 10px;
-  background: var(--sixteenth-color);
+  position: relative;
+  overflow: hidden;
+  padding: 1.6rem 1.3rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 90% at 100% 100%, rgba(255, 220, 22, .14), transparent 55%),
+    var(--sixteenth-color);
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
+  text-align: left;
+}
+
+.ab-cta-k {
+  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
 }
 
 .ab-cta p {
-  font-size: clamp(1.4rem, 5vw, 2rem);
+  margin: .5rem 0 1.4rem;
+  font-size: clamp(1.7rem, 7.4vw, 2.4rem);
   font-weight: 700;
-  letter-spacing: -.02em;
+  line-height: 1.2;
+  letter-spacing: -.01em;
   color: var(--fourth-color);
-  margin-bottom: 1.25rem;
 }
 
-.ab-cta a {
+.ab-cta p em {
+  font-style: normal;
+  color: var(--fifteenth-color);
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+}
+
+.ab-cta-go {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .9rem 1.2rem;
+}
+
+.ab-cta-go > span {
+  font-size: .85rem;
+  color: #8a8a8a;
+}
+
+.ab-cta .ab-cta-alt {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--fourth-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 220, 22, .5);
+  text-underline-offset: 3px;
+}
+
+.ab-cta .ab-cta-alt:hover { color: var(--fifteenth-color); transform: none; }
+
+.ab-cta-go > a {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
@@ -3665,7 +3716,7 @@ details>summary {
   transition: transform .2s;
 }
 
-.ab-cta a:hover {
+.ab-cta-go > a:hover {
   transform: translateY(-2px);
 }
 
@@ -3904,7 +3955,7 @@ details>summary {
 /*===== BUTTONS: one shared soft-square style (Lab buttons keep their own) =====*/
 /* Main action: solid yellow */
 .product-link-button,
-.ab-cta a,
+.ab-cta-go > a,
 .ct-send,
 .back-to-top-btn {
   font-family: var(--body-font);
@@ -4453,7 +4504,7 @@ a.bl-row:hover {
 }
 
 /*===== NEON GLOW: main buttons light up like the NEDCODE logo =====*/
-.ab-cta a,
+.ab-cta-go > a,
 .ct-send,
 .menu-foot .menu-cta {
   transition: transform .2s, box-shadow .3s;
