@@ -1074,13 +1074,11 @@
 
 /*===== EXPERIMENT 3: text sign maker =====*/
 // Type a word, pick a color and a style (each with its own letters), and copy the code.
-// A couple of letters flicker like the NEDCODE logo.
 (() => {
   const root = document.getElementById('neonMaker');
   if (!root) return;
   const sign = root.querySelector('.neon-sign');
   const input = root.querySelector('.neon-input');
-  const FLICKERS = ['neon-n', 'neon-e', 'neon-o'];
   const codeOut = root.querySelector('.neon-code-out code');
   const copyBtn = root.querySelector('.neon-copy');
   // Google Fonts family + CSS stack for each style, used in the copied code
@@ -1141,35 +1139,15 @@
     if (w > room) sign.style.fontSize = Math.max(14, Math.floor(64 * room / w)) + 'px';
   };
 
-  const render = (powerUp) => {
+  // Plain styled text, no animation: what's on screen is exactly what the code makes
+  const render = () => {
     const text = input.value.trim() || 'Type something';
-    sign.textContent = '';
-    // Script letters join up, so it's split into whole words (a box per letter
-    // would break the joins); the other styles go letter by letter
-    const script = root.dataset.font === 'script';
-    const letters = script ? text.split(/( +)/).filter(Boolean) : [...text];
-    const visible = letters.map((c, i) => (c.trim() ? i : -1)).filter((i) => i >= 0);
-    // pick up to two letters to flicker (none in Script: a whole word would blink)
-    const flicker = new Set();
-    while (!script && flicker.size < Math.min(2, visible.length)) flicker.add(visible[(Math.random() * visible.length) | 0]);
-    let n = 0;
-    letters.forEach((c, i) => {
-      const span = document.createElement('span');
-      span.textContent = c;
-      if (c.trim()) {
-        if (powerUp) span.style.setProperty('--d', (n++ * 0.22).toFixed(2) + 's');
-        if (flicker.has(i)) span.dataset.flicker = FLICKERS[(Math.random() * FLICKERS.length) | 0];
-      }
-      sign.append(span);
-    });
-    sign.setAttribute('aria-label', text);
-    root.classList.toggle('is-powering', !!powerUp);
-    if (powerUp) setTimeout(() => root.classList.remove('is-powering'), n * 220 + 900);
+    sign.textContent = text;
     fit();
     updateCode();
   };
 
-  input.addEventListener('input', () => render(false));
+  input.addEventListener('input', render);
 
   root.querySelectorAll('.neon-colors button').forEach((btn) => {
     btn.style.setProperty('--swatch', btn.dataset.color);
@@ -1185,7 +1163,7 @@
     btn.addEventListener('click', () => {
       root.dataset.font = btn.dataset.font;
       root.querySelectorAll('.neon-fonts button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      render(false);
+      render();
       // fonts download the first time they're used: measure again once they arrive
       if (document.fonts) document.fonts.load(`${FONTS[btn.dataset.font].weight} 64px "${FONTS[btn.dataset.font].name}"`).then(() => { fit(); updateCode(); });
     });
@@ -1218,6 +1196,6 @@
 
   addEventListener('resize', fit);
   root.dataset.font = 'tube';
-  render(true);
+  render();
   if (document.fonts) document.fonts.ready.then(() => { fit(); updateCode(); });
 })();

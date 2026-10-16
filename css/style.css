@@ -7084,7 +7084,6 @@ html.is-frozen .egg-crash * {
   text-align: center;
   white-space: nowrap;
   color: var(--neon);
-  transition: color .3s;
 }
 
 /* Each style has its own letters: Tube is drawn in parallel tube lines
@@ -7097,21 +7096,6 @@ html.is-frozen .egg-crash * {
   font-weight: 800;
   text-shadow: 1px 1px 0 var(--edge), 2px 2px 0 var(--edge), 3px 3px 0 var(--edge), 4px 4px 0 var(--edge), 5px 5px 0 var(--edge);
   padding: 0 5px 5px 0;
-}
-
-.neon-sign span {
-  display: inline-block;
-  white-space: pre;
-}
-
-/* a couple of letters flicker like the logo */
-.neon-sign span[data-flicker="neon-n"] { animation: neon-n 20s steps(1, end) infinite; }
-.neon-sign span[data-flicker="neon-e"] { animation: neon-e 27s steps(1, end) infinite; }
-.neon-sign span[data-flicker="neon-o"] { animation: neon-o 16s steps(1, end) infinite; }
-
-/* powering on: letters sputter on one by one */
-.neon.is-powering .neon-sign span {
-  animation: neon-power .8s steps(1, end) var(--d, 0s) both;
 }
 
 .neon-controls {
