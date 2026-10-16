@@ -7263,6 +7263,7 @@ html.is-frozen .egg-crash * {
 .ps-article { position: relative; /* anchors the soft backdrop (::before) */ }
 
 .hw-list::before,
+.hc-list::before,
 .hl-list::before,
 .ab-list::before,
 .ps-article::before {
@@ -7285,4 +7286,173 @@ html.is-frozen .egg-crash * {
   .home-title {
     font-size: min(50px, calc((100vw - 34px) / 6.9));
   }
+}
+
+.nowrap { white-space: nowrap; }
+
+/*===== HOME: Selected work as a circuit =====*/
+/* One yellow trace runs down the left through a node per project, like a
+   circuit board. The newest project's node is filled. Each segment of the
+   trace runs from one node's centre to the next, so scripts.js can light
+   the circuit node by node as it scrolls into view (.will-draw / .is-lit).
+   Without JS or with reduced motion it simply shows lit. */
+.hc-list {
+  --node: 32px;
+  position: relative; /* anchors the soft backdrop (::before) */
+  margin: .5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hc-list > li {
+  position: relative;
+  --seg-delay: calc(var(--i, 0) * .35s + .2s);
+  --node-delay: calc(var(--i, 0) * .35s);
+}
+
+.hc-list > li:nth-child(2) { --i: 1; }
+.hc-list > li:nth-child(3) { --i: 2; }
+.hc-list > li:nth-child(4) { --i: 3; }
+
+/* the trace: a segment from this node down to the next one */
+.hc-list > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--node) / 2 - 1px);
+  top: calc(var(--node) / 2);
+  bottom: calc(var(--node) / -2);
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(var(--fifteenth-color), rgba(255, 220, 22, .55));
+  transform-origin: top;
+}
+
+.hc-list > li:nth-child(2)::after {
+  background: linear-gradient(rgba(255, 220, 22, .55), rgba(255, 220, 22, .3));
+}
+
+.hc-row {
+  position: relative;
+  z-index: 1; /* nodes sit on top of the trace */
+  display: grid;
+  grid-template-columns: var(--node) 1fr;
+  gap: 1rem;
+  padding-bottom: 1.6rem;
+  color: var(--fourth-color);
+  text-align: left;
+}
+
+.hc-list > li:last-child .hc-row { padding-bottom: 1.3rem; }
+
+.hc-node {
+  flex: none;
+  width: var(--node);
+  height: var(--node);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--fifteenth-color);
+  border-radius: 50%;
+  background: var(--thirteenth-color);
+  /* a ring of page colour cuts the trace cleanly around each node */
+  box-shadow: 0 0 0 4px var(--thirteenth-color), 0 0 14px rgba(255, 220, 22, .22);
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--fifteenth-color);
+  transition: box-shadow .3s, transform .3s;
+}
+
+.hc-list > li:first-child .hc-node {
+  background: var(--fifteenth-color);
+  color: var(--thirteenth-color);
+}
+
+.hc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .75rem;
+  padding-top: .3rem;
+}
+
+.hc-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--fourth-color);
+  transition: color .25s;
+}
+
+.hc-out {
+  display: inline-block;
+  width: .6em;
+  height: .6em;
+  margin-left: .4rem;
+  vertical-align: .12em;
+  color: var(--fifteenth-color);
+  transition: transform .25s;
+}
+
+.hc-year {
+  flex: none;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fourteenth-color);
+}
+
+.hc-desc {
+  display: block;
+  margin-top: .3rem;
+  font-size: .82rem;
+  line-height: 1.45;
+  color: var(--fourteenth-color);
+  text-wrap: balance; /* even lines, no word left on its own */
+}
+
+/* the end of the circuit: an open, dashed node pointing to the rest */
+.hc-more {
+  --node: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--fourteenth-color);
+  transition: color .25s;
+}
+
+.hc-node-more {
+  border: 2px dashed #555;
+  box-shadow: none;
+  font-size: .72rem;
+  color: var(--fifteenth-color);
+}
+
+@media (hover: hover) {
+  .hc-row:hover .hc-name { color: var(--fifteenth-color); }
+  .hc-row:hover .hc-out { transform: translate(2px, -2px); }
+  .hc-row:hover .hc-node { box-shadow: 0 0 0 4px var(--thirteenth-color), 0 0 22px rgba(255, 220, 22, .5); transform: scale(1.06); }
+  .hc-more:hover { color: var(--seventh-color); }
+  .hc-more:hover .hc-node-more { border-color: var(--fifteenth-color); }
+}
+
+@media screen and (min-width: 768px) {
+  .hc-list,
+  .hc-more { --node: 36px; }
+  .hc-name { font-size: 1.35rem; }
+  .hc-desc { font-size: .9rem; }
+  .hc-year { font-size: .85rem; }
+}
+
+/* lighting up: nodes switch on one after another, each trace segment
+   running down to the next node */
+.hc-list.will-draw > li::after { transform: scaleY(0); }
+.hc-list.will-draw .hc-node { opacity: .25; transform: scale(.8); }
+.hc-list.will-draw.is-lit > li::after {
+  transform: none;
+  transition: transform .4s cubic-bezier(.22, .61, .36, 1) var(--seg-delay);
+}
+.hc-list.will-draw.is-lit .hc-node {
+  opacity: 1;
+  transform: none;
+  transition: opacity .25s var(--node-delay), transform .35s cubic-bezier(.34, 1.56, .64, 1) var(--node-delay), box-shadow .3s;
 }

@@ -1220,9 +1220,9 @@ whenIdle(() => {
     const out = {};
     const pick = window.nedcodePick;
     if (pick) out.pick = { link: 'favorites.html', topic: 'Just watched', title: pick.title, read: `★ ${pick.rating}` };
-    const row = document.querySelector('.hw-row');
-    const name = row?.querySelector('.hw-name')?.firstChild?.textContent.trim();
-    if (row && name) out.project = { link: row.getAttribute('href'), topic: 'Latest project', title: name, read: row.querySelector('.hw-year')?.textContent.trim() || '', external: row.target === '_blank' };
+    const row = document.querySelector('.hc-row');
+    const name = row?.querySelector('.hc-name')?.firstChild?.textContent.trim();
+    if (row && name) out.project = { link: row.getAttribute('href'), topic: 'Latest project', title: name, read: row.querySelector('.hc-year')?.textContent.trim() || '', external: row.target === '_blank' };
     return out;
   };
   const mix = (posts) => {
@@ -2753,12 +2753,27 @@ function readPostsSeen() {
   });
 })();
 
-/*===== CABLE LISTS: Home's Selected work and the Projects list =====*/
+/*===== HOME: Selected work circuit lights up =====*/
+// The first time the list scrolls into view its nodes switch on one by one,
+// the trace running down from each to the next (see .hc-list in style.css).
+(() => {
+  const list = document.querySelector('.hc-list');
+  if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  list.classList.add('will-draw');
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.intersectionRatio >= .6)) return; // most of it on screen
+    io.disconnect();
+    requestAnimationFrame(() => list.classList.add('is-lit'));
+  }, { threshold: .6 });
+  io.observe(list);
+})();
+
+/*===== CABLE LIST: the Projects page =====*/
 // Each number's cable runs down and along under its project's description,
 // ending in a dot. They're sized to each row (and again if the layout
 // changes), and draw themselves in one after another the first time the
 // list scrolls into view. No JS: no cables; reduced motion: no drawing in.
-[['.hw-list', '.hw-row', '.hw-name', '.hw-desc', 9], ['.hl-list', '.hl-row', '.hl-name', '.hl-desc', 16]].forEach(([L, R, N, D, GAP]) => {
+[['.hl-list', '.hl-row', '.hl-name', '.hl-desc', 16]].forEach(([L, R, N, D, GAP]) => {
   const list = document.querySelector(L);
   if (!list) return;
   const rows = [...list.querySelectorAll(R)].filter((row) => row.querySelector('.hw-cable'));
