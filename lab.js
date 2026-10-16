@@ -1072,8 +1072,8 @@
   });
 })();
 
-/*===== EXPERIMENT 3: neon sign maker =====*/
-// Type a word, pick a color and a style, and it lights up like a neon sign.
+/*===== EXPERIMENT 3: text sign maker =====*/
+// Type a word, pick a color and a style (each with its own letters), and copy the code.
 // A couple of letters flicker like the NEDCODE logo; the switch powers it
 // off and back on letter by letter.
 (() => {
@@ -1087,13 +1087,17 @@
   const copyBtn = root.querySelector('.neon-copy');
   // Google Fonts family + CSS stack for each style, used in the copied code
   const FONTS = {
-    tube: { family: 'Tilt+Neon', css: "'Tilt Neon', sans-serif", weight: 400 },
-    script: { family: 'Neonderthaw', css: "'Neonderthaw', cursive", weight: 400 },
-    bold: { family: 'Poppins:wght@700', css: "'Poppins', sans-serif", weight: 700 },
+    tube: { family: 'Monoton', css: "'Monoton', sans-serif", weight: 400, name: 'Monoton' },
+    script: { family: 'Pacifico', css: "'Pacifico', cursive", weight: 400, name: 'Pacifico' },
+    bold: { family: 'Poppins:wght@800', css: "'Poppins', sans-serif", weight: 800, name: 'Poppins' },
   };
   let on = true;
   let format = 'html';
   let color = '#ffdc16';
+
+  // Bold's 3D edge: the same color, darker
+  const edge = (hex) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * 0.55).toString(16).padStart(2, '0')).join('');
+  const DEPTH = 5;
 
   const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -1101,21 +1105,26 @@
   const updateCode = () => {
     const text = escape(input.value.trim() || 'Type something');
     const font = FONTS[root.dataset.font] || FONTS.tube;
+    const bold = root.dataset.font === 'bold';
     const fontUrl = `https://fonts.googleapis.com/css2?family=${font.family}&display=swap`;
     let code;
     if (format === 'html') {
       code =
         `<link rel="stylesheet" href="${fontUrl}">\n` +
-        `<p style="margin:0; font-family:${font.css}; font-weight:${font.weight}; font-size:64px; color:${color};">${text}</p>`;
+        `<p style="margin:0; font-family:${font.css}; font-weight:${font.weight}; font-size:64px; color:${color};${bold ? ` text-shadow:${Array.from({ length: DEPTH }, (_, i) => `${i + 1}px ${i + 1}px 0 ${edge(color)}`).join(', ')};` : ''}">${text}</p>`;
     } else {
       // size the SVG to the text, measured at 64px
       const scale = 64 / parseFloat(sign.style.fontSize || 64);
       const w = Math.ceil(sign.scrollWidth * scale) + 20;
-      const h = 90;
+      const h = 100;
+      const attrs = `dominant-baseline="central" text-anchor="middle" font-family="${font.css}" font-weight="${font.weight}" font-size="64"`;
+      // Bold: stack darker copies behind the text for the 3D edge
+      const depth = bold ? Array.from({ length: DEPTH }, (_, i) => `  <text x="50%" y="50%" dx="${DEPTH - i}" dy="${DEPTH - i}" ${attrs} fill="${edge(color)}">${text}</text>\n`).join('') : '';
       code =
         `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">\n` +
         `  <style>@import url('${fontUrl.replace(/&/g, '&amp;')}');</style>\n` + // SVG is XML: & must be escaped
-        `  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="${font.css}" font-weight="${font.weight}" font-size="64" fill="${color}">${text}</text>\n` +
+        depth +
+        `  <text x="50%" y="50%" ${attrs} fill="${color}">${text}</text>\n` +
         `</svg>`;
     }
     codeOut.textContent = code;
@@ -1173,7 +1182,7 @@
       fit();
       updateCode();
       // fonts download the first time they're used: measure again once they arrive
-      if (document.fonts) document.fonts.load(`64px "${btn.dataset.font === 'script' ? 'Neonderthaw' : 'Tilt Neon'}"`).then(() => { fit(); updateCode(); });
+      if (document.fonts) document.fonts.load(`${FONTS[btn.dataset.font].weight} 64px "${FONTS[btn.dataset.font].name}"`).then(() => { fit(); updateCode(); });
     });
   });
 

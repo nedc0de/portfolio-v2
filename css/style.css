@@ -7079,16 +7079,25 @@ html.is-frozen .egg-crash * {
 .neon-sign {
   max-width: 100%;
   margin: 0;
-  font-family: 'Tilt Neon', var(--body-font);
-  line-height: 1.1;
+  font-family: 'Monoton', var(--body-font);
+  line-height: 1.25;
   text-align: center;
   white-space: nowrap;
   color: var(--neon);
   transition: color .3s;
 }
 
-.neon[data-font="script"] .neon-sign { font-family: 'Neonderthaw', cursive; }
-.neon[data-font="bold"] .neon-sign { font-family: var(--body-font); font-weight: 700; }
+/* Each style has its own letters: Tube is drawn in parallel tube lines
+   (Monoton), Script is a thick sign-painter brush (Pacifico), and Bold is
+   chunky block letters with a 3D edge in a darker shade of the same color */
+.neon[data-font="script"] .neon-sign { font-family: 'Pacifico', cursive; }
+.neon[data-font="bold"] .neon-sign {
+  --edge: color-mix(in srgb, currentColor 55%, #000);
+  font-family: var(--body-font);
+  font-weight: 800;
+  text-shadow: 1px 1px 0 var(--edge), 2px 2px 0 var(--edge), 3px 3px 0 var(--edge), 4px 4px 0 var(--edge), 5px 5px 0 var(--edge);
+  padding: 0 5px 5px 0;
+}
 
 .neon-sign span {
   display: inline-block;
