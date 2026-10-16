@@ -8188,24 +8188,40 @@ html.is-frozen .egg-crash * {
   padding-bottom: .2rem;
 }
 
+.bl-topics[hidden] { display: none; }
+
 .bl-topics::-webkit-scrollbar { display: none; }
 
+/* hashtag chips: solid dark tags in the code font, the picked one outlined in yellow */
 .bl-topics button {
   flex: none;
-  padding: .45rem .95rem;
-  border: 1px solid #333;
-  border-radius: 999px;
-  background: none;
-  font: 600 .82rem var(--body-font);
-  color: var(--fourth-color);
+  padding: .45rem .8rem;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  background: #121212;
+  font: 700 .74rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #aaa;
   cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
   -webkit-tap-highlight-color: transparent;
+}
+
+.bl-topics button::before {
+  content: "#";
+  margin-right: 2px;
+  color: var(--fifteenth-color);
 }
 
 .bl-topics button[aria-pressed="true"] {
   border-color: var(--fifteenth-color);
-  background: var(--fifteenth-color);
-  color: var(--eleventh-color);
+  background: #2a2510; /* solid, a dark yellow tint */
+  color: var(--fifteenth-color);
+}
+
+@media (hover: hover) {
+  .bl-topics button:not([aria-pressed="true"]):hover { border-color: #555; color: var(--fourth-color); }
 }
 
 .bl-read-mark {
