@@ -162,6 +162,17 @@ body {
 }
 
 .bg-math > div { position: absolute; }
+
+/* stray letters on the grid's dots (centred on the dot); words a touch brighter */
+.bg-math .bg-l {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  line-height: 1;
+  color: rgba(255, 255, 255, .14);
+}
+
+.bg-math .bg-w { color: rgba(255, 220, 22, .3); }
 .bg-math b { font-weight: 400; color: rgba(255, 106, 31, .18); }
 .bg-math i { font: italic 20px/1 Georgia, "Times New Roman", serif; color: rgba(255, 255, 255, .11); margin-right: 10px; }
 .bg-math .rule { display: inline-block; border-top: 1px solid rgba(255, 255, 255, .05); padding-top: 4px; }

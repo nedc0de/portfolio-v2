@@ -2738,6 +2738,10 @@ function readPostsSeen() {
     'temperature=0.7  top_p=0.95  prior=<b data-tick="p">0.049</b>',
     'f(x) = ∫₀¹ x² dx = ⅓',
   ];
+  // stray letters on the dots, and the words they sometimes spell
+  const GLYPHS = 'abcdefghijklmnopqrstuvwxyzθλσμπΣ∇∂ε'.split('');
+  const WORDS = ['gradient', 'softmax', 'tensor', 'entropy', 'sigmoid', 'attention', 'backprop', 'epoch',
+    'vector', 'matrix', 'bayes', 'argmax', 'token', 'embedding', 'neural net', 'dot product', '∇ loss', 'ReLU', 'logits', 'weights'];
   const GRID = 24; // dot spacing, see the html background in style.css
   const GAP = GRID * 9; // one note about every 216px down the page
   const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
@@ -2775,6 +2779,38 @@ function readPostsSeen() {
       note.style.top = top + 'px';
       n++;
     }
+
+    // Stray letters sitting on the grid's dots, one letter per dot, like a
+    // matrix being read. Now and then a run of them spells a real maths / AI
+    // word along a row of dots. All kept off the content like the notes.
+    const cols = Math.floor(width / GRID);
+    const edge = Math.max(2, Math.round((width * 0.06) / GRID));
+    const cell = (col, row, ch, cls) => {
+      const x = col * GRID + GRID / 2, y = row * GRID + GRID / 2;
+      if (!clear(x - 6, y - 8, 12, 16)) return false;
+      const el = document.createElement('span');
+      el.className = cls;
+      el.textContent = ch;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      layer.append(el);
+      return el;
+    };
+    const rows = Math.floor((height - GRID * 3) / GRID);
+    for (let row = 3; row < rows; row += 2) {
+      // a word every ~10 rows, written along the row
+      if (row % 10 === 5) {
+        const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+        const start = edge + Math.floor(Math.random() * Math.max(1, cols - edge * 2 - word.length));
+        const fits = [...word].every((ch, i) => ch === ' ' || clear((start + i) * GRID, row * GRID, GRID, GRID));
+        if (fits) { [...word].forEach((ch, i) => { if (ch !== ' ') cell(start + i, row, ch, 'bg-l bg-w'); }); continue; }
+      }
+      // otherwise one or two lone letters on random dots
+      for (let k = Math.random() < 0.5 ? 1 : 2; k > 0; k--) {
+        const col = edge + Math.floor(Math.random() * Math.max(1, cols - edge * 2));
+        cell(col, row, GLYPHS[Math.floor(Math.random() * GLYPHS.length)], 'bg-l');
+      }
+    }
     layer.style.height = height + 'px';
   };
   // lay out once the page has settled, and again when its size changes
@@ -2787,6 +2823,11 @@ function readPostsSeen() {
 
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const next = { d: () => (20 + Math.random() * 10).toFixed(1), t: () => Math.random().toFixed(2), p: () => (0.03 + Math.random() * 0.04).toFixed(3) };
+  setInterval(() => {
+    const lone = layer.querySelectorAll('.bg-l:not(.bg-w)');
+    const one = lone[Math.floor(Math.random() * lone.length)];
+    if (one) one.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+  }, 1300);
   setInterval(() => {
     const ticks = layer.querySelectorAll('[data-tick]');
     const el = ticks[Math.floor(Math.random() * ticks.length)];
