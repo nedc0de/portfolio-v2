@@ -5251,22 +5251,37 @@ a.tk-item:hover,
 .hm-dots {
   display: flex;
   justify-content: center;
-  gap: .4rem;
-  margin-top: .7rem;
+  margin-top: .2rem;
+  touch-action: pan-y; /* side swipes on the dots move the cards */
 }
 
-.hm-dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
+/* Each dot is a big invisible tap target around a small visible dot */
+.hm-dots button {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  padding: 0 7px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hm-dots button::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background: #3a3a3a;
   transition: width .25s, background .25s;
 }
 
-.hm-dots span.is-on {
-  width: 16px;
+.hm-dots button.is-on::before {
+  width: 20px;
   background: var(--fifteenth-color);
 }
+
+.hm-dots button:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: -6px; border-radius: 8px; }
 
 @media screen and (min-width: 768px) {
   .hm-cards { grid-auto-columns: calc((100% - 1.6rem) / 3); overflow: visible; }

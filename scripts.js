@@ -1270,17 +1270,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     latestBox.hidden = false;
 
-    // Phones: one dot per card, the current one lit, so it's clear they swipe
+    // Phones: one dot per card, the current one lit, so it's clear they swipe.
+    // Tap a dot to jump to that card, or swipe across the dots to move one card.
     const dots = latestBox.querySelector('.hm-dots');
     if (!dots) return;
     const all = [...list.children];
-    all.forEach(() => dots.append(document.createElement('span')));
+    let current = 0;
+    const go = (i) => {
+      i = Math.max(0, Math.min(all.length - 1, i));
+      list.scrollTo({ left: all[i].offsetLeft - all[0].offsetLeft, behavior: 'smooth' });
+    };
+    all.forEach((card, k) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Show post ${k + 1} of ${all.length}`);
+      dot.addEventListener('click', () => go(k));
+      dots.append(dot);
+    });
     const light = () => {
       const step = all[1] ? all[1].offsetLeft - all[0].offsetLeft : 1;
       const atEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
-      const i = atEnd ? all.length - 1 : Math.round(list.scrollLeft / step);
-      [...dots.children].forEach((d, k) => d.classList.toggle('is-on', k === i));
+      current = atEnd ? all.length - 1 : Math.round(list.scrollLeft / step);
+      [...dots.children].forEach((d, k) => {
+        d.classList.toggle('is-on', k === current);
+        if (k === current) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      });
     };
+    let startX = null;
+    dots.addEventListener('pointerdown', (e) => { startX = e.clientX; });
+    dots.addEventListener('pointerup', (e) => {
+      if (startX === null) return;
+      const dx = e.clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 25) go(current + (dx < 0 ? 1 : -1));
+    });
+    dots.addEventListener('pointercancel', () => { startX = null; });
     list.addEventListener('scroll', light, { passive: true });
     light();
   };
