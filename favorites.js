@@ -1132,20 +1132,12 @@
 
   /*---------- home page: latest pick ----------*/
   // The newest movie on the list (they're added at the top): its real poster
-  // (same cover lookup and cache as this page), title, rating and stars, so
-  // the home page stays up to date by itself.
+  // (same cover lookup and cache as this page) on the front of the card and
+  // its details and rating on the back, so the home page stays up to date by
+  // itself.
   if (!grid) {
     const pick = FAVORITES.find((f) => f.type === 'movie');
     if (!pick) return;
-    homeCard.querySelector('.xb-title').textContent = pick.title;
-    if (pick.year) {
-      const yr = document.createElement('span');
-      yr.className = 'xb-year';
-      yr.textContent = ` (${pick.year})`;
-      homeCard.querySelector('.xb-title').append(yr);
-    }
-    homeCard.querySelector('.xb-rate b').textContent = pick.rating;
-    homeCard.querySelector('.xb-stars').outerHTML = starsHTML(pick.rating).replace('fav-stars', 'fav-stars xb-stars');
     // the card's back: details and score
     const back = homeCard.querySelector('.tk3-back');
     if (back) {
