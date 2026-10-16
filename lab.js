@@ -1144,16 +1144,19 @@
   const render = (powerUp) => {
     const text = input.value.trim() || 'Type something';
     sign.textContent = '';
-    const letters = [...text];
-    const visible = letters.map((c, i) => (c === ' ' ? -1 : i)).filter((i) => i >= 0);
-    // pick up to two letters to flicker
+    // Script letters join up, so it's split into whole words (a box per letter
+    // would break the joins); the other styles go letter by letter
+    const script = root.dataset.font === 'script';
+    const letters = script ? text.split(/( +)/).filter(Boolean) : [...text];
+    const visible = letters.map((c, i) => (c.trim() ? i : -1)).filter((i) => i >= 0);
+    // pick up to two letters to flicker (none in Script: a whole word would blink)
     const flicker = new Set();
-    while (flicker.size < Math.min(2, visible.length)) flicker.add(visible[(Math.random() * visible.length) | 0]);
+    while (!script && flicker.size < Math.min(2, visible.length)) flicker.add(visible[(Math.random() * visible.length) | 0]);
     let n = 0;
     letters.forEach((c, i) => {
       const span = document.createElement('span');
       span.textContent = c;
-      if (c !== ' ') {
+      if (c.trim()) {
         if (powerUp) span.style.setProperty('--d', (n++ * 0.22).toFixed(2) + 's');
         if (flicker.has(i)) span.dataset.flicker = FLICKERS[(Math.random() * FLICKERS.length) | 0];
       }
@@ -1182,8 +1185,7 @@
     btn.addEventListener('click', () => {
       root.dataset.font = btn.dataset.font;
       root.querySelectorAll('.neon-fonts button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      fit();
-      updateCode();
+      render(false);
       // fonts download the first time they're used: measure again once they arrive
       if (document.fonts) document.fonts.load(`${FONTS[btn.dataset.font].weight} 64px "${FONTS[btn.dataset.font].name}"`).then(() => { fit(); updateCode(); });
     });
