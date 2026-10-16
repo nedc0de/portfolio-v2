@@ -1077,6 +1077,17 @@
     return safe ? `https://image.tmdb.org/t/p/w342${poster}` : '';
   }
 
+  // Sharp covers on every screen: the cached link is the medium size, and
+  // this lists the other sizes the services offer so each device downloads
+  // the one it needs (bigger on high-density screens like iPhones).
+  function coverSrcset(url) {
+    const tmdb = url.match(/^(https:\/\/image\.tmdb\.org\/t\/p\/)w\d+(\/.+)$/);
+    if (tmdb) return [185, 342, 500, 780].map((w) => `${tmdb[1]}w${w}${tmdb[2]} ${w}w`).join(', ');
+    const ol = url.match(/^(https:\/\/covers\.openlibrary\.org\/b\/id\/\d+)-M\.jpg$/);
+    if (ol) return `${ol[1]}-M.jpg 180w, ${ol[1]}-L.jpg 500w`;
+    return '';
+  }
+
   async function coverFor(f) {
     if (f.cover) return f.cover;
     const id = cacheId(f);
@@ -1103,6 +1114,11 @@
       delete cache[cacheId(item.fav)]; // try again next visit
       saveCache();
     };
+    const set = coverSrcset(url);
+    if (set) {
+      img.sizes = '(min-width: 768px) 220px, 34vw';
+      img.srcset = set;
+    }
     img.src = url;
   }
 
@@ -1159,12 +1175,15 @@
     coverFor(pick)
       .then((url) => {
         if (!url) return;
-        // the card is big on screen, so ask TMDB for a sharper poster than the grid uses
-        url = url.replace('/t/p/w342/', '/t/p/w780/');
         img.onload = () => {
           homeCard.style.setProperty('--poster', `url("${url}")`);
           homeCard.classList.add('has-poster');
         };
+        const set = coverSrcset(url);
+        if (set) {
+          img.sizes = '250px'; // the card's width, so iPhones get the 780px poster
+          img.srcset = set;
+        }
         img.src = url;
       })
       .catch(() => {});
