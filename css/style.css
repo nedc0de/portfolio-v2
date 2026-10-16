@@ -8644,19 +8644,16 @@ html.is-frozen .egg-crash * {
   color: #f2f2f2;
 }
 
-/* back: a yellow playing-card back with the movie's details on a dark panel */
+/* back: a dark playing-card back with the movie's details on a panel */
 .tk3-back {
   display: grid;
   place-items: center;
-  border-color: #151515;
   background:
-    repeating-linear-gradient(45deg, rgba(21, 21, 21, .12) 0 2px, transparent 2px 9px),
-    repeating-linear-gradient(-45deg, rgba(21, 21, 21, .12) 0 2px, transparent 2px 9px),
-    radial-gradient(circle, #151515 1.6px, transparent 2px) 0 0 / 14px 14px,
-    var(--fifteenth-color);
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .03) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .03) 0 2px, transparent 2px 9px),
+    radial-gradient(circle, rgba(255, 255, 255, .07) 1.4px, transparent 1.8px) 0 0 / 14px 14px,
+    #1a1a1a;
 }
-
-.tk3-back::before { border-color: #151515; }
 
 .tk3-corner {
   position: absolute;
@@ -8665,7 +8662,7 @@ html.is-frozen .egg-crash * {
   z-index: 1;
   padding: .2rem .4rem;
   border-radius: 5px;
-  background: #151515;
+  background: #242424;
   font: 700 .5rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .14em;
   color: var(--fifteenth-color);
@@ -8683,8 +8680,9 @@ html.is-frozen .egg-crash * {
   width: calc(100% - 44px);
   padding: 1rem 1rem .95rem;
   border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .08);
   background: #151515;
-  box-shadow: 0 0 0 4px var(--fifteenth-color), 0 0 0 6px #151515;
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
   text-align: left;
 }
 
