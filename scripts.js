@@ -1858,44 +1858,60 @@ function readPostsSeen() {
 // The dot grid lights up yellow in a soft circle around the cursor, or
 // around a finger while it's on the screen, and fades back when the cursor
 // leaves or the finger lifts.
+// It's a small fixed circle that only ever moves (transform), so following the
+// finger costs the phone almost nothing: the yellow dots inside slide the
+// other way to stay lined up with the page's grid. Touches that start on
+// something you swipe sideways (post cards, their dots, the ticker) leave it
+// off, so the swipe gets the phone's full attention.
 (() => {
   const spot = document.createElement('div');
   spot.className = 'grid-spot';
   spot.setAttribute('aria-hidden', 'true');
+  const dots = document.createElement('div');
+  dots.className = 'grid-spot-dots';
+  spot.append(dots);
   document.body.prepend(spot);
-  // as tall as the page: the page's own height (the spotlight is absolutely
-  // positioned, so it doesn't count), measured without forcing extra layouts
-  const fit = () => { spot.style.height = Math.max(document.documentElement.offsetHeight, innerHeight) + 'px'; };
-  fit();
-  addEventListener('load', fit);
-  if ('ResizeObserver' in window) new ResizeObserver(fit).observe(document.body);
 
-  let x = 0, y = 0, queued = false, hide = 0;
-  const move = (px, py) => {
-    x = px; y = py;
+  const TILE = 144; // the grid's repeat, see the html background in style.css
+  const SWIPES = '.hm-cards, .hm-dots, .tk-window';
+  let cx = 0, cy = 0, queued = false, hide = 0;
+  const place = () => {
+    queued = false;
+    const r = spot.offsetWidth / 2;
+    const left = cx - r, top = cy - r;
+    // where the circle's corner sits on the page, to line the dots up with the grid
+    const px = ((left + scrollX) % TILE + TILE) % TILE;
+    const py = ((top + scrollY) % TILE + TILE) % TILE;
+    spot.style.transform = `translate(${left}px, ${top}px)`;
+    dots.style.transform = `translate(${-px}px, ${-py}px)`;
+  };
+  const move = (clientX, clientY) => {
+    cx = clientX; cy = clientY;
     spot.classList.add('is-on');
     clearTimeout(hide);
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(() => {
-      queued = false;
-      spot.style.setProperty('--x', x + 'px');
-      spot.style.setProperty('--y', y + 'px');
-    });
+    if (!queued) { queued = true; requestAnimationFrame(place); }
   };
   const off = (delay) => { clearTimeout(hide); hide = setTimeout(() => spot.classList.remove('is-on'), delay); };
-  // keep it under the cursor while the page scrolls under a still mouse
-  let mouse = null;
+
+  // mouse: follow the cursor, and keep the dots lined up while the page scrolls under it
+  let mouse = false;
   addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return;
-    mouse = [e.clientX, e.clientY];
-    move(e.pageX, e.pageY);
+    mouse = true;
+    move(e.clientX, e.clientY);
   }, { passive: true });
-  addEventListener('scroll', () => { if (mouse && spot.classList.contains('is-on')) move(mouse[0] + scrollX, mouse[1] + scrollY); }, { passive: true });
-  document.documentElement.addEventListener('pointerleave', () => { mouse = null; off(0); });
-  addEventListener('touchstart', (e) => move(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
-  addEventListener('touchmove', (e) => move(e.touches[0].pageX, e.touches[0].pageY), { passive: true });
-  addEventListener('touchend', () => off(700), { passive: true });
+  addEventListener('scroll', () => { if (spot.classList.contains('is-on') && !queued) { queued = true; requestAnimationFrame(place); } }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { mouse = false; off(0); });
+
+  // finger: follow it while it's down, except on the swipeable rows
+  let tracking = false;
+  addEventListener('touchstart', (e) => {
+    tracking = !e.target.closest?.(SWIPES);
+    if (tracking) move(e.touches[0].clientX, e.touches[0].clientY);
+    else off(0);
+  }, { passive: true });
+  addEventListener('touchmove', (e) => { if (tracking) move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  addEventListener('touchend', () => { if (tracking) off(700); tracking = false; }, { passive: true });
 })();
 
 /*===== HOME: newsletter sign-up =====*/
