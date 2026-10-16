@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Commit log style (sample)</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap">
+  <!--
+    A saved design, not used on the site yet: a list shown as a developer's
+    git history. Each item is a commit with a short hash, a type label
+    (fix: / learn: / feat:), a title and a line of text; the newest one is
+    filled in and tagged HEAD. Ned liked it for "How I work" (About page went
+    with the marker style instead), so it's kept here to reuse somewhere else.
+    To use it: copy the .gl CSS and markup into the page, keep the colours
+    from style.css (#ffdc16 yellow, #151515 page).
+  -->
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem 1rem;
+      background: #151515;
+      color: #ccc;
+      font-family: Poppins, sans-serif;
+    }
+
+    .gl {
+      position: relative;
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 0 0 0 2.2rem;
+      list-style: none;
+    }
+
+    /* the branch line */
+    .gl::before {
+      content: "";
+      position: absolute;
+      left: 11px;
+      top: 10px;
+      bottom: 22px;
+      width: 2px;
+      background: linear-gradient(#ffdc16, rgba(255, 220, 22, .3));
+    }
+
+    .gl li {
+      position: relative;
+      padding-bottom: 1.6rem;
+    }
+
+    /* each commit's dot on the line; the newest is filled */
+    .gl li::before {
+      content: "";
+      position: absolute;
+      left: calc(-2.2rem + 5px);
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #ffdc16;
+      border-radius: 50%;
+      background: #151515;
+      box-shadow: 0 0 0 4px #151515;
+    }
+
+    .gl li.is-head::before { background: #ffdc16; }
+
+    .gl-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .5rem;
+      font: 600 .66rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      color: #777;
+    }
+
+    .gl-hash {
+      padding: .1rem .4rem;
+      border: 1px solid #2c2c2c;
+      border-radius: 4px;
+      background: #1f1f1f;
+      color: #aaa;
+    }
+
+    .gl-type { color: #ffdc16; }
+
+    .gl-head {
+      padding: .05rem .4rem;
+      border-radius: 4px;
+      background: #ffdc16;
+      color: #151515;
+      font-weight: 800;
+    }
+
+    .gl h3 {
+      margin: .35rem 0 .3rem;
+      font-size: 1.08rem;
+      color: #eee;
+    }
+
+    .gl p {
+      margin: 0;
+      font-size: .82rem;
+      line-height: 1.5;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <ol class="gl">
+    <li>
+      <span class="gl-meta"><span class="gl-hash">a3f9c1e</span><span class="gl-type">fix:</span> after every failure</span>
+      <h3>Fail, then fix it.</h3>
+      <p>Resilience comes from my failures. Each one pushes me to re-evaluate and improve.</p>
+    </li>
+    <li>
+      <span class="gl-meta"><span class="gl-hash">7be20d4</span><span class="gl-type">learn:</span> from everyone, always</span>
+      <h3>Learn from everyone.</h3>
+      <p>I'm always learning, and I value what other people's experience can teach me.</p>
+    </li>
+    <li class="is-head">
+      <span class="gl-meta"><span class="gl-hash">e51c08b</span><span class="gl-type">feat:</span> together <span class="gl-head">HEAD</span></span>
+      <h3>Build it together.</h3>
+      <p>I like sharing insights with like-minded people, from tech trends to brainstorming creative solutions.</p>
+    </li>
+  </ol>
+</body>
+</html>

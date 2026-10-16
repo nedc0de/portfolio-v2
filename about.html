@@ -39,16 +39,6 @@
       color: var(--eleventh-color);
       transition: background-size .7s cubic-bezier(.22,.61,.36,1), color .3s ease .35s;
     }
-    /* Staggered reveal for How I work rows */
-    html.js .ab-row {
-      opacity: 0;
-      transform: translateY(18px);
-    }
-    html.js .ab-row.in {
-      opacity: 1;
-      transform: none;
-      transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1);
-    }
   </style>
 </head>
 
@@ -124,21 +114,26 @@
       <p class="ab-lead">I solve problems with <mark>design</mark> and <mark>code</mark>, from AI writing tools to web experiments, shipped and in the wild.</p>
     </section>
 
-    <!--===== HOW I WORK (same numbered rows as the projects page) =====-->
+    <!--===== HOW I WORK: marker edits =====-->
+    <!-- As each line scrolls in, "Fail" gets crossed out in red and the key
+         words get a yellow highlighter swipe (scripts.js adds .is-on) -->
     <section class="ab-block">
       <h2 class="ab-label">How I work</h2>
-      <ol class="ab-list">
-        <li class="ab-row">
-          <span class="ab-num">01</span>
-          <div><h3>Fail, then fix it.</h3><p>Resilience comes from my failures. Each one pushes me to re-evaluate and improve.</p></div>
+      <ol class="mk-list">
+        <li class="mk-row">
+          <span class="mk-num">01</span>
+          <h3><s class="mk-x">Fail</s>, then <mark class="mk-hl">fix it.</mark></h3>
+          <p>Resilience comes from my failures. Each one pushes me to re-evaluate and improve.</p>
         </li>
-        <li class="ab-row">
-          <span class="ab-num">02</span>
-          <div><h3>Learn from everyone.</h3><p>I'm always learning, and I value what other people's experience can teach me.</p></div>
+        <li class="mk-row">
+          <span class="mk-num">02</span>
+          <h3>Learn from <mark class="mk-hl">everyone.</mark></h3>
+          <p>I'm always learning, and I value what other people's experience can teach me.</p>
         </li>
-        <li class="ab-row">
-          <span class="ab-num">03</span>
-          <div><h3>Build it together.</h3><p>I like sharing insights with like-minded people, from tech trends to brainstorming creative solutions.</p></div>
+        <li class="mk-row">
+          <span class="mk-num">03</span>
+          <h3>Build it <mark class="mk-hl">together.</mark></h3>
+          <p>I like sharing insights with like-minded people, from tech trends to brainstorming creative solutions.</p>
         </li>
       </ol>
     </section>

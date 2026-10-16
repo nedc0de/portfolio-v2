@@ -2611,29 +2611,21 @@ function readPostsSeen() {
   marks.forEach((m) => io.observe(m));
 })();
 
-/* About page: staggered reveal for How I work rows (container-triggered sequence) */
+/* About page: How I work, marker edits. Each line comes in as it's scrolled
+   to: "Fail" gets crossed out in red, then the key words get a yellow
+   highlighter swipe. Without JS or with reduced motion they're simply marked. */
 (() => {
-  const lists = document.querySelectorAll('.ab-list');
-  if (!lists.length) return;
-  document.documentElement.classList.add('js');
-  const reveal = (list) => {
-    list.querySelectorAll('.ab-row').forEach((r, i) => {
-      r.style.transitionDelay = (i * 220) + 'ms';
-      r.classList.add('in');
-    });
-  };
-  if (!('IntersectionObserver' in window)) {
-    lists.forEach(reveal);
-    return;
-  }
+  const rows = document.querySelectorAll('.mk-row');
+  if (!rows.length || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelector('.mk-list').classList.add('will-mark');
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      reveal(entry.target);
-      io.unobserve(entry.target);
+    entries.forEach((e) => {
+      if (!e.isIntersecting || e.intersectionRatio < .5) return;
+      io.unobserve(e.target);
+      e.target.classList.add('is-on');
     });
-  }, { threshold: 0.2 });
-  lists.forEach((l) => io.observe(l));
+  }, { threshold: .5 });
+  rows.forEach((r) => io.observe(r));
 })();
 
 /*===== BACKGROUND: faded maths notes =====*/
