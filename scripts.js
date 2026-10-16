@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dots) return;
     const all = [...list.children];
     let current = 0;
-    let sliding = 0; // animation frame of a dot-started slide, if one is running
+    let sliding = 0; // timer while a dot-started slide runs, so the lit dot doesn't flick back
     const mark = (i) => {
       current = i;
       [...dots.children].forEach((d, k) => {
@@ -1284,27 +1284,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
       });
     };
-    // Light the dot straight away, then slide quickly to the card. Our own short
-    // slide: the browser's smooth scroll is slow on iPhone, and snapping is
-    // switched off while it runs so the two don't fight.
+    // Light the dot straight away, then let Safari/Chrome do the slide: the
+    // browser's own scrolling runs at the screen's full frame rate (120fps on
+    // iPhone), which a JavaScript animation can't match.
+    const done = () => { clearTimeout(sliding); sliding = 0; light(); };
     const go = (i) => {
       i = Math.max(0, Math.min(all.length - 1, i));
       mark(i);
-      cancelAnimationFrame(sliding);
-      const from = list.scrollLeft;
-      const to = Math.min(all[i].offsetLeft - all[0].offsetLeft, list.scrollWidth - list.clientWidth);
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(to - from) < 2) { list.scrollLeft = to; return; }
-      const start = performance.now();
-      const TIME = 280;
-      list.style.scrollSnapType = 'none';
-      const step = (now) => {
-        const t = Math.min(1, (now - start) / TIME);
-        list.scrollLeft = from + (to - from) * (1 - Math.pow(1 - t, 3));
-        if (t < 1) sliding = requestAnimationFrame(step);
-        else { sliding = 0; list.style.scrollSnapType = ''; }
-      };
-      sliding = requestAnimationFrame(step);
+      clearTimeout(sliding);
+      sliding = setTimeout(done, 800); // in case the browser has no scrollend event
+      list.scrollTo({ left: all[i].offsetLeft - all[0].offsetLeft, behavior: 'smooth' });
     };
+    list.addEventListener('scrollend', () => { if (sliding) done(); });
     all.forEach((card, k) => {
       const dot = document.createElement('button');
       dot.type = 'button';
