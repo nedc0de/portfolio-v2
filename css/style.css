@@ -3741,9 +3741,13 @@ details>summary {
 .ct-lead {
   font-size: 1.1rem;
   line-height: 1.6;
-  max-width: 34ch;
-  margin: 0 auto;
+  max-width: 30rem; /* two even lines on wider screens instead of three cramped ones */
+  margin: 1rem auto 0;
+  text-wrap: balance;
+  color: #a8a8a8;
 }
+
+.ct-lead em { white-space: nowrap; }
 
 /* Labels, shared by the form and the DM card */
 .ct-label {
