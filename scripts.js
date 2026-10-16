@@ -3043,11 +3043,11 @@ function readPostsSeen() {
     led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
-  // Favorites: a 3D ticket you can spin all the way round. Drag sideways (or
+  // Favorites: a 3D card you can spin all the way round. Drag sideways (or
   // use the arrow keys) to turn it; let go and it keeps spinning a little,
   // then settles on whichever side faces you, swaying gently. It spins in
   // once the first time it's scrolled to. A light sheen slides across it as
-  // it turns, like a holographic ticket.
+  // it turns, like a holographic card.
   const movie = box.querySelector('.xb-mv');
   const tk = movie && movie.querySelector('.tk3');
   if (tk) {
