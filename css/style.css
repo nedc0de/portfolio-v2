@@ -3518,6 +3518,12 @@ details>summary {
   line-height: 1.6;
   max-width: 32ch;
   margin: 0 auto;
+  text-wrap: balance;
+}
+
+/* desktop: two even lines, like the other pages' intros */
+@media screen and (min-width: 768px) {
+  .ab-lead { max-width: 40rem; }
 }
 
 .ab-lead mark {
