@@ -2679,6 +2679,25 @@ function readPostsSeen() {
   marks.forEach((m) => io.observe(m));
 })();
 
+/* About page: the six words drop in, one after another, landing with a
+   little bounce and then getting their yellow marker. Without JS or with
+   reduced motion they're simply there. */
+(() => {
+  const list = document.querySelector('.sw-list');
+  if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const words = [...list.children];
+  list.classList.add('will-drop');
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    io.disconnect();
+    words.forEach((w, i) => {
+      w.style.setProperty('--tilt', `${(i % 2 ? 1 : -1) * (4 + (i * 3) % 5)}deg`);
+      setTimeout(() => w.classList.add('is-in'), i * 260);
+    });
+  }, { threshold: .3 });
+  io.observe(list);
+})();
+
 /* About page: How I work, marker edits. Each line comes in as it's scrolled
    to: "Fail" gets crossed out in red, then the key words get a yellow
    highlighter swipe. Without JS or with reduced motion they're simply marked. */

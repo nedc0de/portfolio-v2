@@ -7305,6 +7305,7 @@ html.is-frozen .egg-crash * {
 
 .hw-list::before,
 .hc-list::before,
+.sw-list::before,
 .mk-list::before,
 .xb::before,
 .hl-list::before,
@@ -8284,4 +8285,67 @@ html.is-frozen .egg-crash * {
 .fav-pick {
   border-width: 1px;
   background: #121212;
+}
+
+/*===== ABOUT: in six words =====*/
+/* Six big words, numbered; they drop in from above one by one, land with a
+   squash and a bounce, then get the yellow marker */
+.sw-list {
+  position: relative; /* anchors the soft backdrop (::before) */
+  margin: .3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sw-list li {
+  display: flex;
+  align-items: baseline;
+  gap: .9rem;
+  padding: .3rem 0;
+}
+
+.sw-n {
+  flex: none;
+  width: 1.6rem;
+  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .1em;
+  color: var(--fifteenth-color);
+  transform: translateY(-1.1em);
+}
+
+.sw-w {
+  display: inline-block;
+  font-size: clamp(2.1rem, 9.5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--fifteenth-color);
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .12em no-repeat;
+  transform-origin: 50% 100%;
+}
+
+/* animated version */
+.sw-list.will-drop .sw-n { opacity: 0; transition: opacity .3s .35s; }
+.sw-list.will-drop .sw-w {
+  opacity: 0;
+  color: #eee;
+  background-size: 0% .12em;
+  transform: translateY(-140%) rotate(var(--tilt, -5deg));
+}
+.sw-list.will-drop li.is-in .sw-n { opacity: 1; }
+.sw-list.will-drop li.is-in .sw-w {
+  animation: sw-drop .75s cubic-bezier(.3, 0, .3, 1) forwards;
+  color: var(--fifteenth-color);
+  background-size: 100% .12em;
+  transition: color .4s .55s, background-size .5s cubic-bezier(.65, 0, .35, 1) .6s;
+}
+
+@keyframes sw-drop {
+  0% { opacity: 0; transform: translateY(-140%) rotate(var(--tilt, -5deg)); }
+  15% { opacity: 1; }
+  55% { transform: translateY(0) rotate(0) scale(1.06, .9); } /* hits the ground: squash */
+  72% { transform: translateY(-12%) scale(.98, 1.03); }      /* small bounce */
+  86% { transform: translateY(0) scale(1.01, .99); }
+  100% { opacity: 1; transform: none; }
 }
