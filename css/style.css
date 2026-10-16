@@ -8770,14 +8770,6 @@ html.is-frozen .egg-crash * {
 
 .tk3-go { margin-top: 1.2rem; padding: 0; }
 
-.tk3-hint {
-  margin-top: .35rem;
-  font: 600 .62rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #6f6f6f;
-}
-
 @media screen and (min-width: 768px) {
   .tk3 { --w: 250px; }
 }
