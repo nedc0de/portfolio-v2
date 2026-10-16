@@ -7114,15 +7114,6 @@ html.is-frozen .egg-crash * {
   animation: neon-power .8s steps(1, end) var(--d, 0s) both;
 }
 
-/* switched off: dark glass tubes */
-.neon.is-off .neon-sign {
-  color: var(--third-color);
-}
-
-.neon.is-off .neon-sign span {
-  animation: none;
-}
-
 .neon-controls {
   display: grid;
   gap: .8rem;
@@ -7148,7 +7139,7 @@ html.is-frozen .egg-crash * {
 .neon-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: .8rem;
 }
 
@@ -7170,23 +7161,6 @@ html.is-frozen .egg-crash * {
 .neon-colors button[aria-pressed="true"] {
   border-color: #fff;
   box-shadow: 0 0 0 2px var(--thirteenth-color) inset;
-}
-
-.neon-power {
-  height: 2.2rem;
-  padding: 0 .9rem;
-  border: 2px solid var(--fifteenth-color);
-  border-radius: 8px;
-  background: var(--thirteenth-color);
-  color: var(--fifteenth-color);
-  font: 700 .8rem var(--body-font);
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.neon-power[aria-pressed="false"] {
-  background: var(--fifteenth-color);
-  color: var(--eleventh-color);
 }
 
 .neon-fonts {

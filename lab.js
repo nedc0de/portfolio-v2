@@ -1074,14 +1074,12 @@
 
 /*===== EXPERIMENT 3: text sign maker =====*/
 // Type a word, pick a color and a style (each with its own letters), and copy the code.
-// A couple of letters flicker like the NEDCODE logo; the switch powers it
-// off and back on letter by letter.
+// A couple of letters flicker like the NEDCODE logo.
 (() => {
   const root = document.getElementById('neonMaker');
   if (!root) return;
   const sign = root.querySelector('.neon-sign');
   const input = root.querySelector('.neon-input');
-  const power = root.querySelector('.neon-power');
   const FLICKERS = ['neon-n', 'neon-e', 'neon-o'];
   const codeOut = root.querySelector('.neon-code-out code');
   const copyBtn = root.querySelector('.neon-copy');
@@ -1091,7 +1089,6 @@
     script: { family: 'Pacifico', css: "'Pacifico', cursive", weight: 400, name: 'Pacifico' },
     bold: { family: 'Poppins:wght@800', css: "'Poppins', sans-serif", weight: 800, name: 'Poppins' },
   };
-  let on = true;
   let format = 'html';
   let color = '#ffdc16';
 
@@ -1215,14 +1212,6 @@
       copyBtn.textContent = 'Copy';
       copyBtn.classList.remove('is-copied');
     }, 1500);
-  });
-
-  power.addEventListener('click', () => {
-    on = !on;
-    root.classList.toggle('is-off', !on);
-    power.textContent = on ? 'Turn off' : 'Turn on';
-    power.setAttribute('aria-pressed', String(on));
-    if (on) render(true);
   });
 
   addEventListener('resize', fit);
