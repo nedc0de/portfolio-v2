@@ -8057,3 +8057,11 @@ html.is-frozen .egg-crash * {
 }
 
 .ct-dm-ic svg { width: 22px; height: 22px; }
+
+.ct-dm-text { min-width: 0; }
+
+/* very small phones: the Open button drops under the handle so the card fits */
+@media screen and (max-width: 360px) {
+  .ct-dm { grid-template-columns: 44px 1fr; }
+  .ct-dm .ct-open { grid-column: 1 / -1; justify-self: start; }
+}
