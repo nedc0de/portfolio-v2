@@ -7845,3 +7845,72 @@ html.is-frozen .egg-crash * {
 .mk-list.will-mark .is-on .mk-x { color: #6f6f6f; }
 .mk-list.will-mark .is-on .mk-x::after { transform: none; }
 .mk-list.will-mark .is-on .mk-hl { color: var(--fifteenth-color); background-size: 100% .16em; }
+
+/*===== ABOUT: Off the clock =====*/
+/* One sentence with the key words marked like How I work, then a compact
+   card for each with its own title */
+.oc-say {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.4rem, 6vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.01em;
+  color: var(--fourth-color);
+}
+
+.oc-say em {
+  font-style: normal;
+  color: var(--fifteenth-color);
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+}
+
+.oc-list {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oc-list li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: .85rem;
+  align-items: center;
+  padding: .8rem .9rem;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 12px;
+  background: var(--sixteenth-color);
+  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, .7);
+}
+
+.oc-list i {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #111;
+  color: var(--fifteenth-color);
+}
+
+.oc-list i svg { width: 21px; height: 21px; }
+
+.oc-list b {
+  display: block;
+  font-size: .95rem;
+  color: #eee;
+}
+
+.oc-list b + span {
+  display: block;
+  margin-top: .05rem;
+  font-size: .82rem;
+  color: #999;
+}
+
+@media screen and (min-width: 768px) {
+  .oc-list { grid-template-columns: repeat(3, 1fr); }
+  .oc-list li { grid-template-columns: 1fr; align-items: start; align-content: start; }
+}
