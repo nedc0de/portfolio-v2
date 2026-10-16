@@ -288,6 +288,9 @@ const countCharacters = () => {
   let numOfEnteredChars = textArea.value.length;
   let counter = maxNumOfChars - numOfEnteredChars;
 
+  // the thin bar under the message fills up as you type
+  textArea.parentElement.style.setProperty('--used', `${Math.min(100, (numOfEnteredChars / maxNumOfChars) * 100)}%`);
+
   if (characterCounter) {
     characterCounter.textContent = counter + '/250';
     if (counter < 0) {
@@ -299,6 +302,18 @@ const countCharacters = () => {
     }
   }
 };
+
+// The message hint follows the topic picked above it
+const TOPIC_HINTS = {
+  Project: 'What are you building? Links, timeline, anything that helps.',
+  Collab: 'What do you have in mind? Tell me about you and the idea.',
+  'Say hi': 'Hey Ned! ...',
+};
+document.querySelectorAll('.ct-topics input[name="topic"]').forEach((radio) => {
+  radio.addEventListener('change', () => {
+    if (textArea && radio.checked && TOPIC_HINTS[radio.value]) textArea.placeholder = TOPIC_HINTS[radio.value];
+  });
+});
 
 if (textArea) {
   textArea.addEventListener('input', countCharacters);
