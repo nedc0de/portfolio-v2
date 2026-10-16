@@ -8069,3 +8069,63 @@ html.is-frozen .egg-crash * {
   .ct-dm { grid-template-columns: 44px 1fr; }
   .ct-dm .ct-open { grid-column: 1 / -1; justify-self: start; }
 }
+
+/*===== FAVORITES: intro =====*/
+/* Same as the contact page: one balanced paragraph with a marked word, and
+   "updated regularly" as a small live tag instead of a highlighted line */
+.fav-intro {
+  margin: -40px auto 2.2rem;
+  text-align: center;
+}
+
+.fav-lead {
+  max-width: 30rem;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #a8a8a8;
+  text-wrap: balance;
+}
+
+.fav-lead em {
+  font-style: normal;
+  white-space: nowrap;
+  color: var(--fifteenth-color);
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+}
+
+.fav-fresh {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin: 1rem 0 0;
+  padding: .3rem .75rem;
+  border: 1px solid rgba(255, 220, 22, .25);
+  border-radius: 999px;
+  background: rgba(255, 220, 22, .06);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fifteenth-color);
+}
+
+.fav-fresh-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fifteenth-color);
+  box-shadow: 0 0 0 0 rgba(255, 220, 22, .6);
+  animation: fav-fresh 2s ease-out infinite;
+}
+
+@keyframes fav-fresh {
+  to { box-shadow: 0 0 0 7px rgba(255, 220, 22, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fav-fresh-dot { animation: none; }
+}
+
+@media screen and (min-width: 768px) {
+  .fav-lead { max-width: 38rem; }
+}
