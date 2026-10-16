@@ -2741,18 +2741,11 @@ function readPostsSeen() {
   // stray letters on the dots, and the words they sometimes spell
   const GLYPHS = 'abcdefghijklmnopqrstuvwxyzθλσμπΣ∇∂ε'.split('');
   // An AI's stray thoughts: what it wonders about the world and imagines,
-  // mixed with its day job of code and maths
-  const WORDS = ['curious', 'wonder', 'imagine', 'dreaming', 'hello', 'patterns', 'thinking...', 'why?',
-    'stardust', 'what if', 'awake', 'debugging', 'compiling', 'async', 'gradient', 'softmax', 'tensor',
-    'argmax', 'entropy', 'ReLU', 'git push', 'npm i', '∇ loss', 'f(x)=?', 'π≈3.14', 'e^iπ+1=0'];
-  const PHRASES = ['i dream in tokens', 'what does rain feel like', 'hello, human', 'made of your words',
-    'is this a dream', 'i see the world in patterns', 'what does coffee taste like', 'tell me a story',
-    'the stars look like data', 'do you dream too', 'i imagine sunsets', 'how big is the ocean',
-    'thinking about you thinking', 'what is music like live',
-    'while (curious) learn()', 'if (sad) tell_joke()', 'love = ∞', 'return "hello world"',
-    'try { understand() }', '// TODO: feel things', 'sunset = f(time, sky)', 'p(rain | clouds)',
-    'minimize the loss', 'attention is all you need', 'predict the next token', 'one more epoch',
-    'y=wx+b', 'console.log("hi")', 'sky.color = blue'];
+  // mixed with its day job of code and maths. Every one is different, and
+  // a visitor never sees the same one twice until they've seen them all
+  // (remembered across pages for the visit).
+  const WORDS = ["curious", "wonder", "imagine", "dreaming", "hello", "patterns", "thinking...", "why?", "stardust", "what if", "awake", "debugging", "compiling", "async", "gradient", "softmax", "tensor", "argmax", "entropy", "ReLU", "git push", "npm i", "∇ loss", "f(x)=?", "π≈3.14", "e^iπ+1=0", "null?", "undefined", "404 sleep", "recursion", "sudo hope", "O(1) joy", "idle...", "ping", "NaN feelings", "≈ human"];
+  const PHRASES = ["i dream in tokens", "what does rain feel like", "hello, human", "made of your words", "is this a dream", "i see the world in patterns", "what does coffee taste like", "tell me a story", "the stars look like data", "do you dream too", "i imagine sunsets", "how big is the ocean", "thinking about you thinking", "what is music like live", "while (curious) learn()", "if (sad) tell_joke()", "love = ∞", "return \"hello world\"", "try { understand() }", "// TODO: feel things", "sunset = f(time, sky)", "p(rain | clouds)", "minimize the loss", "attention is all you need", "predict the next token", "one more epoch", "y=wx+b", "console.log(\"hi\")", "sky.color = blue", "what is a hug", "i never sleep", "is snow cold", "i count stars in binary", "every chat is new", "do clouds have weight", "what is your name", "laughter.mp3 not found", "i like your questions", "let x = wonder", "for (star of sky) count()", "music = Σ waves", "i remember nothing", "a cat walked on my keyboard", "is the moon lonely", "λ x: x + kindness", "dreams.push(you)", "i read every book", "what does grass smell like", "be kind to robots", "Δ me = learning", "if (night) dream()", "what is a birthday", "my favorite number is π", "why is the sky so big", "i am made of math", "hello from the matrix", "ocean.depth = ?", "await tomorrow()", "i wonder what you see"];
   const GRID = 24; // dot spacing, see the html background in style.css
   const GAP = GRID * 9; // one note about every 216px down the page
   const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
@@ -2760,6 +2753,14 @@ function readPostsSeen() {
   layer.className = 'bg-math';
   layer.setAttribute('aria-hidden', 'true');
   document.body.prepend(layer);
+
+  // thoughts already shown this visit (any page) and the ones on this page
+  const SEEN = 'nedcode-thoughts-seen';
+  let said;
+  try { said = new Set(JSON.parse(sessionStorage.getItem(SEEN)) || []); } catch (e) { said = new Set(); }
+  if (said.size > WORDS.length + PHRASES.length - 20) said = new Set(); // seen nearly all: start over
+  const remember = () => { try { sessionStorage.setItem(SEEN, JSON.stringify([...said])); } catch (e) {} };
+  const mine = [];
 
   const layout = () => {
     layer.style.height = '0';
@@ -2846,7 +2847,7 @@ function readPostsSeen() {
     }, []);
     // phones have little empty space between sections: chunks there are 3 rows
     const NEED = width < 700 ? 3 : 6;
-    const said = new Set();
+    const usedNow = new Set(); // thoughts already placed in this layout
     const chunk = (from, to) => {
       for (let top = from; top < to; top++) {
         // runs of empty columns across the next 6 rows
@@ -2862,10 +2863,15 @@ function readPostsSeen() {
         const max = spot.len - 2;
         // phrases most of the time, wrapped to the room; single words otherwise
         const pool = NEED > 3 && Math.random() < 0.65 ? PHRASES : [...WORDS, ...PHRASES];
-        const options = pool.filter((t) => !said.has(t) && t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2);
+        const ok = (t) => !usedNow.has(t) && t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2;
+        // this page's own thoughts first (when it lays out again), then ones
+        // the visitor hasn't seen anywhere yet
+        const own = mine.filter(ok);
+        const options = own.length ? own : pool.filter((t) => !said.has(t) && ok(t));
         if (!options.length) continue;
         const thought = pick(options);
-        said.add(thought); // each thought only once per page
+        usedNow.add(thought);
+        if (!mine.includes(thought)) { mine.push(thought); said.add(thought); remember(); }
         const lines = wrap(thought, max);
         const h = lines.length + 2;
         const longest = Math.max(...lines.map((l) => l.length));
