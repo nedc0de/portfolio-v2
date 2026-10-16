@@ -8540,3 +8540,19 @@ html.is-frozen .egg-crash * {
 .hm-news-card .hm-news-form button:hover i { transform: translateX(3px); }
 .hm-news-card .hm-news-form button:disabled { background: none; opacity: .6; }
 .hm-news-card .hm-news-msg { margin-top: .6rem; }
+
+/* Desktop menu: a soft clearing in the grid behind the links, like the lists,
+   so no dot or x ever sits next to a word */
+@media screen and (min-width: 768px) {
+  .nav-list { position: relative; }
+  .nav-list::before {
+    content: "";
+    position: absolute;
+    inset: -.4rem -1rem;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 999px;
+    background: var(--thirteenth-color);
+    box-shadow: 0 0 40px 24px var(--thirteenth-color);
+  }
+}

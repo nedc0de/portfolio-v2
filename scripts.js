@@ -1958,10 +1958,15 @@ function readPostsSeen() {
   const off = (delay) => { clearTimeout(hide); hide = setTimeout(() => spot.classList.remove('is-on'), delay); };
 
   // mouse: follow the cursor, and keep the dots lined up while the page scrolls under it
+  // It stays out of the way of anything you read or click: over the header
+  // and menu, links, buttons, form fields, text and images it fades out, so
+  // the yellow dots never sit behind words you're trying to read.
+  const QUIET = 'header, nav, a, button, input, textarea, select, label, summary, [role="button"], h1, h2, h3, h4, h5, p, li, figure, img, svg, canvas, table, blockquote, .xb, .hm-cards, .tk';
   let mouse = false;
   addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return;
     mouse = true;
+    if (e.target.closest?.(QUIET)) { off(0); return; }
     move(e.clientX, e.clientY);
   }, { passive: true });
   addEventListener('scroll', () => { if (spot.classList.contains('is-on') && !queued) { queued = true; requestAnimationFrame(place); } }, { passive: true });
@@ -1973,7 +1978,7 @@ function readPostsSeen() {
   // buttons like Back to top needed two taps. Swipeable rows never light it.
   let tracking = false, sx = 0, sy = 0, lit = false;
   addEventListener('touchstart', (e) => {
-    tracking = !e.target.closest?.(SWIPES);
+    tracking = !e.target.closest?.(SWIPES) && !e.target.closest?.('header, nav, a, button, input, textarea, select, label');
     lit = false;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     if (!tracking) off(0);
