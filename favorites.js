@@ -1159,6 +1159,8 @@
     coverFor(pick)
       .then((url) => {
         if (!url) return;
+        // the card is big on screen, so ask TMDB for a sharper poster than the grid uses
+        url = url.replace('/t/p/w342/', '/t/p/w780/');
         img.onload = () => {
           homeCard.style.setProperty('--poster', `url("${url}")`);
           homeCard.classList.add('has-poster');
