@@ -8410,3 +8410,91 @@ html.is-frozen .egg-crash * {
   0% { background-position: -150% 0; }
   18%, 100% { background-position: 150% 0; }
 }
+
+/*===== HOME: fewer boxes =====*/
+/* Like the About page, the lower half of the home page is mostly big type on
+   the page itself. Only things that are pictures keep a frame (post covers,
+   the movie poster card, the Lab board). */
+
+/* Explore: About and Lab sit side by side without boxes, split by a line */
+.xb-ab,
+.xb-lb {
+  padding: .4rem 0 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.xb-lb {
+  padding-left: 1.1rem;
+  border-left: 1px solid #2a2a2a;
+}
+
+.xb-ab { padding-right: .3rem; }
+.xb-ab .xb-word { font-size: 1.6rem; }
+
+/* Sign-off: a big statement on the page, no card */
+.hm-signoff .ab-cta {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.hm-signoff .ab-cta p {
+  font-size: clamp(2rem, 9vw, 3rem);
+  margin: .6rem 0 1.4rem;
+}
+
+/* Newsletter: the joke as a statement, then a single underlined line to type
+   on, with Subscribe at its end */
+.hm-news-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.hm-news-card .hm-news-text {
+  font-size: clamp(1.3rem, 5.6vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -.01em;
+}
+
+.hm-news-card .hm-news-form {
+  align-items: end;
+  gap: .9rem;
+  border-bottom: 2px solid #333;
+  transition: border-color .25s;
+}
+
+.hm-news-card .hm-news-form:focus-within { border-bottom-color: var(--fifteenth-color); }
+
+.hm-news-card .hm-news-field input,
+.hm-news-card .hm-news-field input:focus {
+  padding: .7rem 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 1.05rem;
+}
+
+.hm-news-card .hm-news-form button {
+  min-width: 0;
+  padding: .7rem 0;
+  background: none;
+  color: var(--fifteenth-color);
+  font-size: 1rem;
+}
+
+.hm-news-card .hm-news-form button i { margin-left: .2rem; transition: transform .2s; }
+.hm-news-card .hm-news-form button:hover { transform: none; }
+.hm-news-card .hm-news-form button:hover i { transform: translateX(3px); }
+.hm-news-card .hm-news-form button:disabled { background: none; opacity: .6; }
+.hm-news-card .hm-news-msg { margin-top: .6rem; }
