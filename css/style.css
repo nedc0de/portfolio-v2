@@ -8633,77 +8633,68 @@ html.is-frozen .egg-crash * {
   color: #f2f2f2;
 }
 
-/* back: a dark playing-card back with the movie's details on a panel */
+/* back: the movie's details fill the card, the score sits at the bottom */
 .tk3-back {
-  display: grid;
-  place-items: center;
   background:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, .03) 0 2px, transparent 2px 9px),
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .03) 0 2px, transparent 2px 9px),
-    radial-gradient(circle, rgba(255, 255, 255, .07) 1.4px, transparent 1.8px) 0 0 / 14px 14px,
+    radial-gradient(120% 55% at 50% 0%, rgba(255, 220, 22, .1), transparent 62%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .02) 0 2px, transparent 2px 9px),
     #1a1a1a;
 }
 
-.tk3-corner {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 1;
-  padding: .2rem .4rem;
-  border-radius: 5px;
-  background: #242424;
-  font: 700 .5rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  letter-spacing: .14em;
-  color: var(--fifteenth-color);
-}
-
-.tk3-corner-end {
-  inset: auto 16px 16px auto;
-  transform: rotate(180deg);
-}
-
 .tk3-panel {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  width: calc(100% - 44px);
-  padding: 1rem 1rem .95rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, .08);
-  background: #151515;
-  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
+  padding: 1.15rem 1.2rem 1.25rem;
   text-align: left;
 }
 
+.tk3-corner {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  padding: .22rem .45rem;
+  border-radius: 5px;
+  background: #262626;
+  font: 700 .54rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
+}
+
 .tk3-bt {
-  font-size: 1.02rem;
-  font-weight: 700;
-  line-height: 1.15;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* long titles never push the score off the card */
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
   color: #f2f2f2;
 }
 
 .tk3-by {
-  margin-top: .1rem;
-  font-size: .72rem;
+  margin-top: .2rem;
+  font-size: .82rem;
   color: #888;
 }
 
 .tk3-facts {
   display: grid;
-  gap: .5rem;
-  margin: .8rem 0 0;
+  gap: .65rem;
+  margin: 1rem 0 0;
 }
 
 .tk3-facts dt {
-  font: 700 .5rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font: 700 .54rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: #777;
 }
 
 .tk3-facts dd {
-  margin: .05rem 0 0;
-  font-size: .78rem;
+  margin: .1rem 0 0;
+  font-size: .9rem;
   color: #ddd;
 }
 
@@ -8711,9 +8702,9 @@ html.is-frozen .egg-crash * {
 .tk3-rating {
   display: flex;
   align-items: center;
-  gap: .55rem;
-  margin-top: .9rem;
-  padding-top: .8rem;
+  gap: .65rem;
+  margin-top: auto;
+  padding-top: .9rem;
   border-top: 1px solid rgba(255, 255, 255, .08);
 }
 
@@ -8725,7 +8716,7 @@ html.is-frozen .egg-crash * {
 }
 
 .tk3-num b {
-  font-size: 2.1rem;
+  font-size: 2.6rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--fifteenth-color);
@@ -8745,11 +8736,11 @@ html.is-frozen .egg-crash * {
   gap: .3rem;
 }
 
-.tk3-bstars { margin: 0; font-size: .74rem; white-space: nowrap; }
+.tk3-bstars { margin: 0; font-size: .86rem; white-space: nowrap; }
 .tk3-bstars .fav-star { margin-right: 1px; }
 
 .tk3-verdict {
-  font: 700 .52rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font: 700 .56rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: #bbb;
@@ -8757,8 +8748,8 @@ html.is-frozen .egg-crash * {
 
 .tk3-meter {
   display: block;
-  height: 5px;
-  margin-top: .7rem;
+  height: 6px;
+  margin-top: .8rem;
   overflow: hidden;
   border-radius: 3px;
   background: #2a2a2a;
