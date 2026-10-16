@@ -8255,3 +8255,37 @@ html.is-frozen .egg-crash * {
   .bl-row .bl-meta { font-size: .74rem; }
   .bl-list { gap: .6rem; }
 }
+
+/*===== FAVORITES: filters in the same style as the blog's topic chips =====*/
+/* solid dark tags in the code font (no #), the picked one outlined in yellow;
+   "Pick for me" keeps its dashed outline but uses the same font and shape */
+.fav-filter,
+.fav-pick {
+  height: 2.3rem;
+  padding: 0 .85rem;
+  border-radius: 8px;
+  font: 700 .74rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.fav-filter {
+  border: 1px solid #2c2c2c;
+  background: #121212;
+  color: #aaa;
+}
+
+.fav-filter[aria-pressed='true'] {
+  border-color: var(--fifteenth-color);
+  background: #2a2510;
+  color: var(--fifteenth-color);
+}
+
+@media (hover: hover) {
+  .fav-filter:not([aria-pressed='true']):hover { border-color: #555; color: var(--fourth-color); }
+}
+
+.fav-pick {
+  border-width: 1px;
+  background: #121212;
+}
