@@ -243,7 +243,7 @@ document.querySelectorAll('.footer-year').forEach((el) => {
       }
     }
     if (favs) setNote('favorites', `${(favs.match(/type: '(book|movie|tv)'/g) || []).length} picks`);
-    if (projects) setNote('projects', `${parse(projects).querySelectorAll('.hl-row').length} builds`);
+    if (projects) setNote('projects', `${parse(projects).querySelectorAll('.hc-row').length} builds`);
     if (lab) setNote('lab', `${parse(lab).querySelectorAll('.lab-item-title').length} experiments`);
   };
   navToggle?.addEventListener('click', () => { if (navMenu.classList.contains('show-menu')) fill(); });

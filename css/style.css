@@ -4111,11 +4111,13 @@ details>summary {
     display: none;
   }
 
-  /* Top bar: label + close */
+  /* Top bar: label + close, on the same line as the header so the X lands
+     exactly where the menu icon was */
   .menu-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 35px;
     margin-bottom: 1rem;
   }
 
@@ -4133,7 +4135,7 @@ details>summary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: -.75rem; /* line the X up with the arrows below */
+    margin-right: calc(-.75rem - 6px); /* centred where the menu icon is */
     border: 0;
     background: transparent;
     color: var(--fourth-color);
