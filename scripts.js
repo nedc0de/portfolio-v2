@@ -1269,13 +1269,8 @@ whenIdle(() => {
       const a = document.createElement('a');
       a.className = 'hm-card';
       a.href = n.link;
-      if (seen.includes(postSlug(n.link))) {
-        a.classList.add('is-read');
-        const mark = document.createElement('span');
-        mark.className = 'hm-card-read';
-        mark.textContent = '✓ Read';
-        a.append(mark);
-      }
+      const read = seen.includes(postSlug(n.link));
+      if (read) a.classList.add('is-read');
       if (n.img) {
         const img = document.createElement('img');
         img.src = n.img; img.alt = ''; img.width = 940; img.height = 788; img.loading = 'lazy';
@@ -1286,6 +1281,13 @@ whenIdle(() => {
       const m = document.createElement('span');
       m.className = 'hm-card-meta';
       m.textContent = [n.topic, n.read].filter(Boolean).join(' · ');
+      // same "Read" mark as the blog page, on the topic line so every card lines up
+      if (read) {
+        const mark = document.createElement('span');
+        mark.className = 'bl-read-mark';
+        mark.textContent = '✓ Read';
+        m.append(' · ', mark);
+      }
       a.append(h, m);
       list.append(a);
     });

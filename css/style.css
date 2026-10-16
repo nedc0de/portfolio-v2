@@ -5314,24 +5314,20 @@ a.tk-item:hover,
   color: var(--fourteenth-color);
 }
 
-/* Posts this visitor already opened: a small mark, cover a touch dimmer */
-.hm-card { position: relative; }
-
-.hm-card.is-read img,
-.hm-card.is-read h3 { opacity: .6; }
-
-.hm-card-read {
-  position: absolute;
-  z-index: 1;
-  top: 1rem;
-  left: 1rem;
-  padding: .15rem .5rem;
-  border-radius: 6px;
-  background: rgba(21, 21, 21, .85);
-  font-size: .7rem;
-  font-weight: 700;
-  color: var(--fifteenth-color);
+/* Posts this visitor already opened: the blog page's "Read" mark and a dimmer
+   cover; the cards sit on the page like the blog's (hairline edge, shadow) */
+.hm-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
 }
+
+.hm-card img { border-radius: 8px; }
+
+.hm-card.is-read img { opacity: .65; }
+
+.hm-card .bl-read-mark { margin-top: 0; font-size: inherit; }
 
 /* Swipe dots under the cards (phones only, the cards all fit on bigger screens) */
 .hm-dots {
