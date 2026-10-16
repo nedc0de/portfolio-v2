@@ -3043,48 +3043,89 @@ function readPostsSeen() {
     led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
-  // Favorites: the first time the card is scrolled to, it plays a short intro:
-  // the poster swings in with a shine across it, the stars fill one by one
-  // and the rating counts up to its value. After that the poster catches a
-  // slow shine now and then.
+  // Favorites: a 3D ticket you can spin all the way round. Drag sideways (or
+  // use the arrow keys) to turn it; let go and it keeps spinning a little,
+  // then settles on whichever side faces you, swaying gently. It spins in
+  // once the first time it's scrolled to. A light sheen slides across it as
+  // it turns, like a holographic ticket.
   const movie = box.querySelector('.xb-mv');
-  if (movie && !still && 'IntersectionObserver' in window) {
-    movie.classList.add('will-play');
-    const play = () => {
-      movie.classList.add('is-playing');
-      const num = movie.querySelector('.xb-rate b');
-      const end = parseFloat(num.textContent);
-      if (!(end > 0)) return;
-      // counts in step with the stars filling (one star every .15s from .6s)
-      const start = performance.now() + 600;
-      const step = (now) => {
-        const t = Math.min(1, Math.max(0, (now - start) / 900));
-        num.textContent = (end * t).toFixed(1);
-        if (t < 1) requestAnimationFrame(step);
-        else num.textContent = String(end);
-      };
-      num.textContent = '0.0';
-      requestAnimationFrame(step);
+  const tk = movie && movie.querySelector('.tk3');
+  if (tk) {
+    let angle = 0, tilt = 0, vel = 0, drag = null, running = false, visible = false, last = 0, intro = false;
+    const paint = () => {
+      tk.style.transform = `rotateX(${tilt.toFixed(2)}deg) rotateY(${angle.toFixed(2)}deg)`;
+      const turn = ((angle % 360) + 360) % 360;
+      tk.style.setProperty('--sheen', `${(turn / 360) * 200 - 50}%`);
+      const back = turn > 90 && turn < 270;
+      tk.classList.toggle('is-back', back);
     };
-    const io = new IntersectionObserver((entries) => {
-      // wait until favorites.js has filled the card in
-      if (movie.hidden || !entries.some((e) => e.isIntersecting && e.intersectionRatio >= .5)) return;
-      io.disconnect();
-      play();
-    }, { threshold: [0, .5, 1] });
-    io.observe(movie);
-  }
+    const loop = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+      last = now;
+      if (!drag) {
+        if (Math.abs(vel) > 30) {
+          angle += vel * dt;
+          vel *= Math.pow(0.12, dt); // friction
+        } else {
+          vel = 0;
+          // settle on the nearest side, with a slow sway (none with reduced motion)
+          const face = Math.round(angle / 180) * 180;
+          const sway = still ? 0 : Math.sin(now / 1400) * 9;
+          angle += (face + sway - angle) * Math.min(1, dt * 4);
+        }
+        tilt += ((still ? 0 : Math.sin(now / 1900) * 3) - tilt) * Math.min(1, dt * 4);
+      }
+      paint();
+      if (visible || drag || Math.abs(vel) > 30) requestAnimationFrame(loop);
+      else running = false;
+    };
+    const run = () => { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } };
 
-  // Favorites: on a computer the poster leans a little toward the mouse
-  if (movie && !still && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    const poster = movie.querySelector('.xb-poster');
-    movie.addEventListener('pointermove', (e) => {
-      const r = movie.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      poster.style.transform = `perspective(600px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg)`;
+    // drag: sideways turns it, the page still scrolls up and down (touch-action)
+    tk.addEventListener('pointerdown', (e) => {
+      drag = { x: e.clientX, y: e.clientY, t: performance.now(), moved: false, id: e.pointerId };
+      vel = 0;
+      run();
     });
-    movie.addEventListener('pointerleave', () => { poster.style.transform = ''; });
+    tk.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; tk.setPointerCapture(e.pointerId); tk.classList.add('is-grabbed'); }
+      if (!drag.moved) return;
+      const now = performance.now();
+      const step = dx * 0.6;
+      angle += step;
+      tilt = Math.max(-18, Math.min(18, tilt - dy * 0.15));
+      vel = step / Math.max(0.008, (now - drag.t) / 1000);
+      drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
+    });
+    const release = () => {
+      if (!drag) return;
+      if (performance.now() - drag.t > 80) vel = 0; // held still before letting go
+      vel = Math.max(-1400, Math.min(1400, vel));
+      drag = null;
+      tk.classList.remove('is-grabbed');
+      run();
+    };
+    tk.addEventListener('pointerup', release);
+    tk.addEventListener('pointercancel', release);
+    tk.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      vel = (e.key === 'ArrowRight' ? 1 : -1) * 520;
+      run();
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting;
+        if (!visible) return;
+        // the first time: spin in with one full turn
+        if (!intro && !still && !movie.hidden) { intro = true; vel = 820; } // about one turn, then it settles
+        run();
+      }, { threshold: .3 }).observe(movie);
+    } else { visible = true; run(); }
+    paint();
   }
 
   // the cards come in one after another the first time they're scrolled to

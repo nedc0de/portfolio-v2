@@ -205,17 +205,33 @@
       <div class="hm-block">
         <p class="hm-label">Explore</p>
         <div class="xb">
-          <a class="xb-card xb-mv" href="favorites.html" hidden>
-            <span class="xb-bg" aria-hidden="true"></span>
-            <span class="xb-poster" aria-hidden="true"><img alt="" width="342" height="513"></span>
-            <span class="xb-mv-body">
-              <span class="xb-k">Just watched</span>
-              <h3 class="xb-title"></h3>
-              <span class="xb-rate"><span class="xb-stars" aria-hidden="true"></span><b></b></span>
-              <span class="xb-sub"></span>
-              <span class="xb-go">See all picks <span aria-hidden="true">→</span></span>
-            </span>
-          </a>
+          <!-- Just watched: a 3D movie ticket you can grab and spin all the way
+               round (scripts.js). Front: the poster and rating; back: the pick count. -->
+          <div class="xb-card xb-mv" role="group" hidden>
+            <div class="tk3-scene">
+              <div class="tk3" tabindex="0" role="img" aria-roledescription="3D ticket" aria-label="Movie ticket. Drag, or use the arrow keys, to turn it around">
+                <span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span><span class="tk3-layer" aria-hidden="true"></span>
+                <div class="tk3-face tk3-front">
+                  <span class="xb-poster"><img alt="" width="342" height="513" draggable="false"></span>
+                  <div class="tk3-info">
+                    <span class="xb-k">Just watched</span>
+                    <h3 class="xb-title"></h3>
+                    <span class="xb-rate"><span class="xb-stars" aria-hidden="true"></span><b></b></span>
+                  </div>
+                  <div class="tk3-stub" aria-hidden="true"><span>ADMIT ONE</span><span>NED'S PICK</span></div>
+                </div>
+                <div class="tk3-face tk3-back" aria-hidden="true">
+                  <span class="tk3-brand">NED<b>CODE</b></span>
+                  <span class="tk3-big">PICKS</span>
+                  <span class="xb-sub"></span>
+                  <span class="tk3-bars"></span>
+                  <div class="tk3-stub"><span>NEDCODE.COM</span><span>NO. 001</span></div>
+                </div>
+              </div>
+            </div>
+            <a class="xb-go tk3-go" href="favorites.html">See all picks <span aria-hidden="true">→</span></a>
+            <span class="tk3-hint" aria-hidden="true">Drag to spin</span>
+          </div>
           <a class="xb-card xb-ab" href="about.html" data-words="responsible,driven,diligent,ambitious,creative,patient">
             <span class="xb-k">About</span>
             <span class="xb-is">Ned is <span class="xb-word-win"><span class="xb-word">responsible</span></span></span>
