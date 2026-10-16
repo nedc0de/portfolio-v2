@@ -2782,8 +2782,14 @@ details>summary {
     display: none;
   }
 
+  /* light grey so the menu reads easily on the dark page; the page you're on
+     keeps its yellow brush underline and turns white */
   .nav-link {
-    color: var(--second-color);
+    color: #a3a3a3;
+  }
+
+  .nav-link.active {
+    color: #f2f2f2;
   }
 
   /* .wave {
