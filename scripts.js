@@ -2800,37 +2800,32 @@ function readPostsSeen() {
     } else start();
   }
 
-  // Lab: the live time on split flaps; each tap flips to the next city
-  const board = box.querySelector('.xb-board');
-  if (board) {
+  // Lab: a mini dot-matrix departure board, Montreal on top and two more
+  // cities under it (airport codes, like a real board). Each tap brings in
+  // the next two cities.
+  const led = box.querySelector('.xb-led');
+  if (led) {
     const CITIES = [
-      ['Montreal', 'America/Toronto'], ['Tokyo', 'Asia/Tokyo'], ['London', 'Europe/London'],
-      ['Dubai', 'Asia/Dubai'], ['Sydney', 'Australia/Sydney'], ['Los Angeles', 'America/Los_Angeles'],
+      ['LDN', 'Europe/London'], ['TYO', 'Asia/Tokyo'], ['DXB', 'Asia/Dubai'],
+      ['SYD', 'Australia/Sydney'], ['LAX', 'America/Los_Angeles'], ['PAR', 'Europe/Paris'],
     ];
-    const flaps = [...board.querySelectorAll('.xb-flap')];
-    const label = box.querySelector('.xb-city');
-    let city = 0;
-    const formats = CITIES.map(([, zone]) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }));
-    const set = (flap, ch) => {
-      if (flap.textContent === ch) return;
-      if (still) { flap.textContent = ch; return; }
-      flap.classList.remove('is-flip');
-      void flap.offsetWidth;
-      flap.classList.add('is-flip');
-      setTimeout(() => { flap.textContent = ch; }, 140); // swap at the halfway point of the flip
+    const fmt = (zone) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    const home = ['MTL', fmt('America/Toronto')];
+    const others = CITIES.map(([code, zone]) => [code, fmt(zone)]);
+    const rows = [...led.querySelectorAll('.xb-led-row')];
+    let at = 0;
+    const draw = (blink) => {
+      const now = new Date();
+      const list = [home, others[at % others.length], others[(at + 1) % others.length]];
+      rows.forEach((row, k) => {
+        row.textContent = `${list[k][1].format(now)} ${list[k][0]}`;
+        if (blink && k && !still) { row.classList.remove('is-new'); void row.offsetWidth; row.classList.add('is-new'); }
+      });
+      led.setAttribute('aria-label', `World clock: ${list.map(([c, f]) => `${c} ${f.format(now)}`).join(', ')}. Tap to show other cities`);
     };
-    const tick = () => {
-      const t = formats[city].format(new Date()).replace(':', '');
-      flaps.forEach((f, k) => set(f, t[k]));
-    };
-    flaps.forEach((f, k) => { f.textContent = formats[0].format(new Date()).replace(':', '')[k]; });
-    setInterval(tick, 5000);
-    board.addEventListener('click', () => {
-      city = (city + 1) % CITIES.length;
-      label.textContent = city ? CITIES[city][0] : 'Montreal · live';
-      board.setAttribute('aria-label', `Time in ${CITIES[city][0]}. Tap for another city`);
-      tick();
-    });
+    draw();
+    setInterval(() => draw(), 10000);
+    led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
   // Favorites: on a computer the poster leans a little toward the mouse

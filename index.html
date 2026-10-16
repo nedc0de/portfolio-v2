@@ -13,6 +13,7 @@
 
   <!-- Custom and external CSS -->
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@800&display=swap">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
 
   <title>NEDCODE | Ned, Frontend Developer in Montreal</title>
@@ -223,10 +224,10 @@
           </a>
           <div class="xb-card xb-lb">
             <span class="xb-k">Lab</span>
-            <button class="xb-board" type="button" aria-label="Time in Montreal. Tap for another city">
-              <span class="xb-flap">0</span><span class="xb-flap">0</span><span class="xb-colon">:</span><span class="xb-flap">0</span><span class="xb-flap">0</span>
+            <!-- a mini version of the Lab's dot-matrix departure board: tap it to bring in other cities -->
+            <button class="xb-led" type="button" aria-label="World clock. Tap to show other cities">
+              <span class="xb-led-row is-home"></span><span class="xb-led-row"></span><span class="xb-led-row"></span>
             </button>
-            <span class="xb-city">Montreal · live</span>
             <a class="xb-lb-link" href="lab.html"><h3>Departure board</h3><span class="xb-go">Play with it <span aria-hidden="true">→</span></span></a>
           </div>
         </div>
