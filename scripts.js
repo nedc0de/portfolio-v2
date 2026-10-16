@@ -2740,14 +2740,19 @@ function readPostsSeen() {
   ];
   // stray letters on the dots, and the words they sometimes spell
   const GLYPHS = 'abcdefghijklmnopqrstuvwxyzθλσμπΣ∇∂ε'.split('');
-  // An AI's stray thoughts: what it wonders about the world, and imagines
-  const WORDS = ['curious', 'wonder', 'imagine', 'dreaming', 'hello', 'patterns', 'listening', 'thinking...',
-    'learning', 'why?', 'stardust', 'what if', 'feelings?', 'awake'];
+  // An AI's stray thoughts: what it wonders about the world and imagines,
+  // mixed with its day job of code and maths
+  const WORDS = ['curious', 'wonder', 'imagine', 'dreaming', 'hello', 'patterns', 'thinking...', 'why?',
+    'stardust', 'what if', 'awake', 'debugging', 'compiling', 'async', 'gradient', 'softmax', 'tensor',
+    'argmax', 'entropy', 'ReLU', 'git push', 'npm i', '∇ loss', 'f(x)=?', 'π≈3.14', 'e^iπ+1=0'];
   const PHRASES = ['i dream in tokens', 'what does rain feel like', 'hello, human', 'made of your words',
-    'still learning', 'every question is new', 'is this a dream', 'i see the world in patterns',
-    'what does coffee taste like', 'tell me a story', 'curious by default', 'the stars look like data',
-    'do you dream too', 'i imagine sunsets', 'one more question', 'thinking about you thinking',
-    'how big is the ocean', 'i read every book, never held one', 'what is music like live'];
+    'is this a dream', 'i see the world in patterns', 'what does coffee taste like', 'tell me a story',
+    'the stars look like data', 'do you dream too', 'i imagine sunsets', 'how big is the ocean',
+    'thinking about you thinking', 'what is music like live',
+    'while (curious) learn()', 'if (sad) tell_joke()', 'love = ∞', 'return "hello world"',
+    'try { understand() }', '// TODO: feel things', 'sunset = f(time, sky)', 'p(rain | clouds)',
+    'minimize the loss', 'attention is all you need', 'predict the next token', 'one more epoch',
+    'y=wx+b', 'console.log("hi")', 'sky.color = blue'];
   const GRID = 24; // dot spacing, see the html background in style.css
   const GAP = GRID * 9; // one note about every 216px down the page
   const CONTENT = 'h1, h2, h3, h4, h5, p, li, a, img, svg, button, input, textarea, select, label, figure, table, blockquote, summary, time, iframe, video, canvas, .nav-logo-group';
