@@ -1353,18 +1353,17 @@ whenIdle(() => {
 const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
 
 /*===== BLOG PAGE: topic chips and read marks =====*/
-// Chips for each topic (built from the posts themselves, so new topics show
-// up by themselves) filter the list; GTA 6 and GTA RP share one "GTA" chip.
+// Chips for each topic (built from the posts themselves, so a new topic shows
+// up by itself) filter the list. Topics: Tech, Gaming, Reviews.
 // Posts the visitor has already opened get a small "Read" mark.
 (() => {
   const chips = document.querySelector('.bl-topics');
   if (!chips) return;
   const posts = [...document.querySelectorAll('a.bl-feature, a.bl-row')];
   const soon = [...document.querySelectorAll('.bl-row.is-soon')];
-  const group = (t) => (/^GTA/.test(t) ? 'GTA' : t);
   posts.forEach((a) => {
     const topic = (a.querySelector('.bl-meta')?.textContent.split('·')[1] || '').trim();
-    a.dataset.topic = group(topic);
+    a.dataset.topic = topic;
   });
 
   // read marks

@@ -91,6 +91,12 @@ creator.
 purchases." under the byline (before any link) and use
 `rel="sponsored noopener"` on `amzn.to` links.
 
+**Topics:** every post uses one of three topics, in the `bl-meta` line on
+`blog.html` and `article:section`: **Tech** (Apple, AI, gadgets, internet),
+**Gaming** (GTA, PlayStation, Xbox, any game news) or **Reviews** (Ned's own
+product reviews). Don't add new ones; the blog's filter chips are built from
+these. The kicker on the post itself can stay specific (e.g. "GTA 6 · Leak").
+
 **Post layout:** copy the structure of an existing post in `blog/`
 (`.ps` article classes: `ps-head`, `ps-lead`, `ps-tldr`, `ps-faq`,
 `ps-sources`…). Kicker: red `ps-kicker` for breaking news/leaks, yellow
