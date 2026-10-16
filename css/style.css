@@ -3981,7 +3981,7 @@ details>summary {
 
 .product-link-button:not(:disabled):hover,
 .product-link-button:not(:disabled):hover:active,
-.ab-cta a:hover,
+.ab-cta-go > a:hover,
 .ct-send:hover {
   transform: translateY(-2px);
 }
@@ -4529,9 +4529,9 @@ a.bl-row:hover {
   transition: transform .2s, box-shadow .3s;
 }
 
-.ab-cta a:hover,
-.ab-cta a:focus-visible,
-.ab-cta a:active,
+.ab-cta-go > a:hover,
+.ab-cta-go > a:focus-visible,
+.ab-cta-go > a:active,
 .ct-send:hover,
 .ct-send:focus-visible,
 .ct-send:active,
