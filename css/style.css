@@ -4093,6 +4093,19 @@ details>summary {
   .nav-menu.show-menu .nav-item:nth-child(7) { animation-delay: .42s; }
   .nav-menu.show-menu .nav-item:nth-child(8) { animation-delay: .49s; }
 
+  /* then the bottom (newest post, Let's talk, Threads) carries on in the same
+     order, so the whole sheet lights up from the top down */
+  .nav-menu .menu-foot > * {
+    opacity: 0;
+  }
+
+  .nav-menu.show-menu .menu-foot > * {
+    animation: menu-neon .6s steps(1, end) .52s both;
+  }
+
+  .nav-menu.show-menu .menu-foot > :nth-child(2) { animation-delay: .59s; }
+  .nav-menu.show-menu .menu-foot > :nth-child(3) { animation-delay: .66s; }
+
   @keyframes menu-neon {
     0% { opacity: 0; }
     15% { opacity: .8; }
