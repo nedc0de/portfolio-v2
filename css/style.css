@@ -8574,6 +8574,11 @@ html.is-frozen .egg-crash * {
 .tk3-peek-l { --x: -38px; --r: -8deg; }
 .tk3-peek-r { --x: 38px; --r: 8deg; }
 
+@media (max-width: 359px) {
+  .tk3-peek-l { --x: -22px; }
+  .tk3-peek-r { --x: 22px; }
+}
+
 .tk3-peek:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: 2px; }
 
 @media (hover: hover) {
