@@ -4,7 +4,7 @@
 // and the active row's GIF swaps into a floating card.
 
 const list = document.getElementById("hl-list");
-const rows = [...document.querySelectorAll(".hl-row")];
+const rows = [...document.querySelectorAll(".hc-row")];
 const preview = document.getElementById("hl-preview");
 const previewImg = preview.querySelector("img");
 const touchMode = matchMedia("(hover: none), (max-width: 768px)");

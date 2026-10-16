@@ -7306,13 +7306,9 @@ html.is-frozen .egg-crash * {
 
 .hc-list > li {
   position: relative;
+  --node-delay: calc(var(--i, 0) * .35s); /* --i: set by scripts.js for rows lighting up together */
   --seg-delay: calc(var(--i, 0) * .35s + .2s);
-  --node-delay: calc(var(--i, 0) * .35s);
 }
-
-.hc-list > li:nth-child(2) { --i: 1; }
-.hc-list > li:nth-child(3) { --i: 2; }
-.hc-list > li:nth-child(4) { --i: 3; }
 
 /* the trace: a segment from this node down to the next one */
 .hc-list > li:not(:last-child)::after {
@@ -7327,8 +7323,8 @@ html.is-frozen .egg-crash * {
   transform-origin: top;
 }
 
-.hc-list > li:nth-child(2)::after {
-  background: linear-gradient(rgba(255, 220, 22, .55), rgba(255, 220, 22, .3));
+.hc-list > li:not(:first-child)::after {
+  background: linear-gradient(rgba(255, 220, 22, .55), rgba(255, 220, 22, .35));
 }
 
 .hc-row {
@@ -7443,15 +7439,38 @@ html.is-frozen .egg-crash * {
   .hc-year { font-size: .85rem; }
 }
 
-/* lighting up: nodes switch on one after another, each trace segment
-   running down to the next node */
+/* the full list on the Projects page also shows each project's tech, quietly */
+.hc-stack {
+  display: block;
+  margin-top: .45rem;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #6f6f6f;
+}
+
+.hc-list-full {
+  max-width: 760px; /* keeps each year close to its title on wide screens */
+  margin: 1.5rem auto 0;
+}
+
+/* Projects page on phones: the row lit by scrolling (projects.js) */
+.hc-row.is-active .hc-name { color: var(--fifteenth-color); }
+.hc-row.is-active .hc-node {
+  box-shadow: 0 0 0 4px var(--thirteenth-color), 0 0 22px rgba(255, 220, 22, .5);
+  transform: scale(1.06);
+}
+
+/* lighting up: as rows scroll into view their nodes switch on one after
+   another, each trace segment running down to the next node */
 .hc-list.will-draw > li::after { transform: scaleY(0); }
 .hc-list.will-draw .hc-node { opacity: .25; transform: scale(.8); }
-.hc-list.will-draw.is-lit > li::after {
+.hc-list.will-draw > li.is-lit::after {
   transform: none;
   transition: transform .4s cubic-bezier(.22, .61, .36, 1) var(--seg-delay);
 }
-.hc-list.will-draw.is-lit .hc-node {
+.hc-list.will-draw > li.is-lit .hc-node {
   opacity: 1;
   transform: none;
   transition: opacity .25s var(--node-delay), transform .35s cubic-bezier(.34, 1.56, .64, 1) var(--node-delay), box-shadow .3s;

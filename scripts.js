@@ -2753,64 +2753,21 @@ function readPostsSeen() {
   });
 })();
 
-/*===== HOME: Selected work circuit lights up =====*/
-// The first time the list scrolls into view its nodes switch on one by one,
-// the trace running down from each to the next (see .hc-list in style.css).
-(() => {
-  const list = document.querySelector('.hc-list');
-  if (!list || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  list.classList.add('will-draw');
-  const io = new IntersectionObserver((entries) => {
-    if (!entries.some((e) => e.intersectionRatio >= .6)) return; // most of it on screen
-    io.disconnect();
-    requestAnimationFrame(() => list.classList.add('is-lit'));
-  }, { threshold: .6 });
-  io.observe(list);
-})();
-
-/*===== CABLE LIST: the Projects page =====*/
-// Each number's cable runs down and along under its project's description,
-// ending in a dot. They're sized to each row (and again if the layout
-// changes), and draw themselves in one after another the first time the
-// list scrolls into view. No JS: no cables; reduced motion: no drawing in.
-[['.hl-list', '.hl-row', '.hl-name', '.hl-desc', 16]].forEach(([L, R, N, D, GAP]) => {
-  const list = document.querySelector(L);
-  if (!list) return;
-  const rows = [...list.querySelectorAll(R)].filter((row) => row.querySelector('.hw-cable'));
-  if (!rows.length) return;
-  // all cables end at the same point: 60% across the narrowest title column
-  const width = () => Math.min(...rows.map((row) => {
-    const name = row.querySelector(N);
-    return Math.round(name.getBoundingClientRect().left - row.getBoundingClientRect().left + name.offsetWidth * 0.6);
-  }));
-  const size = () => { const w = width(); rows.forEach((row) => {
-    const svg = row.querySelector('.hw-cable');
-    const desc = row.querySelector(D) || row.querySelector(N);
-    const r = row.getBoundingClientRect();
-    const top = svg.getBoundingClientRect().top - r.top;
-    const h = Math.max(16, Math.round(desc.getBoundingClientRect().bottom - r.top - top + GAP)); // GAP: room under the description
-    svg.setAttribute('width', w);
-    svg.setAttribute('height', h);
-    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    svg.querySelector('path').setAttribute('d', `M2 0V${h - 12}Q2 ${h - 2} 12 ${h - 2}H${w - 6}`);
-    const dot = svg.querySelector('circle');
-    dot.setAttribute('cx', w - 3);
-    dot.setAttribute('cy', h - 2);
-  }); };
-  size();
-  if ('ResizeObserver' in window) new ResizeObserver(size).observe(list);
-  if (document.fonts) document.fonts.ready.then(size);
-
+/*===== CIRCUIT LISTS light up (home Selected work, Projects page) =====*/
+// As rows scroll into view their nodes switch on one by one, the trace
+// running down from each to the next (see .hc-list in style.css). Rows that
+// arrive together are staggered so the light follows the circuit.
+document.querySelectorAll('.hc-list').forEach((list) => {
   if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // each row draws in as it scrolls into view; rows arriving together are
-  // staggered so the cables follow one another
   list.classList.add('will-draw');
   const io = new IntersectionObserver((entries) => {
-    entries.filter((e) => e.isIntersecting).forEach((e, i) => {
-      io.unobserve(e.target);
-      e.target.style.setProperty('--i', i);
-      requestAnimationFrame(() => e.target.classList.add('is-drawn'));
-    });
+    entries.filter((e) => e.isIntersecting && e.intersectionRatio >= .6) // the first report can be a sliver
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      .forEach((e, i) => {
+        io.unobserve(e.target);
+        e.target.style.setProperty('--i', i);
+        requestAnimationFrame(() => e.target.classList.add('is-lit'));
+      });
   }, { threshold: .6 });
-  rows.forEach((row) => io.observe(row));
+  list.querySelectorAll(':scope > li').forEach((li) => io.observe(li));
 });
