@@ -588,6 +588,13 @@ position: relative;
   margin-top: 1.2rem;
 }
 
+/* The icon's drawing has 15px of empty space on each side of its lines: nudge
+   it right so the lines end on the same 16px edge as the page content (the tap
+   area stays the full 50px) */
+#nav-toggle {
+  transform: translateX(15px);
+}
+
 /* The menu icon is three plain lines: the phone menu opens as a full sheet
    with its own close button, so the icon doesn't need to turn into an X */
 
@@ -5180,6 +5187,10 @@ a.tk-item:hover,
 }
 
 /* Latest posts: swipe through the 3 newest covers */
+/* min-width: 0 lets the block shrink to the screen; without it the cards row
+   stretched the home page wider than small phones (under ~370px) */
+.hm-latest { min-width: 0; }
+
 .hm-latest-head {
   display: flex;
   align-items: baseline;
@@ -7245,4 +7256,12 @@ html.is-frozen .egg-crash * {
   background: var(--thirteenth-color);
   border-radius: 32px;
   box-shadow: 0 0 90px 50px var(--thirteenth-color);
+}
+
+/* Very small phones (under ~375px): scale the hero title down just enough
+   that "Frontend Dev" stays on one line instead of wrapping */
+@media screen and (max-width: 374px) {
+  .home-title {
+    font-size: min(50px, calc((100vw - 34px) / 6.9));
+  }
 }
