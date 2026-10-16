@@ -8348,3 +8348,65 @@ html.is-frozen .egg-crash * {
   86% { transform: translateY(0) scale(1.01, .99); }
   100% { opacity: 1; transform: none; }
 }
+
+/*===== HOME: Just watched card intro =====*/
+/* Plays once when scrolled to (scripts.js adds .is-playing): the poster
+   swings in with a light sweep, the text slides up, the stars fill one by
+   one; then the poster catches a slow shine every few seconds */
+.xb-poster { position: relative; }
+
+.xb-poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%) -150% 0 / 250% 100% no-repeat;
+  pointer-events: none;
+}
+
+.xb-mv.will-play .xb-poster { opacity: 0; transform: perspective(600px) rotateY(-35deg) translateX(-14px); }
+.xb-mv.will-play .xb-mv-body > * { opacity: 0; transform: translateY(10px); }
+.xb-mv.will-play .xb-stars .fav-star::before { width: 0; }
+
+.xb-mv.is-playing .xb-poster {
+  opacity: 1;
+  transform: none;
+  transition: opacity .5s, transform .8s cubic-bezier(.22, 1.2, .36, 1);
+}
+
+.xb-mv.is-playing .xb-poster::after {
+  animation: xb-shine 1s .45s ease-out both, xb-shine-idle 7s 3s ease-in-out infinite;
+}
+
+.xb-mv.is-playing .xb-mv-body > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .45s, transform .45s cubic-bezier(.22, .61, .36, 1);
+}
+
+.xb-mv.is-playing .xb-mv-body > :nth-child(1) { transition-delay: .2s; }
+.xb-mv.is-playing .xb-mv-body > :nth-child(2) { transition-delay: .3s; }
+.xb-mv.is-playing .xb-mv-body > :nth-child(3) { transition-delay: .4s; }
+.xb-mv.is-playing .xb-mv-body > :nth-child(4) { transition-delay: .5s; }
+.xb-mv.is-playing .xb-mv-body > :nth-child(5) { transition-delay: .6s; }
+
+.xb-mv.is-playing .xb-stars .fav-star::before {
+  width: var(--f, 0%);
+  transition: width .3s ease-out;
+}
+
+.xb-mv.is-playing .xb-stars .fav-star:nth-child(1)::before { transition-delay: .6s; }
+.xb-mv.is-playing .xb-stars .fav-star:nth-child(2)::before { transition-delay: .75s; }
+.xb-mv.is-playing .xb-stars .fav-star:nth-child(3)::before { transition-delay: .9s; }
+.xb-mv.is-playing .xb-stars .fav-star:nth-child(4)::before { transition-delay: 1.05s; }
+.xb-mv.is-playing .xb-stars .fav-star:nth-child(5)::before { transition-delay: 1.2s; }
+
+@keyframes xb-shine {
+  0% { background-position: -150% 0; }
+  100% { background-position: 150% 0; }
+}
+
+/* one slow sweep, then a long rest before the next */
+@keyframes xb-shine-idle {
+  0% { background-position: -150% 0; }
+  18%, 100% { background-position: 150% 0; }
+}

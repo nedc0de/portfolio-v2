@@ -2907,8 +2907,39 @@ function readPostsSeen() {
     led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
-  // Favorites: on a computer the poster leans a little toward the mouse
+  // Favorites: the first time the card is scrolled to, it plays a short intro:
+  // the poster swings in with a shine across it, the stars fill one by one
+  // and the rating counts up to its value. After that the poster catches a
+  // slow shine now and then.
   const movie = box.querySelector('.xb-mv');
+  if (movie && !still && 'IntersectionObserver' in window) {
+    movie.classList.add('will-play');
+    const play = () => {
+      movie.classList.add('is-playing');
+      const num = movie.querySelector('.xb-rate b');
+      const end = parseFloat(num.textContent);
+      if (!(end > 0)) return;
+      // counts in step with the stars filling (one star every .15s from .6s)
+      const start = performance.now() + 600;
+      const step = (now) => {
+        const t = Math.min(1, Math.max(0, (now - start) / 900));
+        num.textContent = (end * t).toFixed(1);
+        if (t < 1) requestAnimationFrame(step);
+        else num.textContent = String(end);
+      };
+      num.textContent = '0.0';
+      requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver((entries) => {
+      // wait until favorites.js has filled the card in
+      if (movie.hidden || !entries.some((e) => e.isIntersecting && e.intersectionRatio >= .5)) return;
+      io.disconnect();
+      play();
+    }, { threshold: [0, .5, 1] });
+    io.observe(movie);
+  }
+
+  // Favorites: on a computer the poster leans a little toward the mouse
   if (movie && !still && matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const poster = movie.querySelector('.xb-poster');
     movie.addEventListener('pointermove', (e) => {
