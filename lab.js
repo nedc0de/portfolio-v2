@@ -1127,7 +1127,13 @@
         `  <text x="50%" y="50%" ${attrs} fill="${color}">${text}</text>\n` +
         `</svg>`;
     }
-    codeOut.textContent = code;
+    // each word in its own box so lines only wrap at spaces, never at a hyphen
+    codeOut.replaceChildren(...code.split(/(\s+)/).filter(Boolean).map((part) => {
+      if (/^\s+$/.test(part)) return part;
+      const word = document.createElement('span');
+      word.textContent = part;
+      return word;
+    }));
   };
 
   // shrink the text until the whole sign fits on the wall

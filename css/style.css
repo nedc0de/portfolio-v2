@@ -7244,7 +7244,14 @@ html.is-frozen .egg-crash * {
   color: var(--fourteenth-color);
   font: 12px/1.6 Consolas, Menlo, monospace;
   white-space: pre-wrap;
-  word-break: break-all;
+  /* wrap at spaces; only split a word (like the long font link) when it can't fit */
+  overflow-wrap: break-word;
+}
+
+.neon-code-out span {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 /* Lists (Home's Selected work, Projects, About's How I work) and every blog
