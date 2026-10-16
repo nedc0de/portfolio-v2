@@ -1276,33 +1276,59 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dots) return;
     const all = [...list.children];
     let current = 0;
+    let sliding = 0; // animation frame of a dot-started slide, if one is running
+    const mark = (i) => {
+      current = i;
+      [...dots.children].forEach((d, k) => {
+        d.classList.toggle('is-on', k === i);
+        if (k === i) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      });
+    };
+    // Light the dot straight away, then slide quickly to the card. Our own short
+    // slide: the browser's smooth scroll is slow on iPhone, and snapping is
+    // switched off while it runs so the two don't fight.
     const go = (i) => {
       i = Math.max(0, Math.min(all.length - 1, i));
-      list.scrollTo({ left: all[i].offsetLeft - all[0].offsetLeft, behavior: 'smooth' });
+      mark(i);
+      cancelAnimationFrame(sliding);
+      const from = list.scrollLeft;
+      const to = Math.min(all[i].offsetLeft - all[0].offsetLeft, list.scrollWidth - list.clientWidth);
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(to - from) < 2) { list.scrollLeft = to; return; }
+      const start = performance.now();
+      const TIME = 280;
+      list.style.scrollSnapType = 'none';
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / TIME);
+        list.scrollLeft = from + (to - from) * (1 - Math.pow(1 - t, 3));
+        if (t < 1) sliding = requestAnimationFrame(step);
+        else { sliding = 0; list.style.scrollSnapType = ''; }
+      };
+      sliding = requestAnimationFrame(step);
     };
     all.forEach((card, k) => {
       const dot = document.createElement('button');
       dot.type = 'button';
       dot.setAttribute('aria-label', `Show post ${k + 1} of ${all.length}`);
-      dot.addEventListener('click', () => go(k));
+      // taps and swipes are handled on pointerup below; this is for the keyboard
+      dot.addEventListener('click', (e) => { if (e.detail === 0) go(k); });
       dots.append(dot);
     });
     const light = () => {
+      if (sliding) return; // the dot is already lit for where we're going
       const step = all[1] ? all[1].offsetLeft - all[0].offsetLeft : 1;
       const atEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 4;
-      current = atEnd ? all.length - 1 : Math.round(list.scrollLeft / step);
-      [...dots.children].forEach((d, k) => {
-        d.classList.toggle('is-on', k === current);
-        if (k === current) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
-      });
+      mark(atEnd ? all.length - 1 : Math.round(list.scrollLeft / step));
     };
+    // Tap a dot: go to it. Swipe across the dots: move one card that way.
     let startX = null;
     dots.addEventListener('pointerdown', (e) => { startX = e.clientX; });
     dots.addEventListener('pointerup', (e) => {
       if (startX === null) return;
       const dx = e.clientX - startX;
       startX = null;
-      if (Math.abs(dx) > 25) go(current + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 25) { go(current + (dx < 0 ? 1 : -1)); return; }
+      const dot = e.target.closest('button');
+      if (dot) go([...dots.children].indexOf(dot));
     });
     dots.addEventListener('pointercancel', () => { startX = null; });
     list.addEventListener('scroll', light, { passive: true });

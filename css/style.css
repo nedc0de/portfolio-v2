@@ -5273,7 +5273,7 @@ a.tk-item:hover,
   height: 8px;
   border-radius: 4px;
   background: #3a3a3a;
-  transition: width .25s, background .25s;
+  transition: width .15s, background .15s;
 }
 
 .hm-dots button.is-on::before {
