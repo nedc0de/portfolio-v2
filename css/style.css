@@ -9488,21 +9488,18 @@ html.is-frozen .egg-crash * {
 }
 
 /*===== FOOTER: Ned × AI =====*/
-/* One quiet grey line: Ned × AI | © year. The × is the only accent, a muted
-   yellow that sways a few degrees and glows a little, very slowly */
+/* One quiet line in the footer's own type: Ned × AI | © year. The × is the
+   only accent, a muted yellow that sways a few degrees and glows a little,
+   very slowly */
 .ft-sig {
   display: inline-flex;
   align-items: center;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: .03em;
-  color: #8a8a8a;
+  /* same type as the footer always had: semi-bold, 12px, its grey */
 }
 
 .ft-x {
   display: inline-block;
-  margin: 0 .55em;
-  font-weight: 400;
+  margin: 0 .5em;
   color: rgba(255, 220, 22, .7);
   animation: ft-sway 8s ease-in-out infinite;
 }
@@ -9517,12 +9514,6 @@ html.is-frozen .egg-crash * {
   height: 11px;
   margin: 0 .9em;
   background: linear-gradient(transparent, #444, transparent);
-}
-
-.ft-year {
-  font-weight: 400;
-  color: #6a6a6a;
-  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
