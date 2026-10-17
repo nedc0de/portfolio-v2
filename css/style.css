@@ -8460,13 +8460,17 @@ html.is-frozen .egg-crash * {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: var(--w);
-  aspect-ratio: 5 / 7;
+  width: calc(var(--w) * 1.9);
+  aspect-ratio: 1;
   background: var(--poster, none) center / cover;
-  border-radius: 24px;
-  filter: blur(38px) saturate(1.6);
+  filter: blur(46px) saturate(1.5);
+  /* a round, soft fade: strongest behind the card, gone well before its
+     edges, so there's no visible box around the glow */
+  -webkit-mask: radial-gradient(closest-side, #000 30%, rgba(0, 0, 0, .5) 60%, transparent 100%);
+  mask: radial-gradient(closest-side, #000 30%, rgba(0, 0, 0, .5) 60%, transparent 100%);
+  mix-blend-mode: screen; /* only adds light: the poster's dark parts never darken the page */
   opacity: 0;
-  transform: translate(-50%, -50%) scale(1.05);
+  transform: translate(-50%, -50%);
   transition: opacity .6s;
   pointer-events: none;
 }
