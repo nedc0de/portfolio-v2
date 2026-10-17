@@ -1216,7 +1216,6 @@
 
       // front poster: a soft shimmer until it arrives, popcorn if there's none
       tk.classList.remove('has-poster', 'no-poster');
-      homeCard.classList.remove('has-glow');
       img.removeAttribute('srcset');
       img.removeAttribute('src');
       covers[i].then((url) => {
@@ -1224,10 +1223,9 @@
         if (!url) { tk.classList.add('no-poster'); return; }
         setPoster(img, url, '250px', () => {
           if (at !== i) return;
-          // the blurred back and the glow behind the deck use the same poster
+          // the blurred back of the card uses the same poster
           homeCard.style.setProperty('--poster', `url("${url}")`);
           tk.classList.add('has-poster');
-          homeCard.classList.add('has-glow');
         });
       });
 

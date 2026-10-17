@@ -8453,29 +8453,6 @@ html.is-frozen .egg-crash * {
   perspective: 1100px;
 }
 
-/* the poster's own colours glow softly behind the deck (a blurred copy of
-   it), fading in once it has loaded and changing with each movie */
-.tk3-scene::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(calc(var(--w) * 1.9), 100vw); /* never wider than the screen; its edge is already faded out */
-  aspect-ratio: 1;
-  background: var(--poster, none) center / cover;
-  filter: blur(46px) saturate(1.5);
-  /* a round, soft fade: strongest behind the card, gone well before its
-     edges, so there's no visible box around the glow */
-  -webkit-mask: radial-gradient(closest-side, #000 30%, rgba(0, 0, 0, .5) 60%, transparent 100%);
-  mask: radial-gradient(closest-side, #000 30%, rgba(0, 0, 0, .5) 60%, transparent 100%);
-  mix-blend-mode: screen; /* only adds light: the poster's dark parts never darken the page */
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  transition: opacity .6s;
-  pointer-events: none;
-}
-
-.xb-mv.has-glow .tk3-scene::before { opacity: .75; }
 
 /* dots under the deck: which movie is in front; tap one to jump to it */
 .tk3-dots {
