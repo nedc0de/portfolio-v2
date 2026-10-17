@@ -3555,10 +3555,11 @@ details>summary {
   .ab-lead { max-width: 40rem; }
 }
 
+/* the same yellow word with a marker underline as the rest of the page */
 .ab-lead mark {
-  background: var(--fifteenth-color);
-  color: var(--eleventh-color);
-  padding: 0 .2em;
+  padding-bottom: .04em;
+  color: var(--fifteenth-color);
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
 }
 
 /* Section labels */
@@ -3571,7 +3572,7 @@ details>summary {
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--fifteenth-color);
+  color: #8a8a8a; /* grey: yellow is kept for links and the key words */
   margin-bottom: 1rem;
 }
 
@@ -3681,16 +3682,9 @@ details>summary {
 /* Call to action */
 /* Sign-off card: same marker style as the rest of the page, a warm glow in
    the corner, the button and a quieter second way to reach Ned */
+/* Sign-off (About and home): a big statement on the page, no card */
 .ab-cta {
   position: relative;
-  overflow: hidden;
-  padding: 1.6rem 1.3rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, .06);
-  border-radius: 14px;
-  background:
-    radial-gradient(120% 90% at 100% 100%, rgba(255, 220, 22, .14), transparent 55%),
-    var(--sixteenth-color);
-  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .8);
   text-align: left;
 }
 
@@ -3698,7 +3692,7 @@ details>summary {
   font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--fifteenth-color);
+  color: #8a8a8a;
 }
 
 .ab-cta p {
@@ -7874,10 +7868,9 @@ html.is-frozen .egg-crash * {
 .mk-list.will-mark .is-on .mk-hl { color: var(--fifteenth-color); background-size: 100% .16em; }
 
 /*===== ABOUT: Off the clock =====*/
-/* One sentence with the key words marked like How I work, then a compact
-   card for each with its own title */
+/* One sentence with the key words marked like How I work */
 .oc-say {
-  margin: 0 0 1.5rem;
+  margin: 0;
   font-size: clamp(1.4rem, 6vw, 1.9rem);
   font-weight: 700;
   line-height: 1.4;
@@ -7892,55 +7885,7 @@ html.is-frozen .egg-crash * {
   background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
 }
 
-.oc-list {
-  display: grid;
-  gap: .6rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
-.oc-list li {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: .85rem;
-  align-items: center;
-  padding: .8rem .9rem;
-  border: 1px solid rgba(255, 255, 255, .06);
-  border-radius: 12px;
-  background: var(--sixteenth-color);
-  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, .7);
-}
-
-.oc-list i {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: #111;
-  color: var(--fifteenth-color);
-}
-
-.oc-list i svg { width: 21px; height: 21px; }
-
-.oc-list b {
-  display: block;
-  font-size: .95rem;
-  color: #eee;
-}
-
-.oc-list b + span {
-  display: block;
-  margin-top: .05rem;
-  font-size: .82rem;
-  color: #999;
-}
-
-@media screen and (min-width: 768px) {
-  .oc-list { grid-template-columns: repeat(3, 1fr); }
-  .oc-list li { grid-template-columns: 1fr; align-items: start; align-content: start; }
-}
 
 /*===== CONTACT PAGE: refresh =====*/
 /* Same feel as the About page: the key words in the yellow marker style,
@@ -8307,9 +8252,8 @@ html.is-frozen .egg-crash * {
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -.02em;
-  color: var(--fifteenth-color);
+  color: #eee; /* white words; the numbers carry the yellow */
   padding-bottom: .04em;
-  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .12em no-repeat;
   transform-origin: 50% 100%;
 }
 
@@ -8317,16 +8261,11 @@ html.is-frozen .egg-crash * {
 .sw-list.will-drop .sw-n { opacity: 0; transition: opacity .3s .35s; }
 .sw-list.will-drop .sw-w {
   opacity: 0;
-  color: #eee;
-  background-size: 0% .12em;
   transform: translateY(-140%) rotate(var(--tilt, -5deg));
 }
 .sw-list.will-drop li.is-in .sw-n { opacity: 1; }
 .sw-list.will-drop li.is-in .sw-w {
   animation: sw-drop .75s cubic-bezier(.3, 0, .3, 1) forwards;
-  color: var(--fifteenth-color);
-  background-size: 100% .12em;
-  transition: color .4s .55s, background-size .5s cubic-bezier(.65, 0, .35, 1) .6s;
 }
 
 @keyframes sw-drop {
@@ -8385,20 +8324,7 @@ html.is-frozen .egg-crash * {
 .xb-lb h3 { margin: 0; font-size: 1.05rem; color: #eee; }
 .xb-lb .xb-go { margin: 0; padding: 0; }
 
-/* home: the sign-off's label is grey like the other section labels */
-.hm-signoff .ab-cta-k { color: #8a8a8a; }
-
-/* Sign-off: a big statement on the page, no card */
-.hm-signoff .ab-cta {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  overflow: visible;
-}
-
-.hm-signoff .ab-cta p {
+.ab-cta p {
   font-size: clamp(2rem, 9vw, 3rem);
   margin: .6rem 0 1.4rem;
 }
