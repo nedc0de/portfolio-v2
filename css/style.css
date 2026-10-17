@@ -97,6 +97,24 @@ html {
     var(--thirteenth-color);
 }
 
+/* phones: just the dots, no x marks, maths notes or spotlight (calmer) */
+@media (max-width: 767px) {
+  html {
+    background:
+      /* soft fade around the edges: the grid shows in the middle and melts
+         into the plain page colour at the sides, the very top and the bottom */
+      linear-gradient(to right, var(--thirteenth-color), transparent var(--edge-fade), transparent calc(100% - var(--edge-fade)), var(--thirteenth-color)),
+      linear-gradient(var(--thirteenth-color), transparent) 0 0 / 100% 280px no-repeat,
+      linear-gradient(transparent, var(--thirteenth-color)) 0 100% / 100% 280px no-repeat,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.07'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 144px 144px,
+      radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
+      var(--thirteenth-color);
+  }
+
+  .grid-spot,
+  .bg-math { display: none; }
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -4827,7 +4845,7 @@ a.tk-item:hover,
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--fifteenth-color);
+  color: #8a8a8a; /* grey: on the home page yellow is kept for links and key words */
   margin: 0 0 1rem;
   text-align: left;
 }
@@ -7593,8 +7611,7 @@ html.is-frozen .egg-crash * {
 .xb-go span { display: inline-block; transition: transform .25s; }
 
 @media (hover: hover) {
-  .xb-card:hover .xb-go span,
-  .xb-lb-link:hover .xb-go span { transform: translateX(3px); }
+  .xb-card:hover .xb-go span { transform: translateX(3px); }
 }
 
 /* Favorites: poster on the left, its own scene blurred behind the card */
@@ -7758,62 +7775,11 @@ html.is-frozen .egg-crash * {
   background: var(--fifteenth-color);
 }
 
-/* Lab: a mini version of the Lab's dot-matrix departure board */
-.xb-led {
-  display: grid;
-  gap: .2rem;
-  margin: .8rem 0 0;
-  padding: .55rem .6rem;
-  border: 1px solid rgba(255, 255, 255, .05);
-  border-radius: 8px;
-  /* unlit LEDs behind the text */
-  background:
-    radial-gradient(circle, rgba(255, 220, 22, .07) 0 .9px, transparent 1.1px) 0 0 / 4px 4px,
-    #0b0b0b;
-  font: 800 .98rem/1.15 "Doto", ui-monospace, monospace;
-  letter-spacing: .04em;
-  text-align: left;
-  white-space: nowrap;
-  color: rgba(255, 220, 22, .68);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.xb-led-row.is-home {
-  color: var(--fifteenth-color);
-  text-shadow: 0 0 6px rgba(255, 220, 22, .45);
-}
-
-.xb-led-row.is-home::before { content: "▸"; margin-right: .1em; }
-.xb-led-row:not(.is-home) { padding-left: .72em; }
-
-/* a new city flickers on like an LED panel */
-.xb-led-row.is-new { animation: xb-led-on .5s steps(1, end); }
-
-@keyframes xb-led-on {
-  0%, 30% { opacity: 0; }
-  15%, 45%, 100% { opacity: 1; }
-}
-
-.xb-lb-link {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  color: inherit;
-}
-
-.xb-lb-link h3 {
-  margin: .55rem 0 0;
-  font-size: .92rem;
-  color: #eee;
-}
-
 @media screen and (min-width: 768px) {
   .xb { gap: .9rem; }
   .xb-card { padding: 1.2rem; }
   .xb-title { font-size: 1.4rem; }
   .xb-word { font-size: 1.9rem; }
-  .xb-led { font-size: 1.25rem; padding: .7rem .8rem; }
 }
 
 /* coming in: one card after another */
@@ -8407,23 +8373,20 @@ html.is-frozen .egg-crash * {
 .xb-ab .xb-dots { margin: .7rem 0 0; }
 .xb-ab .xb-go { margin-top: 0; padding-top: .9rem; }
 
-/* Lab: the board takes the width, title and link on one line under it */
-.xb-lb .xb-led {
-  margin-top: .7rem;
-  font-size: 1.35rem;
-  padding: .7rem .9rem;
-}
-
-.xb-lb .xb-lb-link {
-  flex-direction: row;
+/* Lab: one compact row, the newest experiment's name and a link */
+.xb-lb .xb-lb-row {
+  display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding-top: .8rem;
+  padding-top: .45rem;
 }
 
-.xb-lb .xb-lb-link h3 { margin: 0; font-size: 1.05rem; }
-.xb-lb .xb-lb-link .xb-go { margin: 0; padding: 0; }
+.xb-lb h3 { margin: 0; font-size: 1.05rem; color: #eee; }
+.xb-lb .xb-go { margin: 0; padding: 0; }
+
+/* home: the sign-off's label is grey like the other section labels */
+.hm-signoff .ab-cta-k { color: #8a8a8a; }
 
 /* Sign-off: a big statement on the page, no card */
 .hm-signoff .ab-cta {
@@ -9352,139 +9315,6 @@ html.is-frozen .egg-crash * {
   height: 1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
-}
-
-/*===== HOME: Lab tile, mini receipt printer =====*/
-/* The Lab tile features the newest experiment (scripts.js). For the receipt
-   printer: a small printer with a short receipt for the latest movie pick
-   hanging out of it; tap it and it prints again. */
-.xb-lb-mini[hidden] { display: none; }
-
-.xb-rcpt {
-  display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: .8rem auto 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.xb-rcpt-printer {
-  position: relative;
-  z-index: 1;
-  display: block;
-  height: 30px;
-  border-radius: 10px 10px 5px 5px;
-  background: linear-gradient(#3a3a3a, #262626);
-  box-shadow: inset 0 1px 0 #555, 0 10px 18px -8px #000;
-}
-
-.xb-rcpt-printer::before {
-  content: "";
-  position: absolute;
-  top: 9px;
-  right: 14px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #3cff7a;
-  box-shadow: 0 0 8px #3cff7a;
-}
-
-.xb-rcpt-printer::after {
-  content: "";
-  position: absolute;
-  inset: auto 12px 6px;
-  height: 4px;
-  border-radius: 2px;
-  background: #0a0a0a;
-}
-
-.xb-rcpt.is-printing .xb-rcpt-printer::before { animation: rp-blink .25s steps(2) infinite; animation-iteration-count: 5; }
-
-/* clipped at the slot, so the paper comes out of it */
-.xb-rcpt-out {
-  display: block;
-  margin-top: -8px;
-  padding: 0 0 18px;
-  clip-path: inset(0 -30px -40px -30px);
-}
-
-.xb-rcpt-paper {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  width: min(250px, 78%);
-  margin: 0 auto;
-  padding: 16px 14px 20px;
-  box-sizing: border-box;
-  color: #262626;
-  font: 400 .62rem/1.45 'Space Mono', ui-monospace, Menlo, monospace;
-  text-align: left;
-  background: linear-gradient(90deg, rgba(0, 0, 0, .04), transparent 8%, transparent 92%, rgba(0, 0, 0, .04)), #f7f5ee;
-  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 10px 51% repeat-x, linear-gradient(#000 0 0) top / 100% 51% no-repeat;
-  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 10px 51% repeat-x, linear-gradient(#000 0 0) top / 100% 51% no-repeat;
-  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, .5));
-}
-
-.xb-rcpt.is-printing .xb-rcpt-paper { animation: rp-feed 1.4s steps(12, end) both; }
-
-.xb-rcpt-head {
-  margin-bottom: 4px;
-  font-size: .8rem;
-  letter-spacing: .18em;
-  text-align: center;
-}
-
-.xb-rcpt-row {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.xb-rcpt-row > i {
-  flex: 1;
-  min-width: 6px;
-  overflow: hidden;
-  white-space: nowrap;
-  color: #999;
-}
-
-.xb-rcpt-row > i::before { content: ". . . . . . . . . . . . . . . . . . . . . . . . ."; }
-
-.xb-rcpt-item {
-  overflow: hidden;
-  font-weight: 700;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.xb-rcpt-total { font-size: .86rem; font-weight: 700; }
-
-.xb-rcpt-stamp {
-  align-self: center;
-  margin: 6px 0 2px;
-  padding: 2px 8px;
-  border: 2px solid #d4202a;
-  border-radius: 4px;
-  color: #d4202a;
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  opacity: .85;
-  transform: rotate(-9deg);
-}
-
-.xb-rcpt-stamp:empty { display: none; }
-
-.xb-rcpt-bars {
-  height: 20px;
-  margin: 6px 4px 0;
-  background: repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 3px, #222 3px 4px, transparent 4px 7px, #222 7px 10px, transparent 10px 12px);
 }
 
 /*===== FOOTER: Ned × AI =====*/

@@ -3015,41 +3015,10 @@ function readPostsSeen() {
     } else start();
   }
 
-  // Lab: a mini dot-matrix departure board, Montreal on top and two more
-  // cities under it (airport codes, like a real board). Each tap brings in
-  // the next two cities.
-  const led = box.querySelector('.xb-led');
-  if (led) {
-    const CITIES = [
-      ['LDN', 'Europe/London'], ['TYO', 'Asia/Tokyo'], ['DXB', 'Asia/Dubai'],
-      ['SYD', 'Australia/Sydney'], ['LAX', 'America/Los_Angeles'], ['PAR', 'Europe/Paris'],
-    ];
-    const fmt = (zone) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-    const home = ['MTL', fmt('America/Toronto')];
-    const others = CITIES.map(([code, zone]) => [code, fmt(zone)]);
-    const rows = [...led.querySelectorAll('.xb-led-row')];
-    let at = 0;
-    const draw = (blink) => {
-      const now = new Date();
-      const list = [home, others[at % others.length], others[(at + 1) % others.length]];
-      rows.forEach((row, k) => {
-        row.textContent = `${list[k][1].format(now)} ${list[k][0]}`;
-        if (blink && k && !still) { row.classList.remove('is-new'); void row.offsetWidth; row.classList.add('is-new'); }
-      });
-      led.setAttribute('aria-label', `World clock: ${list.map(([c, f]) => `${c} ${f.format(now)}`).join(', ')}. Tap to show other cities`);
-    };
-    draw();
-    setInterval(() => draw(), 10000);
-    led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
-  }
-
-  // Lab: the tile always shows the newest experiment, the last one in
-  // lab.html. Its title and link come from there, and its small preview if
-  // there's one for it here (data-mini); otherwise just the title.
+  // Lab: one row for the newest experiment, the last one in lab.html; its
+  // title and link come from there
   const lab = box.querySelector('.xb-lb');
   if (lab) {
-    const minis = [...lab.querySelectorAll('.xb-lb-mini')];
-    const link = lab.querySelector('.xb-lb-link');
     fetch('lab.html')
       .then((r) => (r.ok ? r.text() : Promise.reject()))
       .then((html) => {
@@ -3057,35 +3026,10 @@ function readPostsSeen() {
         const last = items[items.length - 1];
         const title = last?.querySelector('.lab-item-title')?.firstChild?.textContent.trim();
         if (!title) return;
-        link.querySelector('h3').textContent = title;
-        link.href = last.id ? `lab.html#${last.id}` : 'lab.html';
-        minis.forEach((m) => { m.hidden = m.dataset.mini !== last.dataset.mini; });
-        lab.classList.toggle('has-mini', minis.some((m) => !m.hidden));
+        lab.querySelector('h3').textContent = title;
+        lab.href = last.id ? `lab.html#${last.id}` : 'lab.html';
       })
-      .catch(() => {}); // offline: the tile keeps what's in the page
-
-    // the mini receipt printer: prints the latest movie pick (favorites.js)
-    const rc = lab.querySelector('.xb-rcpt');
-    if (rc) {
-      const fill = () => {
-        const pick = window.nedcodePick;
-        if (!pick) return;
-        rc.querySelector('.xb-rcpt-item').textContent = `1x ${pick.title.toUpperCase()}`;
-        rc.querySelector('.xb-rcpt-year').textContent = pick.year || '';
-        rc.querySelector('.xb-rcpt-score').textContent = `${pick.rating}/5`;
-        rc.querySelector('.xb-rcpt-stamp').textContent = (pick.verdict || '').toUpperCase();
-        rc.setAttribute('aria-label', `Mini receipt printer: ${pick.title}, ${pick.rating} out of 5. Tap to print it again`);
-      };
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill);
-      else fill();
-      rc.addEventListener('click', () => {
-        fill();
-        if (still) return;
-        rc.classList.remove('is-printing');
-        void rc.offsetWidth;
-        rc.classList.add('is-printing');
-      });
-    }
+      .catch(() => {}); // offline: the row keeps what's in the page
   }
 
   // Favorites: a 3D card you can spin all the way round. Tap it to flip it,

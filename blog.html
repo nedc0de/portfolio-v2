@@ -225,6 +225,23 @@
       </div>
     </section>
 
+    <!-- newsletter sign-up (scripts.js sends it to Beehiiv via the subscribe function) -->
+    <div class="hm-news bl-news">
+      <p class="hm-label">Newsletter</p>
+      <div class="hm-news-card">
+      <p class="hm-news-text">97% of subscribers never got a single email. The other 3% are <em>lying</em>.</p>
+      <form class="hm-news-form" action="/.netlify/functions/subscribe" method="post" novalidate>
+        <label class="hm-news-field">
+          <span class="sr-only">Email address</span>
+          <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+        </label>
+        <input class="hm-news-trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit">Subscribe <i class="uil uil-arrow-right" aria-hidden="true"></i></button>
+        <p class="hm-news-msg" role="status" aria-live="polite"></p>
+      </form>
+      </div>
+    </div>
+
     <p class="bl-credit">Credits: animated emoji reactions by <a href="https://googlefonts.github.io/noto-emoji-animation/" target="_blank" rel="noopener">Google Noto Emoji</a>, licensed <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
   </main>
 

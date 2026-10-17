@@ -13,7 +13,6 @@
 
   <!-- Custom and external CSS -->
   <link rel="stylesheet" href="./css/style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@800&display=swap">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
 
   <title>NEDCODE | Ned, Frontend Developer in Montreal</title>
@@ -251,33 +250,12 @@
             <span class="xb-dots" aria-hidden="true"></span>
             <span class="xb-go">Get to know me <span aria-hidden="true">→</span></span>
           </a>
-          <!-- Lab: always the newest experiment (scripts.js reads lab.html and
-               swaps in its title, link and preview); the receipt printer for now -->
-          <div class="xb-card xb-lb">
+          <!-- Lab: always the newest experiment, as one compact row (scripts.js
+               reads lab.html and swaps in its title and link) -->
+          <a class="xb-card xb-lb" href="lab.html#receipt-printer">
             <span class="xb-k">New in the Lab</span>
-            <!-- a mini receipt printer: tap it to print the latest movie pick -->
-            <div class="xb-lb-mini" data-mini="receipt">
-              <button class="xb-rcpt" type="button" aria-label="Mini receipt printer. Tap to print">
-                <span class="xb-rcpt-printer"></span>
-                <span class="xb-rcpt-out">
-                  <span class="xb-rcpt-paper">
-                    <b class="xb-rcpt-head">MOVIE NIGHT</b>
-                    <span class="xb-rcpt-row"><span class="xb-rcpt-item">1x LATEST PICK</span><i></i><span class="xb-rcpt-year"></span></span>
-                    <span class="xb-rcpt-row xb-rcpt-total"><span>TOTAL</span><i></i><span class="xb-rcpt-score">–/5</span></span>
-                    <span class="xb-rcpt-stamp"></span>
-                    <span class="xb-rcpt-bars"></span>
-                  </span>
-                </span>
-              </button>
-            </div>
-            <!-- a mini version of the Lab's dot-matrix departure board: tap it to bring in other cities -->
-            <div class="xb-lb-mini" data-mini="board" hidden>
-              <button class="xb-led" type="button" aria-label="World clock. Tap to show other cities">
-                <span class="xb-led-row is-home"></span><span class="xb-led-row"></span><span class="xb-led-row"></span>
-              </button>
-            </div>
-            <a class="xb-lb-link" href="lab.html#receipt-printer"><h3>Receipt printer</h3><span class="xb-go">Play with it <span aria-hidden="true">→</span></span></a>
-          </div>
+            <span class="xb-lb-row"><h3>Receipt printer</h3><span class="xb-go">Play with it <span aria-hidden="true">→</span></span></span>
+          </a>
         </div>
       </div>
 
@@ -294,21 +272,6 @@
         </section>
       </div>
 
-      <div class="hm-news">
-        <p class="hm-label">Newsletter</p>
-        <div class="hm-news-card">
-        <p class="hm-news-text">97% of subscribers never got a single email. The other 3% are <em>lying</em>.</p>
-        <form class="hm-news-form" action="/.netlify/functions/subscribe" method="post" novalidate>
-          <label class="hm-news-field">
-            <span class="sr-only">Email address</span>
-            <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
-          </label>
-          <input class="hm-news-trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <button type="submit">Subscribe <i class="uil uil-arrow-right" aria-hidden="true"></i></button>
-          <p class="hm-news-msg" role="status" aria-live="polite"></p>
-        </form>
-        </div>
-      </div>
     </section>
   </main>
 

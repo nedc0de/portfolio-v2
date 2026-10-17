@@ -12,8 +12,7 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
   phone-size browser on every page it touches, including Netlify-style pretty
   URLs (`/about` instead of `/about.html`), and check links actually open.
 - New Lab experiments go at the end of `lab.html` (with an `id`): the home
-  page's Lab tile always features the last one. Give it a small home preview
-  (`data-mini` + a matching `.xb-lb-mini` in `index.html`) when it fits.
+  page's "New in the Lab" row always shows the last one.
 - Never change the logo, the home hero ("Hi, I'm Ned 👋 / Frontend Dev /
   Based out of Montreal") or the Lab's own buttons unless asked.
 - This environment usually can't reach rockstargames.com or reddit.com. If you

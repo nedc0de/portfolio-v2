@@ -1286,7 +1286,7 @@
 
     show(0);
     homeCard.hidden = false;
-    // the home ticker and the Lab tile's mini receipt show the latest pick
+    // the home ticker shows the latest pick
     window.nedcodePick = { title: deck[0].title, rating: deck[0].rating, year: deck[0].year, verdict: verdict(deck[0].rating) };
     return;
   }
