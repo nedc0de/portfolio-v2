@@ -1204,8 +1204,9 @@
 // Prints one of the favorites (favorites.js shares the list) as a till
 // receipt: the poster in black-and-white dots, the details as line items, the
 // score as the total and a red verdict stamp. The back is the "customer copy"
-// with the take, if there is one, and a QR code to the Favorites page. The
-// receipt slides out of the printer, then tap (or Enter) flips it.
+// with the take, if there is one, and a QR code to the Favorites page. It only
+// prints when Print (or Surprise me) is pressed: the receipt slides out of the
+// printer, then tap (or Enter) flips it.
 (() => {
   const root = document.getElementById('labReceipt');
   const favs = window.nedcodeFavs;
@@ -1333,17 +1334,8 @@
     pick.value = opts[Math.floor(Math.random() * opts.length)].value;
     print();
   });
-  pick.addEventListener('change', print);
 
-  // start with the newest movie already printed (it prints once it's in view)
+  // the newest movie is picked to start with; nothing prints until Print is pressed
   const first = list.findIndex((f) => f.type === 'movie');
   pick.value = String(first < 0 ? 0 : first);
-  if ('IntersectionObserver' in window && !still) {
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      print();
-    }, { threshold: .35 });
-    io.observe(root);
-  } else print();
 })();
