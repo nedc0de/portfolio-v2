@@ -4606,7 +4606,7 @@ a.bl-row:hover {
   width: 100%;
   min-width: 0;
   max-width: 560px;
-  margin: 2rem auto 0;
+  margin: 3.5rem auto 0;
   text-align: left;
 }
 
@@ -4614,8 +4614,8 @@ a.bl-row:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: .5rem;
-  font-size: .72rem;
+  margin-bottom: .45rem;
+  font-size: .62rem;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -4629,14 +4629,14 @@ a.bl-row:hover {
   color: var(--fourteenth-color);
   letter-spacing: .06em;
   text-transform: none;
-  font-size: .78rem;
+  font-size: .7rem;
 }
 
 .tk-here b { color: var(--fourth-color); }
 
 .tk-here-eyes {
-  width: 1.4rem;
-  height: .85rem;
+  width: 1.15rem;
+  height: .7rem;
   overflow: visible;
 }
 
@@ -4717,11 +4717,13 @@ a.bl-row:hover {
   to { transform: scale(2.8); opacity: 0; }
 }
 
+/* one thin strip between hairlines: the time, then the scrolling titles */
 .tk-bar {
   display: flex;
   align-items: stretch;
-  height: 3rem;
-  border-radius: 8px;
+  height: 2.4rem;
+  border-top: 1px solid #262626;
+  border-bottom: 1px solid #262626;
   background: var(--thirteenth-color);
   overflow: hidden;
 }
@@ -4730,26 +4732,23 @@ a.bl-row:hover {
 .tk-time {
   flex: none;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 .85rem;
-  border-radius: 6px;
-  background: var(--fifteenth-color);
-  color: var(--eleventh-color);
-  line-height: 1.05;
+  gap: .35rem;
+  padding: 0 .8rem 0 0;
+  border-right: 1px solid #262626;
+  line-height: 1;
 }
 
 .tk-clock {
-  font-size: .95rem;
-  font-weight: 700;
+  font: 600 .8rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   white-space: nowrap;
+  color: #cfcfcf;
 }
 
 .tk-time small {
-  font-size: .62rem;
-  font-weight: 700;
-  letter-spacing: .14em;
+  font: 700 .58rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .1em;
+  color: #777;
 }
 
 /* Scrolling headlines */
@@ -4797,10 +4796,10 @@ a.bl-row:hover {
   align-items: center;
   gap: .55rem;
   padding-right: 2.25rem;
-  font-size: .92rem;
+  font-size: .82rem;
   font-weight: 600;
   white-space: nowrap;
-  color: var(--fourth-color);
+  color: #bdbdbd;
 }
 
 .tk-link {
@@ -4816,20 +4815,17 @@ a.tk-item:hover,
 }
 
 .tk-tag {
-  padding: .12rem .45rem;
-  border: 1px solid var(--fifteenth-color);
-  border-radius: 6px;
-  font-size: .65rem;
+  font-size: .58rem;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--fifteenth-color);
+  color: #777;
 }
 
 .tk-src {
-  font-size: .78rem;
+  font-size: .72rem;
   font-weight: 500;
-  color: #8a8a8a;
+  color: #6f6f6f;
 }
 
 
