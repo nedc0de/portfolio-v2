@@ -8460,7 +8460,7 @@ html.is-frozen .egg-crash * {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: calc(var(--w) * 1.9);
+  width: min(calc(var(--w) * 1.9), 100vw); /* never wider than the screen; its edge is already faded out */
   aspect-ratio: 1;
   background: var(--poster, none) center / cover;
   filter: blur(46px) saturate(1.5);
