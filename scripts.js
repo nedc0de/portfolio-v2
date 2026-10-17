@@ -2240,7 +2240,7 @@ function readPostsSeen() {
 // Plays the Roadster stunt once when it scrolls into view: the car follows
 // the ramp (wheels on the track, so it ends up upside down at the top), its
 // fan arrows show while it's on the ramp, then it leaves the ramp, the
-// thrusters roll it upright, it hovers and lands. The step list lights up as
+// thrusters roll it upright (still facing the way it's going), it hovers and lands. The step list lights up as
 // it goes. Reduced motion or no JS: the landed car and every step, as drawn.
 (() => {
   const fig = document.querySelector('.ps-flip');
@@ -2255,7 +2255,10 @@ function readPostsSeen() {
   const lerp = (a, b, t) => a + (b - a) * t;
   const ease = (t) => (t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
-  const place = (x, y, deg) => car.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+  // sx/sy mirror the car: after the ramp it's heading left, so it's drawn
+  // mirrored (sx -1); upside down is sy -1, and the roll upright runs sy from
+  // -1 to 1, like a real roll seen from the side (it keeps facing left)
+  const place = (x, y, deg, sx = 1, sy = 1) => car.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${deg.toFixed(1)}) scale(${sx} ${sy.toFixed(3)})`);
   // a point on the ramp route, with the car's angle and its centre lifted off the track
   const onTrack = (s) => {
     const p = route.getPointAtLength(s);
@@ -2290,20 +2293,20 @@ function readPostsSeen() {
     } else if (ms < T[0] + T[1]) {
       fig.classList.remove('is-fan');
       const t = (ms - T[0]) / T[1];
-      place(lerp(top.x, LEAVE.x, t), lerp(top.y, LEAVE.y, t * t), 180);
+      place(lerp(top.x, LEAVE.x, t), lerp(top.y, LEAVE.y, t * t), 0, -1, -1);
     } else if (ms < T[0] + T[1] + T[2]) {
       fig.classList.add('is-thrust');
       const t = ease((ms - T[0] - T[1]) / T[2]);
-      place(lerp(LEAVE.x, HOVER.x, t), lerp(LEAVE.y, HOVER.y, t), lerp(180, 360, t));
+      place(lerp(LEAVE.x, HOVER.x, t), lerp(LEAVE.y, HOVER.y, t), Math.sin(t * Math.PI) * -8, -1, lerp(-1, 1, t));
     } else if (ms < T[0] + T[1] + T[2] + T[3]) {
       const t = (ms - T[0] - T[1] - T[2]) / T[3];
       const bob = t < .4 ? Math.sin(t / .4 * Math.PI) * -4 : 0;
       const land = t < .4 ? 0 : ease((t - .4) / .6);
-      place(HOVER.x, lerp(HOVER.y, END.y, land) + bob, 0);
+      place(HOVER.x, lerp(HOVER.y, END.y, land) + bob, 0, -1, 1);
     } else {
       // lands exactly on the drawn final state
       fig.classList.remove('is-thrust', 'is-fan');
-      place(END.x, END.y, 0);
+      place(END.x, END.y, 0, -1, 1);
       steps.forEach((li) => li.classList.remove('is-on'));
       fig.classList.remove('will-play');
       playing = false;
