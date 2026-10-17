@@ -1206,7 +1206,7 @@
 // score as the total and a red verdict stamp. The back is the "customer copy"
 // with the take, if there is one, and a QR code to the Favorites page. It only
 // prints when Print (or Surprise me) is pressed: the receipt slides out of the
-// printer, then tap (or Enter) flips it.
+// printer, a blade cuts it off and it drops free, then tap (or Enter) flips it.
 (() => {
   const root = document.getElementById('labReceipt');
   const favs = window.nedcodeFavs;
@@ -1308,25 +1308,38 @@
     sr.textContent = `Printed: ${f.title}, ${f.rating} out of 5, ${say}.`;
   };
 
+  // print: the paper feeds out of the slot, then a blade cuts it and it
+  // drops free; only a cut receipt can be flipped
+  let cutTimer;
   const print = () => {
+    clearTimeout(cutTimer);
     paper.hidden = false;
-    paper.classList.remove('is-flipped', 'is-printing');
+    paper.classList.remove('is-flipped', 'is-printing', 'is-cut');
+    root.classList.remove('is-cutting');
     draw(Number(pick.value));
-    if (still) return;
+    if (still) { paper.classList.add('is-cut'); return; }
     void paper.offsetWidth; // restart the feed animation
     paper.classList.add('is-printing');
     root.classList.add('is-busy');
   };
-  paper.addEventListener('animationend', () => root.classList.remove('is-busy'));
+  paper.addEventListener('animationend', (e) => {
+    if (e.target !== paper || e.animationName !== 'rp-feed') return;
+    paper.classList.remove('is-printing');
+    root.classList.remove('is-busy');
+    root.classList.add('is-cutting'); // the blade runs across the slot
+    cutTimer = setTimeout(() => {
+      root.classList.remove('is-cutting');
+      paper.classList.add('is-cut');
+    }, 380);
+  });
 
-  const flip = () => { if (!paper.classList.contains('is-printing') || still) paper.classList.toggle('is-flipped'); };
+  const flip = () => { if (paper.classList.contains('is-cut')) paper.classList.toggle('is-flipped'); };
   paper.addEventListener('click', flip);
   paper.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     e.preventDefault();
     flip();
   });
-  paper.addEventListener('animationend', () => paper.classList.remove('is-printing'));
 
   root.querySelector('.rp-print').addEventListener('click', print);
   root.querySelector('.rp-random').addEventListener('click', () => {

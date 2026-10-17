@@ -9027,12 +9027,35 @@ html.is-frozen .egg-crash * {
 
 .rp.is-busy .rp-led { animation: rp-blink .25s steps(2) infinite; }
 
+/* the cutter: a bright blade runs along the slot once the paper is out */
+.rp-printer::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  bottom: 7px;
+  left: 14px;
+  width: 22px;
+  height: 7px;
+  border-radius: 2px;
+  background: linear-gradient(#f4f4f4, #9a9a9a);
+  box-shadow: 0 0 8px rgba(255, 255, 255, .6);
+  opacity: 0;
+}
+
+.rp.is-cutting .rp-printer::before { animation: rp-blade .38s ease-in-out; }
+
+@keyframes rp-blade {
+  0% { opacity: 1; transform: translateX(0); }
+  90% { opacity: 1; transform: translateX(calc(min(272px, 100%) - 50px)); }
+  100% { opacity: 0; transform: translateX(calc(min(272px, 100%) - 50px)); }
+}
+
 @keyframes rp-blink { 50% { opacity: .25; } }
 
 /* the paper comes out of the slot: clipped at the top only */
 .rp-out {
   margin-top: -12px;
-  padding: 0 0 24px;
+  padding: 0 0 52px;
   clip-path: inset(0 -40px -60px -40px);
 }
 
@@ -9046,6 +9069,14 @@ html.is-frozen .egg-crash * {
 }
 
 .rp-paper.is-printing { animation: rp-feed 1.9s steps(16, end) both; }
+
+/* cut off: the receipt drops free of the printer with a little tilt */
+.rp-paper.is-cut {
+  transform: translateY(26px) rotate(-1.8deg);
+  transition: transform .55s cubic-bezier(.3, 1.5, .5, 1);
+}
+
+.rp-paper:not(.is-cut) { cursor: default; }
 
 @keyframes rp-feed {
   from { transform: translateY(-100%); }
@@ -9076,14 +9107,24 @@ html.is-frozen .egg-crash * {
     radial-gradient(circle at 84% 90%, transparent 24px, rgba(150, 95, 40, .12) 25px, rgba(150, 95, 40, .04) 29px, transparent 30px),
     linear-gradient(90deg, rgba(0, 0, 0, .04), transparent 7%, transparent 93%, rgba(0, 0, 0, .04)),
     var(--paper);
+  /* torn bottom edge; the top stays straight while it's still in the printer */
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
+    linear-gradient(#000 0 0) top / 100% 51% no-repeat;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
+    linear-gradient(#000 0 0) top / 100% 51% no-repeat;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rp-paper.is-cut .rp-face {
   -webkit-mask:
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
     conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 51% repeat-x;
   mask:
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
     conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 51% repeat-x;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .rp-back {
