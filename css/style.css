@@ -8012,37 +8012,6 @@ html.is-frozen .egg-crash * {
   background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
 }
 
-.fav-fresh {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  margin: 1rem 0 0;
-  padding: .3rem .75rem;
-  border: 1px solid rgba(255, 220, 22, .25);
-  border-radius: 999px;
-  background: rgba(255, 220, 22, .06);
-  font-size: .78rem;
-  font-weight: 600;
-  color: var(--fifteenth-color);
-}
-
-.fav-fresh-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--fifteenth-color);
-  box-shadow: 0 0 0 0 rgba(255, 220, 22, .6);
-  animation: fav-fresh 2s ease-out infinite;
-}
-
-@keyframes fav-fresh {
-  to { box-shadow: 0 0 0 7px rgba(255, 220, 22, 0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fav-fresh-dot { animation: none; }
-}
-
 @media screen and (min-width: 768px) {
   .fav-lead { max-width: 38rem; }
 }
@@ -8236,6 +8205,38 @@ html.is-frozen .egg-crash * {
 
 @media (hover: hover) {
   .fav-filter:not([aria-pressed='true']):hover { border-color: #555; color: var(--fourth-color); }
+}
+
+/* one row: the filters, then "Pick for me" in the same chip style (its
+   shuffle icon in yellow); on narrow screens the row scrolls sideways */
+.fav-bar {
+  contain: inline-size; /* the scrolling row never widens the page */
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: .5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: .2rem;
+}
+
+.fav-bar::-webkit-scrollbar { display: none; }
+
+.fav-filters { flex: none; flex-wrap: nowrap; }
+
+.fav-filter,
+.fav-pick { flex: none; padding: 0 .7rem; }
+
+.fav-pick,
+.fav-pick:hover {
+  border: 1px solid #2c2c2c;
+  background: #121212;
+  color: #aaa;
+}
+
+.fav-pick svg { color: var(--fifteenth-color); }
+
+@media (hover: hover) {
+  .fav-pick:hover { border-color: #555; color: var(--fourth-color); }
 }
 
 .fav-pick {

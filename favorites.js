@@ -910,7 +910,6 @@
           <span class="fav-face fav-front" style="background-color:${TONES[i % TONES.length]}">
             <span class="fav-placeholder-title">${escapeHTML(f.title)}</span>
             <img class="fav-cover" alt="" decoding="async">
-            <span class="fav-tag">${TYPE_NAME[f.type]}</span>
             <span class="fav-score">★ ${rating}</span>
           </span>
           <span class="fav-face fav-back">
