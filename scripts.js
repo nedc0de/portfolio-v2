@@ -3043,6 +3043,51 @@ function readPostsSeen() {
     led.addEventListener('click', () => { at = (at + 2) % others.length; draw(true); });
   }
 
+  // Lab: the tile always shows the newest experiment, the last one in
+  // lab.html. Its title and link come from there, and its small preview if
+  // there's one for it here (data-mini); otherwise just the title.
+  const lab = box.querySelector('.xb-lb');
+  if (lab) {
+    const minis = [...lab.querySelectorAll('.xb-lb-mini')];
+    const link = lab.querySelector('.xb-lb-link');
+    fetch('lab.html')
+      .then((r) => (r.ok ? r.text() : Promise.reject()))
+      .then((html) => {
+        const items = new DOMParser().parseFromString(html, 'text/html').querySelectorAll('.lab-item');
+        const last = items[items.length - 1];
+        const title = last?.querySelector('.lab-item-title')?.firstChild?.textContent.trim();
+        if (!title) return;
+        link.querySelector('h3').textContent = title;
+        link.href = last.id ? `lab.html#${last.id}` : 'lab.html';
+        minis.forEach((m) => { m.hidden = m.dataset.mini !== last.dataset.mini; });
+        lab.classList.toggle('has-mini', minis.some((m) => !m.hidden));
+      })
+      .catch(() => {}); // offline: the tile keeps what's in the page
+
+    // the mini receipt printer: prints the latest movie pick (favorites.js)
+    const rc = lab.querySelector('.xb-rcpt');
+    if (rc) {
+      const fill = () => {
+        const pick = window.nedcodePick;
+        if (!pick) return;
+        rc.querySelector('.xb-rcpt-item').textContent = `1x ${pick.title.toUpperCase()}`;
+        rc.querySelector('.xb-rcpt-year').textContent = pick.year || '';
+        rc.querySelector('.xb-rcpt-score').textContent = `${pick.rating}/5`;
+        rc.querySelector('.xb-rcpt-stamp').textContent = (pick.verdict || '').toUpperCase();
+        rc.setAttribute('aria-label', `Mini receipt printer: ${pick.title}, ${pick.rating} out of 5. Tap to print it again`);
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill);
+      else fill();
+      rc.addEventListener('click', () => {
+        fill();
+        if (still) return;
+        rc.classList.remove('is-printing');
+        void rc.offsetWidth;
+        rc.classList.add('is-printing');
+      });
+    }
+  }
+
   // Favorites: a 3D card you can spin all the way round. Tap it to flip it,
   // or drag sideways (or use the arrow keys) to turn it; let go and it keeps
   // spinning a little, then settles on whichever side faces you, swaying
