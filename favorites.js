@@ -1181,6 +1181,15 @@
     const dotsBox = homeCard.querySelector('.tk3-dots');
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const covers = deck.map((f) => coverFor(f).catch(() => ''));
+    // load every poster in the deck at front-card size up front, so a swap
+    // never waits on the network
+    covers.forEach((p) => p.then((url) => {
+      if (!url) return;
+      const pre = new Image();
+      const set = coverSrcset(url);
+      if (set) { pre.sizes = '250px'; pre.srcset = set; }
+      pre.src = url;
+    }));
     let at = 0;
 
     // a poster into an <img>, sharp on every screen; ok() runs once it shows
@@ -1271,7 +1280,8 @@
         let frames = 0;
         const settle = () => {
           const ready = tk.classList.contains('has-poster') || tk.classList.contains('no-poster');
-          if (!ready && frames++ < 45) { requestAnimationFrame(settle); return; }
+          if (!ready && frames++ < 150) { requestAnimationFrame(settle); return; }
+          tk.dispatchEvent(new CustomEvent('tk3:reset')); // flat at the hand-over
           scene.classList.add('is-settling');
           scene.classList.remove('is-swapping');
           peek.classList.remove('is-rising');

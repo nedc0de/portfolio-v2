@@ -3042,6 +3042,7 @@ function readPostsSeen() {
   const tk = movie && movie.querySelector('.tk3');
   if (tk) {
     let angle = 0, tilt = 0, vel = 0, drag = null, running = false, visible = false, last = 0, intro = false;
+    let swayFrom = 0; // the sway restarts from flat after a swap, so the new card never jumps
     let goal = null; // the side a tap flips it to
     let lean = null, leanX = 0, leanY = 0; // mouse position over the card (-.5 to .5) and the eased lean
     const paint = () => {
@@ -3089,13 +3090,13 @@ function readPostsSeen() {
           // settle on the nearest side, with a slow sway (none with reduced
           // motion, or while the mouse is leaning it)
           const face = Math.round(angle / 180) * 180;
-          const sway = still || lean ? 0 : Math.sin(now / 1400) * 9;
+          const sway = still || lean ? 0 : Math.sin((now - swayFrom) / 1400) * 9;
           angle += (face + sway - angle) * Math.min(1, dt * 4);
         }
         const ease = Math.min(1, dt * 8);
         leanX += ((lean ? lean.x : 0) - leanX) * ease;
         leanY += ((lean ? lean.y : 0) - leanY) * ease;
-        tilt += ((still ? 0 : Math.sin(now / 1900) * 3) - tilt) * Math.min(1, dt * 4);
+        tilt += ((still ? 0 : Math.sin((now - swayFrom) / 1900) * 3) - tilt) * Math.min(1, dt * 4);
       }
       paint();
       if (visible || drag || Math.abs(vel) > 30) requestAnimationFrame(loop);
@@ -3159,7 +3160,8 @@ function readPostsSeen() {
     });
     // another movie came to the front (favorites.js): face it, poster side
     tk.addEventListener('tk3:reset', () => {
-      angle = 0; vel = 0; goal = null;
+      angle = 0; vel = 0; goal = null; tilt = 0; leanX = 0; leanY = 0;
+      swayFrom = performance.now();
       tk.classList.remove('is-scored');
       paint();
       run();
