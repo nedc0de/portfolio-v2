@@ -8453,40 +8453,82 @@ html.is-frozen .egg-crash * {
   perspective: 1100px;
 }
 
-/* the poster's own colours glow softly behind the deck: its top colour up
-   high, its bottom colour lower down (favorites.js reads them into --g1 and
-   --g2). Pure gradients with many gentle steps, so the glow is perfectly
-   smooth and melts into the page, and fades between movies */
+/* the poster's own palette glows behind the deck like a soft colour cloud:
+   one colour from each corner of the poster, in the same place around the
+   card (favorites.js reads them into --g1 to --g4). Pure gradients with many
+   gentle steps, so it's perfectly smooth and melts into the page; it drifts
+   very slowly, and fades between movies */
 .tk3-scene::before {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(calc(var(--w) * 2), 100vw);
-  aspect-ratio: 1 / 1.15;
+  width: min(calc(var(--w) * 2.1), 94vw);
+  aspect-ratio: 1 / 1.1;
   background:
-    radial-gradient(closest-side at 50% 42%,
-      rgba(var(--g1, 255, 220, 22), .5) 0%,
-      rgba(var(--g1, 255, 220, 22), .44) 30%,
-      rgba(var(--g1, 255, 220, 22), .32) 46%,
-      rgba(var(--g1, 255, 220, 22), .2) 58%,
-      rgba(var(--g1, 255, 220, 22), .11) 70%,
-      rgba(var(--g1, 255, 220, 22), .05) 81%,
-      rgba(var(--g1, 255, 220, 22), .015) 91%,
+    radial-gradient(closest-side at 34% 34%,
+      rgba(var(--g1, 255, 220, 22), 0.56) 0%,
+      rgba(var(--g1, 255, 220, 22), 0.54) 30%,
+      rgba(var(--g1, 255, 220, 22), 0.46) 46%,
+      rgba(var(--g1, 255, 220, 22), 0.34) 58%,
+      rgba(var(--g1, 255, 220, 22), 0.21) 69%,
+      rgba(var(--g1, 255, 220, 22), 0.11) 79%,
+      rgba(var(--g1, 255, 220, 22), 0.045) 88%,
+      rgba(var(--g1, 255, 220, 22), 0.012) 95%,
       rgba(var(--g1, 255, 220, 22), 0) 100%),
-    radial-gradient(closest-side at 50% 60%,
-      rgba(var(--g2, 255, 220, 22), .3) 0%,
-      rgba(var(--g2, 255, 220, 22), .24) 40%,
-      rgba(var(--g2, 255, 220, 22), .12) 62%,
-      rgba(var(--g2, 255, 220, 22), .04) 82%,
-      rgba(var(--g2, 255, 220, 22), 0) 100%);
+    radial-gradient(closest-side at 66% 34%,
+      rgba(var(--g2, 255, 220, 22), 0.56) 0%,
+      rgba(var(--g2, 255, 220, 22), 0.54) 30%,
+      rgba(var(--g2, 255, 220, 22), 0.46) 46%,
+      rgba(var(--g2, 255, 220, 22), 0.34) 58%,
+      rgba(var(--g2, 255, 220, 22), 0.21) 69%,
+      rgba(var(--g2, 255, 220, 22), 0.11) 79%,
+      rgba(var(--g2, 255, 220, 22), 0.045) 88%,
+      rgba(var(--g2, 255, 220, 22), 0.012) 95%,
+      rgba(var(--g2, 255, 220, 22), 0) 100%),
+    radial-gradient(closest-side at 36% 68%,
+      rgba(var(--g3, 255, 220, 22), 0.56) 0%,
+      rgba(var(--g3, 255, 220, 22), 0.54) 30%,
+      rgba(var(--g3, 255, 220, 22), 0.46) 46%,
+      rgba(var(--g3, 255, 220, 22), 0.34) 58%,
+      rgba(var(--g3, 255, 220, 22), 0.21) 69%,
+      rgba(var(--g3, 255, 220, 22), 0.11) 79%,
+      rgba(var(--g3, 255, 220, 22), 0.045) 88%,
+      rgba(var(--g3, 255, 220, 22), 0.012) 95%,
+      rgba(var(--g3, 255, 220, 22), 0) 100%),
+    radial-gradient(closest-side at 64% 68%,
+      rgba(var(--g4, 255, 220, 22), 0.56) 0%,
+      rgba(var(--g4, 255, 220, 22), 0.54) 30%,
+      rgba(var(--g4, 255, 220, 22), 0.46) 46%,
+      rgba(var(--g4, 255, 220, 22), 0.34) 58%,
+      rgba(var(--g4, 255, 220, 22), 0.21) 69%,
+      rgba(var(--g4, 255, 220, 22), 0.11) 79%,
+      rgba(var(--g4, 255, 220, 22), 0.045) 88%,
+      rgba(var(--g4, 255, 220, 22), 0.012) 95%,
+      rgba(var(--g4, 255, 220, 22), 0) 100%);
   opacity: 0;
   transform: translate(-50%, -50%);
-  transition: opacity .8s ease;
+  transition: opacity .9s ease;
   pointer-events: none;
 }
 
-.xb-mv.has-glow .tk3-scene::before { opacity: 1; }
+.xb-mv.has-glow .tk3-scene::before {
+  opacity: 1;
+  animation: tk3-drift 40s ease-in-out infinite alternate;
+}
+
+/* the glow wanders a little around the card, very slowly (a few pixels,
+   so it never reaches past the screen) */
+@keyframes tk3-drift {
+  0% { transform: translate(-50%, -50%); }
+  33% { transform: translate(calc(-50% - 8px), calc(-50% + 10px)); }
+  66% { transform: translate(calc(-50% + 9px), calc(-50% - 6px)); }
+  100% { transform: translate(calc(-50% - 3px), calc(-50% - 10px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xb-mv.has-glow .tk3-scene::before { animation: none; }
+}
 
 /* dots under the deck: which movie is in front; tap one to jump to it */
 .tk3-dots {

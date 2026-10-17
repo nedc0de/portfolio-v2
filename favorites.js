@@ -1194,9 +1194,9 @@
       el.src = url;
     };
 
-    // The poster's two main colours (its top and bottom halves), read from a
-    // tiny copy of it and made bright enough to glow on the dark page. The
-    // glow is then drawn with CSS gradients, so it stays perfectly smooth.
+    // The poster's palette: one colour from each corner, read from a tiny copy
+    // of it and made bright enough to glow on the dark page. The glow is then
+    // drawn with CSS gradients, so it stays perfectly smooth.
     const glowCache = {};
     const glowColors = (url) => {
       if (glowCache[url]) return glowCache[url];
@@ -1210,18 +1210,19 @@
             cv.height = 12;
             const cx = cv.getContext('2d', { willReadFrequently: true });
             cx.drawImage(small, 0, 0, 8, 12);
-            const half = (y) => {
-              const d = cx.getImageData(0, y, 8, 6).data;
+            // average colour of one corner of the poster
+            const area = (x, y) => {
+              const d = cx.getImageData(x, y, 4, 6).data;
               let r = 0, g = 0, b = 0, w = 0;
               for (let k = 0; k < d.length; k += 4) {
                 // colourful pixels count more than grey or near-black ones
                 const mx = Math.max(d[k], d[k + 1], d[k + 2]), mn = Math.min(d[k], d[k + 1], d[k + 2]);
-                const weight = 1 + (mx - mn) / 32 + mx / 255;
+                const weight = 1 + (mx - mn) / 12;
                 r += d[k] * weight; g += d[k + 1] * weight; b += d[k + 2] * weight; w += weight;
               }
               return glowTone(r / w, g / w, b / w);
             };
-            done([half(0), half(6)]);
+            done([area(0, 0), area(4, 0), area(0, 6), area(4, 6)]);
           } catch (e) { done(null); } // the image server didn't allow reading it
         };
         small.onerror = () => done(null);
@@ -1236,8 +1237,10 @@
       let h = 0;
       if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
       h *= 60;
-      const s = d ? Math.max(.55, Math.min(.85, d / (1 - Math.abs(mx + mn - 1)))) : 0;
-      const l = .52;
+      const sat = d ? d / (1 - Math.abs(mx + mn - 1)) : 0;
+      // colourful areas get vivid; grey or black areas stay a soft neutral
+      const s = sat < .15 ? sat : Math.max(.5, Math.min(.85, sat * 1.4));
+      const l = sat < .15 ? .4 : .52;
       const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
       const [a, bb, cc] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
       return [a, bb, cc].map((v) => Math.round((v + m) * 255)).join(', ');
@@ -1280,8 +1283,7 @@
         // the glow behind the deck: the poster's own colours as smooth gradients
         glowColors(url).then((c) => {
           if (at !== i || !c) return;
-          homeCard.style.setProperty('--g1', c[0]);
-          homeCard.style.setProperty('--g2', c[1]);
+          c.forEach((col, k) => homeCard.style.setProperty(`--g${k + 1}`, col));
           homeCard.classList.add('has-glow');
         });
       });
