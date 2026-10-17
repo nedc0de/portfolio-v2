@@ -9486,3 +9486,45 @@ html.is-frozen .egg-crash * {
   margin: 6px 4px 0;
   background: repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 3px, #222 3px 4px, transparent 4px 7px, #222 7px 10px, transparent 10px 12px);
 }
+
+/*===== FOOTER: Ned × AI =====*/
+/* One quiet grey line: Ned × AI | © year. The × is the only accent, a muted
+   yellow that sways a few degrees and glows a little, very slowly */
+.ft-sig {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  color: #8a8a8a;
+}
+
+.ft-x {
+  display: inline-block;
+  margin: 0 .55em;
+  font-weight: 400;
+  color: rgba(255, 220, 22, .7);
+  animation: ft-sway 8s ease-in-out infinite;
+}
+
+@keyframes ft-sway {
+  0%, 100% { transform: rotate(-5deg); text-shadow: 0 0 3px rgba(255, 220, 22, .15); }
+  50% { transform: rotate(5deg); text-shadow: 0 0 8px rgba(255, 220, 22, .35); }
+}
+
+.ft-div {
+  width: 1px;
+  height: 11px;
+  margin: 0 .9em;
+  background: linear-gradient(transparent, #444, transparent);
+}
+
+.ft-year {
+  font-weight: 400;
+  color: #6a6a6a;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-x { animation: none; }
+}
