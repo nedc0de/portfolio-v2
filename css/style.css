@@ -8943,3 +8943,322 @@ html.is-frozen .egg-crash * {
 @media screen and (min-width: 768px) {
   .tk3-scene { --w: 250px; }
 }
+
+/*===== LAB: receipt printer =====*/
+/* A pick from the favorites printed as a till receipt (lab.js). The paper
+   slides out of a small printer, tap it to flip to the customer copy. Its own
+   look on purpose: cream thermal paper, mono type, a red ink stamp. */
+.rp {
+  --paper: #f7f5ee;
+  --ink: #262626;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.rp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .6rem;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 1.4rem;
+}
+
+.rp-pick {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+  padding: .6rem .9rem;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1c1c1c;
+  color: #e6e6e6;
+  font: 500 .9rem var(--body-font);
+}
+
+.rp-btns {
+  display: flex;
+  gap: .5rem;
+}
+
+/* the printer: a dark box with a slot and a light that blinks while it prints */
+.rp-printer {
+  position: relative;
+  z-index: 2;
+  width: min(272px, 100%);
+  height: 40px;
+  border-radius: 12px 12px 6px 6px;
+  background: linear-gradient(#3a3a3a, #262626);
+  box-shadow: inset 0 1px 0 #555, 0 10px 20px -8px #000;
+}
+
+.rp-printer::after {
+  content: "";
+  position: absolute;
+  inset: auto 14px 8px;
+  height: 5px;
+  border-radius: 3px;
+  background: #0a0a0a;
+  box-shadow: inset 0 1px 2px #000;
+}
+
+.rp-name {
+  position: absolute;
+  top: 9px;
+  left: 16px;
+  font: 700 .5rem 'Space Mono', ui-monospace, monospace;
+  letter-spacing: .2em;
+  color: #888;
+}
+
+.rp-led {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3cff7a;
+  box-shadow: 0 0 8px #3cff7a;
+}
+
+.rp.is-busy .rp-led { animation: rp-blink .25s steps(2) infinite; }
+
+@keyframes rp-blink { 50% { opacity: .25; } }
+
+/* the paper comes out of the slot: clipped at the top only */
+.rp-out {
+  margin-top: -12px;
+  padding: 0 0 24px;
+  clip-path: inset(0 -40px -60px -40px);
+}
+
+.rp-paper {
+  width: 236px;
+  perspective: 1200px;
+  cursor: pointer;
+  outline: none;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, .55));
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rp-paper.is-printing { animation: rp-feed 1.9s steps(16, end) both; }
+
+@keyframes rp-feed {
+  from { transform: translateY(-100%); }
+  to { transform: none; }
+}
+
+.rp-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* the dotted lines never widen the paper */
+  transform-style: preserve-3d;
+  transition: transform .7s cubic-bezier(.3, .7, .2, 1.1);
+}
+
+.rp-paper.is-flipped .rp-card { transform: rotateY(180deg); }
+
+.rp-paper:focus-visible .rp-face { outline: 2px solid var(--fifteenth-color); outline-offset: 4px; }
+
+/* each side: cream paper with torn edges, a fold and a faint coffee ring */
+.rp-face {
+  grid-area: 1 / 1;
+  box-sizing: border-box;
+  padding: 20px 16px 26px;
+  color: var(--ink);
+  font: 400 .64rem/1.5 'Space Mono', ui-monospace, monospace;
+  text-align: left;
+  background:
+    linear-gradient(180deg, transparent 46%, rgba(0, 0, 0, .06) 46.4%, rgba(255, 255, 255, .7) 46.9%, transparent 48%),
+    radial-gradient(circle at 84% 90%, transparent 24px, rgba(150, 95, 40, .12) 25px, rgba(150, 95, 40, .04) 29px, transparent 30px),
+    linear-gradient(90deg, rgba(0, 0, 0, .04), transparent 7%, transparent 93%, rgba(0, 0, 0, .04)),
+    var(--paper);
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 51% repeat-x;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 12px 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 51% repeat-x;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rp-back {
+  display: flex;
+  flex-direction: column;
+  transform: rotateY(180deg);
+}
+
+/* the back is shorter: the QR code and thanks sit at the bottom of the paper */
+.rp-back .rp-eq { margin-top: auto; }
+
+.rp-c { text-align: center; }
+
+.rp-logo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.rp-small { font-size: .56rem; color: #555; }
+.rp-faded { opacity: .55; }
+.rp-top { margin-top: 6px; }
+
+.rp-sep {
+  overflow: hidden;
+  margin: 6px 0;
+  white-space: nowrap;
+  color: #888;
+  letter-spacing: .05em;
+}
+
+.rp-sep::before { content: "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"; }
+.rp-eq::before { content: "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ="; }
+
+/* label . . . . value */
+.rp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.rp-row > span:last-child { text-align: right; }
+
+.rp-row > i {
+  flex: 1;
+  min-width: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #999;
+}
+
+.rp-row > i::before { content: ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."; }
+.rp-top > span:last-child { margin-left: auto; }
+.rp-item { font-size: .72rem; font-weight: 700; }
+.rp-total { margin-top: 2px; font-size: 1.05rem; font-weight: 700; }
+
+/* the poster, printed as black-and-white dots */
+.rp-pic {
+  position: relative;
+  height: 128px;
+  margin: 8px 0 6px;
+  overflow: hidden;
+  background: radial-gradient(#bbb .8px, transparent 1.2px) 0 0 / 4px 4px, #e9e6dc;
+}
+
+.rp-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  filter: grayscale(1) contrast(1.55) brightness(1.08);
+  opacity: 0;
+  transition: opacity .4s;
+}
+
+.rp-pic.has-img img { opacity: 1; }
+
+.rp-pic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(rgba(247, 245, 238, .85) .6px, transparent 1.1px) 0 0 / 3px 3px;
+  mix-blend-mode: screen;
+}
+
+.rp-pic.is-empty::before {
+  content: "NO IMAGE";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: #777;
+}
+
+/* exact-fill stars in ink */
+.rp-stars { white-space: nowrap; font-size: .86rem; }
+
+.rp-star {
+  position: relative;
+  margin-left: 2px;
+  color: #cfcbbf;
+}
+
+.rp-star::before {
+  content: "★";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--f, 0%);
+  overflow: hidden;
+  color: var(--ink);
+}
+
+/* the verdict, stamped in red ink */
+.rp-stamp {
+  display: table;
+  margin: 10px auto 2px;
+  padding: 3px 9px;
+  border: 2px solid #d4202a;
+  border-radius: 4px;
+  color: #d4202a;
+  font: 700 .8rem 'Space Mono', ui-monospace, monospace;
+  letter-spacing: .08em;
+  opacity: .85;
+  transform: rotate(-11deg);
+  mix-blend-mode: multiply;
+  -webkit-mask: radial-gradient(circle at 30% 40%, #000 55%, rgba(0, 0, 0, .55) 72%);
+  mask: radial-gradient(circle at 30% 40%, #000 55%, rgba(0, 0, 0, .55) 72%);
+}
+
+.rp-bars {
+  height: 28px;
+  margin: 8px 6px 2px;
+  background: repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 3px, #222 3px 4px, transparent 4px 7px, #222 7px 10px, transparent 10px 12px, #222 12px 13px, transparent 13px 16px);
+}
+
+/* back: score as ten printed blocks, the take, a QR code */
+.rp-meter {
+  display: flex;
+  gap: 2px;
+  margin: 4px 0 2px;
+}
+
+.rp-meter i {
+  flex: 1;
+  height: 9px;
+  background: var(--ink);
+}
+
+.rp-meter i.is-off {
+  box-sizing: border-box;
+  border: 1px solid var(--ink);
+  background: none;
+}
+
+.rp-take { margin: 0; font-style: italic; }
+
+.rp-qr {
+  width: 104px;
+  margin: 14px auto 6px;
+}
+
+.rp-qr svg { display: block; width: 100%; height: auto; }
+
+.rp-thanks {
+  margin-top: 8px;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.rp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}

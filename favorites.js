@@ -11,7 +11,8 @@
 (() => {
   const grid = document.getElementById('favGrid');
   const homeCard = document.querySelector('.xb-mv'); // the "just watched" card on the home page
-  if (!grid && !homeCard) return;
+  const labReceipt = document.getElementById('labReceipt'); // the Lab's receipt printer
+  if (!grid && !homeCard && !labReceipt) return;
 
   /*---------- settings ----------*/
   const COVER_CACHE_KEY = 'nedcode-fav-covers-v1';
@@ -846,6 +847,11 @@
     const x = 0.5 - Math.sin(Math.asin(1 - 2 * f) / 3);
     return Math.round(4 + 92 * x);
   }
+  // a short verdict from the rating (home card and the Lab's receipts)
+  function verdict(r) {
+    return r >= 4.5 ? 'Must watch' : r >= 4 ? 'Really good' : r >= 3.5 ? 'Worth a watch' : r >= 3 ? 'Just okay' : r >= 2 ? 'Skip it' : 'Avoid';
+  }
+
   function starsHTML(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
@@ -1154,6 +1160,10 @@
     pump();
   }
 
+  /*---------- Lab: the receipt printer reads the same list ----------*/
+  if (labReceipt) window.nedcodeFavs = { list: FAVORITES, coverFor, coverSrcset, verdict, escapeHTML };
+  if (!grid && !homeCard) return;
+
   /*---------- home page: the movie deck ----------*/
   // The newest movies on the list (they're added at the top) as a small deck:
   // the latest one is the 3D card (poster on the front, details, take and
@@ -1170,9 +1180,6 @@
     const peeks = [...homeCard.querySelectorAll('.tk3-peek')];
     const dotsBox = homeCard.querySelector('.tk3-dots');
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // a one-word verdict from Ned's rating
-    const verdict = (r) =>
-      r >= 4.5 ? 'Must watch' : r >= 4 ? 'Really good' : r >= 3.5 ? 'Worth a watch' : r >= 3 ? 'Just okay' : r >= 2 ? 'Skip it' : 'Avoid';
     const covers = deck.map((f) => coverFor(f).catch(() => ''));
     let at = 0;
 

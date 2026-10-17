@@ -1199,3 +1199,151 @@
   render();
   if (document.fonts) document.fonts.ready.then(() => { fit(); updateCode(); });
 })();
+
+/*===== EXPERIMENT 4: receipt printer =====*/
+// Prints one of the favorites (favorites.js shares the list) as a till
+// receipt: the poster in black-and-white dots, the details as line items, the
+// score as the total and a red verdict stamp. The back is the "customer copy"
+// with the take, if there is one, and a QR code to the Favorites page. The
+// receipt slides out of the printer, then tap (or Enter) flips it.
+(() => {
+  const root = document.getElementById('labReceipt');
+  const favs = window.nedcodeFavs;
+  if (!root || !favs) return;
+
+  const { list, coverFor, coverSrcset, verdict, escapeHTML: esc } = favs;
+  const pick = root.querySelector('.rp-pick');
+  const paper = root.querySelector('.rp-paper');
+  const front = root.querySelector('.rp-front');
+  const back = root.querySelector('.rp-back');
+  const sr = root.querySelector('.rp-sr');
+  const qr = document.getElementById('rpQr').innerHTML;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const KIND = {
+    movie: { group: 'Movies', head: 'MOVIE NIGHT', by: 'DIRECTOR', verb: 'watch' },
+    tv: { group: 'TV shows', head: 'BINGE NIGHT', by: 'CREATOR', verb: 'watch' },
+    book: { group: 'Books', head: 'BOOK CLUB', by: 'AUTHOR', verb: 'read' },
+  };
+
+  // the picker: one group per type, in the list's own order (newest first)
+  Object.keys(KIND).forEach((type) => {
+    const og = document.createElement('optgroup');
+    og.label = KIND[type].group;
+    list.forEach((f, i) => {
+      if (f.type !== type) return;
+      og.append(new Option(f.year ? `${f.title} (${f.year})` : f.title, i));
+    });
+    if (og.children.length) pick.append(og);
+  });
+
+  const up = (s) => esc(String(s).toUpperCase());
+  const row = (k, v, cls = '') => `<div class="rp-row ${cls}"><span>${k}</span><i></i><span>${v}</span></div>`;
+  const pad = (n) => String(n).padStart(3, '0');
+  const stamp = () => {
+    const d = new Date();
+    const two = (n) => String(n).padStart(2, '0');
+    return `${two(d.getMonth() + 1)}/${two(d.getDate())}/${String(d.getFullYear()).slice(2)} ${two(d.getHours())}:${two(d.getMinutes())}`;
+  };
+  // exact-fill stars, printed in black
+  const stars = (r) => [1, 2, 3, 4, 5].map((i) => {
+    const f = Math.max(0, Math.min(1, r - (i - 1)));
+    return `<span class="rp-star" style="--f:${Math.round(f * 100)}%">★</span>`;
+  }).join('');
+
+  const draw = (i) => {
+    const f = list[i];
+    const k = KIND[f.type] || KIND.movie;
+    const say = verdict(f.rating).replace('watch', k.verb);
+    const no = `${pad(i + 1)} OF ${list.length}`;
+    const blocks = Math.round(f.rating * 2); // ten blocks, half a point each
+
+    front.innerHTML = `
+      <div class="rp-c rp-logo">${k.head}</div>
+      <div class="rp-c rp-small">NEDCODE.COM</div>
+      <div class="rp-row rp-small rp-top"><span>TICKET #${no}</span><span>${stamp()}</span></div>
+      <div class="rp-sep"></div>
+      <div class="rp-pic"><img alt="" draggable="false"></div>
+      ${row(`1x ${up(f.title)}`, f.year || '', 'rp-item')}
+      ${f.genre ? row('&nbsp;&nbsp;GENRE', up(f.genre)) : ''}
+      ${f.by ? row(`&nbsp;&nbsp;${k.by}`, up(f.by)) : ''}
+      <div class="rp-sep"></div>
+      ${row('RATING', `<span class="rp-stars">${stars(f.rating)}</span>`)}
+      ${row('TOTAL', `${f.rating}/5`, 'rp-total')}
+      <span class="rp-stamp">${up(say)}</span>
+      <div class="rp-sep rp-eq"></div>
+      <div class="rp-c rp-small">TAP TO FLIP · KEEP THIS RECEIPT</div>
+      <div class="rp-bars"></div>
+      <div class="rp-c rp-small rp-faded">*** ${pad(i + 1)} · ${f.year || '0000'} · ${String(f.rating).replace('.', '')} ***</div>`;
+
+    back.innerHTML = `
+      <div class="rp-c rp-logo">CUSTOMER COPY</div>
+      <div class="rp-c rp-small">${up(f.title)}${f.year ? ` (${f.year})` : ''}</div>
+      <div class="rp-sep"></div>
+      ${row('<b>SCORE</b>', `<b>${f.rating}</b>`)}
+      <div class="rp-meter">${Array.from({ length: 10 }, (_, b) => `<i${b < blocks ? '' : ' class="is-off"'}></i>`).join('')}</div>
+      ${f.take ? `<div class="rp-sep"></div><div><b>MY TAKE</b></div><p class="rp-take">“${esc(f.take)}”</p>` : ''}
+      <div class="rp-sep"></div>
+      ${row('VERDICT', `<b>${up(say)}</b>`)}
+      ${row('TICKET', no)}
+      <div class="rp-sep rp-eq"></div>
+      <div class="rp-qr">${qr}</div>
+      <div class="rp-c rp-small">SCAN FOR ALL ${list.length} PICKS</div>
+      <div class="rp-c rp-thanks">THANK YOU, COME AGAIN</div>`;
+
+    // the cover, if one can be found; a dotted "no image" box otherwise
+    const pic = front.querySelector('.rp-pic');
+    const img = pic.querySelector('img');
+    coverFor(f).then((url) => {
+      if (!url) { pic.classList.add('is-empty'); return; }
+      img.onload = () => pic.classList.add('has-img');
+      img.onerror = () => pic.classList.add('is-empty');
+      const set = coverSrcset(url);
+      if (set) { img.sizes = '220px'; img.srcset = set; }
+      img.src = url;
+    }).catch(() => pic.classList.add('is-empty'));
+
+    paper.setAttribute('aria-label', `Receipt for ${f.title}, rated ${f.rating} out of 5: ${say}. Tap to flip it over`);
+    sr.textContent = `Printed: ${f.title}, ${f.rating} out of 5, ${say}.`;
+  };
+
+  const print = () => {
+    paper.hidden = false;
+    paper.classList.remove('is-flipped', 'is-printing');
+    draw(Number(pick.value));
+    if (still) return;
+    void paper.offsetWidth; // restart the feed animation
+    paper.classList.add('is-printing');
+    root.classList.add('is-busy');
+  };
+  paper.addEventListener('animationend', () => root.classList.remove('is-busy'));
+
+  const flip = () => { if (!paper.classList.contains('is-printing') || still) paper.classList.toggle('is-flipped'); };
+  paper.addEventListener('click', flip);
+  paper.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    flip();
+  });
+  paper.addEventListener('animationend', () => paper.classList.remove('is-printing'));
+
+  root.querySelector('.rp-print').addEventListener('click', print);
+  root.querySelector('.rp-random').addEventListener('click', () => {
+    const opts = [...pick.options].filter((o) => o.value !== pick.value);
+    pick.value = opts[Math.floor(Math.random() * opts.length)].value;
+    print();
+  });
+  pick.addEventListener('change', print);
+
+  // start with the newest movie already printed (it prints once it's in view)
+  const first = list.findIndex((f) => f.type === 'movie');
+  pick.value = String(first < 0 ? 0 : first);
+  if ('IntersectionObserver' in window && !still) {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      print();
+    }, { threshold: .35 });
+    io.observe(root);
+  } else print();
+})();
