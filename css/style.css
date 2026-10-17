@@ -9055,7 +9055,7 @@ html.is-frozen .egg-crash * {
 /* the paper comes out of the slot: clipped at the top only */
 .rp-out {
   margin-top: -12px;
-  padding: 0 0 52px;
+  padding: 0 0 72px;
   clip-path: inset(0 -40px -60px -40px);
 }
 
@@ -9072,11 +9072,14 @@ html.is-frozen .egg-crash * {
 
 /* cut off: the receipt drops free of the printer with a little tilt */
 .rp-paper.is-cut {
-  transform: translateY(26px) rotate(-1.8deg);
+  transform: translateY(46px) rotate(-1.8deg);
   transition: transform .55s cubic-bezier(.3, 1.5, .5, 1);
 }
 
 .rp-paper:not(.is-cut) { cursor: default; }
+
+/* once it's cut it's free of the slot: nothing clips it while it turns */
+.rp-out:has(.is-cut) { clip-path: none; }
 
 @keyframes rp-feed {
   from { transform: translateY(-100%); }
@@ -9084,18 +9087,65 @@ html.is-frozen .egg-crash * {
 }
 
 .rp-card {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr); /* the dotted lines never widen the paper */
   transform-style: preserve-3d;
-  transition: transform .7s cubic-bezier(.3, .7, .2, 1.1);
 }
 
 .rp-paper.is-flipped .rp-card { transform: rotateY(180deg); }
+
+/* turning it over like thin paper: it lifts toward you, bends a little as it
+   turns (skew), overshoots and wobbles flat again */
+.rp-paper.is-turning.is-flipped .rp-card { animation: rp-turn-back .95s cubic-bezier(.35, .1, .25, 1) both; }
+.rp-paper.is-turning:not(.is-flipped) .rp-card { animation: rp-turn-front .95s cubic-bezier(.35, .1, .25, 1) both; }
+
+@keyframes rp-turn-back {
+  0% { transform: none; }
+  30% { transform: translateY(6px) rotateY(62deg) rotateZ(-3deg) skewY(3.5deg) scale(1.04); }
+  55% { transform: translateY(10px) rotateY(128deg) rotateZ(2deg) skewY(-4deg) scale(1.05); }
+  78% { transform: translateY(3px) rotateY(192deg) rotateZ(-1deg) skewY(1.5deg); }
+  90% { transform: rotateY(176deg) skewY(-.6deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+@keyframes rp-turn-front {
+  0% { transform: rotateY(180deg); }
+  30% { transform: translateY(6px) rotateY(242deg) rotateZ(3deg) skewY(-3.5deg) scale(1.04); }
+  55% { transform: translateY(10px) rotateY(308deg) rotateZ(-2deg) skewY(4deg) scale(1.05); }
+  78% { transform: translateY(3px) rotateY(372deg) rotateZ(1deg) skewY(-1.5deg); }
+  90% { transform: rotateY(356deg) skewY(.6deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+/* the shadow grows while it's lifted */
+.rp-paper.is-turning { animation: rp-lift .95s ease-in-out; }
+
+@keyframes rp-lift {
+  45% { filter: drop-shadow(0 34px 30px rgba(0, 0, 0, .45)); }
+}
+
+/* each side darkens as it turns away from the light */
+.rp-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, rgba(0, 0, 0, .28), rgba(0, 0, 0, .05) 60%, rgba(255, 255, 255, .15));
+  opacity: 0;
+}
+
+.rp-paper.is-turning .rp-face::after { animation: rp-shade .95s ease-in-out; }
+
+@keyframes rp-shade {
+  45% { opacity: 1; }
+}
 
 .rp-paper:focus-visible .rp-face { outline: 2px solid var(--fifteenth-color); outline-offset: 4px; }
 
 /* each side: cream paper with torn edges, a fold and a faint coffee ring */
 .rp-face {
+  position: relative;
   grid-area: 1 / 1;
   box-sizing: border-box;
   padding: 20px 16px 26px;

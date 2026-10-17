@@ -1333,7 +1333,17 @@
     }, 380);
   });
 
-  const flip = () => { if (paper.classList.contains('is-cut')) paper.classList.toggle('is-flipped'); };
+  // flipping it over like real paper: it lifts, bends as it turns, catches
+  // the light and settles with a little wobble (style.css, .is-turning)
+  const flip = () => {
+    if (!paper.classList.contains('is-cut') || paper.classList.contains('is-turning')) return;
+    paper.classList.toggle('is-flipped');
+    if (still) return;
+    paper.classList.add('is-turning');
+  };
+  paper.addEventListener('animationend', (e) => {
+    if (e.animationName === 'rp-turn-back' || e.animationName === 'rp-turn-front') paper.classList.remove('is-turning');
+  });
   paper.addEventListener('click', flip);
   paper.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
