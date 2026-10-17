@@ -9327,9 +9327,9 @@ html.is-frozen .egg-crash * {
 
 .fl-body { fill: #d9d9d9; }
 .fl-glass { fill: #6b4f3c; } /* the Roadster's bronze-tinted glass */
-.fl-lower { fill: #0e0e0e; }
+.fl-lower { fill: #222; }
 .fl-tail { stroke: #ff3b3b; stroke-width: 1.2; stroke-linecap: round; }
-.fl-arch { fill: #0e0e0e; }
+.fl-arch { fill: #080808; }
 .fl-wheel { fill: #0b0b0b; stroke: #2e2e2e; stroke-width: .8; }
 .fl-spokes { stroke: #8f8f8f; stroke-width: .9; stroke-linecap: round; }
 
