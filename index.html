@@ -208,8 +208,9 @@
           <!-- Just watched: a 3D movie card you can grab and spin all the way
                round, or tap to flip (scripts.js). Front: the poster; back: the
                movie's details, Ned's take and score. The two cards fanned out
-               behind are the movies before it: tap one to bring it to the front
-               (favorites.js fills them all). -->
+               behind are the movies before it: tap one (or a dot below) to bring
+               it to the front (favorites.js fills them all). A blurred copy of
+               the poster glows behind the deck. -->
           <div class="xb-card xb-mv" role="group" hidden>
             <div class="tk3-scene">
               <button class="tk3-peek tk3-peek-l" type="button"><span class="tk3-peek-img"><img alt="" width="342" height="513" draggable="false"></span></button>
@@ -241,6 +242,7 @@
                 </div>
               </div>
             </div>
+            <div class="tk3-dots" hidden></div>
             <a class="xb-go tk3-go" href="favorites.html">See all picks <span aria-hidden="true">→</span></a>
           </div>
           <a class="xb-card xb-ab" href="about.html" data-words="responsible,driven,diligent,ambitious,creative,patient">

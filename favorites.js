@@ -1168,6 +1168,7 @@
     const back = homeCard.querySelector('.tk3-back');
     const img = homeCard.querySelector('.xb-poster img');
     const peeks = [...homeCard.querySelectorAll('.tk3-peek')];
+    const dotsBox = homeCard.querySelector('.tk3-dots');
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     // a one-word verdict from Ned's rating
     const verdict = (r) =>
@@ -1209,7 +1210,7 @@
 
       // front poster: a soft shimmer until it arrives, popcorn if there's none
       tk.classList.remove('has-poster', 'no-poster');
-      tk.style.removeProperty('--poster');
+      homeCard.classList.remove('has-glow');
       img.removeAttribute('srcset');
       img.removeAttribute('src');
       covers[i].then((url) => {
@@ -1217,10 +1218,14 @@
         if (!url) { tk.classList.add('no-poster'); return; }
         setPoster(img, url, '250px', () => {
           if (at !== i) return;
-          tk.style.setProperty('--poster', `url("${url}")`);
+          // the blurred back and the glow behind the deck use the same poster
+          homeCard.style.setProperty('--poster', `url("${url}")`);
           tk.classList.add('has-poster');
+          homeCard.classList.add('has-glow');
         });
       });
+
+      dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
 
       // the other movies fan out behind, in order
       peeks.forEach((peek, k) => {
@@ -1254,6 +1259,18 @@
       }, 220);
     };
     peeks.forEach((peek) => peek.addEventListener('click', () => deal(Number(peek.dataset.i))));
+
+    // one dot per movie under the deck: shows which one is in front, tap to jump
+    const dots = deck.length > 1 ? deck.map((f, k) => {
+      const d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'tk3-dot';
+      d.setAttribute('aria-label', `Show ${f.title}`);
+      d.addEventListener('click', () => deal(k));
+      dotsBox.append(d);
+      return d;
+    }) : [];
+    dotsBox.hidden = !dots.length;
     tk.addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
       e.preventDefault();

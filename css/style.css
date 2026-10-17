@@ -8540,6 +8540,63 @@ html.is-frozen .egg-crash * {
   perspective: 1100px;
 }
 
+/* the poster's own colours glow softly behind the deck (a blurred copy of
+   it), fading in once it has loaded and changing with each movie */
+.tk3-scene::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--w);
+  aspect-ratio: 5 / 7;
+  background: var(--poster, none) center / cover;
+  border-radius: 24px;
+  filter: blur(38px) saturate(1.6);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.05);
+  transition: opacity .6s;
+  pointer-events: none;
+}
+
+.xb-mv.has-glow .tk3-scene::before { opacity: .75; }
+
+/* dots under the deck: which movie is in front; tap one to jump to it */
+.tk3-dots {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 1.1rem;
+}
+
+.tk3-dot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.tk3-dot::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #3a3a3a;
+  transition: width .3s, background .3s;
+}
+
+.tk3-dot[aria-current="true"]::before {
+  width: 18px;
+  background: var(--fifteenth-color);
+}
+
+.tk3-dot:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: -2px; border-radius: 6px; }
+
+.tk3-dots + .tk3-go { margin-top: .6rem; }
+
 /* swapping movies: the card drops back into the deck, the next one comes up */
 .tk3-hold.is-dealing {
   opacity: 0;
