@@ -9299,3 +9299,115 @@ html.is-frozen .egg-crash * {
 @media (prefers-reduced-motion: reduce) {
   .ft-x { animation: none; }
 }
+
+/*===== BLOG POSTS: Roadster flip diagram =====*/
+/* A side view of the stunt (scripts.js plays it when scrolled into view):
+   the car runs up a curved ramp, rides it upside down held by its fan, leaves
+   it, thrusters roll it upright, it hovers and lands. Each step lights up in
+   the list below as it happens. Without JS or with reduced motion it shows
+   the car landed and every step listed. */
+.ps-flip-svg {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  margin: .4rem auto 0;
+  overflow: visible;
+}
+
+.fl-ground { stroke: #333; stroke-width: 2; }
+.fl-route { fill: none; stroke: none; }
+
+.fl-ramp {
+  fill: none;
+  stroke: var(--fifteenth-color);
+  stroke-opacity: .55;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.fl-body { fill: #e6e6e6; }
+.fl-glass { fill: #2a2a2a; }
+.fl-wheel { fill: #151515; stroke: #8a8a8a; stroke-width: 1.5; }
+
+/* fan suction: arrows pulling the car onto the ramp */
+.fl-fan path {
+  fill: none;
+  stroke: var(--fifteenth-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* thruster puffs: compressed air */
+.fl-puffs circle { fill: #d9e4ec; }
+
+.fl-fan,
+.fl-puffs { opacity: 0; transition: opacity .2s; }
+
+.ps-flip.is-fan .fl-fan { opacity: 1; }
+.ps-flip.is-thrust .fl-puffs { opacity: .75; }
+
+.ps-flip.is-thrust .fl-puffs circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fl-puff .35s ease-out infinite;
+}
+
+.ps-flip.is-thrust .fl-puffs circle:nth-child(2) { animation-delay: .12s; }
+.ps-flip.is-thrust .fl-puffs circle:nth-child(3) { animation-delay: .24s; }
+
+@keyframes fl-puff {
+  from { transform: scale(.4); opacity: 1; }
+  to { transform: scale(1.4); opacity: 0; }
+}
+
+/* the steps, lit one by one */
+.ps-flip-steps {
+  display: grid;
+  gap: .45rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.ps-flip-steps li {
+  display: flex;
+  align-items: baseline;
+  gap: .7rem;
+  font-size: .92rem;
+  color: var(--fourth-color);
+  transition: opacity .3s, color .3s;
+}
+
+.ps-flip-steps b {
+  flex: none;
+  width: 1.5rem;
+  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--fifteenth-color);
+}
+
+.ps-flip.will-play .ps-flip-steps li { opacity: .3; }
+.ps-flip.will-play .ps-flip-steps li.is-done { opacity: .75; }
+.ps-flip.will-play .ps-flip-steps li.is-on { opacity: 1; color: #f2f2f2; }
+
+.ps-flip-replay {
+  display: block;
+  margin: .9rem auto 0;
+  padding: .4rem .9rem;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  background: #121212;
+  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #aaa;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-flip-replay[hidden] { display: none; }
+
+@media (hover: hover) {
+  .ps-flip-replay:hover { border-color: #555; color: var(--fourth-color); }
+}

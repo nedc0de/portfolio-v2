@@ -2236,6 +2236,104 @@ function readPostsSeen() {
   });
 })();
 
+/*===== BLOG POSTS: Roadster flip diagram =====*/
+// Plays the Roadster stunt once when it scrolls into view: the car follows
+// the ramp (wheels on the track, so it ends up upside down at the top), its
+// fan arrows show while it's on the ramp, then it leaves the ramp, the
+// thrusters roll it upright, it hovers and lands. The step list lights up as
+// it goes. Reduced motion or no JS: the landed car and every step, as drawn.
+(() => {
+  const fig = document.querySelector('.ps-flip');
+  if (!fig || !('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const route = fig.querySelector('.fl-route');
+  const car = fig.querySelector('.fl-car');
+  const steps = [...fig.querySelectorAll('.ps-flip-steps li')];
+  const replay = fig.querySelector('.ps-flip-replay');
+  const total = route.getTotalLength();
+  const RIDE = 11; // car centre above the track (the car is drawn at 1.25x)
+  const END = { x: 110, y: 179 };
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+  const place = (x, y, deg) => car.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${deg.toFixed(1)})`);
+  // a point on the ramp route, with the car's angle and its centre lifted off the track
+  const onTrack = (s) => {
+    const p = route.getPointAtLength(s);
+    const q = route.getPointAtLength(Math.min(total, s + 1));
+    const r = route.getPointAtLength(Math.max(0, s - 1));
+    const a = Math.atan2(q.y - r.y, q.x - r.x);
+    return { x: p.x + Math.sin(a) * RIDE, y: p.y - Math.cos(a) * RIDE, deg: a * 180 / Math.PI };
+  };
+  const top = onTrack(total);
+  const LEAVE = { x: 160, y: 72 };   // off the ramp, still upside down
+  const HOVER = { x: 110, y: 140 };  // upright, hovering
+
+  // phase lengths in ms: ramp, leave, flip, hover + land
+  const T = [1900, 550, 950, 1100];
+  const stepFor = (ms, s) => (ms < T[0] ? (s < 210 ? 0 : 1) : ms < T[0] + T[1] ? 2 : ms < T[0] + T[1] + T[2] ? 3 : 4);
+  const setStep = (k) => steps.forEach((li, i) => {
+    li.classList.toggle('is-on', i === k);
+    li.classList.toggle('is-done', i < k);
+  });
+
+  let t0 = 0, playing = false;
+  const frame = (now) => {
+    const ms = now - t0;
+    let s = 0;
+    if (ms < T[0]) {
+      // speeds up along the ground, then rides the loop
+      const t = ms / T[0];
+      s = total * (t < .45 ? (t / .45) ** 2 * .42 : .42 + (t - .45) / .55 * .58);
+      const p = onTrack(s);
+      place(p.x, p.y, p.deg);
+      fig.classList.toggle('is-fan', s > 205);
+    } else if (ms < T[0] + T[1]) {
+      fig.classList.remove('is-fan');
+      const t = (ms - T[0]) / T[1];
+      place(lerp(top.x, LEAVE.x, t), lerp(top.y, LEAVE.y, t * t), 180);
+    } else if (ms < T[0] + T[1] + T[2]) {
+      fig.classList.add('is-thrust');
+      const t = ease((ms - T[0] - T[1]) / T[2]);
+      place(lerp(LEAVE.x, HOVER.x, t), lerp(LEAVE.y, HOVER.y, t), lerp(180, 360, t));
+    } else if (ms < T[0] + T[1] + T[2] + T[3]) {
+      const t = (ms - T[0] - T[1] - T[2]) / T[3];
+      const bob = t < .4 ? Math.sin(t / .4 * Math.PI) * -4 : 0;
+      const land = t < .4 ? 0 : ease((t - .4) / .6);
+      place(HOVER.x, lerp(HOVER.y, END.y, land) + bob, 0);
+    } else {
+      // lands exactly on the drawn final state
+      fig.classList.remove('is-thrust', 'is-fan');
+      place(END.x, END.y, 0);
+      steps.forEach((li) => li.classList.remove('is-on'));
+      fig.classList.remove('will-play');
+      playing = false;
+      replay.hidden = false;
+      return;
+    }
+    setStep(stepFor(ms, s));
+    requestAnimationFrame(frame);
+  };
+  const play = () => {
+    if (playing) return;
+    playing = true;
+    replay.hidden = true;
+    fig.classList.add('will-play');
+    t0 = performance.now();
+    requestAnimationFrame(frame);
+  };
+
+  const start = onTrack(0);
+  fig.classList.add('will-play');
+  place(start.x, start.y, start.deg);
+  const io = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    io.disconnect();
+    play();
+  }, { threshold: .55 });
+  io.observe(fig);
+  replay.addEventListener('click', play);
+})();
+
 /*===== BLOG POSTS: touchscreen demo =====*/
 // A grid of row/column sensor lines. Each finger changes the reading at the
 // crossings near it (brighter dot = bigger change) and the "controller" works
