@@ -1174,6 +1174,7 @@
     if (!deck.length) return;
     const tk = homeCard.querySelector('.tk3');
     const hold = homeCard.querySelector('.tk3-hold');
+    const scene = homeCard.querySelector('.tk3-scene');
     const back = homeCard.querySelector('.tk3-back');
     const img = homeCard.querySelector('.xb-poster img');
     const peeks = [...homeCard.querySelectorAll('.tk3-peek')];
@@ -1245,22 +1246,42 @@
       });
     };
 
-    // bring another movie to the front: the card drops back, then the new one
-    // comes forward (scripts.js turns it to face you again)
+    // bring another movie to the front, like a real deck: its card glides from
+    // the fan to the front and grows into place while the current card sinks
+    // back behind it; then the deck quietly settles (scripts.js turns the new
+    // card to face you). One smooth motion with iOS-style easing.
+    const SWAP_MS = 520;
+    let swapping = false;
     const deal = (i) => {
-      if (i === at || hold.classList.contains('is-dealing')) return;
+      if (i === at || swapping) return;
       const swap = () => {
         show(i);
         tk.dispatchEvent(new CustomEvent('tk3:reset'));
       };
-      if (still) { swap(); return; }
-      hold.classList.add('is-dealing');
+      const peek = peeks.find((p) => p.dataset.i === String(i));
+      if (still || !peek) { swap(); return; }
+      swapping = true;
+      scene.classList.add('is-swapping');
+      peek.classList.add('is-rising');
       setTimeout(() => {
+        // the risen card now sits exactly where the front card is: swap the
+        // content under it, wait for the new poster to be on the front card,
+        // then put everything back in place without a jump
         swap();
-        hold.classList.remove('is-dealing');
-        hold.classList.add('is-dealt');
-        setTimeout(() => hold.classList.remove('is-dealt'), 400);
-      }, 220);
+        let frames = 0;
+        const settle = () => {
+          const ready = tk.classList.contains('has-poster') || tk.classList.contains('no-poster');
+          if (!ready && frames++ < 45) { requestAnimationFrame(settle); return; }
+          scene.classList.add('is-settling');
+          scene.classList.remove('is-swapping');
+          peek.classList.remove('is-rising');
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            scene.classList.remove('is-settling');
+            swapping = false;
+          }));
+        };
+        requestAnimationFrame(settle);
+      }, SWAP_MS);
     };
     peeks.forEach((peek) => peek.addEventListener('click', () => deal(Number(peek.dataset.i))));
 

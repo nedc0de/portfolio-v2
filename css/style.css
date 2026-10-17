@@ -8471,6 +8471,7 @@ html.is-frozen .egg-crash * {
   border: 0;
   background: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .tk3-dot::before {
@@ -8491,18 +8492,35 @@ html.is-frozen .egg-crash * {
 
 .tk3-dots + .tk3-go { margin-top: .6rem; }
 
-/* swapping movies: the card drops back into the deck, the next one comes up */
-.tk3-hold.is-dealing {
-  opacity: 0;
-  transform: translateY(14px) scale(.9) rotate(-3deg);
-  transition: opacity .22s ease-in, transform .22s ease-in;
+/* swapping movies (favorites.js), like a real deck: the tapped card glides
+   from the fan to the front and grows into place over the current one, which
+   sinks back a little; iOS-style easing, no fades or bounces. While
+   "settling" everything snaps back without transitions, invisibly. */
+.tk3-hold {
+  transition: transform .52s cubic-bezier(.32, .72, 0, 1), filter .52s cubic-bezier(.32, .72, 0, 1);
 }
 
-.tk3-hold.is-dealt { animation: tk3-deal .4s cubic-bezier(.2, .8, .2, 1.15); }
-
-@keyframes tk3-deal {
-  from { opacity: 0; transform: translateY(-10px) scale(.94); }
+.tk3-scene.is-swapping .tk3-hold {
+  transform: scale(.94) translateY(6px);
+  filter: brightness(.55);
 }
+
+.tk3-peek.is-rising {
+  z-index: 2;
+  --x: 0px;
+  --r: 0deg;
+  filter: brightness(1) saturate(1); /* same functions as the dim fan, so it brightens cleanly */
+  transform: translate(-50%, -50%) scale(calc(1 / .92));
+  box-shadow: 0 22px 40px -20px rgba(0, 0, 0, .9);
+  transition: transform .52s cubic-bezier(.32, .72, 0, 1), filter .52s cubic-bezier(.32, .72, 0, 1), box-shadow .52s;
+}
+
+.tk3-scene.is-settling .tk3-hold,
+.tk3-scene.is-settling .tk3-peek { transition: none; }
+
+/* the new card's tag eases in once it's at the front */
+.tk3-tag { transition: opacity .3s ease .05s; }
+.tk3-scene.is-swapping .tk3-tag { opacity: 0; }
 
 /* the movies before it, fanned out behind; tap one to bring it forward */
 .tk3-peek {
@@ -8519,6 +8537,7 @@ html.is-frozen .egg-crash * {
   background: #1c1c1c;
   box-shadow: 0 16px 30px -16px rgba(0, 0, 0, .9);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent; /* no blue flash on tap */
   filter: brightness(.5) saturate(.8);
   transform: translate(-50%, -50%) translateX(var(--x)) rotate(var(--r));
   transition: transform .3s cubic-bezier(.2, .8, .2, 1), filter .3s;
@@ -8535,7 +8554,7 @@ html.is-frozen .egg-crash * {
 .tk3-peek:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: 2px; }
 
 @media (hover: hover) {
-  .tk3-peek:hover { filter: brightness(.8); }
+  .tk3-peek:hover { filter: brightness(.8) saturate(.9); }
   .tk3-peek-l:hover { --x: -52px; --r: -11deg; }
   .tk3-peek-r:hover { --x: 52px; --r: 11deg; }
 }
