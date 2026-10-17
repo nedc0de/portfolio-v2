@@ -1251,20 +1251,20 @@ whenIdle(() => {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) release(); });
   window.addEventListener('pageshow', release);
 
-  fetch('blog.html')
+  // always the current list, never a copy the browser saved earlier
+  fetch('blog.html', { cache: 'no-cache' })
     .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
     .then((html) => ready.then(() => { const posts = readPosts(html); build(mix(posts)); latest(posts); }))
     .catch(() => ready.then(() => build(mix([]))));
 
-  // "Latest posts": the next 3 posts as swipeable cover cards. The newest one
-  // already leads the ticker, so the cards start from the one before it.
+  // "Latest posts": the 3 newest posts as swipeable cover cards, newest first.
   // Posts the visitor has opened get a small "Read" mark (see BLOG: READ MARKS).
   const latestBox = document.querySelector('.hm-latest');
   const latest = (posts) => {
     if (!latestBox || !posts.length) return;
     const list = latestBox.querySelector('.hm-cards');
     const seen = readPostsSeen();
-    const cards = posts.length > 3 ? posts.slice(1, 4) : posts.slice(0, 3);
+    const cards = posts.slice(0, 3);
     cards.forEach((n) => {
       const a = document.createElement('a');
       a.className = 'hm-card';
@@ -3117,7 +3117,7 @@ function readPostsSeen() {
   // title and link come from there
   const lab = box.querySelector('.xb-lb');
   if (lab) {
-    fetch('lab.html')
+    fetch('lab.html', { cache: 'no-cache' })
       .then((r) => (r.ok ? r.text() : Promise.reject()))
       .then((html) => {
         const items = new DOMParser().parseFromString(html, 'text/html').querySelectorAll('.lab-item');

@@ -77,7 +77,7 @@ creator.
 - File name: `blog/Title-Words-Like-This.html`.
 - Add the URL to `sitemap.xml`; make it the featured post on `blog.html`
   (move the previous one into "More posts"); the home page's ticker and
-  "Latest posts" row read blog.html, so they update by themselves; link related posts to each other (every post ends
+  "Latest posts" row (newest first) read blog.html, so they update by themselves; link related posts to each other (every post ends
   with a `.ps-related` "Keep reading" box of 2 posts; update the others' boxes
   so the new post gets linked too).
 - Link sources inline too: the first time an outlet or official source is
