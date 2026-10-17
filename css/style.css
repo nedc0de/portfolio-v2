@@ -4394,7 +4394,7 @@ details>summary {
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--fifteenth-color);
+  color: #8a8a8a;
   margin-bottom: 1rem;
 }
 
@@ -8184,6 +8184,29 @@ html.is-frozen .egg-crash * {
 
   .bl-row .bl-meta { font-size: .74rem; }
   .bl-list { gap: .6rem; }
+}
+
+/* More posts as a plain list: no boxes, a thin line between rows, the covers
+   do the talking */
+.bl-list { gap: 0; }
+
+.bl-row,
+.bl-row:hover {
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid #262626;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.bl-row:last-child { border-bottom: 0; }
+
+.bl-row h3 { transition: color .2s; }
+
+@media (hover: hover) {
+  a.bl-row:hover h3 { color: var(--fifteenth-color); }
 }
 
 /*===== FAVORITES: filters in the same style as the blog's topic chips =====*/
