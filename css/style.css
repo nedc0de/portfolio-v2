@@ -9325,9 +9325,13 @@ html.is-frozen .egg-crash * {
   stroke-linecap: round;
 }
 
-.fl-body { fill: #e6e6e6; }
-.fl-glass { fill: #2a2a2a; }
-.fl-wheel { fill: #151515; stroke: #8a8a8a; stroke-width: 1.5; }
+.fl-body { fill: #d9d9d9; }
+.fl-glass { fill: #6b4f3c; } /* the Roadster's bronze-tinted glass */
+.fl-lower { fill: #0e0e0e; }
+.fl-tail { stroke: #ff3b3b; stroke-width: 1.2; stroke-linecap: round; }
+.fl-arch { fill: #0e0e0e; }
+.fl-wheel { fill: #0b0b0b; stroke: #2e2e2e; stroke-width: .8; }
+.fl-spokes { stroke: #8f8f8f; stroke-width: .9; stroke-linecap: round; }
 
 /* fan suction: arrows pulling the car onto the ramp */
 .fl-fan path {
