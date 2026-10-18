@@ -1206,7 +1206,9 @@
       el.src = url;
     };
 
-    const show = (i) => {
+    // smooth: used at the end of a shuffle, when every new poster is already
+    // loaded; the posters are swapped in place, with no shimmer in between
+    const show = (i, smooth = false) => {
       at = i;
       const pick = deck[i];
       homeCard.querySelector('.tk3-tag').textContent = i === 0 ? 'Just watched' : 'Recently watched';
@@ -1227,12 +1229,15 @@
       homeCard.setAttribute('aria-label', `${i === 0 ? 'Just watched' : 'Recently watched'}: ${pick.title}, rated ${pick.rating} out of 5`);
 
       // front poster: a soft shimmer until it arrives, popcorn if there's none
-      tk.classList.remove('has-poster', 'no-poster');
-      img.removeAttribute('srcset');
-      img.removeAttribute('src');
+      if (!smooth) {
+        tk.classList.remove('has-poster', 'no-poster');
+        img.removeAttribute('srcset');
+        img.removeAttribute('src');
+      }
       covers[i].then((url) => {
         if (at !== i) return;
-        if (!url) { tk.classList.add('no-poster'); return; }
+        if (!url) { tk.classList.remove('has-poster'); tk.classList.add('no-poster'); return; }
+        tk.classList.remove('no-poster');
         setPoster(img, url, '250px', () => {
           if (at !== i) return;
           // the blurred back of the card uses the same poster
@@ -1250,10 +1255,11 @@
         peek.dataset.i = j;
         peek.setAttribute('aria-label', `Show ${deck[j].title}`);
         const pimg = peek.querySelector('img');
-        peek.classList.remove('has-poster', 'no-poster');
+        if (!smooth) peek.classList.remove('has-poster', 'no-poster');
         covers[j].then((url) => {
           if (peek.dataset.i !== String(j)) return;
-          if (!url) { peek.classList.add('no-poster'); return; }
+          if (!url) { peek.classList.remove('has-poster'); peek.classList.add('no-poster'); return; }
+          peek.classList.remove('no-poster');
           setPoster(pimg, url, '120px', () => peek.classList.add('has-poster'));
         });
       });
@@ -1274,7 +1280,22 @@
       return { x: parseFloat(cs.getPropertyValue('--x')) || 0, r: parseFloat(cs.getPropertyValue('--r')) || 0 };
     };
     const peekTf = (x, r, extra = '') => `translate(-50%, -50%) translateX(${x}px) rotate(${r}deg) ${extra}`;
-    const ready = (el, cls) => el.classList.contains(cls[0]) || (cls[1] && el.classList.contains(cls[1]));
+    // a poster fully loaded and decoded at the size it's shown at, so swapping
+    // it in later shows it in the very same frame
+    const decoded = {};
+    const decode = (k, sizes) => covers[k].then((url) => {
+      if (!url) return;
+      const key = `${url} ${sizes}`;
+      if (!decoded[key]) {
+        const pre = new Image();
+        const set = coverSrcset(url);
+        if (set) { pre.sizes = sizes; pre.srcset = set; }
+        pre.src = url;
+        decoded[key] = (pre.decode ? pre.decode() : Promise.resolve()).catch(() => {});
+      }
+      return decoded[key];
+    });
+    const wait = (ms) => new Promise((done) => setTimeout(done, ms));
     const deal = (i) => {
       if (i === at || swapping) return;
       const swap = () => {
@@ -1313,27 +1334,28 @@
         ], opts),
       ];
       hold.style.zIndex = 1;
-      Promise.all(anims.map((a) => a.finished)).then(() => {
-        // every card now sits exactly where its new content will be: swap the
-        // movies, wait (briefly) for their posters, then drop the animations
-        swap();
-        let frames = 0;
-        const settle = () => {
-          const done = ready(tk, ['has-poster', 'no-poster']) && peeks.every((p) => p.hidden || ready(p, ['has-poster', 'no-poster']));
-          if (!done && frames++ < 120) { requestAnimationFrame(settle); return; }
-          tk.dispatchEvent(new CustomEvent('tk3:reset')); // flat at the hand-over
-          scene.classList.add('is-settling');
-          anims.forEach((a) => a.cancel());
-          [peek, other, hold].forEach((el) => { el.style.zIndex = ''; });
-          scene.classList.remove('is-swapping');
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            scene.classList.remove('is-settling');
-            swapping = false;
-          }));
-        };
-        requestAnimationFrame(settle);
-      });
+      // meanwhile, get every new poster ready: the front one and both back ones
+      const others = [1, 2].map((k) => (i + k) % deck.length).filter((k) => k !== i);
+      const posters = Promise.race([
+        Promise.all([decode(i, '250px'), ...others.map((k) => decode(k, '120px'))]),
+        wait(1500), // never hold the cards up for long on a slow connection
+      ]);
+      Promise.all([...anims.map((a) => a.finished), posters]).then(() => requestAnimationFrame(() => {
+        // every card sits exactly where its new movie goes: swap the movies
+        // and drop the animations in this same frame, so nothing flashes
+        show(i, true);
+        tk.dispatchEvent(new CustomEvent('tk3:reset')); // flat at the hand-over
+        scene.classList.add('is-settling');
+        anims.forEach((a) => a.cancel());
+        [peek, other, hold].forEach((el) => { el.style.zIndex = ''; });
+        scene.classList.remove('is-swapping');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          scene.classList.remove('is-settling');
+          swapping = false;
+        }));
+      }));
     };
+
     peeks.forEach((peek) => peek.addEventListener('click', () => deal(Number(peek.dataset.i))));
 
     // one dot per movie under the deck: shows which one is in front, tap to jump
