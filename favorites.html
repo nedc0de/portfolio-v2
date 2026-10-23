@@ -113,15 +113,21 @@
       <section class="fav" id="favorites" aria-label="Favorites">
         <div class="fav-stats" id="favStats"></div>
         <div class="fav-bar">
-          <div class="fav-filters" role="group" aria-label="Show">
-            <button type="button" class="fav-filter" data-filter="all" aria-pressed="true">All</button>
-            <button type="button" class="fav-filter" data-filter="movie" aria-pressed="false">Movies</button>
-            <button type="button" class="fav-filter" data-filter="tv" aria-pressed="false">Shows</button>
-            <button type="button" class="fav-filter" data-filter="book" aria-pressed="false">Books</button>
-          </div>
+          <!-- two small menus (the phone's own picker on phones): what to show,
+               and which genre; favorites.js fills the genres -->
+          <label class="fav-select"><span class="sr-only">Show</span>
+            <select id="favType">
+              <option value="all">All</option>
+              <option value="movie">Movies</option>
+              <option value="tv">Shows</option>
+              <option value="book">Books</option>
+            </select>
+          </label>
+          <label class="fav-select"><span class="sr-only">Genre</span>
+            <select id="favGenre"><option value="any">Any genre</option></select>
+          </label>
           <button type="button" class="fav-pick" id="favPick" aria-label="Pick for me">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h3c4 0 6 10 10 10h5" /><path d="M3 17h3c1.6 0 2.8-1.6 4-3.6" /><path d="M14 9.6c1.2-1.6 2.4-2.6 4-2.6h3" /><path d="M18 4l3 3l-3 3" /><path d="M18 14l3 3l-3 3" /></svg>
-            Pick
           </button>
         </div>
         <div class="fav-grid" id="favGrid">
