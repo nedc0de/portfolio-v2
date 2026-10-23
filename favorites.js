@@ -875,7 +875,65 @@
   }
 
   const cards = [];
+  // Shelves: rows you swipe sideways, one per verdict, best first. Each card
+  // goes on the shelf for its rating; the filters hide cards and any shelf
+  // left empty. (Without JS the plain list in the page shows instead.)
+  const SHELVES = [
+    { min: 5, name: 'All-time favorites' },
+    { min: 4.5, name: 'Must watch' },
+    { min: 4, name: 'Really good' },
+    { min: 3.5, name: 'Worth a watch' },
+    { min: 3, name: 'Just okay' },
+    { min: 0, name: 'Skip it' },
+  ].map((s) => ({ ...s, cards: [] }));
+  const shelfFor = (rating) => SHELVES.find((s) => rating >= s.min);
+  // books are read, not watched
+  const shelfName = (s) => (filter === 'book' ? s.name.replace('watch', 'read') : s.name);
+  function buildShelves() {
+    grid.classList.replace('fav-grid', 'fav-shelves');
+    SHELVES.forEach((s) => {
+      s.el = document.createElement('section');
+      s.el.className = 'fav-shelf';
+      s.el.innerHTML = `
+        <div class="fav-shelf-head">
+          <h2 class="fav-shelf-title"></h2>
+          <span class="fav-shelf-count"></span>
+          <span class="fav-shelf-nav">
+            <button type="button" class="fav-shelf-btn" data-dir="-1" aria-label="Scroll back">&larr;</button>
+            <button type="button" class="fav-shelf-btn" data-dir="1" aria-label="Scroll on">&rarr;</button>
+          </span>
+        </div>
+        <div class="fav-row"></div>`;
+      s.row = s.el.querySelector('.fav-row');
+      // arrows for mouse users: a screenful at a time, greyed out at either end
+      const [back, on] = s.el.querySelectorAll('.fav-shelf-btn');
+      s.ends = () => {
+        const max = s.row.scrollWidth - s.row.clientWidth;
+        back.disabled = s.row.scrollLeft <= 2;
+        on.disabled = s.row.scrollLeft >= max - 2;
+        s.el.classList.toggle('is-scrollable', max > 2);
+        s.el.classList.toggle('is-end', s.row.scrollLeft >= max - 2);
+      };
+      [back, on].forEach((b) => b.addEventListener('click', () => {
+        s.row.scrollBy({ left: Number(b.dataset.dir) * s.row.clientWidth * .85, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }));
+      s.row.addEventListener('scroll', s.ends, { passive: true });
+      addEventListener('resize', s.ends);
+      grid.appendChild(s.el);
+    });
+  }
+  function updateShelves() {
+    SHELVES.forEach((s) => {
+      const shown = s.cards.filter((c) => !c.hidden).length;
+      s.el.hidden = !shown;
+      s.el.querySelector('.fav-shelf-title').textContent = shelfName(s);
+      s.el.querySelector('.fav-shelf-count').textContent = shown;
+      s.row.scrollLeft = 0;
+      s.ends();
+    });
+  }
   function buildCards() {
+    buildShelves();
     // movies, then TV shows (each newest first, same year A to Z), then books in list order
     const TYPE_ORDER = { movie: 0, tv: 1, book: 2 };
     const sorted = FAVORITES.map((f, i) => ({ f, i }))
@@ -931,9 +989,12 @@
           flip();
         }
       });
-      grid.appendChild(card);
-      cards.push({ el: card, fav: f });
+      const shelf = shelfFor(rating);
+      shelf.row.appendChild(card);
+      shelf.cards.push(card);
+      cards.push({ el: card, fav: f, shelf });
     });
+    updateShelves();
   }
 
   // an open card flips back to its cover on its own after 10 seconds
@@ -962,6 +1023,7 @@
       cards.forEach(({ el, fav }) => {
         el.hidden = filter !== 'all' && fav.type !== filter;
       });
+      updateShelves();
     });
   });
 
@@ -971,16 +1033,21 @@
 
   function onScreen(el) {
     const r = el.getBoundingClientRect();
-    return r.bottom > 0 && r.top < window.innerHeight && r.width > 0;
+    const row = el.parentElement.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight && r.width > 0 &&
+      r.right > row.left && r.left < row.right;
   }
 
   function land(card) {
     const r = card.getBoundingClientRect();
-    const visible = r.top >= 0 && r.bottom <= window.innerHeight;
+    const row = card.parentElement.getBoundingClientRect();
+    const visible = r.top >= 0 && r.bottom <= window.innerHeight &&
+      r.left >= row.left && r.right <= row.right;
     if (!visible)
       card.scrollIntoView({
         behavior: reduceMotion.matches ? 'auto' : 'smooth',
         block: 'center',
+        inline: 'center',
       });
     setTimeout(
       () => {
@@ -1384,19 +1451,22 @@
   /*---------- start ----------*/
   renderStats();
   buildCards();
+  // covers load a shelf at a time, as each shelf comes near the screen (the
+  // cards further along a row are scrolled out of sight, so watching cards
+  // one by one would miss them)
+  const loadShelf = (shelf) => cards.filter((c) => c.shelf === shelf).forEach(requestCover);
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
-          const item = cards.find((c) => c.el === e.target);
-          if (item) requestCover(item);
+          loadShelf(SHELVES.find((s) => s.el === e.target));
           io.unobserve(e.target);
         });
       },
       { rootMargin: '400px 0px' },
     );
-    cards.forEach((c) => io.observe(c.el));
+    SHELVES.forEach((s) => io.observe(s.el));
   } else {
     cards.forEach(requestCover);
   }
