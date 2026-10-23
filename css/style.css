@@ -9768,34 +9768,49 @@ html.is-frozen .egg-crash * {
 .fav-row { --card-w: clamp(92px, 26vw, 140px); }
 .fav-row .fav-score { font-size: .72rem; }
 
-/* genre chips: one per shelf, they scroll sideways on phones */
+/* "Jump to genre": one small menu instead of a row of chips */
 .fav-jump {
-  display: flex;
-  gap: .4rem;
+  position: relative;
+  display: inline-flex;
   margin: -.25rem 0 1.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  contain: inline-size; /* the chip row never widens the page */
 }
-.fav-jump::-webkit-scrollbar { display: none; }
 .fav-jump[hidden] { display: none; }
 
-.fav-jump-chip {
-  flex: none;
-  padding: .32rem .7rem;
+.fav-jump::after {
+  content: "";
+  position: absolute;
+  right: .8rem;
+  top: 50%;
+  width: .4rem;
+  height: .4rem;
+  margin-top: -.3rem;
+  border: solid #8a8a8a;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.fav-jump-select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: .42rem 2rem .42rem .85rem;
   border: 1px solid #2a2a2a;
   border-radius: 999px;
   background: #171717;
-  font: 600 .74rem var(--body-font);
+  font: 600 .78rem var(--body-font);
   color: #b5b5b5;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: border-color .15s, color .15s;
 }
 
+.fav-jump-select option { background: #171717; color: #ddd; }
+
 @media (hover: hover) {
-  .fav-jump-chip:hover { border-color: #555; color: var(--fifteenth-color); }
+  .fav-jump-select:hover { border-color: #555; color: var(--fourth-color); }
 }
+
+.fav-jump-select:focus-visible { outline: 2px solid var(--fifteenth-color); outline-offset: 2px; }
 
 /* jumping to a shelf leaves room for the header */
 .fav-shelf { scroll-margin-top: 5.5rem; }

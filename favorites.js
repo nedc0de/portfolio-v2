@@ -886,10 +886,17 @@
   let shelfIO = null;
   const parked = document.createElement('div'); // cards the filter hides wait here
   parked.hidden = true;
-  // genre chips under the filters: tap one to jump to its shelf
-  const jump = document.createElement('nav');
+  // one small "Jump to genre" menu under the filters (the phone's own
+  // picker on phones): choose a genre to scroll to its shelf
+  const jump = document.createElement('label');
   jump.className = 'fav-jump';
-  jump.setAttribute('aria-label', 'Jump to a genre');
+  jump.innerHTML = '<span class="sr-only">Jump to a genre</span><select class="fav-jump-select"></select>';
+  const jumpSelect = jump.querySelector('select');
+  jumpSelect.addEventListener('change', () => {
+    const s = SHELVES[Number(jumpSelect.value)];
+    jumpSelect.value = '';
+    if (s) s.el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  });
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function makeShelf(name, list) {
     const s = { name, cards: list.map((c) => c.el) };
@@ -943,16 +950,10 @@
       : [];
     if (rest.length) SHELVES.push(makeShelf(big.length ? 'Everything else' : `All ${TYPE_PLURAL[filter]}`, rest.sort(best)));
     SHELVES.forEach((s) => { grid.appendChild(s.el); s.ends(); });
-    jump.replaceChildren(...SHELVES.map((s) => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'fav-jump-chip';
-      chip.textContent = s.name;
-      chip.addEventListener('click', () => s.el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' }));
-      return chip;
-    }));
+    jumpSelect.replaceChildren(new Option('Jump to genre', ''), ...SHELVES.map((s, k) => new Option(`${s.name} (${s.cards.length})`, k)));
+    jumpSelect.options[0].disabled = true;
+    jumpSelect.value = '';
     jump.hidden = SHELVES.length < 2;
-    jump.scrollLeft = 0;
     // each shelf rises in as it's scrolled to, its posters fanning in after
     if (!still && 'IntersectionObserver' in window) {
       SHELVES.forEach((s) => {
