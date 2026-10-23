@@ -9525,3 +9525,6 @@ html.is-frozen .egg-crash * {
   -webkit-mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
   mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
 }
+/* seconds tick without the box changing width */
+.tk-clock { font-variant-numeric: tabular-nums; }
+.tk-time { min-width: 4.1rem; box-sizing: border-box; }

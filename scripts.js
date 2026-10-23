@@ -1129,12 +1129,14 @@ whenIdle(() => {
   const track = box.querySelector('.tk-track');
 
   // made once: building a time formatter is slow, using one is quick
-  const TIME_12 = new Intl.DateTimeFormat('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit' });
+  const TIME_12 = new Intl.DateTimeFormat('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit', second: '2-digit' });
+  // ticks on each new second, so the seconds never skip or stall
   const tickClock = () => {
     const now = new Date();
     clock.textContent = TIME_12.format(now);
+    setTimeout(tickClock, 1000 - now.getMilliseconds());
   };
-  tickClock(); setInterval(tickClock, 30000);
+  tickClock();
 
   // Featured post + "More posts" (skipping "coming soon" cards), newest first
   const readPosts = (html) => {
