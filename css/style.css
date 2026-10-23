@@ -9683,3 +9683,82 @@ html.is-frozen .egg-crash * {
 @media screen and (min-width: 1024px) {
   .tk { --tk-w: 552px; }
 }
+
+/*===== FAVORITES: shelves =====*/
+/* one row per verdict, best first; each row swipes sideways (snaps to a
+   card) and fades out at the right edge so it's clear there's more */
+.fav-shelves {
+  display: grid;
+  gap: 2rem;
+  min-width: 0;
+}
+
+.fav-shelf { min-width: 0; }
+.fav-shelf[hidden] { display: none; }
+
+.fav-shelf-head {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  margin-bottom: .75rem;
+}
+
+.fav-shelf-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #eee;
+}
+
+.fav-shelf-count {
+  font: 700 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: #8a8a8a;
+}
+
+.fav-row {
+  --card-w: clamp(108px, 31vw, 168px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--card-w);
+  gap: clamp(.5rem, 1.5vw, .9rem);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 2px;
+  padding: 4px 2px 10px; /* room for the hover lift and the pick glow */
+  scrollbar-width: none;
+  -webkit-mask: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+  mask: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+}
+
+.fav-row::-webkit-scrollbar { display: none; }
+.fav-row > .fav-card { scroll-snap-align: start; }
+
+/* arrows (mouse and trackpad only; phones swipe) */
+.fav-shelf-nav { display: none; margin-left: auto; gap: .4rem; }
+
+@media (hover: hover) and (pointer: fine) {
+  .fav-shelf.is-scrollable .fav-shelf-nav { display: flex; }
+}
+
+.fav-shelf-btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #2c2c2c;
+  border-radius: 50%;
+  background: #161616;
+  font-size: .85rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, opacity .15s;
+}
+
+.fav-shelf-btn:hover:not(:disabled) { border-color: #555; color: var(--fifteenth-color); }
+.fav-shelf-btn:disabled { opacity: .3; cursor: default; }
+
+/* no fade once you've reached the end of a row */
+.fav-shelf.is-end .fav-row,
+.fav-shelf:not(.is-scrollable) .fav-row { -webkit-mask: none; mask: none; }

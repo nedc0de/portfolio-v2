@@ -875,7 +875,85 @@
   }
 
   const cards = [];
+  // Shelves: rows you swipe sideways, one per genre (biggest first), best
+  // rated first in each. Genres with only a couple of titles share an
+  // "Everything else" shelf at the end; if no genre has enough (books), it's
+  // one shelf. The shelves are rebuilt for each filter. (Without JS the
+  // plain list in the page shows instead.)
+  const MIN_SHELF = 3;
+  const TYPE_PLURAL = { all: 'favorites', movie: 'movies', tv: 'shows', book: 'books' };
+  let SHELVES = [];
+  let shelfIO = null;
+  const parked = document.createElement('div'); // cards the filter hides wait here
+  parked.hidden = true;
+  function makeShelf(name, list) {
+    const s = { name, cards: list.map((c) => c.el) };
+    s.el = document.createElement('section');
+    s.el.className = 'fav-shelf';
+    s.el.innerHTML = `
+      <div class="fav-shelf-head">
+        <h2 class="fav-shelf-title"></h2>
+        <span class="fav-shelf-count"></span>
+        <span class="fav-shelf-nav">
+          <button type="button" class="fav-shelf-btn" data-dir="-1" aria-label="Scroll back">&larr;</button>
+          <button type="button" class="fav-shelf-btn" data-dir="1" aria-label="Scroll on">&rarr;</button>
+        </span>
+      </div>
+      <div class="fav-row"></div>`;
+    s.el.querySelector('.fav-shelf-title').textContent = name;
+    s.el.querySelector('.fav-shelf-count').textContent = list.length;
+    s.row = s.el.querySelector('.fav-row');
+    list.forEach((c) => { c.shelf = s; s.row.appendChild(c.el); });
+    // arrows for mouse users: a screenful at a time, greyed out at either end
+    const [back, on] = s.el.querySelectorAll('.fav-shelf-btn');
+    s.ends = () => {
+      const max = s.row.scrollWidth - s.row.clientWidth;
+      back.disabled = s.row.scrollLeft <= 2;
+      on.disabled = s.row.scrollLeft >= max - 2;
+      s.el.classList.toggle('is-scrollable', max > 2);
+      s.el.classList.toggle('is-end', s.row.scrollLeft >= max - 2);
+    };
+    [back, on].forEach((btn) => btn.addEventListener('click', () => {
+      s.row.scrollBy({ left: Number(btn.dataset.dir) * s.row.clientWidth * .85, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }));
+    s.row.addEventListener('scroll', s.ends, { passive: true });
+    return s;
+  }
+  function layoutShelves() {
+    if (shelfIO) shelfIO.disconnect();
+    SHELVES.forEach((s) => s.el.remove());
+    const shown = cards.filter((c) => filter === 'all' || c.fav.type === filter);
+    cards.forEach((c) => { if (!shown.includes(c)) { c.shelf = null; parked.appendChild(c.el); } });
+    const byGenre = new Map();
+    shown.forEach((c) => {
+      const g = c.fav.genre || 'Other';
+      if (!byGenre.has(g)) byGenre.set(g, []);
+      byGenre.get(g).push(c);
+    });
+    const best = (a, b) => b.rating - a.rating || (b.fav.year || 0) - (a.fav.year || 0);
+    const big = [...byGenre].filter(([, l]) => l.length >= MIN_SHELF).sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+    const rest = [...byGenre].filter(([, l]) => l.length < MIN_SHELF).flatMap(([, l]) => l);
+    SHELVES = big.length
+      ? big.map(([g, l]) => makeShelf(g, l.sort(best)))
+      : [];
+    if (rest.length) SHELVES.push(makeShelf(big.length ? 'Everything else' : `All ${TYPE_PLURAL[filter]}`, rest.sort(best)));
+    SHELVES.forEach((s) => { grid.appendChild(s.el); s.ends(); });
+    // covers load a shelf at a time as each comes near the screen (cards
+    // further along a row are scrolled out of sight, so watching single
+    // cards would miss them)
+    if ('IntersectionObserver' in window) {
+      shelfIO = new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        shelfIO.unobserve(e.target);
+        cards.filter((c) => c.shelf && c.shelf.el === e.target).forEach(requestCover);
+      }), { rootMargin: '400px 0px' });
+      SHELVES.forEach((s) => shelfIO.observe(s.el));
+    } else shown.forEach(requestCover);
+  }
+  addEventListener('resize', () => SHELVES.forEach((s) => s.ends()));
   function buildCards() {
+    grid.classList.replace('fav-grid', 'fav-shelves');
+    grid.appendChild(parked);
     // movies, then TV shows (each newest first, same year A to Z), then books in list order
     const TYPE_ORDER = { movie: 0, tv: 1, book: 2 };
     const sorted = FAVORITES.map((f, i) => ({ f, i }))
@@ -931,9 +1009,9 @@
           flip();
         }
       });
-      grid.appendChild(card);
-      cards.push({ el: card, fav: f });
+      cards.push({ el: card, fav: f, rating, shelf: null });
     });
+    layoutShelves();
   }
 
   // an open card flips back to its cover on its own after 10 seconds
@@ -959,9 +1037,8 @@
       filterButtons.forEach((b) =>
         b.setAttribute('aria-pressed', String(b === btn)),
       );
-      cards.forEach(({ el, fav }) => {
-        el.hidden = filter !== 'all' && fav.type !== filter;
-      });
+      cards.forEach((c) => setFlipped(c.el, false));
+      layoutShelves();
     });
   });
 
@@ -971,16 +1048,21 @@
 
   function onScreen(el) {
     const r = el.getBoundingClientRect();
-    return r.bottom > 0 && r.top < window.innerHeight && r.width > 0;
+    const row = el.parentElement.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight && r.width > 0 &&
+      r.right > row.left && r.left < row.right;
   }
 
   function land(card) {
     const r = card.getBoundingClientRect();
-    const visible = r.top >= 0 && r.bottom <= window.innerHeight;
+    const row = card.parentElement.getBoundingClientRect();
+    const visible = r.top >= 0 && r.bottom <= window.innerHeight &&
+      r.left >= row.left && r.right <= row.right;
     if (!visible)
       card.scrollIntoView({
         behavior: reduceMotion.matches ? 'auto' : 'smooth',
         block: 'center',
+        inline: 'center',
       });
     setTimeout(
       () => {
@@ -997,7 +1079,7 @@
   if (pickButton) {
     pickButton.addEventListener('click', () => {
       if (picking) return;
-      const pool = cards.filter((c) => !c.el.hidden).map((c) => c.el);
+      const pool = cards.filter((c) => c.shelf).map((c) => c.el);
       if (!pool.length) return;
       picking = true;
       pool.forEach((c) => setFlipped(c, false));
@@ -1384,20 +1466,4 @@
   /*---------- start ----------*/
   renderStats();
   buildCards();
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const item = cards.find((c) => c.el === e.target);
-          if (item) requestCover(item);
-          io.unobserve(e.target);
-        });
-      },
-      { rootMargin: '400px 0px' },
-    );
-    cards.forEach((c) => io.observe(c.el));
-  } else {
-    cards.forEach(requestCover);
-  }
 })();
