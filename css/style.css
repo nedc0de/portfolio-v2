@@ -9476,3 +9476,19 @@ html.is-frozen .egg-crash * {
 .ps-line.is-drawn .pl-path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s cubic-bezier(.45, .05, .25, 1); }
 .ps-line.is-drawn .pl-area,
 .ps-line.is-drawn .pl-dot-end { opacity: 1; transition: opacity .5s 1.4s; }
+
+/*===== HOME: smaller ticker =====*/
+.tk-head { margin-bottom: .4rem; font-size: .62rem; }
+.tk-live { gap: .45rem; }
+.tk-dot { width: .45rem; height: .45rem; }
+.tk-here { gap: .35rem; font-size: .68rem; }
+.tk-here-eyes { width: 1.15rem; height: .7rem; }
+.tk-here-dot { width: .38rem; height: .38rem; }
+.tk-bar { height: 2.3rem; }
+.tk-time { padding: 0 .6rem; }
+.tk-clock { font-size: .78rem; }
+.tk-time small { font-size: .52rem; }
+.tk-track { padding-left: .8rem; }
+.tk-item { gap: .45rem; padding-right: 1.75rem; font-size: .78rem; }
+.tk-tag { padding: .08rem .38rem; font-size: .56rem; }
+.tk-src { font-size: .68rem; }
