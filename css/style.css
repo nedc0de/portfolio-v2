@@ -9512,7 +9512,7 @@ html.is-frozen .egg-crash * {
 
 /*===== HOME: quieter, smaller clock box =====*/
 .tk-time {
-  margin: .25rem 0 .25rem .25rem;
+  margin: .25rem 0;
   padding: 0 .4rem;
   border-radius: 4px;
   background: #2a2a2a;
@@ -9520,3 +9520,8 @@ html.is-frozen .egg-crash * {
 }
 .tk-clock { font-size: .54rem; font-weight: 600; }
 .tk-time small { font-size: .38rem; color: #8a8a8a; }
+/* the scrolling posts run right up to the edge, in line with the eyes */
+.tk-window {
+  -webkit-mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
+  mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
+}
