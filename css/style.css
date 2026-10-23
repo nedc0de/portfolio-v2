@@ -10183,3 +10183,18 @@ html.fav-sheet-open { overflow: hidden; }
 /* About's How I work: the line still swipes in as each row comes in */
 .mk-list.will-mark .mk-hl { background-size: 0% .14em; }
 .mk-list.will-mark .is-on .mk-hl { background-size: 100% .14em; }
+
+/*===== Page titles: the same soft line, no brush =====*/
+/* "let's Talk", "top Picks"…: the yellow word gets the same underline as the
+   menu and the marked words in the text (one soft yellow, faded at both
+   ends), sized to the title */
+.favorites-title .about-title-color::after {
+  top: auto;
+  bottom: -.13em; /* below the tails of g, p, y */
+  left: 0;
+  width: 100%;
+  height: .09em;
+  border-radius: .05em;
+  background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .32) .35em, rgba(255, 220, 22, .32) calc(100% - .35em), rgba(255, 220, 22, 0));
+  opacity: 1;
+}
