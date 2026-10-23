@@ -1065,6 +1065,58 @@
       );
   }
 
+  /*---------- summaries and backdrops ----------*/
+  // What each title is about, for the details panel and the banner: TMDB's
+  // overview (and its wide backdrop image) for movies and shows, Open
+  // Library's description for books. Looked up only when needed, then kept
+  // in this browser for a month.
+  const INFO_CACHE_KEY = 'nedcode-fav-info-v1';
+  let infoCache = {};
+  try { infoCache = JSON.parse(localStorage.getItem(INFO_CACHE_KEY)) || {}; } catch (e) { infoCache = {}; }
+  const plain = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+  async function findScreenInfo(f) {
+    const kind = f.type === 'tv' ? 'tv' : 'movie';
+    const base = '/.netlify/functions/tmdb';
+    let hit;
+    if (f.tmdbId) hit = await getJSON(`${base}?kind=${kind}&id=${encodeURIComponent(f.tmdbId)}`);
+    else {
+      const query = `q=${encodeURIComponent(f.title)}`;
+      let data = await getJSON(`${base}?kind=${kind}&${query}${f.year ? `&year=${f.year}` : ''}`);
+      hit = (data.results || []).find((r) => r.poster_path);
+      if (!hit && f.year) {
+        data = await getJSON(`${base}?kind=${kind}&${query}`);
+        hit = (data.results || []).find((r) => r.poster_path);
+      }
+    }
+    if (!hit) return { summary: '', backdrop: '' };
+    const back = typeof hit.backdrop_path === 'string' && /^\/[A-Za-z0-9._-]+$/.test(hit.backdrop_path) ? hit.backdrop_path : '';
+    return { summary: plain(hit.overview), backdrop: back ? `https://image.tmdb.org/t/p/w1280${back}` : '' };
+  }
+  async function findBookInfo(f) {
+    const q = `title=${encodeURIComponent(f.title)}` + (f.by ? `&author=${encodeURIComponent(f.by)}` : '');
+    const data = await getJSON(`https://openlibrary.org/search.json?${q}&limit=1&fields=key,first_sentence`);
+    const doc = (data.docs || [])[0];
+    if (!doc) return { summary: '', backdrop: '' };
+    let summary = '';
+    if (/^\/works\/OL\d+W$/.test(doc.key || '')) {
+      const work = await getJSON(`https://openlibrary.org${doc.key}.json`);
+      const d = work.description;
+      summary = plain(typeof d === 'string' ? d : d && d.value);
+      summary = summary.split(/\s*(?:-{3,}|\[source\]|\(\[source\])/i)[0]; // drop trailing notes and links
+    }
+    if (!summary && doc.first_sentence) summary = plain([].concat(doc.first_sentence)[0]);
+    return { summary, backdrop: '' };
+  }
+  async function infoFor(f) {
+    const id = cacheId(f);
+    const hit = infoCache[id];
+    if (hit && Date.now() - hit.t < 30 * 86400000) return hit;
+    const info = f.type === 'book' ? await findBookInfo(f) : await findScreenInfo(f);
+    infoCache[id] = { ...info, t: Date.now() };
+    try { localStorage.setItem(INFO_CACHE_KEY, JSON.stringify(infoCache)); } catch (e) {}
+    return info;
+  }
+
   /*---------- details panel ----------*/
   // Tapping a poster slides up a panel from the bottom (a centred card on
   // desktop): a big poster, what it is, the stars and the take. Close with
@@ -1088,9 +1140,9 @@
             <span class="fav-sheet-meta"></span>
             <span class="fav-sheet-by"></span>
             <span class="fav-sheet-rate"><b class="fav-sheet-num"></b><span class="fav-sheet-stars"></span><span class="fav-sheet-verdict"></span></span>
-            <p class="fav-sheet-take"></p>
           </div>
         </div>
+        <p class="fav-sheet-sum"></p>
       </div>`;
     document.body.appendChild(sheet);
     sheet.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeSheet(); });
@@ -1124,8 +1176,14 @@
     q('.fav-sheet-num').textContent = item.rating;
     q('.fav-sheet-stars').innerHTML = starsHTML(item.rating);
     q('.fav-sheet-verdict').textContent = verdict(item.rating).replace(/watch/, f.type === 'book' ? 'read' : 'watch');
-    q('.fav-sheet-take').textContent = f.take ? `“${f.take}”` : '';
-    q('.fav-sheet-take').hidden = !f.take;
+    // what it's about (looked up the first time it's opened)
+    const sum = q('.fav-sheet-sum');
+    sum.textContent = '';
+    sum.classList.add('is-loading');
+    infoFor(f).then((info) => {
+      if (q('.fav-sheet-title').textContent !== f.title) return;
+      sum.textContent = info.summary || '';
+    }).catch(() => {}).finally(() => sum.classList.remove('is-loading'));
     const poster = q('.fav-sheet-poster');
     const img = poster.querySelector('img');
     poster.style.backgroundColor = item.el.querySelector('.fav-front').style.backgroundColor;
@@ -1172,10 +1230,23 @@
         <h2 class="fav-hero-title">${escapeHTML(f.title)}</h2>
         <span class="fav-hero-meta">${escapeHTML([f.year, f.genre].filter(Boolean).join(' · '))}</span>
         <span class="fav-hero-rate">${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span></span>
+        <p class="fav-hero-sum"></p>
         <button type="button" class="fav-hero-go">See details <span aria-hidden="true">&rarr;</span></button>
       </div>`;
     bar.before(hero);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => openSheet(item));
+    // desktop: the movie's own wide still drifts slowly behind the banner,
+    // with its summary beside the poster
+    infoFor(f).then((info) => {
+      hero.querySelector('.fav-hero-sum').textContent = info.summary || '';
+      if (!info.backdrop) return;
+      const still = new Image();
+      still.onload = () => {
+        hero.style.setProperty('--backdrop', `url("${info.backdrop}")`);
+        hero.classList.add('has-backdrop');
+      };
+      still.src = info.backdrop;
+    }).catch(() => {});
     coverFor(f).then((url) => {
       if (!url) return;
       const img = hero.querySelector('img');

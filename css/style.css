@@ -10039,3 +10039,68 @@ html.fav-sheet-open { overflow: hidden; }
 .fav-sheet .fav-star { opacity: 1; transform: none; }
 .fav-hero .fav-stars { margin: 0; font-size: 15px; }
 .fav-sheet .fav-stars { margin: 0; font-size: 18px; }
+
+/*===== FAVORITES: summaries and the moving backdrop =====*/
+.fav-sheet-sum { margin: 1.1rem 0 0; font-size: .9rem; line-height: 1.55; color: #cfcfcf; }
+.fav-sheet-sum:empty:not(.is-loading) { display: none; }
+.fav-sheet-sum.is-loading {
+  height: 3.6em;
+  border-radius: 6px;
+  background: linear-gradient(100deg, #222 30%, #2c2c2c 50%, #222 70%) 0 0 / 250% 100%;
+  animation: fav-sum-shimmer 1.2s linear infinite;
+}
+@keyframes fav-sum-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+
+/* the banner's summary: desktop only, three lines at most */
+.fav-hero-sum { display: none; }
+
+/* desktop: the movie's wide still slowly pans and zooms behind the banner
+   (Ken Burns), darkened on the left so the text stays readable */
+@media (min-width: 900px) {
+  .fav-hero { min-height: 300px; padding: 1.6rem; gap: 1.6rem; }
+  .fav-hero-sum {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    max-width: 52ch;
+    margin: .3rem 0 0;
+    font-size: .88rem;
+    line-height: 1.55;
+    color: #c8c8c8;
+  }
+  .fav-hero.has-backdrop .fav-hero-bg { opacity: 0; }
+  .fav-hero::before,
+  .fav-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  /* the still itself */
+  .fav-hero::before {
+    background: var(--backdrop, none) center 30% / cover no-repeat;
+    opacity: 0;
+    transform-origin: 70% 40%;
+    transition: opacity 1.2s;
+  }
+  .fav-hero.has-backdrop::before {
+    opacity: 1;
+    animation: fav-kenburns 28s ease-in-out infinite alternate;
+  }
+  /* darkening: strong on the left behind the text, fading to the right */
+  .fav-hero::after {
+    background:
+      linear-gradient(90deg, rgba(14, 14, 14, .96) 0%, rgba(14, 14, 14, .82) 38%, rgba(14, 14, 14, .25) 75%, rgba(14, 14, 14, .45) 100%),
+      linear-gradient(0deg, rgba(14, 14, 14, .6), transparent 45%);
+    opacity: 0;
+    transition: opacity 1.2s;
+  }
+  .fav-hero.has-backdrop::after { opacity: 1; }
+}
+
+@keyframes fav-kenburns {
+  from { transform: scale(1.06) translate(0, 0); }
+  to { transform: scale(1.18) translate(-3%, -2%); }
+}
