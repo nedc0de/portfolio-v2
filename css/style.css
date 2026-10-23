@@ -159,7 +159,7 @@ body {
   will-change: transform;
 }
 
-.grid-spot.is-on { opacity: 1; transition-duration: .2s; }
+.grid-spot.is-on { opacity: .45; transition-duration: .2s; } /* a soft glow, not a bright one */
 
 @media (hover: none), (max-width: 768px) {
   .grid-spot { --r: 120px; }
