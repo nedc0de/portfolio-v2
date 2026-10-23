@@ -279,10 +279,11 @@ document.addEventListener('click', () => {
 });
 
 /*===== DESKTOP MENU: laser scan =====*/
-// A glowing laser dot, like the one in the logo, rests under the page you're
-// on with a short yellow trail. Point at another link and the dot shoots
-// along the line to it, its trail stretching behind and catching up; move
-// off the menu and it slides back home. Phones keep their own menu.
+// A soft yellow laser line rests under the page you're on. Point at another
+// link and it slides along to it, its bright end leading: the words it
+// passes warm up for a moment and a few faint sparks fall off as it moves.
+// Clicking a link makes the line flash briefly before the next page loads.
+// Everything stays quiet and faded. Phones keep their own menu.
 (() => {
   const list = document.querySelector('.nav-list');
   if (!list) return;
@@ -290,41 +291,91 @@ document.addEventListener('click', () => {
   const laser = document.createElement('span');
   laser.className = 'nav-laser';
   laser.setAttribute('aria-hidden', 'true');
-  laser.innerHTML = '<span class="nav-laser-trail"></span><span class="nav-laser-dot"></span>';
+  laser.innerHTML = '<span class="nav-laser-trail"></span>';
   list.prepend(laser);
   const trail = laser.firstChild;
-  const dot = laser.lastChild;
   const links = [...list.querySelectorAll('.nav-link')];
   const home = links.find((a) => a.classList.contains('active'));
-  let at = null;
+  let at = null, y = 0, moving = 0, lastSpark = 0;
 
-  // the trail runs under the word; the dot sits at its leading end
   const aim = (a, instant) => {
     if (!wide.matches) return;
     if (!a) { laser.classList.remove('is-on'); return; }
     const box = list.getBoundingClientRect();
     const r = a.getBoundingClientRect();
     const left = r.left - box.left;
-    const goingLeft = at && left < at;
-    laser.classList.toggle('is-left', !!goingLeft);
+    if (at !== null && Math.abs(left - at) < 1 && !instant) return;
+    laser.classList.toggle('is-left', at !== null && left < at);
     laser.classList.toggle('is-instant', !!instant);
+    y = r.bottom - box.top + 7;
     laser.style.setProperty('--x', `${left}px`);
     laser.style.setProperty('--w', `${r.width}px`);
-    laser.style.setProperty('--y', `${r.bottom - box.top + 7}px`);
+    laser.style.setProperty('--y', `${y}px`);
     laser.classList.add('is-on');
     at = left;
     if (instant) requestAnimationFrame(() => requestAnimationFrame(() => laser.classList.remove('is-instant')));
+    else track();
+  };
+
+  // while the line slides: find its bright end each frame, warm the word
+  // above it and now and then drop a faint spark
+  const head = () => {
+    const m = new DOMMatrixReadOnly(getComputedStyle(trail).transform);
+    return laser.classList.contains('is-left') ? m.m41 : m.m41 + trail.offsetWidth;
+  };
+  const spark = (x) => {
+    const sp = document.createElement('span');
+    sp.className = 'nav-laser-spark';
+    sp.style.left = `${x}px`;
+    sp.style.top = `${y}px`;
+    list.appendChild(sp);
+    const drift = (Math.random() - .5) * 10;
+    sp.animate([
+      { transform: 'translate(-50%, -50%) scale(1)', opacity: .55 },
+      { transform: `translate(calc(-50% + ${drift}px), ${6 + Math.random() * 6}px) scale(.4)`, opacity: 0 },
+    ], { duration: 450 + Math.random() * 250, easing: 'ease-out' }).onfinish = () => sp.remove();
+  };
+  const track = () => {
+    const until = performance.now() + 750;
+    if (moving) { moving = until; return; }
+    moving = until;
+    const box = () => list.getBoundingClientRect();
+    const step = (now) => {
+      const x = head();
+      const left = box().left;
+      links.forEach((a) => {
+        const r = a.getBoundingClientRect();
+        const near = x >= r.left - left - 6 && x <= r.right - left + 6;
+        a.classList.toggle('is-lit', near);
+      });
+      if (now - lastSpark > 55) { lastSpark = now; spark(x); }
+      if (now < moving) requestAnimationFrame(step);
+      else { moving = 0; links.forEach((a) => a.classList.remove('is-lit')); }
+    };
+    requestAnimationFrame(step);
   };
 
   links.forEach((a) => {
     a.addEventListener('pointerenter', () => aim(a));
     a.addEventListener('focus', () => aim(a));
+    // a plain click: a short flash on the line, then the page changes
+    a.addEventListener('click', (e) => {
+      if (!wide.matches || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
+      e.preventDefault();
+      aim(a, true);
+      laser.classList.remove('is-fire');
+      void laser.offsetWidth;
+      laser.classList.add('is-fire');
+      setTimeout(() => { location.href = a.href; }, 170);
+    });
   });
   list.addEventListener('pointerleave', () => aim(home));
   list.addEventListener('focusout', (e) => { if (!list.contains(e.relatedTarget)) aim(home); });
   const reset = () => aim(home, true);
   addEventListener('resize', reset);
   wide.addEventListener('change', reset);
+  // coming back with the browser's back button: put it home again
+  addEventListener('pageshow', () => { laser.classList.remove('is-fire'); reset(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(reset);
   reset();
 })();
