@@ -10119,8 +10119,7 @@ html.fav-sheet-open { overflow: hidden; }
 /*===== DESKTOP MENU: laser scan =====*/
 /* calm grey words, white for the page you're on and the one you point at;
    a soft laser line (scripts.js) replaces the brush underline and the tilt */
-.nav-laser,
-.nav-laser-spark { display: none; }
+.nav-laser { display: none; }
 
 @media screen and (min-width: 768px) {
   .nav-list { position: relative; }
@@ -10166,19 +10165,6 @@ html.fav-sheet-open { overflow: hidden; }
 
   /* click: a quick, soft flash along the line */
   .nav-laser.is-fire .nav-laser-trail { animation: nav-laser-fire .32s ease-out; }
-
-  /* faint sparks falling off the moving line */
-  .nav-laser-spark {
-    display: block;
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: rgba(255, 225, 120, .9);
-    box-shadow: 0 0 4px rgba(255, 200, 40, .5);
-    pointer-events: none;
-    opacity: 0;
-  }
 }
 
 @keyframes nav-laser-fire {
