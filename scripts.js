@@ -278,6 +278,57 @@ document.addEventListener('click', () => {
   }
 });
 
+/*===== DESKTOP MENU: laser scan =====*/
+// A glowing laser dot, like the one in the logo, rests under the page you're
+// on with a short yellow trail. Point at another link and the dot shoots
+// along the line to it, its trail stretching behind and catching up; move
+// off the menu and it slides back home. Phones keep their own menu.
+(() => {
+  const list = document.querySelector('.nav-list');
+  if (!list) return;
+  const wide = matchMedia('(min-width: 768px)');
+  const laser = document.createElement('span');
+  laser.className = 'nav-laser';
+  laser.setAttribute('aria-hidden', 'true');
+  laser.innerHTML = '<span class="nav-laser-trail"></span><span class="nav-laser-dot"></span>';
+  list.prepend(laser);
+  const trail = laser.firstChild;
+  const dot = laser.lastChild;
+  const links = [...list.querySelectorAll('.nav-link')];
+  const home = links.find((a) => a.classList.contains('active'));
+  let at = null;
+
+  // the trail runs under the word; the dot sits at its leading end
+  const aim = (a, instant) => {
+    if (!wide.matches) return;
+    if (!a) { laser.classList.remove('is-on'); return; }
+    const box = list.getBoundingClientRect();
+    const r = a.getBoundingClientRect();
+    const left = r.left - box.left;
+    const goingLeft = at && left < at;
+    laser.classList.toggle('is-left', !!goingLeft);
+    laser.classList.toggle('is-instant', !!instant);
+    laser.style.setProperty('--x', `${left}px`);
+    laser.style.setProperty('--w', `${r.width}px`);
+    laser.style.setProperty('--y', `${r.bottom - box.top + 7}px`);
+    laser.classList.add('is-on');
+    at = left;
+    if (instant) requestAnimationFrame(() => requestAnimationFrame(() => laser.classList.remove('is-instant')));
+  };
+
+  links.forEach((a) => {
+    a.addEventListener('pointerenter', () => aim(a));
+    a.addEventListener('focus', () => aim(a));
+  });
+  list.addEventListener('pointerleave', () => aim(home));
+  list.addEventListener('focusout', (e) => { if (!list.contains(e.relatedTarget)) aim(home); });
+  const reset = () => aim(home, true);
+  addEventListener('resize', reset);
+  wide.addEventListener('change', reset);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reset);
+  reset();
+})();
+
 /*===== CONTACT-TEXTAREA =====*/
 let textArea = document.getElementById('textbox');
 let characterCounter = document.getElementById('char_count');
