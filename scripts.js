@@ -2337,6 +2337,67 @@ function readPostsSeen() {
   replay.addEventListener('click', play);
 })();
 
+/*===== BLOG POSTS: build-up diagrams and line graphs =====*/
+// .ps-build: the diagram's [data-step] parts appear one step at a time (lines
+// draw in), lighting the matching .ps-build-steps item, with a replay button.
+// .ps-line: the line draws left to right, then the end value fades in.
+// Both play once when scrolled into view; reduced motion or no JS shows the
+// finished picture.
+(() => {
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const STEP_MS = 1300;
+  const once = (el, fn) => {
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      fn();
+    }, { threshold: .5 });
+    io.observe(el);
+  };
+
+  document.querySelectorAll('.ps-build').forEach((fig) => {
+    const parts = [...fig.querySelectorAll('[data-step]')];
+    const steps = [...fig.querySelectorAll('.ps-build-steps li')];
+    const replay = fig.querySelector('.ps-build-replay');
+    const n = steps.length;
+    let timer = 0;
+    const show = (k) => {
+      parts.forEach((el) => el.classList.toggle('is-in', +el.dataset.step <= k));
+      steps.forEach((li, i) => {
+        li.classList.toggle('is-on', i === k - 1);
+        li.classList.toggle('is-done', i < k - 1);
+      });
+    };
+    const play = () => {
+      clearTimeout(timer);
+      if (replay) replay.hidden = true;
+      fig.classList.add('will-build');
+      show(0);
+      let k = 0;
+      const next = () => {
+        show(++k);
+        if (k < n) { timer = setTimeout(next, STEP_MS); return; }
+        // the finished picture, every step readable again
+        timer = setTimeout(() => {
+          fig.classList.remove('will-build');
+          steps.forEach((li) => li.classList.remove('is-on', 'is-done'));
+          if (replay) replay.hidden = false;
+        }, STEP_MS);
+      };
+      timer = setTimeout(next, 250);
+    };
+    fig.classList.add('will-build');
+    show(0);
+    once(fig, play);
+    if (replay) replay.addEventListener('click', play);
+  });
+
+  document.querySelectorAll('.ps-line').forEach((fig) => {
+    fig.classList.add('will-draw');
+    once(fig, () => requestAnimationFrame(() => fig.classList.add('is-drawn')));
+  });
+})();
+
 /*===== BLOG POSTS: touchscreen demo =====*/
 // A grid of row/column sensor lines. Each finger changes the reading at the
 // crossings near it (brighter dot = bigger change) and the "controller" works
