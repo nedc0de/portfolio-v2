@@ -9669,7 +9669,7 @@ html.is-frozen .egg-crash * {
 /*===== HOME: ticker as wide as the menu on desktop =====*/
 /* the menu's words run from "home" to "contact" over 552px (530px on small
    tablets); the ticker matches that, centred under the hero (which is
-   narrower), with its text a step bigger to fill it */
+   narrower). Text sizes stay the same as on phones. */
 @media screen and (min-width: 768px) {
   .tk {
     --tk-w: 530px;
@@ -9678,17 +9678,6 @@ html.is-frozen .egg-crash * {
     margin-left: calc(50% - var(--tk-w) / 2);
     margin-right: 0;
   }
-  .tk-head { font-size: .62rem; }
-  .tk-here { font-size: .7rem; }
-  .tk-here-eyes { width: 1.1rem; height: .66rem; }
-  .tk-bar { height: 2.2rem; }
-  .tk-time { padding: 0 .6rem; }
-  .tk-clock { font-size: .74rem; }
-  .tk-ap { font-size: .56rem; }
-  .tk-time small.tk-zone { font-size: .52rem; }
-  .tk-item { font-size: .8rem; padding-right: 1.8rem; }
-  .tk-tag { font-size: .56rem; padding: .08rem .38rem; }
-  .tk-src { font-size: .7rem; }
 }
 
 @media screen and (min-width: 1024px) {
