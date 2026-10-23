@@ -933,8 +933,14 @@
     ofType.forEach((c) => { const g = c.fav.genre || 'Other'; counts.set(g, (counts.get(g) || 0) + 1); });
     if (genre !== 'any' && !counts.has(genre)) genre = 'any';
     genreSelect.replaceChildren(new Option('Any genre', 'any'),
-      ...[...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([g, n]) => new Option(`${g} (${n})`, g)));
+      ...[...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([g, n]) => {
+        const o = new Option(`${g} (${n})`, g);
+        o.dataset.label = o.textContent;
+        return o;
+      }));
     genreSelect.value = genre;
+    // the chosen genre shows just its name: its count is already on the shelf
+    [...genreSelect.options].forEach((o) => { o.textContent = o.value === 'any' || o.value !== genre ? o.dataset.label || o.textContent : o.value; });
     const shown = genre === 'any' ? ofType : ofType.filter((c) => (c.fav.genre || 'Other') === genre);
     cards.forEach((c) => { if (!shown.includes(c)) { c.shelf = null; parked.appendChild(c.el); } });
     const byGenre = new Map();
