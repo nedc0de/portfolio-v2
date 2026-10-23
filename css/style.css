@@ -9509,3 +9509,39 @@ html.is-frozen .egg-crash * {
 .tk-item { gap: .35rem; padding-right: 1.3rem; font-size: .62rem; }
 .tk-tag { padding: .05rem .28rem; border-radius: 4px; font-size: .45rem; }
 .tk-src { font-size: .56rem; }
+
+/*===== HOME: quieter, smaller clock box =====*/
+.tk-time {
+  margin: .25rem 0;
+  padding: 0 .4rem;
+  border-radius: 4px;
+  background: #2a2a2a;
+  color: #e6e6e6;
+}
+.tk-clock { font-size: .54rem; font-weight: 600; }
+.tk-time small { font-size: .38rem; color: #8a8a8a; }
+/* the scrolling posts run right up to the edge, in line with the eyes */
+.tk-window {
+  -webkit-mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
+  mask: linear-gradient(90deg, transparent, #000 .9rem, #000 calc(100% - .5rem), transparent);
+}
+/* seconds tick without the box changing width */
+.tk-clock { font-variant-numeric: tabular-nums; }
+.tk-time { min-width: 4.1rem; box-sizing: border-box; }
+
+/*===== HOME: ticker clock on one line: 10:55:06 PM ET =====*/
+.tk-time {
+  flex-direction: row;
+  align-items: center;
+  gap: .3rem;
+  min-width: 0;
+  padding: 0 .5rem;
+  background: #202020;
+  line-height: 1;
+}
+.tk-clock { font-size: .6rem; }
+.tk-hm { font-weight: 600; color: #e6e6e6; }
+.tk-s { font-weight: 500; color: #777; }
+.tk-ap { font-size: .46rem; font-weight: 700; letter-spacing: .04em; color: #9a9a9a; }
+.tk-time small.tk-zone { font-size: .42rem; font-weight: 700; letter-spacing: .08em; color: var(--fifteenth-color); }
+.tk-s { display: inline-block; min-width: 1.5em; } /* steady width as seconds tick */

@@ -1117,24 +1117,46 @@ whenIdle(() => {
 });
 
 /*===== HOME: TICKER =====*/
-// Montreal time + a scrolling loop of what's new on the site: the latest blog
+// The visitor's own time (with their zone, like ET) + a scrolling loop of what's new on the site: the latest blog
 // posts (read from blog.html), the latest Favorites pick and the latest project.
 // All three update by themselves when blog.html, favorites.js or the Selected
 // work list change.
 (() => {
-  const ZONE = 'America/Toronto';
   const box = document.querySelector('.tk');
   if (!box) return;
   const clock = box.querySelector('.tk-clock');
   const track = box.querySelector('.tk-track');
 
   // made once: building a time formatter is slow, using one is quick
-  const TIME_12 = new Intl.DateTimeFormat('en-US', { timeZone: ZONE, hour: 'numeric', minute: '2-digit' });
+  const TIME_12 = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+  // the visitor's zone, short: "ET", "PT", "CEST", "BST", "AEDT", "IST";
+  // a few English locales know different abbreviations, so try each, then
+  // fall back to "GMT+9"
+  const zoneName = (locale, style) => {
+    try {
+      return new Intl.DateTimeFormat(locale, { timeZoneName: style }).formatToParts(new Date())
+        .find((part) => part.type === 'timeZoneName').value;
+    } catch (e) { return ''; }
+  };
+  const zone = box.querySelector('.tk-zone');
+  const named = [['en-US', 'shortGeneric'], ['en-GB', 'short'], ['en-AU', 'short'], ['en-IN', 'short']]
+    .map(([locale, style]) => zoneName(locale, style))
+    .find((name) => /^[A-Z]{2,5}$/.test(name));
+  zone.textContent = named || zoneName('en-US', 'short') || 'Local';
+  // "10:55" bright, ":06" dimmer, then a small "PM"
+  const hm = clock.querySelector('.tk-hm');
+  const sec = clock.querySelector('.tk-s');
+  const ap = clock.querySelector('.tk-ap');
+  // ticks on each new second, so the seconds never skip or stall
   const tickClock = () => {
     const now = new Date();
-    clock.textContent = TIME_12.format(now);
+    const part = Object.fromEntries(TIME_12.formatToParts(now).map((p) => [p.type, p.value]));
+    hm.textContent = `${part.hour}:${part.minute}`;
+    sec.textContent = `:${part.second}`;
+    ap.textContent = part.dayPeriod || '';
+    setTimeout(tickClock, 1000 - now.getMilliseconds());
   };
-  tickClock(); setInterval(tickClock, 30000);
+  tickClock();
 
   // Featured post + "More posts" (skipping "coming soon" cards), newest first
   const readPosts = (html) => {
