@@ -3234,6 +3234,11 @@ function readPostsSeen() {
       tk.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
       const turn = ((angle % 360) + 360) % 360;
       tk.style.setProperty('--sheen', `${(turn / 360) * 200 - 50 - leanX * 60}%`);
+      // holographic foil: the rainbow and the glare move as the card sways,
+      // turns and leans, like tilting a real holo card in the light
+      const off = angle - Math.round(angle / 180) * 180; // -90..90 from the face
+      tk.style.setProperty('--hx', `${(50 + off * 3 + leanX * 90).toFixed(1)}%`);
+      tk.style.setProperty('--hy', `${(50 - tilt * 7 + leanY * 90).toFixed(1)}%`);
       const back = turn > 90 && turn < 270;
       tk.classList.toggle('is-back', back);
       // each time it lands on the back, the score counts up as the meter fills
