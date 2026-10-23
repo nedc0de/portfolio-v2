@@ -1143,10 +1143,17 @@ whenIdle(() => {
     .map(([locale, style]) => zoneName(locale, style))
     .find((name) => /^[A-Z]{2,5}$/.test(name));
   zone.textContent = named || zoneName('en-US', 'short') || 'Local';
+  // "10:55" bright, ":06" dimmer, then a small "PM"
+  const hm = clock.querySelector('.tk-hm');
+  const sec = clock.querySelector('.tk-s');
+  const ap = clock.querySelector('.tk-ap');
   // ticks on each new second, so the seconds never skip or stall
   const tickClock = () => {
     const now = new Date();
-    clock.textContent = TIME_12.format(now);
+    const part = Object.fromEntries(TIME_12.formatToParts(now).map((p) => [p.type, p.value]));
+    hm.textContent = `${part.hour}:${part.minute}`;
+    sec.textContent = `:${part.second}`;
+    ap.textContent = part.dayPeriod || '';
     setTimeout(tickClock, 1000 - now.getMilliseconds());
   };
   tickClock();

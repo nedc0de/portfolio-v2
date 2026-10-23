@@ -9528,3 +9528,20 @@ html.is-frozen .egg-crash * {
 /* seconds tick without the box changing width */
 .tk-clock { font-variant-numeric: tabular-nums; }
 .tk-time { min-width: 4.1rem; box-sizing: border-box; }
+
+/*===== HOME: ticker clock on one line: 10:55:06 PM ET =====*/
+.tk-time {
+  flex-direction: row;
+  align-items: center;
+  gap: .3rem;
+  min-width: 0;
+  padding: 0 .5rem;
+  background: #202020;
+  line-height: 1;
+}
+.tk-clock { font-size: .6rem; }
+.tk-hm { font-weight: 600; color: #e6e6e6; }
+.tk-s { font-weight: 500; color: #777; }
+.tk-ap { font-size: .46rem; font-weight: 700; letter-spacing: .04em; color: #9a9a9a; }
+.tk-time small.tk-zone { font-size: .42rem; font-weight: 700; letter-spacing: .08em; color: var(--fifteenth-color); }
+.tk-s { display: inline-block; min-width: 1.5em; } /* steady width as seconds tick */
