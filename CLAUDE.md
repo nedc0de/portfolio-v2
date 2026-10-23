@@ -8,6 +8,9 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Show a sample first (screenshot at phone size), then apply on a branch,
   test in a browser, push the branch, and **ask before merging into `main`**.
 - Ned reads on his phone: keep updates short and send screenshots.
+- Commits are authored as Ned only: `git config user.name "Ned"` and
+  `git config user.email "70671308+nedcodev@users.noreply.github.com"`, with
+  no Co-Authored-By or Claude-Session lines.
 - Test every change for real before asking to merge: tap through it on a
   phone-size browser on every page it touches, including Netlify-style pretty
   URLs (`/about` instead of `/about.html`), and check links actually open.
