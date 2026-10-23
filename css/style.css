@@ -9665,3 +9665,21 @@ html.is-frozen .egg-crash * {
 /* the maths notes and words in the background, about a quarter dimmer (the
    grid's dots and x's are dimmed in the html background above) */
 .bg-math { opacity: .75; }
+
+/*===== HOME: ticker as wide as the menu on desktop =====*/
+/* the menu's words run from "home" to "contact" over 552px (530px on small
+   tablets); the ticker matches that, centred under the hero (which is
+   narrower). Text sizes stay the same as on phones. */
+@media screen and (min-width: 768px) {
+  .tk {
+    --tk-w: 530px;
+    width: var(--tk-w);
+    max-width: none;
+    margin-left: calc(50% - var(--tk-w) / 2);
+    margin-right: 0;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .tk { --tk-w: 552px; }
+}
