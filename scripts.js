@@ -281,7 +281,7 @@ document.addEventListener('click', () => {
 /*===== DESKTOP MENU: laser scan =====*/
 // A soft yellow laser line rests under the page you're on. Point at another
 // link and it slides along to it, its bright end leading: the words it
-// passes warm up for a moment and a few faint sparks fall off as it moves.
+// passes warm up for a moment.
 // Clicking a link makes the line flash briefly before the next page loads.
 // Everything stays quiet and faded. Phones keep their own menu.
 (() => {
@@ -296,7 +296,7 @@ document.addEventListener('click', () => {
   const trail = laser.firstChild;
   const links = [...list.querySelectorAll('.nav-link')];
   const home = links.find((a) => a.classList.contains('active'));
-  let at = null, y = 0, moving = 0, lastSpark = 0;
+  let at = null, moving = 0;
 
   const aim = (a, instant) => {
     if (!wide.matches) return;
@@ -307,33 +307,20 @@ document.addEventListener('click', () => {
     if (at !== null && Math.abs(left - at) < 1 && !instant) return;
     laser.classList.toggle('is-left', at !== null && left < at);
     laser.classList.toggle('is-instant', !!instant);
-    y = r.bottom - box.top + 7;
     laser.style.setProperty('--x', `${left}px`);
     laser.style.setProperty('--w', `${r.width}px`);
-    laser.style.setProperty('--y', `${y}px`);
+    laser.style.setProperty('--y', `${r.bottom - box.top + 7}px`);
     laser.classList.add('is-on');
     at = left;
     if (instant) requestAnimationFrame(() => requestAnimationFrame(() => laser.classList.remove('is-instant')));
     else track();
   };
 
-  // while the line slides: find its bright end each frame, warm the word
-  // above it and now and then drop a faint spark
+  // while the line slides: find its bright end each frame and warm the
+  // word above it
   const head = () => {
     const m = new DOMMatrixReadOnly(getComputedStyle(trail).transform);
     return laser.classList.contains('is-left') ? m.m41 : m.m41 + trail.offsetWidth;
-  };
-  const spark = (x) => {
-    const sp = document.createElement('span');
-    sp.className = 'nav-laser-spark';
-    sp.style.left = `${x}px`;
-    sp.style.top = `${y}px`;
-    list.appendChild(sp);
-    const drift = (Math.random() - .5) * 10;
-    sp.animate([
-      { transform: 'translate(-50%, -50%) scale(1)', opacity: .55 },
-      { transform: `translate(calc(-50% + ${drift}px), ${6 + Math.random() * 6}px) scale(.4)`, opacity: 0 },
-    ], { duration: 450 + Math.random() * 250, easing: 'ease-out' }).onfinish = () => sp.remove();
   };
   const track = () => {
     const until = performance.now() + 750;
@@ -348,7 +335,6 @@ document.addEventListener('click', () => {
         const near = x >= r.left - left - 6 && x <= r.right - left + 6;
         a.classList.toggle('is-lit', near);
       });
-      if (now - lastSpark > 55) { lastSpark = now; spark(x); }
       if (now < moving) requestAnimationFrame(step);
       else { moving = 0; links.forEach((a) => a.classList.remove('is-lit')); }
     };
