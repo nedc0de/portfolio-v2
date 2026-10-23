@@ -9606,3 +9606,5 @@ html.is-frozen .egg-crash * {
 .tk3-layer:nth-child(8) { transform: translateZ(2.65px); }
 .tk3-front { transform: translateZ(3px); }
 .tk3-back { transform: rotateY(180deg) translateZ(3px); }
+/* no yellow outline round the movie card */
+.tk3-face { border: 0; }
