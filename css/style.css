@@ -9593,18 +9593,27 @@ html.is-frozen .egg-crash * {
 /*===== HOME: the movie card's edge, brushed silver =====*/
 /* seen side-on mid-spin the card shows a solid chrome edge (matching the
    glint on the front) instead of a thin dark line; kept slim, like a real card */
+/* the layers sit a little inside the faces, and clear of them in depth, so
+   Safari never draws a sliver of the edge through the front or back */
 .tk3-layer {
+  inset: .5px;
   background: linear-gradient(180deg, #f4f4f4 0%, #a9a9a9 22%, #e9e9e9 48%, #8c8c8c 74%, #d9d9d9 100%);
 }
-.tk3-layer:nth-child(1) { transform: translateZ(-1.3px); }
-.tk3-layer:nth-child(2) { transform: translateZ(-0.93px); }
-.tk3-layer:nth-child(3) { transform: translateZ(-0.56px); }
-.tk3-layer:nth-child(4) { transform: translateZ(-0.19px); }
-.tk3-layer:nth-child(5) { transform: translateZ(0.19px); }
-.tk3-layer:nth-child(6) { transform: translateZ(0.56px); }
-.tk3-layer:nth-child(7) { transform: translateZ(0.93px); }
-.tk3-layer:nth-child(8) { transform: translateZ(1.3px); }
-.tk3-front { transform: translateZ(1.5px); }
-.tk3-back { transform: rotateY(180deg) translateZ(1.5px); }
+.tk3-layer:nth-child(1) { transform: translateZ(-0.9px); }
+.tk3-layer:nth-child(2) { transform: translateZ(-0.64px); }
+.tk3-layer:nth-child(3) { transform: translateZ(-0.39px); }
+.tk3-layer:nth-child(4) { transform: translateZ(-0.13px); }
+.tk3-layer:nth-child(5) { transform: translateZ(0.13px); }
+.tk3-layer:nth-child(6) { transform: translateZ(0.39px); }
+.tk3-layer:nth-child(7) { transform: translateZ(0.64px); }
+.tk3-layer:nth-child(8) { transform: translateZ(0.9px); }
+.tk3-front { transform: translateZ(1.6px); }
+.tk3-back { transform: rotateY(180deg) translateZ(1.6px); }
 /* no yellow outline round the movie card */
 .tk3-face { border: 0; }
+/* Safari: keep each face's contents (the blurred poster on the back)
+   clipped to its rounded corners while the card is turned in 3D */
+.tk3-face {
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  isolation: isolate;
+}
