@@ -9545,3 +9545,17 @@ html.is-frozen .egg-crash * {
 .tk-ap { font-size: .46rem; font-weight: 700; letter-spacing: .04em; color: #9a9a9a; }
 .tk-time small.tk-zone { font-size: .42rem; font-weight: 700; letter-spacing: .08em; color: var(--fifteenth-color); }
 .tk-s { display: inline-block; min-width: 1.5em; } /* steady width as seconds tick */
+
+/*===== HOME: no rules between About and the Lab; the Lab gets a soft tile =====*/
+.xb-ab {
+  padding-bottom: 2rem;
+  border-bottom: 0;
+}
+
+.xb-lb {
+  margin-bottom: 1.8rem;
+  padding: 1rem 1.1rem;
+  border: 0;
+  border-radius: 14px;
+  background: #1b1b1b;
+}
