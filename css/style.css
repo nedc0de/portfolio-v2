@@ -9850,3 +9850,268 @@ html.is-frozen .egg-crash * {
   border-radius: 50%;
 }
 .fav-bar .fav-pick svg { margin: 0; }
+
+/*===== FAVORITES: featured banner =====*/
+.fav-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin: 0 0 1.4rem;
+  padding: 1rem;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #181818;
+  isolation: isolate;
+}
+
+/* the poster again, blurred and dark, behind everything */
+.fav-hero-bg {
+  position: absolute;
+  inset: -30px;
+  z-index: -1;
+  background: var(--hero, none) center / cover;
+  filter: blur(26px) brightness(.38) saturate(1.2);
+  opacity: 0;
+  transition: opacity .6s;
+}
+.fav-hero.has-cover .fav-hero-bg { opacity: 1; }
+
+.fav-hero-poster {
+  flex: none;
+  width: clamp(92px, 28vw, 150px);
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #2a2a2a;
+  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, .8);
+}
+.fav-hero-poster img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; }
+.fav-hero.has-cover .fav-hero-poster img { opacity: 1; }
+
+.fav-hero-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: .3rem; text-align: left; }
+
+.fav-hero-kicker {
+  font: 700 .66rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
+}
+
+.fav-hero-title { margin: 0; font-size: clamp(1.25rem, 5.5vw, 1.9rem); line-height: 1.1; color: #f2f2f2; }
+.fav-hero-meta { font-size: .8rem; color: #a8a8a8; }
+
+.fav-hero-rate { display: flex; align-items: center; gap: .45rem; font-size: .8rem; color: #bbb; }
+.fav-hero-rate b { color: #f2f2f2; }
+
+.fav-hero-go {
+  margin-top: .4rem;
+  padding: .45rem .9rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fifteenth-color);
+  font: 700 .78rem var(--body-font);
+  color: #111;
+  cursor: pointer;
+}
+
+/*===== FAVORITES: menus stick under the top of the screen =====*/
+.fav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: .6rem 1rem;
+  background: rgba(21, 21, 21, .86);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/*===== FAVORITES: details panel =====*/
+.fav-sheet { position: fixed; inset: 0; z-index: 200; }
+.fav-sheet[hidden] { display: none; }
+html.fav-sheet-open { overflow: hidden; }
+
+.fav-sheet-shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .6);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.fav-sheet-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: .7rem 1.25rem calc(1.6rem + env(safe-area-inset-bottom));
+  border-radius: 20px 20px 0 0;
+  background: #1b1b1b;
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, .55);
+  transform: translateY(100%);
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+  text-align: left;
+}
+
+.fav-sheet.is-open .fav-sheet-shade { opacity: 1; }
+.fav-sheet.is-open .fav-sheet-panel { transform: none; }
+
+.fav-sheet-grab { display: block; width: 38px; height: 4px; margin: 0 auto 1rem; border-radius: 4px; background: #444; }
+
+.fav-sheet-x {
+  position: absolute;
+  top: .7rem;
+  right: .8rem;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: #2a2a2a;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.fav-sheet-body { display: flex; gap: 1.1rem; align-items: flex-start; }
+
+.fav-sheet-poster {
+  flex: none;
+  width: clamp(110px, 36vw, 200px);
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .9);
+}
+.fav-sheet-poster img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .35s; }
+.fav-sheet-poster.has-cover img { opacity: 1; }
+
+.fav-sheet-info { min-width: 0; display: flex; flex-direction: column; gap: .35rem; padding-top: .2rem; }
+
+.fav-sheet-kicker {
+  font: 700 .66rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fifteenth-color);
+}
+
+.fav-sheet-title { margin: 0; padding-right: 2rem; font-size: 1.35rem; line-height: 1.15; color: #f2f2f2; }
+.fav-sheet-meta, .fav-sheet-by { font-size: .82rem; color: #a8a8a8; }
+.fav-sheet-by:empty { display: none; }
+
+.fav-sheet-rate { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-top: .3rem; }
+.fav-sheet-num { font-size: 1.6rem; line-height: 1; color: var(--fifteenth-color); }
+.fav-sheet-verdict {
+  font: 700 .66rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #bbb;
+}
+
+.fav-sheet-take { margin: .5rem 0 0; font-size: .92rem; line-height: 1.5; font-style: italic; color: #d6d6d6; }
+.fav-sheet-take[hidden] { display: none; }
+
+/* desktop: a centred card instead of a bottom panel */
+@media (min-width: 768px) {
+  .fav-sheet-panel {
+    top: 50%;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    width: min(560px, 90vw);
+    padding: 1.6rem;
+    border-radius: 18px;
+    transform: translate(-50%, -46%) scale(.97);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .25s;
+  }
+  .fav-sheet.is-open .fav-sheet-panel { transform: translate(-50%, -50%); opacity: 1; }
+  .fav-sheet-grab { display: none; }
+}
+
+/* the banner and the panel show the stars full size straight away (on the
+   cards they pop in as the card flips) */
+.fav-hero .fav-star,
+.fav-sheet .fav-star { opacity: 1; transform: none; }
+.fav-hero .fav-stars { margin: 0; font-size: 15px; }
+.fav-sheet .fav-stars { margin: 0; font-size: 18px; }
+
+/*===== FAVORITES: summaries and the moving backdrop =====*/
+.fav-sheet-sum { margin: 1.1rem 0 0; font-size: .9rem; line-height: 1.55; color: #cfcfcf; }
+.fav-sheet-sum:empty:not(.is-loading) { display: none; }
+.fav-sheet-sum.is-loading {
+  height: 3.6em;
+  border-radius: 6px;
+  background: linear-gradient(100deg, #222 30%, #2c2c2c 50%, #222 70%) 0 0 / 250% 100%;
+  animation: fav-sum-shimmer 1.2s linear infinite;
+}
+@keyframes fav-sum-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+
+/* the banner's summary: desktop only, three lines at most */
+.fav-hero-sum { display: none; }
+
+/* desktop: a taller banner, with the summary beside the poster */
+@media (min-width: 900px) {
+  .fav-hero { min-height: 300px; padding: 1.6rem; gap: 1.6rem; }
+  .fav-hero-sum {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    max-width: 52ch;
+    margin: .3rem 0 0;
+    font-size: .88rem;
+    line-height: 1.55;
+    color: #c8c8c8;
+  }
+}
+
+/* the movie's wide still slowly pans and zooms behind the banner (Ken
+   Burns) on every screen, darkened so the text stays readable */
+.fav-hero.has-backdrop .fav-hero-bg { opacity: 0; }
+.fav-hero::before,
+.fav-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.fav-hero::before {
+  background: var(--backdrop, none) center 30% / cover no-repeat;
+  opacity: 0;
+  transform-origin: 70% 40%;
+  transition: opacity 1.2s;
+}
+.fav-hero.has-backdrop::before {
+  opacity: 1;
+  animation: fav-kenburns 28s ease-in-out infinite alternate;
+}
+/* phones: the text sits right of the poster, so darken evenly, a bit more
+   at the bottom */
+.fav-hero::after {
+  background:
+    linear-gradient(90deg, rgba(14, 14, 14, .55), rgba(14, 14, 14, .78) 45%, rgba(14, 14, 14, .82)),
+    linear-gradient(0deg, rgba(14, 14, 14, .55), transparent 55%);
+  opacity: 0;
+  transition: opacity 1.2s;
+}
+.fav-hero.has-backdrop::after { opacity: 1; }
+
+/* desktop: strong on the left behind the text, fading to the right */
+@media (min-width: 900px) {
+  .fav-hero::after {
+    background:
+      linear-gradient(90deg, rgba(14, 14, 14, .96) 0%, rgba(14, 14, 14, .82) 38%, rgba(14, 14, 14, .25) 75%, rgba(14, 14, 14, .45) 100%),
+      linear-gradient(0deg, rgba(14, 14, 14, .6), transparent 45%);
+  }
+}
+
+@keyframes fav-kenburns {
+  from { transform: scale(1.06) translate(0, 0); }
+  to { transform: scale(1.18) translate(-3%, -2%); }
+}

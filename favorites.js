@@ -1034,18 +1034,20 @@
             ${f.take ? `<span class="fav-take">${escapeHTML(f.take)}</span>` : ''}
           </span>
         </span>`;
-      const flip = () => {
+      const item = { el: card, fav: f, rating, shelf: null };
+      // tap: the details panel slides up (bigger poster, details, take)
+      const open = () => {
         if (picking) return;
-        setFlipped(card, !card.classList.contains('is-flipped'));
+        openSheet(item);
       };
-      card.addEventListener('click', flip);
+      card.addEventListener('click', open);
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          flip();
+          open();
         }
       });
-      cards.push({ el: card, fav: f, rating, shelf: null });
+      cards.push(item);
     });
     layoutShelves();
   }
@@ -1061,6 +1063,199 @@
         () => setFlipped(card, false),
         AUTO_FLIP_BACK_MS,
       );
+  }
+
+  /*---------- summaries and backdrops ----------*/
+  // What each title is about, for the details panel and the banner: TMDB's
+  // overview (and its wide backdrop image) for movies and shows, Open
+  // Library's description for books. Looked up only when needed, then kept
+  // in this browser for a month.
+  const INFO_CACHE_KEY = 'nedcode-fav-info-v1';
+  let infoCache = {};
+  try { infoCache = JSON.parse(localStorage.getItem(INFO_CACHE_KEY)) || {}; } catch (e) { infoCache = {}; }
+  const plain = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+  async function findScreenInfo(f) {
+    const kind = f.type === 'tv' ? 'tv' : 'movie';
+    const base = '/.netlify/functions/tmdb';
+    let hit;
+    if (f.tmdbId) hit = await getJSON(`${base}?kind=${kind}&id=${encodeURIComponent(f.tmdbId)}`);
+    else {
+      const query = `q=${encodeURIComponent(f.title)}`;
+      let data = await getJSON(`${base}?kind=${kind}&${query}${f.year ? `&year=${f.year}` : ''}`);
+      hit = (data.results || []).find((r) => r.poster_path);
+      if (!hit && f.year) {
+        data = await getJSON(`${base}?kind=${kind}&${query}`);
+        hit = (data.results || []).find((r) => r.poster_path);
+      }
+    }
+    if (!hit) return { summary: '', backdrop: '' };
+    const back = typeof hit.backdrop_path === 'string' && /^\/[A-Za-z0-9._-]+$/.test(hit.backdrop_path) ? hit.backdrop_path : '';
+    return { summary: plain(hit.overview), backdrop: back ? `https://image.tmdb.org/t/p/w1280${back}` : '' };
+  }
+  async function findBookInfo(f) {
+    const q = `title=${encodeURIComponent(f.title)}` + (f.by ? `&author=${encodeURIComponent(f.by)}` : '');
+    const data = await getJSON(`https://openlibrary.org/search.json?${q}&limit=1&fields=key,first_sentence`);
+    const doc = (data.docs || [])[0];
+    if (!doc) return { summary: '', backdrop: '' };
+    let summary = '';
+    if (/^\/works\/OL\d+W$/.test(doc.key || '')) {
+      const work = await getJSON(`https://openlibrary.org${doc.key}.json`);
+      const d = work.description;
+      summary = plain(typeof d === 'string' ? d : d && d.value);
+      summary = summary.split(/\s*(?:-{3,}|\[source\]|\(\[source\])/i)[0]; // drop trailing notes and links
+    }
+    if (!summary && doc.first_sentence) summary = plain([].concat(doc.first_sentence)[0]);
+    return { summary, backdrop: '' };
+  }
+  async function infoFor(f) {
+    const id = cacheId(f);
+    const hit = infoCache[id];
+    if (hit && Date.now() - hit.t < 30 * 86400000) return hit;
+    const info = f.type === 'book' ? await findBookInfo(f) : await findScreenInfo(f);
+    infoCache[id] = { ...info, t: Date.now() };
+    try { localStorage.setItem(INFO_CACHE_KEY, JSON.stringify(infoCache)); } catch (e) {}
+    return info;
+  }
+
+  /*---------- details panel ----------*/
+  // Tapping a poster slides up a panel from the bottom (a centred card on
+  // desktop): a big poster, what it is, the stars and the take. Close with
+  // the x, a tap outside, Esc or the phone's back swipe of the panel.
+  let sheet = null;
+  let lastFocus = null;
+  function buildSheet() {
+    sheet = document.createElement('div');
+    sheet.className = 'fav-sheet';
+    sheet.hidden = true;
+    sheet.innerHTML = `
+      <div class="fav-sheet-shade" data-close></div>
+      <div class="fav-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="favSheetTitle">
+        <button type="button" class="fav-sheet-x" data-close aria-label="Close">&times;</button>
+        <span class="fav-sheet-grab" aria-hidden="true"></span>
+        <div class="fav-sheet-body">
+          <span class="fav-sheet-poster"><img alt="" width="342" height="513"></span>
+          <div class="fav-sheet-info">
+            <span class="fav-sheet-kicker"></span>
+            <h2 class="fav-sheet-title" id="favSheetTitle"></h2>
+            <span class="fav-sheet-meta"></span>
+            <span class="fav-sheet-by"></span>
+            <span class="fav-sheet-rate"><b class="fav-sheet-num"></b><span class="fav-sheet-stars"></span><span class="fav-sheet-verdict"></span></span>
+          </div>
+        </div>
+        <p class="fav-sheet-sum"></p>
+      </div>`;
+    document.body.appendChild(sheet);
+    sheet.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeSheet(); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
+    // swipe the panel down to close it (phones)
+    const panel = sheet.querySelector('.fav-sheet-panel');
+    let y0 = null;
+    panel.addEventListener('touchstart', (e) => { y0 = panel.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+    panel.addEventListener('touchmove', (e) => {
+      if (y0 === null) return;
+      const dy = Math.max(0, e.touches[0].clientY - y0);
+      panel.style.transform = dy ? `translateY(${dy}px)` : '';
+    }, { passive: true });
+    panel.addEventListener('touchend', (e) => {
+      if (y0 === null) return;
+      const dy = e.changedTouches[0].clientY - y0;
+      y0 = null;
+      panel.style.transform = '';
+      if (dy > 90) closeSheet();
+    });
+  }
+  function openSheet(item) {
+    if (!item) return;
+    if (!sheet) buildSheet();
+    const f = item.fav;
+    const q = (c) => sheet.querySelector(c);
+    q('.fav-sheet-kicker').textContent = f === FEATURED ? 'Just watched' : TYPE_NAME[f.type];
+    q('.fav-sheet-title').textContent = f.title;
+    q('.fav-sheet-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
+    q('.fav-sheet-by').textContent = f.by ? (f.type === 'book' ? 'by ' : 'Directed by ') + f.by : '';
+    q('.fav-sheet-num').textContent = item.rating;
+    q('.fav-sheet-stars').innerHTML = starsHTML(item.rating);
+    q('.fav-sheet-verdict').textContent = verdict(item.rating).replace(/watch/, f.type === 'book' ? 'read' : 'watch');
+    // what it's about (looked up the first time it's opened)
+    const sum = q('.fav-sheet-sum');
+    sum.textContent = '';
+    sum.classList.add('is-loading');
+    infoFor(f).then((info) => {
+      if (q('.fav-sheet-title').textContent !== f.title) return;
+      sum.textContent = info.summary || '';
+    }).catch(() => {}).finally(() => sum.classList.remove('is-loading'));
+    const poster = q('.fav-sheet-poster');
+    const img = poster.querySelector('img');
+    poster.style.backgroundColor = item.el.querySelector('.fav-front').style.backgroundColor;
+    poster.classList.remove('has-cover');
+    img.removeAttribute('srcset');
+    img.removeAttribute('src');
+    coverFor(f).then((url) => {
+      if (!url || q('.fav-sheet-title').textContent !== f.title) return;
+      img.onload = () => poster.classList.add('has-cover');
+      const set = coverSrcset(url);
+      if (set) { img.sizes = '(min-width: 768px) 240px, 40vw'; img.srcset = set; }
+      img.src = url;
+    }).catch(() => {});
+    lastFocus = document.activeElement;
+    sheet.hidden = false;
+    document.documentElement.classList.add('fav-sheet-open');
+    requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('is-open')));
+    q('.fav-sheet-x').focus({ preventScroll: true });
+  }
+  function closeSheet() {
+    sheet.classList.remove('is-open');
+    document.documentElement.classList.remove('fav-sheet-open');
+    setTimeout(() => { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 320);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+
+  /*---------- featured banner ----------*/
+  // The latest movie (the list's newest is at the top) as a wide banner above
+  // the menus: its poster, blurred behind, the title, stars and a button to
+  // its details.
+  const FEATURED = FAVORITES.find((f) => f.type === 'movie');
+  function buildBanner() {
+    const bar = document.querySelector('.fav-bar');
+    const item = cards.find((c) => c.fav === FEATURED);
+    if (!bar || !item) return;
+    const f = FEATURED;
+    const hero = document.createElement('div');
+    hero.className = 'fav-hero';
+    hero.innerHTML = `
+      <span class="fav-hero-bg" aria-hidden="true"></span>
+      <span class="fav-hero-poster"><img alt="" width="342" height="513"></span>
+      <div class="fav-hero-info">
+        <span class="fav-hero-kicker">Just watched</span>
+        <h2 class="fav-hero-title">${escapeHTML(f.title)}</h2>
+        <span class="fav-hero-meta">${escapeHTML([f.year, f.genre].filter(Boolean).join(' · '))}</span>
+        <span class="fav-hero-rate">${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span></span>
+        <p class="fav-hero-sum"></p>
+        <button type="button" class="fav-hero-go">See details <span aria-hidden="true">&rarr;</span></button>
+      </div>`;
+    bar.before(hero);
+    hero.querySelector('.fav-hero-go').addEventListener('click', () => openSheet(item));
+    // desktop: the movie's own wide still drifts slowly behind the banner,
+    // with its summary beside the poster
+    infoFor(f).then((info) => {
+      hero.querySelector('.fav-hero-sum').textContent = info.summary || '';
+      if (!info.backdrop) return;
+      const still = new Image();
+      still.onload = () => {
+        hero.style.setProperty('--backdrop', `url("${info.backdrop}")`);
+        hero.classList.add('has-backdrop');
+      };
+      still.src = info.backdrop;
+    }).catch(() => {});
+    coverFor(f).then((url) => {
+      if (!url) return;
+      const img = hero.querySelector('img');
+      img.onload = () => hero.classList.add('has-cover');
+      const set = coverSrcset(url);
+      if (set) { img.sizes = '(min-width: 768px) 160px, 30vw'; img.srcset = set; }
+      img.src = url;
+      hero.style.setProperty('--hero', `url("${url}")`);
+    }).catch(() => {});
   }
 
   /*---------- filters ----------*/
@@ -1101,10 +1296,10 @@
     setTimeout(
       () => {
         card.classList.add('is-picked');
-        setFlipped(card, true);
-        card.focus({ preventScroll: true });
         setTimeout(() => card.classList.remove('is-picked'), 1600);
         picking = false;
+        // then its details open, like tapping it
+        setTimeout(() => openSheet(cards.find((c) => c.el === card)), 500);
       },
       visible || reduceMotion.matches ? 0 : 450,
     );
@@ -1500,4 +1695,5 @@
   /*---------- start ----------*/
   renderStats();
   buildCards();
+  buildBanner();
 })();
