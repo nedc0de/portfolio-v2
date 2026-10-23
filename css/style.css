@@ -9492,3 +9492,19 @@ html.is-frozen .egg-crash * {
 .tk-item { gap: .45rem; padding-right: 1.75rem; font-size: .78rem; }
 .tk-tag { padding: .08rem .38rem; font-size: .56rem; }
 .tk-src { font-size: .68rem; }
+
+/*===== HOME: ticker right under the hero, smaller again =====*/
+.tk { margin-top: 1.5rem; }
+.tk-head { margin-bottom: .35rem; font-size: .56rem; }
+.tk-dot { width: .4rem; height: .4rem; }
+.tk-here { font-size: .62rem; }
+.tk-here-eyes { width: 1rem; height: .6rem; }
+.tk-here-dot { width: .34rem; height: .34rem; }
+.tk-bar { height: 1.95rem; border-radius: 7px; }
+.tk-time { padding: 0 .5rem; border-radius: 5px; }
+.tk-clock { font-size: .68rem; }
+.tk-time small { font-size: .46rem; }
+.tk-track { padding-left: .7rem; }
+.tk-item { gap: .4rem; padding-right: 1.5rem; font-size: .7rem; }
+.tk-tag { padding: .06rem .32rem; border-radius: 5px; font-size: .5rem; }
+.tk-src { font-size: .62rem; }
