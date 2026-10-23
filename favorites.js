@@ -886,10 +886,10 @@
   let shelfIO = null;
   const parked = document.createElement('div'); // cards the filter hides wait here
   parked.hidden = true;
-  // genre chips under the filters: tap one to jump to its shelf
-  const jump = document.createElement('nav');
-  jump.className = 'fav-jump';
-  jump.setAttribute('aria-label', 'Jump to a genre');
+  // the genre menu next to the type menu: "Any genre" shows every shelf,
+  // a genre shows just its own
+  const genreSelect = document.getElementById('favGenre');
+  let genre = 'any';
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function makeShelf(name, list) {
     const s = { name, cards: list.map((c) => c.el) };
@@ -927,7 +927,15 @@
   function layoutShelves() {
     if (shelfIO) shelfIO.disconnect();
     SHELVES.forEach((s) => s.el.remove());
-    const shown = cards.filter((c) => filter === 'all' || c.fav.type === filter);
+    const ofType = cards.filter((c) => filter === 'all' || c.fav.type === filter);
+    // the genre menu lists this type's genres, biggest first, with counts
+    const counts = new Map();
+    ofType.forEach((c) => { const g = c.fav.genre || 'Other'; counts.set(g, (counts.get(g) || 0) + 1); });
+    if (genre !== 'any' && !counts.has(genre)) genre = 'any';
+    genreSelect.replaceChildren(new Option('Any genre', 'any'),
+      ...[...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([g, n]) => new Option(`${g} (${n})`, g)));
+    genreSelect.value = genre;
+    const shown = genre === 'any' ? ofType : ofType.filter((c) => (c.fav.genre || 'Other') === genre);
     cards.forEach((c) => { if (!shown.includes(c)) { c.shelf = null; parked.appendChild(c.el); } });
     const byGenre = new Map();
     shown.forEach((c) => {
@@ -936,23 +944,14 @@
       byGenre.get(g).push(c);
     });
     const best = (a, b) => b.rating - a.rating || (b.fav.year || 0) - (a.fav.year || 0);
-    const big = [...byGenre].filter(([, l]) => l.length >= MIN_SHELF).sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
-    const rest = [...byGenre].filter(([, l]) => l.length < MIN_SHELF).flatMap(([, l]) => l);
+    const min = genre === 'any' ? MIN_SHELF : 1; // a chosen genre always gets its own shelf
+    const big = [...byGenre].filter(([, l]) => l.length >= min).sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+    const rest = [...byGenre].filter(([, l]) => l.length < min).flatMap(([, l]) => l);
     SHELVES = big.length
       ? big.map(([g, l]) => makeShelf(g, l.sort(best)))
       : [];
     if (rest.length) SHELVES.push(makeShelf(big.length ? 'Everything else' : `All ${TYPE_PLURAL[filter]}`, rest.sort(best)));
     SHELVES.forEach((s) => { grid.appendChild(s.el); s.ends(); });
-    jump.replaceChildren(...SHELVES.map((s) => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'fav-jump-chip';
-      chip.textContent = s.name;
-      chip.addEventListener('click', () => s.el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' }));
-      return chip;
-    }));
-    jump.hidden = SHELVES.length < 2;
-    jump.scrollLeft = 0;
     // each shelf rises in as it's scrolled to, its posters fanning in after
     if (!still && 'IntersectionObserver' in window) {
       SHELVES.forEach((s) => {
@@ -985,7 +984,6 @@
   function buildCards() {
     grid.classList.replace('fav-grid', 'fav-shelves');
     grid.appendChild(parked);
-    grid.before(jump);
     // movies, then TV shows (each newest first, same year A to Z), then books in list order
     const TYPE_ORDER = { movie: 0, tv: 1, book: 2 };
     const sorted = FAVORITES.map((f, i) => ({ f, i }))
@@ -1061,18 +1059,16 @@
 
   /*---------- filters ----------*/
   let filter = 'all';
-  const filterButtons = document.querySelectorAll('.fav-filter');
-  filterButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (picking) return;
-      filter = btn.dataset.filter;
-      filterButtons.forEach((b) =>
-        b.setAttribute('aria-pressed', String(b === btn)),
-      );
-      cards.forEach((c) => setFlipped(c.el, false));
-      layoutShelves();
-    });
-  });
+  const typeSelect = document.getElementById('favType');
+  const refilter = () => {
+    cards.forEach((c) => setFlipped(c.el, false));
+    layoutShelves();
+  };
+  if (typeSelect) {
+    typeSelect.value = 'all';
+    typeSelect.addEventListener('change', () => { filter = typeSelect.value; refilter(); });
+    genreSelect.addEventListener('change', () => { genre = genreSelect.value; refilter(); });
+  }
 
   /*---------- pick for me ----------*/
   let picking = false;
