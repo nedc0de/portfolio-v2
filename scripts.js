@@ -280,10 +280,9 @@ document.addEventListener('click', () => {
 
 /*===== DESKTOP MENU: laser scan =====*/
 // A soft yellow laser line rests under the page you're on. Point at another
-// link and it slides along to it, its bright end leading: the words it
-// passes warm up for a moment.
-// Clicking a link makes the line flash briefly before the next page loads.
-// Everything stays quiet and faded. Phones keep their own menu.
+// link and it slides along to it; the words it passes warm up for a moment.
+// The line looks the same under every word, on every page: one soft
+// brightness with a short fade at both ends. Phones keep their own menu.
 (() => {
   const list = document.querySelector('.nav-list');
   if (!list) return;
@@ -305,7 +304,6 @@ document.addEventListener('click', () => {
     const r = a.getBoundingClientRect();
     const left = r.left - box.left;
     if (at !== null && Math.abs(left - at) < 1 && !instant) return;
-    laser.classList.toggle('is-left', at !== null && left < at);
     laser.classList.toggle('is-instant', !!instant);
     laser.style.setProperty('--x', `${left}px`);
     laser.style.setProperty('--w', `${r.width}px`);
@@ -318,9 +316,10 @@ document.addEventListener('click', () => {
 
   // while the line slides: find its bright end each frame and warm the
   // word above it
+  // the middle of the line, wherever it is mid-slide
   const head = () => {
     const m = new DOMMatrixReadOnly(getComputedStyle(trail).transform);
-    return laser.classList.contains('is-left') ? m.m41 : m.m41 + trail.offsetWidth;
+    return m.m41 + trail.offsetWidth / 2;
   };
   const track = () => {
     const until = performance.now() + 750;
@@ -344,16 +343,6 @@ document.addEventListener('click', () => {
   links.forEach((a) => {
     a.addEventListener('pointerenter', () => aim(a));
     a.addEventListener('focus', () => aim(a));
-    // a plain click: a short flash on the line, then the page changes
-    a.addEventListener('click', (e) => {
-      if (!wide.matches || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target) return;
-      e.preventDefault();
-      aim(a, true);
-      laser.classList.remove('is-fire');
-      void laser.offsetWidth;
-      laser.classList.add('is-fire');
-      setTimeout(() => { location.href = a.href; }, 170);
-    });
   });
   list.addEventListener('pointerleave', () => aim(home));
   list.addEventListener('focusout', (e) => { if (!list.contains(e.relatedTarget)) aim(home); });
@@ -361,7 +350,7 @@ document.addEventListener('click', () => {
   addEventListener('resize', reset);
   wide.addEventListener('change', reset);
   // coming back with the browser's back button: put it home again
-  addEventListener('pageshow', () => { laser.classList.remove('is-fire'); reset(); });
+  addEventListener('pageshow', reset);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(reset);
   reset();
 })();

@@ -10144,8 +10144,8 @@ html.fav-sheet-open { overflow: hidden; }
   }
   .nav-laser.is-on { opacity: 1; }
 
-  /* the line: faint behind, a soft yellow at the leading end; it follows
-     with an easing that eases out gently */
+  /* the line: one soft yellow, with the same short fade at both ends under
+     every word, so it looks alike on every page whatever the word's length */
   .nav-laser-trail {
     position: absolute;
     top: -1px;
@@ -10153,23 +10153,11 @@ html.fav-sheet-open { overflow: hidden; }
     width: var(--w, 0px);
     height: 2px;
     border-radius: 2px;
-    background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .22) 50%, rgba(255, 220, 22, .6));
-    box-shadow: 0 0 6px rgba(255, 220, 22, .18);
+    background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .45) 12px, rgba(255, 220, 22, .45) calc(100% - 12px), rgba(255, 220, 22, 0));
+    box-shadow: 0 0 6px rgba(255, 220, 22, .14);
     transform: translateX(var(--x, 0px));
-    transition: transform .6s cubic-bezier(.3, .7, .2, 1), width .6s cubic-bezier(.3, .7, .2, 1), box-shadow .3s, opacity .3s;
-  }
-  .nav-laser.is-left .nav-laser-trail {
-    background: linear-gradient(270deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .22) 50%, rgba(255, 220, 22, .6));
+    transition: transform .6s cubic-bezier(.3, .7, .2, 1), width .6s cubic-bezier(.3, .7, .2, 1);
   }
   .nav-laser.is-instant .nav-laser-trail { transition: none; }
-
-  /* click: a quick, soft flash along the line */
-  .nav-laser.is-fire .nav-laser-trail { animation: nav-laser-fire .32s ease-out; }
-}
-
-@keyframes nav-laser-fire {
-  0% { box-shadow: 0 0 6px rgba(255, 220, 22, .18); filter: brightness(1); }
-  35% { box-shadow: 0 0 14px 2px rgba(255, 220, 22, .45); filter: brightness(1.6); }
-  100% { box-shadow: 0 0 6px rgba(255, 220, 22, .18); filter: brightness(1); }
 }
 
