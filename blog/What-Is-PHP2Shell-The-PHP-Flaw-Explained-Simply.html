@@ -22,6 +22,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="PHP2Shell: the PHP flaw, explained simply. Patched October 21.">
   <meta property="article:published_time" content="2026-10-22T12:00:00-04:00">
+  <meta property="article:modified_time" content="2026-10-23T12:00:00-04:00">
   <meta property="article:section" content="Tech">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="What Is PHP2Shell? The PHP Flaw Explained Simply">
@@ -39,7 +40,7 @@
       "https://nedcode.com/img/blog/php2shell-og.jpg"
     ],
     "datePublished": "2026-10-22T12:00:00-04:00",
-    "dateModified": "2026-10-22T12:00:00-04:00",
+    "dateModified": "2026-10-23T12:00:00-04:00",
     "author": {
       "@type": "Person",
       "name": "Ned",
@@ -178,12 +179,12 @@
         <a class="ps-back" href="../blog.html">&larr; buzz Blog</a>
         <p class="ps-kicker">Security · Breaking</p>
         <h1 class="ps-title">PHP2Shell Explained Simply: What Happened, Who’s at Risk and What to Do</h1>
-        <p class="ps-meta">By <a href="https://www.threads.com/@nedcodev/" target="_blank" rel="noopener">Ned</a> · <time datetime="2026-10-22">October 22, 2026</time> · 5 min read</p>
+        <p class="ps-meta">By <a href="https://www.threads.com/@nedcodev/" target="_blank" rel="noopener">Ned</a> · <time datetime="2026-10-22">October 22, 2026</time> · Updated <time datetime="2026-10-23">Oct 23</time> · 6 min read</p>
         <img class="ps-cover" src="../img/blog/php2shell-thumb.jpg" alt="PHP2Shell: the PHP flaw, explained simply. Patched October 21." width="940" height="788">
       </header>
 
       <div class="ps-body">
-        <p class="ps-lead">Two bugs in <a href="https://www.php.net" target="_blank" rel="noopener">PHP</a>, the language quietly running most of the web, went public this week, and attackers moved fast. It’s called <strong>PHP2Shell</strong>, and part of it has been hiding in PHP since 2012.</p>
+        <p class="ps-lead">Two bugs in <a href="https://www.php.net" target="_blank" rel="noopener">PHP</a>, the language quietly running most of the web, went public this week. Attackers moved fast, and governments pulled their own websites offline to stay safe. It’s called <strong>PHP2Shell</strong>, and part of it has been hiding in PHP since 2012.</p>
 
         <h2>What is PHP, in plain English?</h2>
         <p>Every time you open a website, a computer somewhere builds that page for you. On most websites, the program doing the building is written in PHP. You never see it; think of it as the kitchen behind a restaurant.</p>
@@ -218,17 +219,38 @@
         <h2>What happened with PHP2Shell</h2>
         <p>Security firm <a href="https://www.wiz.io/blog/php2shell-php-rce" target="_blank" rel="noopener">Wiz</a> found two flaws in PHP itself, CVE-2026-109618 and CVE-2026-109619, and says AI tools helped a single researcher do it in about a week. Both are rated 9.2 out of 10 for severity, <a href="https://thehackernews.com/2026/10/php-issues-emergency-patches-for-two.html" target="_blank" rel="noopener">The Hacker News</a> reported, and Wiz says versions as far back as PHP 5.4, released in 2012, are affected.</p>
         <p>A fix was planned for October 22. Details leaked online on October 20, so PHP shipped it on October 21 instead, <a href="https://www.helpnetsecurity.com/2026/10/21/php2shell-php-vulnerabilities-patched-cve-2026-109618-cve-2026-109619/" target="_blank" rel="noopener">Help Net Security</a> reported.</p>
+        <p>One of the bugs wasn’t new to PHP’s team. Early signs showed up in a 2024 security audit, but the team couldn’t agree on how to fix it without breaking other things, <a href="https://thenextweb.com/news/php-foundation-structural-failure-2024-flaw-leak" target="_blank" rel="noopener">The Next Web</a> reported. In a <a href="https://thephp.foundation/blog/2026/10/21/todays-php-security-release-and-how-were-strengthening-php-security/" target="_blank" rel="noopener">blog post</a>, the PHP Foundation owned it:</p>
+        <figure class="ps-quote">
+          <blockquote>“The delay was a structural failure, caused by both the security team’s decision process and its lack of resources.”</blockquote>
+          <figcaption>The PHP Foundation, on why the fix took so long</figcaption>
+        </figure>
+        <p>The foundation says it’s switching to majority votes on hard calls and adding staff, so a bug like this can’t sit for years again.</p>
         <figure class="ps-chart">
           <p class="ps-chart-title">From discovery to emergency patch</p>
           <ol class="ps-timeline">
+            <li><b>2024</b><span>Early signs of one bug turn up in an audit</span></li>
             <li><b>Aug 19</b><span>Wiz finds the first flaw, with help from AI tools</span></li>
             <li><b>Aug 24</b><span>Reported privately to the PHP team</span></li>
             <li><b>Oct 17</b><span>Amazon spots an attack attempt, before anything is public</span></li>
             <li><b>Oct 20</b><span>Details leak online</span></li>
-            <li class="is-now"><b>Oct 21</b><span>PHP releases the fix a day early</span></li>
+            <li class="is-now"><b>Oct 21</b><span>PHP releases the fix a day early, as governments take sites offline</span></li>
             <li class="is-next"><b>Now</b><span>The race to update servers</span></li>
           </ol>
         </figure>
+
+        <h2>Why governments took websites offline</h2>
+        <p>On October 21, the NSA and the FBI told organizations that couldn’t update right away to take their systems offline until they could, <a href="https://www.secureworld.io/industry-news/patch-php-now-php2shell" target="_blank" rel="noopener">SecureWorld</a> and <a href="https://www.newsweek.com/fbi-issues-advice-as-security-issue-hits-global-websites-12603155" target="_blank" rel="noopener">Newsweek</a> reported. Plenty did. In the Netherlands, the parliament’s website and the national cyber agency went dark. In Finland, state IT provider Valtori switched off government services as a precaution, <a href="https://www.cnbc.com/2026/10/21/government-websites-go-dark-as-software-flaw-sparks-security-scramble.html" target="_blank" rel="noopener">CNBC</a> reported.</p>
+        <div class="ps-table-wrap">
+          <table class="ps-table">
+            <thead><tr><th scope="col">Where</th><th scope="col">What happened</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Netherlands</th><td>Parliament site and cyber agency went offline</td></tr>
+              <tr><th scope="row">Finland</th><td>Government online services switched off</td></tr>
+              <tr><th scope="row">United States</th><td>NSA and FBI: patch, or go offline</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>None of them said they’d been hacked. It was a safety step, like closing a shop while the locks get changed.</p>
 
         <h2>How the PHP2Shell attack works</h2>
         <p>Normally you ask a website for a page, PHP builds it and sends it back. PHP2Shell lets an attacker send a booby-trapped request that confuses how PHP cleans up memory between visitors, <a href="https://blog.qualys.com/vulnerabilities-threat-research/2026/10/20/php-announces-critical-security-release-for-two-vulnerabilities" target="_blank" rel="noopener">Qualys</a> explained. That can let them run their own commands on the server, or read bits of memory holding other people’s passwords, login tokens and keys. No login needed.</p>
@@ -262,7 +284,18 @@
         <p>The scary part: a website can be perfectly built and still be exposed, because the bug sits in PHP, not in the site’s own code. Qualys says servers using Apache’s mod_php setup are at the highest risk.</p>
 
         <h2>Is anyone being attacked?</h2>
-        <p>Attempts started early. Amazon’s threat team saw one on October 17, The Hacker News reported, and <a href="https://watchtowr.com/intelligence/php-cve-2026-109618-faq/" target="_blank" rel="noopener">watchTowr</a> said its honeypots caught attacks on October 21. <a href="https://www.recordedfuture.com/blog/php2shell-vulnerability-exploitation" target="_blank" rel="noopener">Recorded Future</a> counted public GitHub projects claiming working exploit code. As of October 22, no confirmed break-in at a real company had been reported, so how much damage has been done is still unconfirmed.</p>
+        <p>Plenty of people are trying. <a href="https://aws.amazon.com/blogs/security/amazon-threat-intelligence-identifies-php2shell-exploitation-prior-to-public-disclosure-in-madpot/" target="_blank" rel="noopener">Amazon</a> says it caught an attempt on October 17, days before anything was public. Cloudflare CEO Matthew Prince said the company saw thousands of attempts in the 10 hours before the flaws were announced, then tens of thousands within 45 minutes, hundreds of thousands within two hours, and millions since, <a href="https://cybernews.com/security/php2shell-wordpress-amazon-cloudflare-ai-cyberattacks/" target="_blank" rel="noopener">Cybernews</a> and <a href="https://www.theregister.com/cyber-crime/2026/10/22/hackers-pile-on-php2shell-as-aws-reveals-attacks-began-before-disclosure/5304749" target="_blank" rel="noopener">The Register</a> reported.</p>
+        <figure class="ps-chart">
+          <p class="ps-chart-title">Attack attempts seen by Cloudflare</p>
+          <div class="ps-gap">
+            <div class="ps-gap-row"><span class="ps-gap-name">10 hrs before</span><span class="ps-gap-track"><span class="ps-gap-bar" style="width:16%"></span></span><span class="ps-gap-val">1,000s</span></div>
+            <div class="ps-gap-row"><span class="ps-gap-name">+45 min</span><span class="ps-gap-track"><span class="ps-gap-bar" style="width:40%"></span></span><span class="ps-gap-val">10,000s</span></div>
+            <div class="ps-gap-row"><span class="ps-gap-name">+2 hours</span><span class="ps-gap-track"><span class="ps-gap-bar" style="width:68%"></span></span><span class="ps-gap-val">100,000s</span></div>
+            <div class="ps-gap-row"><span class="ps-gap-name">Since</span><span class="ps-gap-track"><span class="ps-gap-bar" style="width:100%"></span></span><span class="ps-gap-val">Millions</span></div>
+          </div>
+          <figcaption>Each step is roughly 10 times the last, so bars are on a log scale. Attempts, not successful hacks. Source: Matthew Prince, via Cybernews and The Register.</figcaption>
+        </figure>
+        <p>Trying isn’t the same as getting in. Germany’s cyber agency BSI said it had seen attacks but no successful ones, and the Dutch cyber agency saw no sign the flaw was being misused, <a href="https://thenextweb.com/news/php2shell-millions-exploit-attempts-no-confirmed-breaches" target="_blank" rel="noopener">The Next Web</a> reported. The PHP Foundation’s executive director, Elizabeth Barron, told <a href="https://www.cnbc.com/2026/10/22/php2shell-vulnerability-what-is-it-and-is-your-data-at-risk.html" target="_blank" rel="noopener">CNBC</a> she hadn’t seen a working exploit, though security researcher Matt Suiche told CNBC his team at Tolmo built one in under a day. As of October 23, a real-world break-in is still unconfirmed.</p>
         <div class="ps-stats">
           <div><b>9.2</b><span>out of 10 severity</span></div>
           <div><b>70%</b><span>of sites with a known server language use PHP</span></div>
@@ -291,7 +324,7 @@
         <div class="ps-tldr">
           <p class="ps-tldr-title">My take</p>
           <p>What gets me is how long this sat there. Fourteen years in something most of the web runs on, and AI helped find it in about a week.</p>
-          <p>If you have a website, just message your host today and ask if PHP is updated. Takes two minutes and that’s honestly the whole fix for most people.</p>
+          <p>And governments switching off their own sites tells you how seriously the pros took it. If you have a website, just message your host today and ask if PHP is updated. Takes two minutes and that’s honestly the whole fix for most people.</p>
         </div>
 
         <h2>FAQ</h2>
@@ -320,6 +353,16 @@
           <li><a href="https://www.helpnetsecurity.com/2026/10/21/php2shell-php-vulnerabilities-patched-cve-2026-109618-cve-2026-109619/" target="_blank" rel="noopener">Help Net Security: PHP2Shell patched, update now</a></li>
           <li><a href="https://blog.qualys.com/vulnerabilities-threat-research/2026/10/20/php-announces-critical-security-release-for-two-vulnerabilities" target="_blank" rel="noopener">Qualys: how to find, mitigate and patch PHP2Shell</a></li>
           <li><a href="https://watchtowr.com/intelligence/php-cve-2026-109618-faq/" target="_blank" rel="noopener">watchTowr: CVE-2026-109618 FAQ</a></li>
+          <li><a href="https://thephp.foundation/blog/2026/10/21/todays-php-security-release-and-how-were-strengthening-php-security/" target="_blank" rel="noopener">The PHP Foundation: today’s security release</a></li>
+          <li><a href="https://thenextweb.com/news/php-foundation-structural-failure-2024-flaw-leak" target="_blank" rel="noopener">The Next Web: PHP knew about one flaw in 2024</a></li>
+          <li><a href="https://thenextweb.com/news/php2shell-millions-exploit-attempts-no-confirmed-breaches" target="_blank" rel="noopener">The Next Web: millions of attempts, no confirmed break-in</a></li>
+          <li><a href="https://www.cnbc.com/2026/10/21/government-websites-go-dark-as-software-flaw-sparks-security-scramble.html" target="_blank" rel="noopener">CNBC: government websites go dark</a></li>
+          <li><a href="https://www.cnbc.com/2026/10/22/php2shell-vulnerability-what-is-it-and-is-your-data-at-risk.html" target="_blank" rel="noopener">CNBC: is your data at risk?</a></li>
+          <li><a href="https://www.newsweek.com/fbi-issues-advice-as-security-issue-hits-global-websites-12603155" target="_blank" rel="noopener">Newsweek: FBI issues advice</a></li>
+          <li><a href="https://www.secureworld.io/industry-news/patch-php-now-php2shell" target="_blank" rel="noopener">SecureWorld: patch PHP or take it offline, NSA warns</a></li>
+          <li><a href="https://aws.amazon.com/blogs/security/amazon-threat-intelligence-identifies-php2shell-exploitation-prior-to-public-disclosure-in-madpot/" target="_blank" rel="noopener">Amazon: PHP2Shell exploitation before disclosure</a></li>
+          <li><a href="https://cybernews.com/security/php2shell-wordpress-amazon-cloudflare-ai-cyberattacks/" target="_blank" rel="noopener">Cybernews: attempts hit millions</a></li>
+          <li><a href="https://www.theregister.com/cyber-crime/2026/10/22/hackers-pile-on-php2shell-as-aws-reveals-attacks-began-before-disclosure/5304749" target="_blank" rel="noopener">The Register: hackers pile on PHP2Shell</a></li>
           <li><a href="https://www.recordedfuture.com/blog/php2shell-vulnerability-exploitation" target="_blank" rel="noopener">Recorded Future: PHP2Shell exploitation</a></li>
           <li><a href="https://www.cybersecuritydive.com/news/php-website-vulnerabilities/833580/" target="_blank" rel="noopener">Cybersecurity Dive: critical PHP vulnerabilities</a></li>
           <li><a href="https://fortune.com/2026/10/21/ai-tools-discovered-the-php-vulnerability-that-could-take-down-70-of-the-internet-now-the-race-is-on-to-patch-it-before-ai-powered-hackers-attack/" target="_blank" rel="noopener">Fortune: AI found the PHP flaw</a></li>
