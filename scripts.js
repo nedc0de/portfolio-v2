@@ -1315,6 +1315,20 @@ whenIdle(() => {
     });
     latestBox.hidden = false;
 
+    // the cards rise in one after another the first time they're scrolled to;
+    // the classes come off afterwards so the hover lift works as before
+    if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cards.forEach((n, i) => list.children[i].style.setProperty('--i', i));
+      list.classList.add('will-rise');
+      const rise = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        rise.disconnect();
+        requestAnimationFrame(() => list.classList.add('is-risen'));
+        setTimeout(() => list.classList.remove('will-rise', 'is-risen'), 1400);
+      }, { threshold: .2 });
+      rise.observe(list);
+    }
+
     // Phones: one dot per card, the current one lit, so it's clear they swipe.
     // Tap a dot to jump to that card, or swipe across the dots to move one card.
     const dots = latestBox.querySelector('.hm-dots');
