@@ -886,6 +886,11 @@
   let shelfIO = null;
   const parked = document.createElement('div'); // cards the filter hides wait here
   parked.hidden = true;
+  // genre chips under the filters: tap one to jump to its shelf
+  const jump = document.createElement('nav');
+  jump.className = 'fav-jump';
+  jump.setAttribute('aria-label', 'Jump to a genre');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function makeShelf(name, list) {
     const s = { name, cards: list.map((c) => c.el) };
     s.el = document.createElement('section');
@@ -938,6 +943,23 @@
       : [];
     if (rest.length) SHELVES.push(makeShelf(big.length ? 'Everything else' : `All ${TYPE_PLURAL[filter]}`, rest.sort(best)));
     SHELVES.forEach((s) => { grid.appendChild(s.el); s.ends(); });
+    jump.replaceChildren(...SHELVES.map((s) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'fav-jump-chip';
+      chip.textContent = s.name;
+      chip.addEventListener('click', () => s.el.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' }));
+      return chip;
+    }));
+    jump.hidden = SHELVES.length < 2;
+    jump.scrollLeft = 0;
+    // each shelf rises in as it's scrolled to, its posters fanning in after
+    if (!still && 'IntersectionObserver' in window) {
+      SHELVES.forEach((s) => {
+        s.el.classList.add('will-rise');
+        [...s.row.children].forEach((c, k) => c.style.setProperty('--k', Math.min(k, 8)));
+      });
+    }
     // covers load a shelf at a time as each comes near the screen (cards
     // further along a row are scrolled out of sight, so watching single
     // cards would miss them)
@@ -945,6 +967,15 @@
       shelfIO = new IntersectionObserver((entries) => entries.forEach((e) => {
         if (!e.isIntersecting) return;
         shelfIO.unobserve(e.target);
+        const shelf = e.target;
+        const rise = new IntersectionObserver(([r]) => {
+          if (!r.isIntersecting) return;
+          rise.disconnect();
+          shelf.classList.add('is-risen');
+          // done: drop the classes so hover and flips behave as before
+          setTimeout(() => shelf.classList.remove('will-rise', 'is-risen'), 1700);
+        }, { threshold: .15 });
+        if (shelf.classList.contains('will-rise')) rise.observe(shelf);
         cards.filter((c) => c.shelf && c.shelf.el === e.target).forEach(requestCover);
       }), { rootMargin: '400px 0px' });
       SHELVES.forEach((s) => shelfIO.observe(s.el));
@@ -954,6 +985,7 @@
   function buildCards() {
     grid.classList.replace('fav-grid', 'fav-shelves');
     grid.appendChild(parked);
+    grid.before(jump);
     // movies, then TV shows (each newest first, same year A to Z), then books in list order
     const TYPE_ORDER = { movie: 0, tv: 1, book: 2 };
     const sorted = FAVORITES.map((f, i) => ({ f, i }))
