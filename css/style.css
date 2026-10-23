@@ -10118,15 +10118,19 @@ html.fav-sheet-open { overflow: hidden; }
 
 /*===== DESKTOP MENU: laser scan =====*/
 /* calm grey words, white for the page you're on and the one you point at;
-   the laser (scripts.js) replaces the brush underline and the hover tilt */
-.nav-laser { display: none; }
+   a soft laser line (scripts.js) replaces the brush underline and the tilt */
+.nav-laser,
+.nav-laser-spark { display: none; }
 
 @media screen and (min-width: 768px) {
   .nav-list { position: relative; }
-  .nav-link { font-weight: 500; transition: color .25s; }
-  .nav-link:hover { transform: none; color: #f2f2f2; transition: color .25s; }
+  .nav-link { font-weight: 500; transition: color .25s, text-shadow .45s; }
+  .nav-link:hover { transform: none; color: #f2f2f2; transition: color .25s, text-shadow .45s; }
   .nav-link.active { color: #f2f2f2; }
   .nav-link.active::after { display: none; }
+
+  /* a word the line is passing under warms up a little */
+  .nav-link.is-lit { text-shadow: 0 0 12px rgba(255, 220, 22, .28); transition: color .1s, text-shadow .1s; }
 
   .nav-laser {
     display: block;
@@ -10141,8 +10145,8 @@ html.fav-sheet-open { overflow: hidden; }
   }
   .nav-laser.is-on { opacity: 1; }
 
-  /* the trail: brightest at the dot's end, fading out behind it; it follows
-     a little slower than the dot, so it stretches as the dot races ahead */
+  /* the line: faint behind, a soft yellow at the leading end; it follows
+     with an easing that eases out gently */
   .nav-laser-trail {
     position: absolute;
     top: -1px;
@@ -10150,38 +10154,36 @@ html.fav-sheet-open { overflow: hidden; }
     width: var(--w, 0px);
     height: 2px;
     border-radius: 2px;
-    background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .45) 45%, #ffdc16);
-    box-shadow: 0 0 8px rgba(255, 220, 22, .45);
+    background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .22) 50%, rgba(255, 220, 22, .6));
+    box-shadow: 0 0 6px rgba(255, 220, 22, .18);
     transform: translateX(var(--x, 0px));
-    transition: transform .6s cubic-bezier(.3, .7, .2, 1), width .6s cubic-bezier(.3, .7, .2, 1);
+    transition: transform .6s cubic-bezier(.3, .7, .2, 1), width .6s cubic-bezier(.3, .7, .2, 1), box-shadow .3s, opacity .3s;
   }
   .nav-laser.is-left .nav-laser-trail {
-    background: linear-gradient(270deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .45) 45%, #ffdc16);
+    background: linear-gradient(270deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .22) 50%, rgba(255, 220, 22, .6));
   }
+  .nav-laser.is-instant .nav-laser-trail { transition: none; }
 
-  /* the dot: white-hot centre, yellow glow, a gentle flicker like the logo */
-  .nav-laser-dot {
+  /* click: a quick, soft flash along the line */
+  .nav-laser.is-fire .nav-laser-trail { animation: nav-laser-fire .32s ease-out; }
+
+  /* faint sparks falling off the moving line */
+  .nav-laser-spark {
+    display: block;
     position: absolute;
-    top: -4px;
-    left: -4px;
-    width: 8px;
-    height: 8px;
+    width: 2px;
+    height: 2px;
     border-radius: 50%;
-    background: #fffbe0;
-    box-shadow: 0 0 6px 2px #ffdc16, 0 0 18px 5px rgba(255, 170, 0, .45);
-    transform: translateX(calc(var(--x, 0px) + var(--w, 0px)));
-    transition: transform .38s cubic-bezier(.2, .8, .2, 1);
-    animation: nav-laser-flicker 3.2s ease-in-out infinite;
+    background: rgba(255, 225, 120, .9);
+    box-shadow: 0 0 4px rgba(255, 200, 40, .5);
+    pointer-events: none;
+    opacity: 0;
   }
-  .nav-laser.is-left .nav-laser-dot { transform: translateX(var(--x, 0px)); }
-
-  .nav-laser.is-instant .nav-laser-trail,
-  .nav-laser.is-instant .nav-laser-dot { transition: none; }
 }
 
-@keyframes nav-laser-flicker {
-  0%, 100% { opacity: 1; }
-  46% { opacity: .82; }
-  50% { opacity: 1; }
-  53% { opacity: .9; }
+@keyframes nav-laser-fire {
+  0% { box-shadow: 0 0 6px rgba(255, 220, 22, .18); filter: brightness(1); }
+  35% { box-shadow: 0 0 14px 2px rgba(255, 220, 22, .45); filter: brightness(1.6); }
+  100% { box-shadow: 0 0 6px rgba(255, 220, 22, .18); filter: brightness(1); }
 }
+
