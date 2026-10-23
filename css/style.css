@@ -10185,12 +10185,15 @@ html.fav-sheet-open { overflow: hidden; }
 .mk-list.will-mark .is-on .mk-hl { background-size: 100% .14em; }
 
 /*===== Page titles: the same soft line, no brush =====*/
+.favorites-title .about-title-color { z-index: 0; } /* keeps the line just behind its own word */
 /* "let's Talk", "top Picks"…: the yellow word gets the same underline as the
    menu and the marked words in the text (one soft yellow, faded at both
    ends), sized to the title */
 .favorites-title .about-title-color::after {
-  top: auto;
-  bottom: -.13em; /* below the tails of g, p, y */
+  top: 1.2em; /* just under the letters, clear of the tails of g, p, y */
+  bottom: auto;
+  margin-top: 0; /* phones had the brush nudged up */
+  z-index: -1; /* behind the letters, so a g or p tail sits over it */
   left: 0;
   width: 100%;
   height: .09em;
