@@ -9631,3 +9631,32 @@ html.is-frozen .egg-crash * {
     opacity .6s ease calc(var(--i, 0) * 120ms),
     transform .8s cubic-bezier(.22, 1, .36, 1) calc(var(--i, 0) * 120ms);
 }
+
+/*===== Grid clearings that hug the text =====*/
+/* The lists and the home Explore area no longer sit on a big dark box (it
+   read as a wide black fade beside short lines). Instead the text itself
+   gets a thin halo in the page colour, so dots clear only right around the
+   words. Blog articles keep their box: it's the width of the text anyway. */
+.hw-list::before,
+.hc-list::before,
+.sw-list::before,
+.mk-list::before,
+.xb::before,
+.hl-list::before,
+.ab-list::before { content: none; }
+
+.hw-list,
+.hc-list,
+.sw-list,
+.mk-list,
+.xb,
+.hl-list,
+.ab-list {
+  text-shadow: 0 0 6px var(--thirteenth-color), 0 0 14px var(--thirteenth-color), 0 0 22px var(--thirteenth-color);
+}
+
+.ps-article::before { box-shadow: 0 0 36px 14px var(--thirteenth-color); }
+
+/* the movie card: a small, tight shadow (a big soft one read as a faded side
+   when the card turns) */
+.tk3-face { box-shadow: 0 10px 18px -12px rgba(0, 0, 0, .7); }
