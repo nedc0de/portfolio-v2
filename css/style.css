@@ -9762,3 +9762,56 @@ html.is-frozen .egg-crash * {
 /* no fade once you've reached the end of a row */
 .fav-shelf.is-end .fav-row,
 .fav-shelf:not(.is-scrollable) .fav-row { -webkit-mask: none; mask: none; }
+
+/*===== FAVORITES: shelves, round 2 =====*/
+/* tighter posters: about 3.5 across a phone, 7 to 8 on desktop */
+.fav-row { --card-w: clamp(92px, 26vw, 140px); }
+.fav-row .fav-score { font-size: .72rem; }
+
+/* genre chips: one per shelf, they scroll sideways on phones */
+.fav-jump {
+  display: flex;
+  gap: .4rem;
+  margin: -.25rem 0 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  contain: inline-size; /* the chip row never widens the page */
+}
+.fav-jump::-webkit-scrollbar { display: none; }
+.fav-jump[hidden] { display: none; }
+
+.fav-jump-chip {
+  flex: none;
+  padding: .32rem .7rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 999px;
+  background: #171717;
+  font: 600 .74rem var(--body-font);
+  color: #b5b5b5;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .15s, color .15s;
+}
+
+@media (hover: hover) {
+  .fav-jump-chip:hover { border-color: #555; color: var(--fifteenth-color); }
+}
+
+/* jumping to a shelf leaves room for the header */
+.fav-shelf { scroll-margin-top: 5.5rem; }
+
+/* shelves rise in; their posters fan in one after another */
+.fav-shelf.will-rise .fav-shelf-head,
+.fav-shelf.will-rise .fav-card {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.fav-shelf.will-rise .fav-card { transform: translateY(18px) scale(.96); }
+
+.fav-shelf.will-rise.is-risen .fav-shelf-head,
+.fav-shelf.will-rise.is-risen .fav-card {
+  opacity: 1;
+  transform: none;
+  transition: opacity .55s ease, transform .75s cubic-bezier(.22, 1, .36, 1);
+}
+.fav-shelf.will-rise.is-risen .fav-card { transition-delay: calc(.1s + var(--k, 0) * 60ms); }
