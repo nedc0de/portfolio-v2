@@ -10173,3 +10173,25 @@ html.fav-sheet-open { overflow: hidden; }
   100% { box-shadow: 0 0 6px rgba(255, 220, 22, .18); filter: brightness(1); }
 }
 
+
+/*===== One underline style for the words marked in the text =====*/
+/* every yellow-marked word in the pages' text (About, Contact, Favorites,
+   the blog, the newsletter…) gets the same line as the menu: one soft
+   yellow, the same thickness, with a short fade at both ends */
+.ab-lead mark,
+.ab-cta p em,
+.bl-lead em,
+.mk-hl,
+.oc-say em,
+.ct-lead em,
+.fav-lead em,
+.hm-news-text em {
+  background-image: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .32) .35em, rgba(255, 220, 22, .32) calc(100% - .35em), rgba(255, 220, 22, 0));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% .14em;
+}
+
+/* About's How I work: the line still swipes in as each row comes in */
+.mk-list.will-mark .mk-hl { background-size: 0% .14em; }
+.mk-list.will-mark .is-on .mk-hl { background-size: 100% .14em; }
