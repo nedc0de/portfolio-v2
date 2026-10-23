@@ -1164,13 +1164,12 @@
   if (!grid && !homeCard) return;
 
   /*---------- home page: the movie deck ----------*/
-  // The newest movies on the list (they're added at the top) as a small deck:
-  // the latest one is the 3D card (poster on the front, details, take and
-  // rating on the back), the two before it fan out behind. Tapping one of
-  // those brings it to the front. Posters use the same lookup and cache as
+  // The newest movie on the list (they're added at the top) as one 3D card:
+  // poster on the front, details, take and rating on the back. The deck
+  // code below still handles more cards; slice(0, 1) keeps it to one. Posters use the same lookup and cache as
   // this page, so the home page stays up to date by itself.
   if (!grid) {
-    const deck = FAVORITES.filter((f) => f.type === 'movie').slice(0, 3);
+    const deck = FAVORITES.filter((f) => f.type === 'movie').slice(0, 1);
     if (!deck.length) return;
     const tk = homeCard.querySelector('.tk3');
     const hold = homeCard.querySelector('.tk3-hold');

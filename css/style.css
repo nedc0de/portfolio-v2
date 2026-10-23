@@ -9559,3 +9559,34 @@ html.is-frozen .egg-crash * {
   border-radius: 14px;
   background: #1b1b1b;
 }
+
+/*===== HOME: one movie card, holographic =====*/
+/* Holo foil: soft rainbow stripes that only show around the "light" (a
+   radial mask), plus a white glare at the same spot. The light moves with
+   --hx/--hy (set in scripts.js as the card sways, turns and leans) and the
+   stripes slide the other way, so the colours shift like a real holo card.
+   Smooth gradients only, no textures, so it stays clean on every screen. */
+.tk3-holo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(115deg,
+      #ff4f9a 0%, #ffbf4d 2.5%, #e9ff6a 5%, #5cffbf 7.5%, #4fc8ff 10%, #a77bff 12.5%, #ff4f9a 15%)
+    calc(100% - var(--hx, 50%)) calc(100% - var(--hy, 50%)) / 160% 160%;
+  -webkit-mask: radial-gradient(farthest-corner circle at var(--hx, 50%) var(--hy, 50%), #000 0%, rgba(0, 0, 0, .55) 30%, rgba(0, 0, 0, .12) 65%);
+  mask: radial-gradient(farthest-corner circle at var(--hx, 50%) var(--hy, 50%), #000 0%, rgba(0, 0, 0, .55) 30%, rgba(0, 0, 0, .12) 65%);
+  mix-blend-mode: color-dodge;
+  opacity: .36;
+}
+
+.tk3-holo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(farthest-corner circle at var(--hx, 50%) var(--hy, 50%), rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, .12) 25%, transparent 55%);
+  mix-blend-mode: overlay;
+}
+/* only on a real poster, not on the plain popcorn fallback */
+.tk3:not(.has-poster) .tk3-holo { display: none; }
