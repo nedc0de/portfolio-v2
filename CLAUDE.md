@@ -77,7 +77,10 @@ creator.
 - JSON-LD `BlogPosting` + `FAQPage` matching the on-page FAQ.
 - Exactly one `<h1>`; keywords in the H1 and H2s; descriptive alt text.
 - Images as compressed JPEGs in `img/blog/`, `loading="lazy"` below the fold.
-- File name: `blog/Title-Words-Like-This.html`.
+- File name: `blog/Title-Words-Like-This.html`. Its address is all lowercase
+  with no `.html` (Netlify redirects any capital letters to lowercase), so
+  the canonical, `og:url`, JSON-LD, sitemap entry and every link to the post
+  use `https://nedcode.com/blog/title-words-like-this` (links: `blog/title-words-like-this`).
 - Add the URL to `sitemap.xml`; make it the featured post on `blog.html`
   (move the previous one into "More posts"); the home page's ticker and
   "Latest posts" row (newest first) read blog.html, so they update by themselves; link related posts to each other (every post ends

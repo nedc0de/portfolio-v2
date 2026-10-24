@@ -10201,3 +10201,9 @@ html.fav-sheet-open { overflow: hidden; }
   background: linear-gradient(90deg, rgba(255, 220, 22, 0), rgba(255, 220, 22, .32) .35em, rgba(255, 220, 22, .32) calc(100% - .35em), rgba(255, 220, 22, 0));
   opacity: 1;
 }
+
+/*===== 404: page not found =====*/
+.nf-hero { padding: 2rem 0 4rem; text-align: center; }
+.nf-lead { max-width: 30rem; margin: 2rem auto 1.4rem; font-size: 1rem; line-height: 1.6; color: #a8a8a8; }
+.nf-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.4rem; margin: 0; }
+.nf-go { font-weight: 700; color: var(--fifteenth-color); }
