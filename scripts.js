@@ -2511,6 +2511,46 @@ function readPostsSeen() {
   });
 })();
 
+/*===== BLOG POSTS: "What's your tide?" demo =====*/
+// Pick low, mid or high tide and only that column of tasks stays bright,
+// with its first tiny step below. The first time it's scrolled into view it
+// shows itself in action (low, mid, then high), then waits for a tap.
+// Reduced motion or no JS: all three columns, nothing picked.
+(() => {
+  document.querySelectorAll('.ps-tide').forEach((fig) => {
+    const picks = [...fig.querySelectorAll('.pt-pick')];
+    const cols = [...fig.querySelectorAll('.pt-col')];
+    const job = fig.querySelector('.pt-job');
+    const steps = {
+      low: 'Your only job: <b>carry one bag to the door.</b> That counts.',
+      mid: 'Your only job: <b>open the email and write one line.</b>',
+      high: 'Your only job: <b>open the project and set a 25 minute timer.</b>',
+    };
+    const resting = job.innerHTML;
+    let demo = 0;
+    const pick = (tide) => {
+      fig.classList.toggle('has-pick', !!tide);
+      picks.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tide === tide)));
+      cols.forEach((c) => c.classList.toggle('is-on', c.dataset.tide === tide));
+      job.innerHTML = tide ? steps[tide] : resting;
+    };
+    picks.forEach((b) => b.addEventListener('click', () => {
+      clearTimeout(demo);
+      pick(b.getAttribute('aria-pressed') === 'true' ? null : b.dataset.tide);
+    }));
+    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      const order = ['low', 'mid', 'high', null];
+      let i = 0;
+      const next = () => { pick(order[i]); i += 1; if (i < order.length) demo = setTimeout(next, 1500); };
+      demo = setTimeout(next, 400);
+    }, { threshold: .6 });
+    io.observe(fig);
+  });
+})();
+
 /*===== BLOG POSTS: touchscreen demo =====*/
 // A grid of row/column sensor lines. Each finger changes the reading at the
 // crossings near it (brighter dot = bigger change) and the "controller" works

@@ -10183,3 +10183,57 @@ html.fav-sheet-open { overflow: hidden; }
 .nf-lead { max-width: 30rem; margin: 2rem auto 1.4rem; font-size: 1rem; line-height: 1.6; color: #a8a8a8; }
 .nf-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.4rem; margin: 0; }
 .nf-go { font-weight: 700; color: var(--fifteenth-color); }
+
+/*===== BLOG POSTS: wall-to-steps diagram, tide demo, wide figures, steps =====*/
+/* Wall of Awful -> Wall of Okay (built step by step by the .ps-build script) */
+.ww-ground { stroke: #333; stroke-width: 2; stroke-linecap: round; }
+.ww-brick rect { fill: #1a1a1a; stroke: #4a4a4a; stroke-width: 1.4; }
+.ww-brick text,
+.ww-step text { font: 600 8.5px var(--body-font); text-anchor: middle; fill: #8a8a8a; }
+.ww-step rect { fill: var(--fifteenth-color); stroke: none; }
+.ww-step text { fill: #1a1a1a; }
+.ww-you circle { fill: none; stroke: #ddd; stroke-width: 2; }
+.ww-you path { stroke: #ddd; stroke-width: 2; stroke-linecap: round; }
+.ww-cap { font: 600 9px var(--body-font); text-anchor: middle; fill: #8a8a8a; }
+.ww-ok { font: 800 15px var(--body-font); fill: var(--fifteenth-color); }
+.ww-okay .pb-draw { stroke: var(--fifteenth-color); stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* "What's your tide?" demo: pick a tide, the other columns fade back */
+.pt-picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin: .2rem 0 1rem; }
+.pt-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .1rem;
+  padding: .55rem .3rem;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  background: #121212;
+  font: 700 .8rem var(--body-font);
+  color: #ddd;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .25s, background .25s, color .25s;
+}
+.pt-pick small { font-size: .68rem; font-weight: 500; color: #8a8a8a; }
+.pt-pick[aria-pressed='true'] { border-color: var(--fifteenth-color); background: #2a2510; color: var(--fifteenth-color); }
+
+.pt-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.pt-col { min-width: 0; padding: .55rem; border-radius: 10px; background: #161616; transition: opacity .35s, transform .35s; }
+.pt-head { margin: 0 0 .45rem; font: 700 .66rem ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .12em; text-transform: uppercase; color: #8a8a8a; }
+.pt-card { margin: 0 0 .4rem; padding: .45rem .5rem; border-radius: 7px; background: #222; font-size: .74rem; line-height: 1.35; color: #ddd; }
+.pt-card:last-child { margin-bottom: 0; }
+.pt-card span { display: block; margin-top: .15rem; font-size: .66rem; color: #8a8a8a; }
+.ps-tide.has-pick .pt-col { opacity: .25; transform: scale(.97); }
+.ps-tide.has-pick .pt-col.is-on { opacity: 1; transform: none; }
+.ps-tide .pt-col.is-on .pt-head { color: var(--fifteenth-color); }
+.pt-job { min-height: 2.6em; margin: .9rem 0 0; font-size: .86rem; line-height: 1.45; color: #bbb; text-align: center; }
+.pt-job b { color: var(--fifteenth-color); }
+
+/* wide images (screenshots) use the column's full width */
+.ps-fig.ps-fig-wide { max-width: 100%; }
+
+/* numbered how-to steps */
+.ps-body ol.ps-steps { margin: 0 0 1.25rem; padding-left: 1.3rem; }
+.ps-body ol.ps-steps li { margin-bottom: .6rem; }
+.ps-body ol.ps-steps li::marker { color: var(--fifteenth-color); font-weight: 700; }
