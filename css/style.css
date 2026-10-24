@@ -9248,37 +9248,13 @@ html.is-frozen .egg-crash * {
   clip: rect(0 0 0 0);
 }
 
-/*===== FOOTER: Ned × AI =====*/
-/* One quiet line in the footer's own type: Ned × AI | © year. The × is the
-   only accent, a muted yellow that sways a few degrees and glows a little,
-   very slowly */
+/*===== FOOTER: © year NEDCODE =====*/
+/* One quiet line in the footer's own type, under the Threads and GitHub icons */
 .ft-sig {
   display: inline-flex;
   align-items: center;
+  gap: .3em;
   /* same type as the footer always had: semi-bold, 12px, its grey */
-}
-
-.ft-x {
-  display: inline-block;
-  margin: 0 .5em;
-  color: rgba(255, 220, 22, .7);
-  animation: ft-sway 8s ease-in-out infinite;
-}
-
-@keyframes ft-sway {
-  0%, 100% { transform: rotate(-5deg); text-shadow: 0 0 3px rgba(255, 220, 22, .15); }
-  50% { transform: rotate(5deg); text-shadow: 0 0 8px rgba(255, 220, 22, .35); }
-}
-
-.ft-div {
-  width: 1px;
-  height: 11px;
-  margin: 0 .9em;
-  background: linear-gradient(transparent, #444, transparent);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ft-x { animation: none; }
 }
 
 /*===== BLOG POSTS: Roadster flip diagram =====*/
