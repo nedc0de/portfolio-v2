@@ -1231,7 +1231,7 @@
         <span class="fav-hero-meta">${escapeHTML([f.year, f.genre].filter(Boolean).join(' · '))}</span>
         <span class="fav-hero-rate">${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span></span>
         <p class="fav-hero-sum"></p>
-        <button type="button" class="fav-hero-go">See details <span aria-hidden="true">&rarr;</span></button>
+        <button type="button" class="fav-hero-go">See details</button>
       </div>`;
     bar.before(hero);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => openSheet(item));

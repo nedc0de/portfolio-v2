@@ -4467,13 +4467,6 @@ details>summary {
   color: var(--fifteenth-color);
 }
 
-.bl-feature:hover .bl-read i {
-  transform: translateX(4px);
-}
-
-.bl-read i {
-  transition: transform .25s;
-}
 
 /* More posts: compact rows */
 .bl-list {
@@ -7602,11 +7595,6 @@ html.is-frozen .egg-crash * {
   color: var(--fifteenth-color);
 }
 
-.xb-go span { display: inline-block; transition: transform .25s; }
-
-@media (hover: hover) {
-  .xb-card:hover .xb-go span { transform: translateX(3px); }
-}
 
 /* Favorites: poster on the left, its own scene blurred behind the card */
 .xb-mv {
@@ -10239,3 +10227,25 @@ html.fav-sheet-open { overflow: hidden; }
 .ps-body ol.ps-steps { margin: 0 0 1.25rem; padding-left: 1.3rem; }
 .ps-body ol.ps-steps li { margin-bottom: .6rem; }
 .ps-body ol.ps-steps li::marker { color: var(--fifteenth-color); font-weight: 700; }
+
+/*===== Text links: a yellow marker stroke instead of a trailing arrow =====*/
+/* Same stroke as "project" in the home's "Your move" (.ab-cta p em). It fills
+   up like a highlighter on hover, or when the whole card is hovered. */
+.xb-go,
+.hm-all,
+.bl-read,
+.nf-go {
+  width: fit-content;
+  padding-bottom: .04em;
+  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
+  transition: background-size .25s ease;
+}
+
+@media (hover: hover) {
+  .xb-card:hover .xb-go,
+  .hm-all:hover,
+  .bl-feature:hover .bl-read,
+  .nf-go:hover {
+    background-size: 100% 100%;
+  }
+}
