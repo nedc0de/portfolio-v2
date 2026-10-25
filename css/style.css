@@ -10228,24 +10228,40 @@ html.fav-sheet-open { overflow: hidden; }
 .ps-body ol.ps-steps li { margin-bottom: .6rem; }
 .ps-body ol.ps-steps li::marker { color: var(--fifteenth-color); font-weight: 700; }
 
-/*===== Text links: a yellow marker stroke instead of a trailing arrow =====*/
-/* Same stroke as "project" in the home's "Your move" (.ab-cta p em). It fills
-   up like a highlighter on hover, or when the whole card is hovered. */
-.xb-go,
-.hm-all,
-.bl-read,
-.nf-go {
-  width: fit-content;
-  padding-bottom: .04em;
-  background: linear-gradient(rgba(255, 220, 22, .28), rgba(255, 220, 22, .28)) 0 100% / 100% .14em no-repeat;
-  transition: background-size .25s ease;
+/*===== Text links: rolling text instead of a trailing arrow =====*/
+/* scripts.js wraps the words in .roll > span. The span carries a white copy of
+   itself one line below (text-shadow); rolling it up swaps yellow for white.
+   Desktop rolls on hover; phones roll up and back once when the link scrolls
+   into view (.is-rolled). Without JS the links are plain yellow text. */
+.roll {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.3em;
+  line-height: 1.3em;
+  vertical-align: bottom;
+}
+
+.roll > span {
+  display: block;
+  text-shadow: 0 1.3em 0 #f2f2f2;
+  transition: transform .4s cubic-bezier(.65, 0, .25, 1);
+}
+
+.roll.is-rolled > span,
+.nf-go:focus-visible .roll > span,
+.hm-all:focus-visible .roll > span {
+  transform: translateY(-1.3em);
 }
 
 @media (hover: hover) {
-  .xb-card:hover .xb-go,
-  .hm-all:hover,
-  .bl-feature:hover .bl-read,
-  .nf-go:hover {
-    background-size: 100% 100%;
+  .xb-card:hover .roll > span,
+  .hm-all:hover .roll > span,
+  .bl-feature:hover .roll > span,
+  .nf-go:hover .roll > span {
+    transform: translateY(-1.3em);
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll > span { transition: none; }
 }
