@@ -3076,9 +3076,6 @@ function readPostsSeen() {
   if (said.size > WORDS.length + PHRASES.length - 20) said = new Set(); // seen nearly all: start over
   const remember = () => { try { sessionStorage.setItem(SEEN, JSON.stringify([...said])); } catch (e) {} };
   const mine = [];
-  // fresh thoughts Claude wrote for this batch (netlify/functions/thoughts.js);
-  // they go first, the lists above are only the fallback
-  let freshPhrases = [], freshWords = [];
 
   const layout = () => {
     layer.style.height = '0';
@@ -3180,15 +3177,12 @@ function readPostsSeen() {
         const spot = pick(room);
         const max = spot.len - 2;
         // phrases most of the time, wrapped to the room; single words otherwise
-        const phrasesOnly = NEED > 3 && Math.random() < 0.65;
-        const pool = phrasesOnly ? PHRASES : [...WORDS, ...PHRASES];
-        const fresh = phrasesOnly ? freshPhrases : [...freshWords, ...freshPhrases];
+        const pool = NEED > 3 && Math.random() < 0.65 ? PHRASES : [...WORDS, ...PHRASES];
         const ok = (t) => !usedNow.has(t) && t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2;
-        // this page's own thoughts first (when it lays out again), then fresh
-        // AI ones, then built-in ones the visitor hasn't seen anywhere yet
+        // this page's own thoughts first (when it lays out again), then ones
+        // the visitor hasn't seen anywhere yet
         const own = mine.filter(ok);
-        const newOnes = fresh.filter((t) => !said.has(t) && ok(t));
-        const options = own.length ? own : newOnes.length ? newOnes : pool.filter((t) => !said.has(t) && ok(t));
+        const options = own.length ? own : pool.filter((t) => !said.has(t) && ok(t));
         if (!options.length) continue;
         const thought = pick(options);
         usedNow.add(thought);
@@ -3232,24 +3226,6 @@ function readPostsSeen() {
   if (document.readyState === 'complete') later(); else addEventListener('load', later);
   if ('ResizeObserver' in window) new ResizeObserver(later).observe(document.body);
   else addEventListener('resize', later);
-
-  // Ask Claude for a new batch of thoughts now and every 5 minutes while the
-  // tab is open; each batch replaces what's on screen with ones never shown
-  const think = () => {
-    if (document.hidden) return;
-    fetch('/.netlify/functions/thoughts')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!data || !(data.phrases || []).length) return;
-        freshPhrases = data.phrases;
-        freshWords = data.words || [];
-        mine.length = 0; // let this page show the new thoughts
-        later();
-      })
-      .catch(() => {});
-  };
-  think();
-  setInterval(think, 5 * 60 * 1000);
 
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const next = { d: () => (20 + Math.random() * 10).toFixed(1), t: () => Math.random().toFixed(2), p: () => (0.03 + Math.random() * 0.04).toFixed(3) };
