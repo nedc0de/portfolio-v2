@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "https://github.com/nedmarafawi/portfolio.git",
   "author": "Ned Marafawi <70671308+nedmarafawi@users.noreply.github.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  }
 }
