@@ -2556,10 +2556,14 @@ details>summary {
   transition: color .2s, text-shadow .2s;
 }
 
-.footer-top:hover,
-.footer-top:focus-visible {
+/* rolls from grey to a yellow copy (see .roll); without JS it just turns yellow */
+.footer-top:hover:not(:has(.roll)),
+.footer-top:focus-visible:not(:has(.roll)) {
   color: var(--fifteenth-color);
-  text-shadow: 0 0 10px rgba(255, 220, 22, .5);
+}
+
+.footer-top .roll > span {
+  text-shadow: 0 1.3em 0 var(--fifteenth-color);
 }
 
 /*===== MEDIA QUERIES =====*/
@@ -10249,6 +10253,7 @@ html.fav-sheet-open { overflow: hidden; }
 
 .roll.is-rolled > span,
 .nf-go:focus-visible .roll > span,
+.footer-top:focus-visible .roll > span,
 .hm-all:focus-visible .roll > span {
   transform: translateY(-1.3em);
 }
@@ -10257,7 +10262,8 @@ html.fav-sheet-open { overflow: hidden; }
   .xb-card:hover .roll > span,
   .hm-all:hover .roll > span,
   .bl-feature:hover .roll > span,
-  .nf-go:hover .roll > span {
+  .nf-go:hover .roll > span,
+  .footer-top:hover .roll > span {
     transform: translateY(-1.3em);
   }
 }

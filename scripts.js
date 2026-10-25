@@ -404,7 +404,7 @@ document.querySelectorAll('.footer').forEach((footer) => {
   const top = document.createElement('a');
   top.className = 'footer-top';
   top.href = '#';
-  top.innerHTML = '<span aria-hidden="true">↑</span> Back to top';
+  top.textContent = 'Back to top';
   top.addEventListener('click', (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3531,12 +3531,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 });
 
 /*===== Text links: rolling text =====*/
-// "Get to know me", "Play with it", "See all picks", "All posts", "Read post"
-// and the 404 links: wrap the words so CSS can roll them up to a white copy
+// "Get to know me", "Play with it", "See all picks", "All posts", "Read post",
+// the 404 links and the footer's "Back to top": wrap the words so CSS can roll them up to a white copy
 // (see .roll in style.css). Phones have no hover, so each one rolls up and
 // back once when it scrolls into view.
 (() => {
-  const links = document.querySelectorAll('.xb-go, .hm-all, .bl-read, .nf-go');
+  const links = document.querySelectorAll('.xb-go, .hm-all, .bl-read, .nf-go, .footer-top');
   if (!links.length) return;
   const rolls = [...links].map((el) => {
     const text = el.textContent.trim();
