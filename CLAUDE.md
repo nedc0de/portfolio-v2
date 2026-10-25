@@ -77,6 +77,9 @@ creator.
 - JSON-LD `BlogPosting` + `FAQPage` matching the on-page FAQ.
 - Exactly one `<h1>`; keywords in the H1 and H2s; descriptive alt text.
 - Images as compressed JPEGs in `img/blog/`, `loading="lazy"` below the fold.
+- Browsers keep images for a day (see `_headers`). When you replace an image
+  under the same name (logo, covers, share images), bump the `?v=` number on
+  every link to it, or visitors keep seeing the old one.
 - File name: `blog/Title-Words-Like-This.html`. Its address is all lowercase
   with no `.html` (Netlify redirects any capital letters to lowercase), so
   the canonical, `og:url`, JSON-LD, sitemap entry and every link to the post
