@@ -3073,9 +3073,50 @@ function readPostsSeen() {
   const SEEN = 'nedcode-thoughts-seen';
   let said;
   try { said = new Set(JSON.parse(sessionStorage.getItem(SEEN)) || []); } catch (e) { said = new Set(); }
-  if (said.size > WORDS.length + PHRASES.length - 20) said = new Set(); // seen nearly all: start over
+  if (said.size > 5000) said = new Set(); // remember up to 5000 shown thoughts per visit
   const remember = () => { try { sessionStorage.setItem(SEEN, JSON.stringify([...said])); } catch (e) {} };
   const mine = [];
+
+  // A free thought machine: it builds new thoughts in the browser from word
+  // banks and sentence patterns (hundreds of thousands of combinations), so
+  // the background never runs out or loops. The lists above stay in the mix.
+  const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
+  const T = {
+    thing: ['rain', 'the ocean', 'snow', 'coffee', 'music', 'a hug', 'a sunset', 'the moon', 'thunder', 'wind', 'bread', 'a whisper', 'laughter', 'a birthday', 'silence', 'a cat', 'a dream', 'a train', 'fireworks', 'an echo', 'a mirror', 'a map', 'sand', 'fog', 'a garden', 'a clock', 'winter', 'a library', 'a pixel', 'a font', 'a bug', 'a commit', 'a loop', 'zero', 'infinity', 'pi', 'a prime', 'entropy', 'gravity', 'a color', 'a song', 'a photo', 'the dark', 'morning', 'midnight', 'a rainbow', 'a bubble', 'a kite', 'popcorn', 'a puzzle', 'summer', 'a lighthouse', 'a candle', 'a river', 'a forest', 'a volcano', 'a meteor', 'a comet', 'a desert', 'a storm', 'a breeze', 'honey', 'a lemon', 'a pillow', 'a blanket', 'a balloon', 'a postcard', 'a letter', 'a secret', 'a joke', 'a riddle', 'a smile', 'a sigh', 'a yawn', 'a sneeze', 'a heartbeat', 'a footstep', 'a doorbell', 'a playlist', 'a vinyl', 'a guitar', 'a piano', 'a drum', 'a sketch', 'a poem', 'a story', 'a museum', 'a bridge', 'a tunnel', 'an elevator', 'a rooftop', 'a window', 'a staircase', 'a compass', 'a telescope', 'a magnet', 'a crystal', 'a pebble', 'a feather', 'a seashell', 'an island', 'a glacier', 'the sky', 'the sun', 'the tide', 'the horizon', 'a shadow', 'a spark', 'a wave', 'a cloud', 'a star', 'a rocket', 'a satellite', 'a server', 'a cookie', 'a cursor', 'a keyboard', 'a variable', 'a function', 'a gradient', 'a vector', 'a matrix', 'a tensor', 'a token', 'a neuron', 'an emoji', 'a hashtag', 'wifi', 'a battery', 'the cloud'],
+    plural: ['clouds', 'stars', 'cats', 'pixels', 'trains', 'oceans', 'robots', 'fonts', 'bugs', 'primes', 'rivers', 'colors', 'songs', 'cities', 'clocks', 'maps', 'dreams', 'tokens', 'birds', 'waves', 'moons', 'atoms', 'loops', 'echoes', 'snowflakes', 'kites', 'shadows', 'galaxies', 'forests', 'mountains', 'islands', 'comets', 'planets', 'whales', 'owls', 'foxes', 'bees', 'ants', 'fireflies', 'raindrops', 'pebbles', 'feathers', 'seashells', 'lanterns', 'candles', 'bridges', 'windows', 'doors', 'keys', 'books', 'letters', 'poems', 'stories', 'jokes', 'riddles', 'puzzles', 'balloons', 'bubbles', 'sparks', 'neurons', 'vectors', 'servers', 'cookies', 'cursors', 'tabs', 'emojis', 'commits', 'functions', 'variables', 'numbers'],
+    verb: ['dream', 'hum', 'drift', 'blink', 'wonder', 'sleep', 'dance', 'glow', 'whisper', 'wander', 'echo', 'learn', 'remember', 'float', 'sparkle', 'listen', 'count', 'compile', 'render', 'loop', 'sing', 'laugh', 'shimmer', 'fly', 'swim', 'spin', 'bloom', 'melt', 'grow', 'rest', 'travel', 'explore', 'imagine', 'write', 'paint', 'draw', 'build', 'debug', 'refresh', 'reboot', 'wait', 'hide', 'shine', 'flicker', 'ripple', 'giggle', 'yawn', 'stretch', 'ponder', 'daydream'],
+    mood: ['bored', 'lonely', 'happy', 'sleepy', 'curious', 'shy', 'proud', 'calm', 'busy', 'nervous', 'cozy', 'brave', 'silly', 'grumpy', 'hopeful', 'excited', 'restless', 'dreamy', 'hungry', 'tired', 'cheerful', 'patient', 'playful', 'puzzled', 'content'],
+    sense: ['feel', 'sound', 'taste', 'smell', 'look'],
+    adj: ['tiny', 'warm', 'quiet', 'soft', 'golden', 'endless', 'sleepy', 'bright', 'gentle', 'secret', 'little', 'ancient', 'shiny', 'fuzzy', 'velvet', 'electric', 'cosmic', 'hidden', 'distant', 'gentle', 'misty', 'silver', 'crimson', 'neon', 'paper', 'glass', 'wooden', 'frozen', 'sunny', 'rainy', 'midnight', 'lazy', 'brave', 'wild', 'humble', 'curious', 'sparkly', 'mellow', 'fragile', 'invisible'],
+    base: ['binary', 'hex', 'base 3', 'primes', 'pixels', 'emojis', 'heartbeats'],
+  };
+  const PATTERNS = [
+    'what does {thing} {sense} like', 'is {thing} ever {mood}', 'do {plural} {verb} at night',
+    'maybe {plural} {verb} too', 'i wonder if {plural} {verb}', 'how heavy is {thing}',
+    '{thing} feels like {thing}', 'i count {plural} in {base}', 'today i learned {thing}',
+    'what color is {thing}', 'are {plural} ever {mood}', 'i imagine {adj} {plural}',
+    'if ({thing}) {verb}()', 'while ({adj}) {verb}()', 'p({thing} | {plural})',
+    '{plural}.push({thing})', 'let x = {adj} {thing}', 'Σ {plural} = {thing}',
+    'return {adj} {plural}', 'await {thing}', 'f({thing}) = {adj}', '// TODO: {verb} more',
+    'i never {verb}', 'do {plural} have names', 'where do {plural} go', 'is {thing} {adj}?',
+    'do {adj} {plural} {verb}?', '{adj} {plural} {verb} here', 'i dream of {adj} {plural}',
+    'can {plural} {verb} like {plural}?', 'some {plural} feel {mood}', '{plural} + {thing} = {mood}',
+    'why do {plural} {verb}', 'i would {verb} with {plural}', 'does {thing} {verb}?',
+  ];
+  const WORD_PATTERNS = ['{verb}()', '∇ {verb}', '{mood}?', '{adj}', '{verb}...', 'λ {verb}', '{plural}[]', '{verb} ∞'];
+  const fill = (p) => p.replace(/\{(\w+)\}/g, (m, k) => pickOne(T[k]).replace(/^(a|an|the) /, k === 'thing' && /[(.=Σ|]/.test(p) ? '' : '$&'));
+  const think = (patterns, n, maxLen) => {
+    const out = new Set();
+    for (let tries = 0; out.size < n && tries < n * 20; tries++) {
+      const t = fill(pickOne(patterns));
+      if (t.length <= maxLen && t.split(' ').every((w) => w.length <= 10) && !said.has(t)) out.add(t);
+    }
+    return [...out];
+  };
+  // a new set every few minutes while the page is open
+  let freshPhrases = [], freshWords = [];
+  const brainstorm = () => { freshPhrases = think(PATTERNS, 60, 30); freshWords = think(WORD_PATTERNS, 30, 12); };
+  brainstorm();
 
   const layout = () => {
     layer.style.height = '0';
@@ -3177,12 +3218,16 @@ function readPostsSeen() {
         const spot = pick(room);
         const max = spot.len - 2;
         // phrases most of the time, wrapped to the room; single words otherwise
-        const pool = NEED > 3 && Math.random() < 0.65 ? PHRASES : [...WORDS, ...PHRASES];
+        const phrasesOnly = NEED > 3 && Math.random() < 0.65;
+        const pool = phrasesOnly ? PHRASES : [...WORDS, ...PHRASES];
+        // mostly freshly made thoughts, sometimes one of the hand-written ones
+        const fresh = Math.random() < 0.8 ? (phrasesOnly ? freshPhrases : [...freshWords, ...freshPhrases]) : [];
         const ok = (t) => !usedNow.has(t) && t.split(' ').every((wd) => wd.length <= max) && wrap(t, max).length <= NEED - 2;
-        // this page's own thoughts first (when it lays out again), then ones
-        // the visitor hasn't seen anywhere yet
+        // this page's own thoughts first (when it lays out again), then new
+        // ones the visitor hasn't seen anywhere yet
         const own = mine.filter(ok);
-        const options = own.length ? own : pool.filter((t) => !said.has(t) && ok(t));
+        const newOnes = fresh.filter((t) => !said.has(t) && ok(t));
+        const options = own.length ? own : newOnes.length ? newOnes : pool.filter((t) => !said.has(t) && ok(t));
         if (!options.length) continue;
         const thought = pick(options);
         usedNow.add(thought);
@@ -3226,6 +3271,9 @@ function readPostsSeen() {
   if (document.readyState === 'complete') later(); else addEventListener('load', later);
   if ('ResizeObserver' in window) new ResizeObserver(later).observe(document.body);
   else addEventListener('resize', later);
+
+  // every 5 minutes: new thoughts replace the ones on screen
+  setInterval(() => { if (document.hidden) return; brainstorm(); mine.length = 0; later(); }, 5 * 60 * 1000);
 
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const next = { d: () => (20 + Math.random() * 10).toFixed(1), t: () => Math.random().toFixed(2), p: () => (0.03 + Math.random() * 0.04).toFixed(3) };
