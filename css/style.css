@@ -10271,3 +10271,12 @@ html.fav-sheet-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .roll > span { transition: none; }
 }
+
+/* Selected work / Projects circuit: a small pad in each node instead of a number */
+.hc-row .hc-node::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
