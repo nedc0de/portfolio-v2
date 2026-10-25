@@ -9299,27 +9299,29 @@ html.is-frozen .egg-crash * {
   stroke-linejoin: round;
 }
 
-/* thruster puffs: compressed air */
-.fl-puffs circle { fill: #d9e4ec; }
+/* thruster jets: compressed air, soft and blurred, flickering as it blows */
+.fl-puffs ellipse { fill: #e6eef5; }
+.fl-jet { fill-opacity: .65; }
+.fl-wash { fill-opacity: .3; }
 
 .fl-fan,
 .fl-puffs { opacity: 0; transition: opacity .2s; }
 
 .ps-flip.is-fan .fl-fan { opacity: 1; }
-.ps-flip.is-thrust .fl-puffs { opacity: .75; }
+.ps-flip.is-thrust .fl-puffs { opacity: 1; }
 
-.ps-flip.is-thrust .fl-puffs circle {
+.ps-flip.is-thrust .fl-puffs ellipse {
   transform-box: fill-box;
-  transform-origin: center;
-  animation: fl-puff .35s ease-out infinite;
+  transform-origin: 50% 0;
+  animation: fl-jet .3s ease-in-out infinite alternate;
 }
 
-.ps-flip.is-thrust .fl-puffs circle:nth-child(2) { animation-delay: .12s; }
-.ps-flip.is-thrust .fl-puffs circle:nth-child(3) { animation-delay: .24s; }
+.ps-flip.is-thrust .fl-puffs ellipse:nth-child(3n+2) { animation-delay: .1s; }
+.ps-flip.is-thrust .fl-puffs ellipse:nth-child(3n) { animation-delay: .2s; }
 
-@keyframes fl-puff {
-  from { transform: scale(.4); opacity: 1; }
-  to { transform: scale(1.4); opacity: 0; }
+@keyframes fl-jet {
+  from { transform: scaleY(.8); opacity: .75; }
+  to { transform: scaleY(1.15); opacity: 1; }
 }
 
 /* the steps, lit one by one */
