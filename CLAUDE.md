@@ -54,6 +54,9 @@ creator.
   template but each gets its own simple icon on the right (`.art` slot) and,
   for leaks, the red glow (`body.leak`): wifi crossed out for "no online",
   cracked video with a red drip for leaks. No characters or photos.
+  Every cover's icon must be unique (never reuse another post's icon) and
+  cleanly shaped: a recognisable, well-proportioned symbol with even
+  strokes, not a lopsided or oddly drawn one. Check it at thumbnail size.
 - Visuals between sections so there's never a wall of text. Use official images
   when Ned provides them (credit "Image: Rockstar Games"; keep GTA posts free
   of ads/affiliate links per Rockstar's non-commercial policy). Otherwise build
