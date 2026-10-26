@@ -9411,6 +9411,18 @@ html.is-frozen .egg-crash * {
   fill: #ff8a8a;
 }
 
+/* Huffman tree: letter tiles, count circles, 0/1 badges, code chips */
+.hf-leaf rect { fill: #151515; stroke: #3a3a3a; stroke-width: 1.2; }
+.hf-leaf text { font: 700 18px var(--body-font); fill: #eee; text-anchor: middle; }
+.hf-leaf .hf-n { font-size: 11px; font-weight: 500; fill: #8a8a8a; }
+.hf-sum circle { fill: #151515; stroke: #ff7a1a; stroke-width: 2; }
+.hf-sum text { font: 700 14px var(--body-font); fill: #eee; text-anchor: middle; }
+.hf-bit circle { fill: #ff7a1a; }
+.hf-bit text,
+.hf-code text { font: 700 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #111; text-anchor: middle; }
+.hf-code rect { fill: rgba(255, 122, 26, .14); stroke: #ff7a1a; stroke-width: 1.2; }
+.hf-code text { fill: #ff7a1a; }
+
 /* animation: hidden until its step, lines draw in */
 .ps-build.will-build [data-step] { opacity: 0; transition: opacity .35s; }
 .ps-build.will-build [data-step].is-in { opacity: 1; }
