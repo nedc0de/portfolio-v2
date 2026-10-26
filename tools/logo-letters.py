@@ -2,7 +2,9 @@
 # img/logo-code-*.svg) from hd/glyphs.json. Usage:
 #   python3 logo-letters.py '#ff7632' '#ff5400' <out dir>     (core colour, glow colour)
 # Letters sit exactly where the original artwork had them, so they line up with
-# the sign in img/full-logo.webp; the glow is a live SVG blur, sharp at any zoom.
+# the sign in img/full-logo.svg. Only the glow goes through the blur filter and the
+# letter is drawn again on top unfiltered: Safari renders filtered content at low
+# resolution, so a filtered letter goes soft when you zoom in on an iPhone.
 # Build crisp SVG versions of the logo's neon letters: exact Poppins Bold
 # outlines placed on the original letters, with the glow as an SVG filter.
 import json, sys
@@ -28,8 +30,9 @@ for name, (ch, x0, y0, x1, y1) in BOX.items():
 <feGaussianBlur in="c" stdDeviation="5" result="b1"/><feGaussianBlur in="c" stdDeviation="16" result="b2"/>
 <feComponentTransfer in="b1" result="b1o"><feFuncA type="linear" slope=".75"/></feComponentTransfer>
 <feComponentTransfer in="b2" result="b2o"><feFuncA type="linear" slope=".55"/></feComponentTransfer>
-<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#g)"><path fill="{CORE}" transform="translate({tx:.2f} {ty:.2f}) scale({s:.6f} {-s:.6f})" d="{g['d']}"/></g>
+<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/></feMerge></filter>
+<path id="l" fill="{CORE}" transform="translate({tx:.2f} {ty:.2f}) scale({s:.6f} {-s:.6f})" d="{g['d']}"/></defs>
+<g filter="url(#g)"><use href="#l"/></g><use href="#l"/>
 </svg>
 '''
     open(f'{out}/{name}.svg', 'w').write(svg)

@@ -4,6 +4,7 @@
 <feGaussianBlur in="c" stdDeviation="5" result="b1"/><feGaussianBlur in="c" stdDeviation="16" result="b2"/>
 <feComponentTransfer in="b1" result="b1o"><feFuncA type="linear" slope=".75"/></feComponentTransfer>
 <feComponentTransfer in="b2" result="b2o"><feFuncA type="linear" slope=".55"/></feComponentTransfer>
-<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#g)"><path fill="#ff7632" transform="translate(556.05 306.21) scale(0.138177 -0.138177)" d="M386 710Q511 710 600.0 644.0Q689 578 719 464H531Q510 508 471.5 531.0Q433 554 384 554Q305 554 256.0 499.0Q207 444 207 352Q207 260 256.0 205.0Q305 150 384 150Q433 150 471.5 173.0Q510 196 531 240H719Q689 126 600.0 60.5Q511 -5 386 -5Q284 -5 203.5 40.5Q123 86 78.0 167.0Q33 248 33 352Q33 456 78.0 537.5Q123 619 203.5 664.5Q284 710 386 710Z"/></g>
+<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/></feMerge></filter>
+<path id="l" fill="#ff7632" transform="translate(556.05 306.21) scale(0.138177 -0.138177)" d="M386 710Q511 710 600.0 644.0Q689 578 719 464H531Q510 508 471.5 531.0Q433 554 384 554Q305 554 256.0 499.0Q207 444 207 352Q207 260 256.0 205.0Q305 150 384 150Q433 150 471.5 173.0Q510 196 531 240H719Q689 126 600.0 60.5Q511 -5 386 -5Q284 -5 203.5 40.5Q123 86 78.0 167.0Q33 248 33 352Q33 456 78.0 537.5Q123 619 203.5 664.5Q284 710 386 710Z"/></defs>
+<g filter="url(#g)"><use href="#l"/></g><use href="#l"/>
 </svg>

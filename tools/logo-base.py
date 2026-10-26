@@ -3,7 +3,8 @@
 # 1125x450 bitmap. Uses hd/glyphs.json from logo-glyphs.py. Usage:
 #   python3 logo-base.py <scripts.js> <out.svg>
 # Panel sizes and colours were measured on the original artwork; the cables
-# reuse the traced paths in scripts.js, smoothed the same way.
+# reuse the traced paths in scripts.js, smoothed the same way. Shadows are
+# separate filtered copies under unfiltered shapes, so Safari keeps them sharp.
 import json, re, sys
 G = json.load(open('hd/glyphs.json'))['700']['g']
 BOX = [('N', 270, 209, 356, 306, '#323232'), ('E', 375, 209, 434, 306, '#323232'),
@@ -42,13 +43,13 @@ letters = ''.join(f'<path fill="{c}" {letter(ch, *b)}/>' for ch, *b, c in BOX)
 wires = ''.join(f'<path d="{smooth(c)}"/>' for c in cables)
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1125 450" width="1125" height="450">
 <defs>
-<filter id="sh" x="-5%" y="-10%" width="115%" height="130%" color-interpolation-filters="sRGB"><feDropShadow dx="4" dy="6" stdDeviation="4" flood-color="#000" flood-opacity=".45"/></filter>
+<filter id="sh" x="-5%" y="-10%" width="115%" height="130%" color-interpolation-filters="sRGB"><feFlood flood-color="#000" flood-opacity=".45"/><feComposite in2="SourceAlpha" operator="in"/><feGaussianBlur stdDeviation="4"/><feOffset dx="4" dy="6"/></filter>
 <filter id="bl" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter>
 <clipPath id="in"><rect x="205" y="162" width="787" height="190"/></clipPath>
 </defs>
 <rect x="203.25" y="161" width="790.5" height="192.75" rx="4" fill="#242424" stroke="#363636" stroke-width="2.5"/>
 <g clip-path="url(#in)"><rect x="205" y="162" width="787" height="13" fill="#1e1e1e"/><rect x="205" y="349" width="787" height="3" fill="#1e1e1e"/>
-<g filter="url(#sh)">{letters}</g></g>
+<g filter="url(#sh)">{letters}</g>{letters}</g>
 <circle cx="213.5" cy="169" r="3" fill="#b00c0f"/><circle cx="222" cy="169" r="3" fill="#ff5400"/><circle cx="229.5" cy="169" r="3" fill="#00bf48"/>
 <rect x="977.5" y="165" width="7.5" height="7.5" rx="1" fill="#363636"/>
 <g fill="none" stroke-linecap="round"><g stroke="#000" stroke-opacity=".4" stroke-width="7" transform="translate(2 3)" filter="url(#bl)">{wires}</g>

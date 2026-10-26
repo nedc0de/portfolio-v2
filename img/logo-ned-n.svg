@@ -4,6 +4,7 @@
 <feGaussianBlur in="c" stdDeviation="5" result="b1"/><feGaussianBlur in="c" stdDeviation="16" result="b2"/>
 <feComponentTransfer in="b1" result="b1o"><feFuncA type="linear" slope=".75"/></feComponentTransfer>
 <feComponentTransfer in="b2" result="b2o"><feFuncA type="linear" slope=".55"/></feComponentTransfer>
-<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#g)"><path fill="#ff7632" transform="translate(261.05 306.00) scale(0.138177 -0.138177)" d="M690 0H519L233 433V0H62V702H233L519 267V702H690Z"/></g>
+<feMerge><feMergeNode in="b2o"/><feMergeNode in="b1o"/></feMerge></filter>
+<path id="l" fill="#ff7632" transform="translate(261.05 306.00) scale(0.138177 -0.138177)" d="M690 0H519L233 433V0H62V702H233L519 267V702H690Z"/></defs>
+<g filter="url(#g)"><use href="#l"/></g><use href="#l"/>
 </svg>
