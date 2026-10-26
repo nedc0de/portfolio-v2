@@ -9422,6 +9422,11 @@ html.is-frozen .egg-crash * {
 .hf-code text { font: 700 12px ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #111; text-anchor: middle; }
 .hf-code rect { fill: rgba(255, 122, 26, .14); stroke: #ff7a1a; stroke-width: 1.2; }
 .hf-code text { fill: #ff7a1a; }
+.hf-path { stroke: #fff; stroke-width: 3.5; }
+.hf-tile { fill: #151515; stroke: #3a3a3a; stroke-width: 1.2; }
+.hf-tl { font: 700 15px var(--body-font); fill: #eee; text-anchor: middle; }
+.hf-tc { font: 700 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #ff7a1a; text-anchor: middle; }
+.hf-total { font: 600 12px var(--body-font); fill: #8a8a8a; text-anchor: middle; }
 
 /* animation: hidden until its step, lines draw in */
 .ps-build.will-build [data-step] { opacity: 0; transition: opacity .35s; }
