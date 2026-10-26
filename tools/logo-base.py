@@ -37,24 +37,48 @@ def smooth(d):  # same as smooth() in scripts.js
 
 js = open(sys.argv[1]).read()
 cables = re.findall(r"'(M\d[\d ]+)'", js.split('const CABLES')[1].split('];')[0])
-# small sockets where the cables meet the panel's edge
-sockets = ''.join(f'<rect x="{x - 3}" y="{y - 1.5}" width="6" height="3" rx="1"/>' for x, y in [(445, 161), (789, 160), (739, 161), (897, 354)])
+# where a cable meets the panel's edge (y 161 top, 355 bottom), drop the one or
+# two traced points lying on the edge and add a smooth curve that carries the
+# cable on in its own direction and dives in behind the panel
+def ends(c):
+    n = list(map(int, c[1:].split())); pts = [n[i:i + 2] for i in range(0, len(n), 2)]
+    def edge(p): return next((e for e in (161, 355) if abs(p[1] - e) < 4), None)
+    head = edge(pts[0]); tail = edge(pts[-1])
+    while edge(pts[0]): pts = pts[1:]
+    while edge(pts[-1]): pts = pts[:-1]
+    d = smooth('M' + ' '.join(f'{x} {y}' for x, y in pts))
+    def dive(p, q, e):  # from point p, heading away from q, into the panel past edge e
+        dx, dy = p[0] - q[0], p[1] - q[1]; k = 6 / max((dx * dx + dy * dy) ** .5, 1)
+        inner = e + 12 if e == 161 else e - 12; x = p[0] + max(-6, min(6, dx * k * 1.5))
+        return (p[0] + dx * k, p[1] + dy * k), (x, e + (-3 if e == 161 else 3)), (x, inner)
+    if tail:
+        c1, c2, z = dive(pts[-1], pts[-3], tail)
+        d += f' C{c1[0]:.1f} {c1[1]:.1f} {c2[0]:.1f} {c2[1]:.1f} {z[0]:.1f} {z[1]:.1f}'
+    if head:
+        c1, c2, z = dive(pts[0], pts[2], head)
+        d = f'M{z[0]:.1f} {z[1]:.1f} C{c2[0]:.1f} {c2[1]:.1f} {c1[0]:.1f} {c1[1]:.1f} ' + d[1:]
+    return d
 letters = ''.join(f'<path fill="{c}" {letter(ch, *b)}/>' for ch, *b, c in BOX)
-wires = ''.join(f'<path d="{smooth(c)}"/>' for c in cables)
+wires = ''.join(f'<path d="{ends(c)}"/>' for c in cables)
+# cables are drawn behind the panel, then again (clipped to the panel's lower
+# part) in front where they cross it to plug into the N and the O
+cablegroup = (f'<g fill="none" stroke-linecap="round"><g stroke="#000" stroke-opacity=".4" stroke-width="7" transform="translate(2 3)" filter="url(#bl)">{wires}</g>'
+              f'<g stroke="#2f2f2f" stroke-width="7">{wires}</g><g stroke="#3b3b3b" stroke-width="1.2" transform="translate(-1.4 -1.4)">{wires}</g></g>')
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1125 450" width="1125" height="450">
 <defs>
 <filter id="sh" x="-5%" y="-10%" width="115%" height="130%" color-interpolation-filters="sRGB"><feFlood flood-color="#000" flood-opacity=".45"/><feComposite in2="SourceAlpha" operator="in"/><feGaussianBlur stdDeviation="4"/><feOffset dx="4" dy="6"/></filter>
 <filter id="bl" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter>
+<clipPath id="front"><rect x="200" y="200" width="680" height="165"/></clipPath>
 <clipPath id="in"><rect x="205" y="162" width="787" height="190"/></clipPath>
 </defs>
+{cablegroup}
 <rect x="203.25" y="161" width="790.5" height="192.75" rx="4" fill="#242424" stroke="#363636" stroke-width="2.5"/>
 <g clip-path="url(#in)"><rect x="205" y="162" width="787" height="13" fill="#1e1e1e"/><rect x="205" y="349" width="787" height="3" fill="#1e1e1e"/>
 <g filter="url(#sh)">{letters}</g>{letters}</g>
 <circle cx="213.5" cy="169" r="3" fill="#b00c0f"/><circle cx="222" cy="169" r="3" fill="#ff5400"/><circle cx="229.5" cy="169" r="3" fill="#00bf48"/>
 <rect x="977.5" y="165" width="7.5" height="7.5" rx="1" fill="#363636"/>
-<g fill="none" stroke-linecap="round"><g stroke="#000" stroke-opacity=".4" stroke-width="7" transform="translate(2 3)" filter="url(#bl)">{wires}</g>
-<g stroke="#2f2f2f" stroke-width="7">{wires}</g><g stroke="#3b3b3b" stroke-width="1.2" transform="translate(-1.4 -1.4)">{wires}</g></g>
-<g fill="#3e3e3e">{sockets}</g>
+<g clip-path="url(#front)">{cablegroup}</g>
+
 </svg>
 '''
 open(sys.argv[2], 'w').write(svg)
