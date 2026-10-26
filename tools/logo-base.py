@@ -44,6 +44,8 @@ def ends(c):
     n = list(map(int, c[1:].split())); pts = [n[i:i + 2] for i in range(0, len(n), 2)]
     def edge(p): return next((e for e in (161, 355) if abs(p[1] - e) < 4), None)
     head = edge(pts[0]); tail = edge(pts[-1])
+    if head == tail == 161:  # the little loop on top: a clean, even arch
+        return f'M{pts[-1][0] - 1} 172 C{pts[-1][0] - 1} 144 {pts[0][0] + 1} 144 {pts[0][0] + 1} 172'
     while edge(pts[0]): pts = pts[1:]
     while edge(pts[-1]): pts = pts[:-1]
     d = smooth('M' + ' '.join(f'{x} {y}' for x, y in pts))
