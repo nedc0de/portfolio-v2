@@ -4201,7 +4201,9 @@ details>summary {
     opacity: 0;
   }
 
+  /* visible once open, so a tap's glow (which swaps the animation) can't hide it */
   .nav-menu.show-menu .menu-foot > * {
+    opacity: 1;
     animation: menu-neon .6s steps(1, end) .52s both;
   }
 
