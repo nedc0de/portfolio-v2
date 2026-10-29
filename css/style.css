@@ -1944,7 +1944,7 @@ ul li:before {
   color: var(--fourteenth-color);
   font-size: .85rem;
   text-align: center;
-  margin: -1rem 0 3rem;
+  margin: 58px 0 3rem; /* the title box pulls up 50px: this leaves the same 8px gap as About */
 }
 
 .hl-count b {
@@ -3739,7 +3739,7 @@ details>summary {
   font-size: 1.1rem;
   line-height: 1.6;
   max-width: 30rem; /* two even lines on wider screens instead of three cramped ones */
-  margin: 1rem auto 0;
+  margin: 0 auto;
   text-wrap: balance;
   color: #a8a8a8;
 }
@@ -4334,7 +4334,7 @@ details>summary {
 
 .bl-lead {
   max-width: 30rem;
-  margin: 1rem auto 0;
+  margin: 0 auto;
   font-size: 1.1rem;
   line-height: 1.6;
   color: #a8a8a8;
@@ -10304,3 +10304,16 @@ html.fav-sheet-open { overflow: hidden; }
 /*===== ABOUT: fewer orange words (orange kept for "Me", "fix it.", "everyone." and "frontend dev") =====*/
 .ab-lead mark,
 .oc-say em { color: var(--fourth-color); }
+
+/* Picks and Lab: their title sits in a grid, where its top margin doesn't
+   fold into the page's like on About, so it starts 16px lower. Match About. */
+.bd-grid > .favorites-title > .about-title { margin-top: 8px; }
+
+/* every page's intro under the title reads like About's: same size and colour */
+.bl-lead,
+.ct-lead,
+.fav-lead {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: rgb(179, 179, 179);
+}
