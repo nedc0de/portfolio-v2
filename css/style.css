@@ -10304,3 +10304,16 @@ html.fav-sheet-open { overflow: hidden; }
 /*===== ABOUT: fewer orange words (orange kept for "Me", "fix it.", "everyone." and "frontend dev") =====*/
 .ab-lead mark,
 .oc-say em { color: var(--fourth-color); }
+
+/* Picks and Lab: their title sits in a grid, where its top margin doesn't
+   fold into the page's like on About, so it starts 16px lower. Match About. */
+.bd-grid > .favorites-title > .about-title { margin-top: 8px; }
+
+/* every page's intro under the title reads like About's: same size and colour */
+.bl-lead,
+.ct-lead,
+.fav-lead {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: rgb(179, 179, 179);
+}
