@@ -10300,3 +10300,31 @@ html.fav-sheet-open { overflow: hidden; }
   border-radius: 50%;
   background: currentColor;
 }
+
+/*===== BLOG POSTS: "Blog / topic" line above the title, FAQ arrows on the right =====*/
+/* the topic line is one orange for every post (no red, no live dot), with
+   "Blog" in grey as the way back to the blog */
+.ps-kicker,
+.ps-kicker-review { color: var(--fifteenth-color); }
+.ps-crumb { color: #8a8a8a; transition: color .2s; }
+.ps-crumb:hover { color: var(--fourth-color); }
+.ps-crumb-sep { color: #555; }
+
+/* FAQ: the question on the left, a thin chevron on the right that flips up
+   and turns orange when the answer opens */
+.ps-faq summary { justify-content: space-between; align-items: center; }
+.ps-faq summary::before { content: none; }
+.ps-faq summary::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-left: 1rem;
+  border: solid #8a8a8a;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform .3s cubic-bezier(.22, .61, .36, 1), border-color .3s;
+}
+.ps-faq[open] summary::after,
+.ps-faq.is-open summary::after { transform: translateY(2px) rotate(-135deg); border-color: var(--fifteenth-color); }
+.ps-faq.is-closing summary::after { transform: translateY(-3px) rotate(45deg); border-color: #8a8a8a; }

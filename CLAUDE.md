@@ -113,5 +113,6 @@ these. The kicker on the post itself can stay specific (e.g. "GTA 6 · Leak").
 
 **Post layout:** copy the structure of an existing post in `blog/`
 (`.ps` article classes: `ps-head`, `ps-lead`, `ps-tldr`, `ps-faq`,
-`ps-sources`…). Kicker: red `ps-kicker` for breaking news/leaks, yellow
-`ps-kicker ps-kicker-review` for explainers and reviews.
+`ps-sources`…). The line above the title starts with the grey "Blog" link
+back to the blog: `<p class="ps-kicker"><a class="ps-crumb" href="../blog.html">Blog</a><span class="ps-crumb-sep" aria-hidden="true">/</span>Topic · Detail</p>`.
+It's the same orange on every post (no red, no dot), whatever the topic.
