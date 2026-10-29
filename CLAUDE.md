@@ -8,6 +8,8 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Show a sample first (screenshot at phone size), then apply on a branch,
   test in a browser, push the branch, and **ask before merging into `main`**.
 - Ned reads on his phone: keep updates short and send screenshots.
+- Save tokens: answer questions briefly, without a long "Merge it?" recap.
+  When Ned likes a design he'll say so ("go with that one and merge").
 - Commits are authored as Ned only: `git config user.name "Ned"` and
   `git config user.email "70671308+nedcodev@users.noreply.github.com"`, with
   no Co-Authored-By or Claude-Session lines.
