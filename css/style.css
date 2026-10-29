@@ -5360,9 +5360,9 @@ a.tk-item:hover,
 
 .hm-card img { border-radius: 8px; }
 
-.hm-card.is-read img { opacity: .65; }
+.hm-card.is-read img { filter: grayscale(.8) brightness(.7); }
 
-.hm-card .bl-read-mark { margin-top: 0; font-size: inherit; }
+.hm-card.is-read h3 { color: #9a9a9a; }
 
 /* Swipe dots under the cards (phones only, the cards all fit on bigger screens) */
 .hm-dots {
@@ -8131,16 +8131,12 @@ html.is-frozen .egg-crash * {
   .bl-topics button:not([aria-pressed="true"]):hover { border-color: #555; color: var(--fourth-color); }
 }
 
-.bl-read-mark {
-  display: inline-block;
-  margin-top: .35rem;
-  font-size: .72rem;
-  font-weight: 700;
-  color: var(--fifteenth-color);
-}
-
+/* posts the visitor has opened: grey cover and title, like a visited link */
 .bl-row.is-read img,
-.bl-feature.is-read img { opacity: .65; }
+.bl-feature.is-read img { filter: grayscale(.8) brightness(.7); }
+
+.bl-row.is-read h3,
+.bl-feature.is-read h2 { color: #9a9a9a; }
 
 @media screen and (max-width: 767px) {
   .bl-row {

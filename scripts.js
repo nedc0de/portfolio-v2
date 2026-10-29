@@ -1357,7 +1357,7 @@ whenIdle(() => {
     .catch(() => ready.then(() => build(mix([]))));
 
   // "Latest posts": the 3 newest posts as swipeable cover cards, newest first.
-  // Posts the visitor has opened get a small "Read" mark (see BLOG: READ MARKS).
+  // Posts the visitor has opened are faded, like a visited link (see BLOG: READ MARKS).
   const latestBox = document.querySelector('.hm-latest');
   const latest = (posts) => {
     if (!latestBox || !posts.length) return;
@@ -1380,13 +1380,6 @@ whenIdle(() => {
       const m = document.createElement('span');
       m.className = 'hm-card-meta';
       m.textContent = [n.topic, n.read].filter(Boolean).join(' · ');
-      // same "Read" mark as the blog page, on the topic line so every card lines up
-      if (read) {
-        const mark = document.createElement('span');
-        mark.className = 'bl-read-mark';
-        mark.textContent = '✓ Read';
-        m.append(' · ', mark);
-      }
       a.append(h, m);
       list.append(a);
     });
@@ -1468,7 +1461,7 @@ const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
 /*===== BLOG PAGE: topic chips and read marks =====*/
 // Chips for each topic (built from the posts themselves, so a new topic shows
 // up by itself) filter the list. Topics: Tech, Gaming, Reviews.
-// Posts the visitor has already opened get a small "Read" mark.
+// Posts the visitor has already opened are faded, like a visited link.
 (() => {
   const chips = document.querySelector('.bl-topics');
   if (!chips) return;
@@ -1483,11 +1476,9 @@ const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
   const seen = readPostsSeen();
   posts.forEach((a) => {
     if (!seen.includes(postSlug(a.getAttribute('href')))) return;
-    a.classList.add('is-read');
-    const mark = document.createElement('span');
-    mark.className = 'bl-read-mark';
-    mark.textContent = '✓ Read';
-    (a.querySelector('.bl-meta') || a).after(mark);
+    a.classList.add('is-read'); // faded cover and title, like a visited link
+    const cta = a.querySelector('.bl-read'); // featured post: "Read post" becomes "Read again"
+    if (cta) cta.textContent = 'Read again';
   });
 
   // topics, most posts first
