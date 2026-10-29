@@ -10,6 +10,11 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Ned reads on his phone: keep updates short and send screenshots.
 - Save tokens: answer questions briefly, without a long "Merge it?" recap.
   When Ned likes a design he'll say so ("go with that one and merge").
+- Be creative, never generic: no AI-template looks (icon tiles, pill
+  buttons, arrow symbols like ↗/→, emoji bullets, stock card grids). Each
+  design should feel made for this site. Research how real sites do it first.
+- Act as a frontend developer; switch to full-stack (Netlify functions,
+  APIs, data) when a feature needs a back end.
 - Commits are authored as Ned only: `git config user.name "Ned"` and
   `git config user.email "70671308+nedcodev@users.noreply.github.com"`, with
   no Co-Authored-By or Claude-Session lines.
