@@ -92,12 +92,12 @@ html {
     linear-gradient(to right, var(--thirteenth-color), transparent var(--edge-fade), transparent calc(100% - var(--edge-fade)), var(--thirteenth-color)),
     linear-gradient(var(--thirteenth-color), transparent) 0 0 / 100% 280px no-repeat,
     linear-gradient(transparent, var(--thirteenth-color)) 0 100% / 100% 280px no-repeat,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.055'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' stroke='%23fff' stroke-opacity='.055' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.032'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' stroke='%23fff' stroke-opacity='.032' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 144px 144px,
     radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
     var(--thirteenth-color);
 }
 
-/* phones: just the dots, no x marks, maths notes or spotlight (calmer) */
+/* phones: just the dots, no x marks or maths notes (calmer) */
 @media (max-width: 767px) {
   html {
     background:
@@ -106,12 +106,11 @@ html {
       linear-gradient(to right, var(--thirteenth-color), transparent var(--edge-fade), transparent calc(100% - var(--edge-fade)), var(--thirteenth-color)),
       linear-gradient(var(--thirteenth-color), transparent) 0 0 / 100% 280px no-repeat,
       linear-gradient(transparent, var(--thirteenth-color)) 0 100% / 100% 280px no-repeat,
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.055'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 144px 144px,
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.032'%3E%3Ccircle cx='36' cy='12' r='1.1'/%3E%3Ccircle cx='60' cy='12' r='1.1'/%3E%3Ccircle cx='84' cy='12' r='1.1'/%3E%3Ccircle cx='108' cy='12' r='1.1'/%3E%3Ccircle cx='132' cy='12' r='1.1'/%3E%3Ccircle cx='12' cy='36' r='1.1'/%3E%3Ccircle cx='36' cy='36' r='1.1'/%3E%3Ccircle cx='60' cy='36' r='1.1'/%3E%3Ccircle cx='84' cy='36' r='1.1'/%3E%3Ccircle cx='108' cy='36' r='1.1'/%3E%3Ccircle cx='132' cy='36' r='1.1'/%3E%3Ccircle cx='12' cy='60' r='1.1'/%3E%3Ccircle cx='36' cy='60' r='1.1'/%3E%3Ccircle cx='60' cy='60' r='1.1'/%3E%3Ccircle cx='84' cy='60' r='1.1'/%3E%3Ccircle cx='108' cy='60' r='1.1'/%3E%3Ccircle cx='132' cy='60' r='1.1'/%3E%3Ccircle cx='12' cy='84' r='1.1'/%3E%3Ccircle cx='36' cy='84' r='1.1'/%3E%3Ccircle cx='60' cy='84' r='1.1'/%3E%3Ccircle cx='84' cy='84' r='1.1'/%3E%3Ccircle cx='108' cy='84' r='1.1'/%3E%3Ccircle cx='132' cy='84' r='1.1'/%3E%3Ccircle cx='12' cy='108' r='1.1'/%3E%3Ccircle cx='36' cy='108' r='1.1'/%3E%3Ccircle cx='60' cy='108' r='1.1'/%3E%3Ccircle cx='84' cy='108' r='1.1'/%3E%3Ccircle cx='108' cy='108' r='1.1'/%3E%3Ccircle cx='132' cy='108' r='1.1'/%3E%3Ccircle cx='12' cy='132' r='1.1'/%3E%3Ccircle cx='36' cy='132' r='1.1'/%3E%3Ccircle cx='60' cy='132' r='1.1'/%3E%3Ccircle cx='84' cy='132' r='1.1'/%3E%3Ccircle cx='108' cy='132' r='1.1'/%3E%3Ccircle cx='132' cy='132' r='1.1'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 144px 144px,
       radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
       var(--thirteenth-color);
   }
 
-  .grid-spot,
   .bg-math { display: none; }
 }
 
@@ -123,46 +122,6 @@ body {
   color: var(--second-color);
   background-color: transparent; /* the grid lives on html, see above */
   overflow-x: clip; /* soft list backdrops reach past the screen edge on phones */
-}
-
-/* Grid spotlight: the same grid in yellow, revealed in a soft circle around
-   the cursor (or a finger on phones), so the dots light up where you are.
-   It scrolls with the page like the grid and sits behind everything,
-   including the soft backdrops behind lists and articles. scripts.js moves it
-   and sets its height. */
-.grid-spot {
-  --r: 170px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: calc(var(--r) * 2);
-  height: calc(var(--r) * 2);
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .5s ease;
-  will-change: transform;
-  -webkit-mask: radial-gradient(closest-side, #000 0, rgba(0, 0, 0, .55) 45%, transparent 100%);
-  mask: radial-gradient(closest-side, #000 0, rgba(0, 0, 0, .55) 45%, transparent 100%);
-}
-
-/* the yellow copy of the grid, one tile bigger than the circle so it can
-   slide back into line with the page grid wherever the circle is */
-.grid-spot-dots {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: calc(var(--r) * 2 + 144px);
-  height: calc(var(--r) * 2 + 144px);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23ff7a1a' fill-opacity='.75'%3E%3Ccircle cx='36' cy='12' r='1.25'/%3E%3Ccircle cx='60' cy='12' r='1.25'/%3E%3Ccircle cx='84' cy='12' r='1.25'/%3E%3Ccircle cx='108' cy='12' r='1.25'/%3E%3Ccircle cx='132' cy='12' r='1.25'/%3E%3Ccircle cx='12' cy='36' r='1.25'/%3E%3Ccircle cx='36' cy='36' r='1.25'/%3E%3Ccircle cx='60' cy='36' r='1.25'/%3E%3Ccircle cx='84' cy='36' r='1.25'/%3E%3Ccircle cx='108' cy='36' r='1.25'/%3E%3Ccircle cx='132' cy='36' r='1.25'/%3E%3Ccircle cx='12' cy='60' r='1.25'/%3E%3Ccircle cx='36' cy='60' r='1.25'/%3E%3Ccircle cx='60' cy='60' r='1.25'/%3E%3Ccircle cx='84' cy='60' r='1.25'/%3E%3Ccircle cx='108' cy='60' r='1.25'/%3E%3Ccircle cx='132' cy='60' r='1.25'/%3E%3Ccircle cx='12' cy='84' r='1.25'/%3E%3Ccircle cx='36' cy='84' r='1.25'/%3E%3Ccircle cx='60' cy='84' r='1.25'/%3E%3Ccircle cx='84' cy='84' r='1.25'/%3E%3Ccircle cx='108' cy='84' r='1.25'/%3E%3Ccircle cx='132' cy='84' r='1.25'/%3E%3Ccircle cx='12' cy='108' r='1.25'/%3E%3Ccircle cx='36' cy='108' r='1.25'/%3E%3Ccircle cx='60' cy='108' r='1.25'/%3E%3Ccircle cx='84' cy='108' r='1.25'/%3E%3Ccircle cx='108' cy='108' r='1.25'/%3E%3Ccircle cx='132' cy='108' r='1.25'/%3E%3Ccircle cx='12' cy='132' r='1.25'/%3E%3Ccircle cx='36' cy='132' r='1.25'/%3E%3Ccircle cx='60' cy='132' r='1.25'/%3E%3Ccircle cx='84' cy='132' r='1.25'/%3E%3Ccircle cx='108' cy='132' r='1.25'/%3E%3Ccircle cx='132' cy='132' r='1.25'/%3E%3C/g%3E%3Cpath d='M7.5 7.5L16.5 16.5M16.5 7.5L7.5 16.5' stroke='%23ff7a1a' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E") 0 0 / 144px 144px;
-  will-change: transform;
-}
-
-.grid-spot.is-on { opacity: .45; transition-duration: .2s; } /* a soft glow, not a bright one */
-
-@media (hover: none), (max-width: 768px) {
-  .grid-spot { --r: 120px; }
 }
 
 .bg-math {
@@ -8803,7 +8762,6 @@ html.is-frozen .egg-crash * {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--fifteenth-color);
-  text-shadow: 0 0 22px rgba(255, 122, 26, .3);
 }
 
 .tk3-num small {
@@ -9649,9 +9607,8 @@ html.is-frozen .egg-crash * {
 
 /*===== Grid clearings that hug the text =====*/
 /* The lists and the home Explore area no longer sit on a big dark box (it
-   read as a wide black fade beside short lines). Instead the text itself
-   gets a thin halo in the page colour, so dots clear only right around the
-   words. Blog articles keep their box: it's the width of the text anyway. */
+   read as a wide black fade beside short lines). The dots are faint enough
+   to sit behind text as is. Blog articles keep their box, without the glow. */
 .hw-list::before,
 .hc-list::before,
 .sw-list::before,
@@ -9660,17 +9617,7 @@ html.is-frozen .egg-crash * {
 .hl-list::before,
 .ab-list::before { content: none; }
 
-.hw-list,
-.hc-list,
-.sw-list,
-.mk-list,
-.xb,
-.hl-list,
-.ab-list {
-  text-shadow: 0 0 6px var(--thirteenth-color), 0 0 14px var(--thirteenth-color), 0 0 22px var(--thirteenth-color);
-}
-
-.ps-article::before { box-shadow: 0 0 36px 14px var(--thirteenth-color); }
+.ps-article::before { box-shadow: none; }
 
 /* the movie card: a small, tight shadow (a big soft one read as a faded side
    when the card turns) */
@@ -10144,7 +10091,7 @@ html.fav-sheet-open { overflow: hidden; }
   .nav-link.active::after { display: none; }
 
   /* a word the line is passing under warms up a little */
-  .nav-link.is-lit { text-shadow: 0 0 12px rgba(255, 122, 26, .28); transition: color .1s, text-shadow .1s; }
+  .nav-link.is-lit { transition: color .1s; }
 
   .nav-laser {
     display: block;
