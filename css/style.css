@@ -10322,16 +10322,32 @@ html.fav-sheet-open { overflow: hidden; }
 /* scripts.js moves his joints (and the "d") every frame, easing between poses */
 .hm-d { display: inline-block; transform-origin: 15% 95%; will-change: transform; }
 .sk-dust circle { fill: currentColor; stroke: none; opacity: 0; }
+/* his laptop: lies shut on the floor until he sits down to type */
+.sk-lap-base { stroke-width: 3.2; }
+.sk-lap-screen { stroke-width: 2.6; transition: stroke .4s; }
+.stick.is-typing .sk-lap-screen { stroke: var(--fifteenth-color); }
+/* thought bubble: drawn, not an emoji; dots fill in, then the idea */
+.sk-think { opacity: 0; transform: translateY(3px) scale(.8); transform-origin: 30px 4px; transform-box: view-box; transition: opacity .35s, transform .45s cubic-bezier(.3, .7, .4, 1.3); }
+.sk-think ellipse, .sk-think > circle { stroke-width: 1.6; fill: var(--thirteenth-color); }
+.stick.is-thinking .sk-think { opacity: 1; transform: none; }
+.sk-dots circle { fill: currentColor; stroke: none; opacity: .2; animation: sk-dot 1.2s infinite; }
+.sk-dots circle:nth-child(2) { animation-delay: .2s; }
+.sk-dots circle:nth-child(3) { animation-delay: .4s; }
+@keyframes sk-dot { 0%, 100% { opacity: .2; } 40% { opacity: 1; } }
+.sk-idea { font: 700 13px var(--body-font); fill: var(--fifteenth-color); stroke: none; opacity: 0; transition: opacity .3s; }
+.stick.has-idea .sk-dots { opacity: 0; }
+.stick.has-idea .sk-idea { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .sk-dots circle { animation: none; opacity: .8; } }
 
 .stick {
-  width: .55em;
-  height: .86em;
-  margin-left: -.054em; /* his hands grip the "d"'s stem */
-  vertical-align: -.134em; /* feet on the baseline */
+  width: .66em;
+  height: .7em;
+  margin-left: -.046em; /* his hands grip the "d"'s stem */
+  vertical-align: -.117em; /* feet on the baseline */
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 3.2;
+  stroke-width: 3.6;
   stroke-linecap: round;
   stroke-linejoin: round;
   color: var(--fourth-color);
