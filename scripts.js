@@ -3527,36 +3527,114 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   rolls.forEach((r) => io.observe(r));
 })();
 
-/*===== HOME: tap the stick figure: he jumps and waves at you until you
-   scroll, then slowly reaches back for the "d" =====*/
+/*===== HOME: the stick figure next to "Ned" =====*/
+// He's one skeleton (head, neck, shoulder, hip, two hands, two feet) drawn
+// from joint points. Every frame the points ease towards the current pose, so
+// he moves smoothly instead of snapping between drawings. While pulling he
+// leans back on his front heel in a slow tug and the "d" tilts with him.
+// Tap him: a hop, then he waves until you scroll, then reaches back for the "d".
 (() => {
-  const stick = document.querySelector('.stick');
-  if (!stick) return;
-  const d = document.querySelector('.hm-d'); // stays still while he's not pulling it
-  let timers = [];
-  let waving = false;
-  let tappedAt = 0;
-  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const svg = document.querySelector('.stick');
+  if (!svg) return;
+  const d = document.querySelector('.hm-d');
+  const el = (c) => svg.querySelector(c);
+  const head = el('.sk-head'), body = el('.sk-body'), armA = el('.sk-arm-a'),
+    armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b');
 
-  stick.addEventListener('click', () => {
-    timers.forEach(clearTimeout);
-    timers = [];
+  // joint positions in the 40×64 drawing: [x, y]
+  const POSES = {
+    pull:  { head: [26, 12.5], neck: [24.5, 21.5], sh: [22.5, 27.5], hip: [18.5, 39.5], ha: [1.5, 28], hb: [1.5, 33], fa: [9, 57], fb: [23.5, 57] },
+    reach: { head: [23, 11.5], neck: [22, 21], sh: [21, 26.5], hip: [19.5, 40], ha: [7, 28.5], hb: [7, 32], fa: [13.5, 57], fb: [24.5, 57] },
+    jump:  { head: [20, 11], neck: [20, 21.5], sh: [20, 25], hip: [20, 38.5], ha: [8.5, 17], hb: [31.5, 17], fa: [13, 54], fb: [27, 54] },
+    wave:  { head: [20, 11], neck: [20, 21.5], sh: [20, 25], hip: [20, 38.5], ha: [11, 35.5], hb: [32, 15], fa: [12, 57], fb: [28, 57] },
+  };
+  const KEYS = Object.keys(POSES.pull);
+  const copy = (p) => Object.fromEntries(KEYS.map((k) => [k, [...p[k]]]));
+  const ease = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const rot = ([x, y], [cx, cy], a) => {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c];
+  };
+
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  let from = copy(POSES.pull), to = POSES.pull, mode = 'pull';
+  let blendStart = 0, blendMs = 1, modeStart = performance.now();
+  let tug = 0; // 0..1, how hard he's pulling right now (shared with the "d")
+
+  const go = (pose, ms, now = performance.now()) => {
+    if (still.matches) ms = 1; // reduced motion: just change pose
+    from = current(now);
+    to = POSES[pose];
+    mode = pose;
+    blendStart = now;
+    blendMs = ms;
+    modeStart = now;
+  };
+
+  // the pose as it should look at time `now`
+  const current = (now) => {
+    const t = ease(Math.min(1, (now - blendStart) / blendMs));
+    const p = {};
+    KEYS.forEach((k) => { p[k] = [from[k][0] + (to[k][0] - from[k][0]) * t, from[k][1] + (to[k][1] - from[k][1]) * t]; });
+    const age = (now - modeStart) / 1000;
+    if (mode === 'pull') {
+      // a slow tug every 2.4s: lean back, hold, ease off (smooth, no sharp turns)
+      const c = (age % 2.4) / 2.4;
+      tug = c < .55 ? Math.sin(Math.PI * c / .55) ** 2 : 0;
+      tug *= t; // ramps in after coming back from a wave
+      KEYS.forEach((k) => { if (k !== 'fa') p[k] = rot(p[k], p.fa, tug * .15); });
+    } else {
+      tug = 0;
+    }
+    if (mode === 'wave') {
+      // the raised hand swings to and fro around the shoulder
+      const a = (Math.sin(age * Math.PI * 2 / 1.1) * .5 + .5) * .6 * t; // outward only, clear of his head
+      p.hb = rot(p.hb, p.sh, a);
+    }
+    if (mode === 'jump') {
+      const up = Math.sin(Math.PI * Math.min(1, age / .45)) * 7;
+      KEYS.forEach((k) => { p[k][1] -= up; });
+    }
+    return p;
+  };
+
+  const line = (path, a, b) => path.setAttribute('d', `M${a[0].toFixed(2)} ${a[1].toFixed(2)}L${b[0].toFixed(2)} ${b[1].toFixed(2)}`);
+  const draw = (p) => {
+    head.setAttribute('cx', p.head[0].toFixed(2));
+    head.setAttribute('cy', p.head[1].toFixed(2));
+    line(body, p.neck, p.hip);
+    line(armA, p.sh, p.ha);
+    line(armB, p.sh, p.hb);
+    line(legA, p.hip, p.fa);
+    line(legB, p.hip, p.fb);
+    if (d) d.style.transform = tug ? `translateX(${(tug * .035).toFixed(4)}em) rotate(${(tug * 4).toFixed(2)}deg)` : '';
+  };
+
+  let raf = 0, onScreen = true;
+  const frame = (now) => {
+    draw(current(now));
+    raf = onScreen && !document.hidden && !still.matches ? requestAnimationFrame(frame) : 0;
+  };
+  const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); }).observe(svg);
+  document.addEventListener('visibilitychange', wake);
+  wake();
+
+  let waving = false, tappedAt = 0, hop = 0;
+  svg.addEventListener('click', () => {
     waving = true;
     tappedAt = scrollY;
-    stick.dataset.pose = 'jump';
-    if (d) d.classList.add('is-still');
-    later(450, () => { if (waving) stick.dataset.pose = 'wave'; });
+    clearTimeout(hop);
+    go('jump', 220);
+    hop = setTimeout(() => { if (waving) go('wave', 380); }, 450);
+    wake();
   });
-
   addEventListener('scroll', () => {
     if (!waving || Math.abs(scrollY - tappedAt) < 8) return;
     waving = false;
-    timers.forEach(clearTimeout);
-    timers = [];
-    later(150, () => { stick.dataset.pose = 'reach'; });
-    later(900, () => {
-      stick.dataset.pose = 'push';
-      if (d) d.classList.remove('is-still');
-    });
+    clearTimeout(hop);
+    go('reach', 650);                                   // turns back, slowly
+    hop = setTimeout(() => go('pull', 550), 700);       // grabs the "d" again
+    wake();
   }, { passive: true });
 })();
