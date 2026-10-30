@@ -10321,6 +10321,7 @@ html.fav-sheet-open { overflow: hidden; }
 /*===== HOME: a stick figure next to "Ned", trying to pull the "d" away =====*/
 /* scripts.js moves his joints (and the "d") every frame, easing between poses */
 .hm-d { display: inline-block; transform-origin: 15% 95%; will-change: transform; }
+.sk-dust circle { fill: currentColor; stroke: none; opacity: 0; }
 
 .stick {
   width: .55em;

@@ -3530,9 +3530,14 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 /*===== HOME: the stick figure next to "Ned" =====*/
 // He's one skeleton (head, neck, shoulder, hip, two hands, two feet) drawn
 // from joint points. Every frame the points ease towards the current pose, so
-// he moves smoothly instead of snapping between drawings. While pulling he
-// leans back on his front heel in a slow tug and the "d" tilts with him.
-// Tap him: a hop, then he waves until you scroll, then reaches back for the "d".
+// he moves smoothly instead of snapping between drawings.
+// - pulling: slow tugs on the "d"; now and then his front foot slips (dust)
+// - every 20s or so he takes a break: wipes his forehead, shakes his arms out
+// - tap: a hop, then he waves until you scroll, then reaches back for the "d"
+// - tap three times fast: he yanks the "d" out, falls over holding it, it
+//   springs back into place and he gets up to try again
+// - at night (the visitor's own time) he's asleep against the "d"; tap wakes him
+// - on desktop his head leans a little towards the mouse
 (() => {
   const svg = document.querySelector('.stick');
   if (!svg) return;
@@ -3540,54 +3545,78 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const el = (c) => svg.querySelector(c);
   const head = el('.sk-head'), body = el('.sk-body'), armA = el('.sk-arm-a'),
     armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b');
+  const dust = [...svg.querySelectorAll('.sk-dust circle')];
 
-  // joint positions in the 40×64 drawing: [x, y]
+  // joint positions in the 40×64 drawing (ground at y 57): [x, y]
+  const P = (head, neck, sh, hip, ha, hb, fa, fb) => ({ head, neck, sh, hip, ha, hb, fa, fb });
   const POSES = {
-    pull:  { head: [26, 12.5], neck: [24.5, 21.5], sh: [22.5, 27.5], hip: [18.5, 39.5], ha: [1.5, 28], hb: [1.5, 33], fa: [9, 57], fb: [23.5, 57] },
-    reach: { head: [23, 11.5], neck: [22, 21], sh: [21, 26.5], hip: [19.5, 40], ha: [7, 28.5], hb: [7, 32], fa: [13.5, 57], fb: [24.5, 57] },
-    jump:  { head: [20, 11], neck: [20, 21.5], sh: [20, 25], hip: [20, 38.5], ha: [8.5, 17], hb: [31.5, 17], fa: [13, 54], fb: [27, 54] },
-    wave:  { head: [20, 11], neck: [20, 21.5], sh: [20, 25], hip: [20, 38.5], ha: [11, 35.5], hb: [32, 15], fa: [12, 57], fb: [28, 57] },
+    pull:    P([26, 12.5], [24.5, 21.5], [22.5, 27.5], [18.5, 39.5], [1.5, 28], [1.5, 33], [9, 57], [23.5, 57]),
+    reach:   P([23, 11.5], [22, 21], [21, 26.5], [19.5, 40], [7, 28.5], [7, 32], [13.5, 57], [24.5, 57]),
+    jump:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 17], [31.5, 17], [13, 54], [27, 54]),
+    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [11, 35.5], [32, 15], [12, 57], [28, 57]),
+    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [13, 35], [29, 35], [15, 57], [27, 57]),
+    wipe:    P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [14, 10], [29, 35], [15, 57], [27, 57]),
+    stretch: P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 5], [27, 5], [16, 57], [26, 57]),
+    yank:    P([31, 17], [28.5, 25], [26.5, 29.5], [20, 42], [1.5, 26], [1.5, 31], [7, 57], [21, 57]),
+    fallen:  P([36, 51], [31.5, 52], [28.5, 51.5], [17, 54.5], [16, 40], [21, 39], [6, 45], [10, 49]),
+    sleep:   P([7.5, 29], [6, 38], [6.5, 42], [8.5, 54], [15, 52], [17, 53.5], [27, 57], [29, 55.5]),
   };
   const KEYS = Object.keys(POSES.pull);
   const copy = (p) => Object.fromEntries(KEYS.map((k) => [k, [...p[k]]]));
-  const ease = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const inOut = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const back = (t) => 1 + 2.4 * Math.pow(t - 1, 3) + 1.4 * Math.pow(t - 1, 2); // springy overshoot
   const rot = ([x, y], [cx, cy], a) => {
     const c = Math.cos(a), s = Math.sin(a);
     return [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c];
   };
-
   const still = matchMedia('(prefers-reduced-motion: reduce)');
-  let from = copy(POSES.pull), to = POSES.pull, mode = 'pull';
+  const hour = new Date().getHours();
+  let mode = hour < 6 ? 'sleep' : 'pull';
+  let from = copy(POSES[mode]), to = POSES[mode];
   let blendStart = 0, blendMs = 1, modeStart = performance.now();
-  let tug = 0; // 0..1, how hard he's pulling right now (shared with the "d")
+  let tug = 0, tugCount = 0, lastCycle = -1, slip = 0, dustAt = -9e9;
+  let look = 0; // -1..1, where the mouse is (desktop)
+
+  // the "d": [x em, y em, degrees], tweened when he pulls it out
+  let dFrom = [0, 0, 0], dTo = [0, 0, 0], dStart = 0, dMs = 1, dEase = inOut, dFree = false;
+  const moveD = (target, ms, easeFn = inOut, now = performance.now()) => {
+    dFrom = dNow(now); dTo = target; dStart = now; dMs = still.matches ? 1 : ms; dEase = easeFn;
+  };
+  const dNow = (now) => {
+    const t = dEase(Math.min(1, (now - dStart) / dMs));
+    return dFrom.map((v, i) => v + (dTo[i] - v) * t);
+  };
 
   const go = (pose, ms, now = performance.now()) => {
-    if (still.matches) ms = 1; // reduced motion: just change pose
     from = current(now);
     to = POSES[pose];
     mode = pose;
     blendStart = now;
-    blendMs = ms;
+    blendMs = still.matches ? 1 : ms;
     modeStart = now;
   };
 
-  // the pose as it should look at time `now`
   const current = (now) => {
-    const t = ease(Math.min(1, (now - blendStart) / blendMs));
+    const t = inOut(Math.min(1, (now - blendStart) / blendMs));
     const p = {};
     KEYS.forEach((k) => { p[k] = [from[k][0] + (to[k][0] - from[k][0]) * t, from[k][1] + (to[k][1] - from[k][1]) * t]; });
     const age = (now - modeStart) / 1000;
+    tug = 0;
     if (mode === 'pull') {
-      // a slow tug every 2.4s: lean back, hold, ease off (smooth, no sharp turns)
-      const c = (age % 2.4) / 2.4;
-      tug = c < .55 ? Math.sin(Math.PI * c / .55) ** 2 : 0;
-      tug *= t; // ramps in after coming back from a wave
+      // a slow tug every 2.4s: lean back, hold, ease off
+      const cycle = Math.floor(age / 2.4), c = (age % 2.4) / 2.4;
+      if (cycle !== lastCycle) { lastCycle = cycle; tugCount++; slip = tugCount % 3 === 0 ? 1 : 0; }
+      tug = (c < .55 ? Math.sin(Math.PI * c / .55) ** 2 : 0) * t;
+      // every third tug his front foot skids towards the "d" and kicks up dust
+      if (slip && c > .2 && c < .55) {
+        const k = Math.sin(Math.PI * (c - .2) / .35);
+        p.fa[0] -= 1.6 * k;
+        if (c > .26 && now - dustAt > 1500) dustAt = now;
+      }
       KEYS.forEach((k) => { if (k !== 'fa') p[k] = rot(p[k], p.fa, tug * .15); });
-    } else {
-      tug = 0;
+      p.head[0] += look * 1.2;
     }
     if (mode === 'wave') {
-      // the raised hand swings to and fro around the shoulder
       const a = (Math.sin(age * Math.PI * 2 / 1.1) * .5 + .5) * .6 * t; // outward only, clear of his head
       p.hb = rot(p.hb, p.sh, a);
     }
@@ -3595,46 +3624,119 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const up = Math.sin(Math.PI * Math.min(1, age / .45)) * 7;
       KEYS.forEach((k) => { p[k][1] -= up; });
     }
+    if (mode === 'wipe') p.ha[0] += Math.sin(age * Math.PI * 2 / .8) * 4 * t; // hand across the forehead
+    if (mode === 'stand') { // shaking his arms out
+      const j = Math.sin(age * Math.PI * 2 / .22) * 1.6 * t;
+      p.ha[1] += j; p.hb[1] -= j;
+    }
+    if (mode === 'sleep') { // slow breathing
+      const b = Math.sin(age * Math.PI * 2 / 3.6) * .6;
+      p.head[1] += b; p.neck[1] += b * .6;
+    }
     return p;
   };
 
-  const line = (path, a, b) => path.setAttribute('d', `M${a[0].toFixed(2)} ${a[1].toFixed(2)}L${b[0].toFixed(2)} ${b[1].toFixed(2)}`);
-  const draw = (p) => {
-    head.setAttribute('cx', p.head[0].toFixed(2));
-    head.setAttribute('cy', p.head[1].toFixed(2));
+  const f2 = (n) => n.toFixed(2);
+  const line = (path, a, b) => path.setAttribute('d', `M${f2(a[0])} ${f2(a[1])}L${f2(b[0])} ${f2(b[1])}`);
+  const draw = (now) => {
+    const p = current(now);
+    head.setAttribute('cx', f2(p.head[0]));
+    head.setAttribute('cy', f2(p.head[1]));
     line(body, p.neck, p.hip);
     line(armA, p.sh, p.ha);
     line(armB, p.sh, p.hb);
     line(legA, p.hip, p.fa);
     line(legB, p.hip, p.fb);
-    if (d) d.style.transform = tug ? `translateX(${(tug * .035).toFixed(4)}em) rotate(${(tug * 4).toFixed(2)}deg)` : '';
+    // dust: three little puffs drifting up and out from the front foot
+    const da = (now - dustAt) / 700;
+    dust.forEach((c, i) => {
+      const on = da >= 0 && da < 1;
+      c.setAttribute('cx', f2(p.fa[0] - 2 - i * 5 * da - da * 3));
+      c.setAttribute('cy', f2(56 - da * (5 + i * 3)));
+      c.setAttribute('r', on ? f2(2.4 + da * (3 + i)) : '0');
+      c.style.opacity = on ? f2((1 - da) * .7) : '0';
+    });
+    if (d) {
+      const [x, y, r] = dFree ? dNow(now) : [tug * .035, 0, tug * 4];
+      d.style.transform = x || y || r ? `translate(${x.toFixed(4)}em, ${y.toFixed(4)}em) rotate(${r.toFixed(2)}deg)` : '';
+    }
   };
 
   let raf = 0, onScreen = true;
   const frame = (now) => {
-    draw(current(now));
+    draw(now);
     raf = onScreen && !document.hidden && !still.matches ? requestAnimationFrame(frame) : 0;
   };
   const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); }).observe(svg);
   document.addEventListener('visibilitychange', wake);
-  wake();
 
-  let waving = false, tappedAt = 0, hop = 0;
-  svg.addEventListener('click', () => {
-    waving = true;
-    tappedAt = scrollY;
-    clearTimeout(hop);
-    go('jump', 220);
-    hop = setTimeout(() => { if (waving) go('wave', 380); }, 450);
+  // timed sequences; starting a new one cancels whatever was queued
+  let queued = [];
+  const run = (steps) => {
+    queued.forEach(clearTimeout);
+    queued = steps.map(([ms, fn]) => setTimeout(() => { fn(); wake(); }, ms));
     wake();
+  };
+
+  // breaks: every 20–26s of pulling he stops for a breather
+  let busy = false, waving = false, tappedAt = 0;
+  const backToPulling = (delay = 0) => [
+    [delay, () => go('reach', 600)],
+    [delay + 650, () => { go('pull', 550); busy = false; }],
+  ];
+  const takeBreak = () => {
+    if (mode !== 'pull' || busy || document.hidden) return;
+    busy = true;
+    run([
+      [0, () => go('wipe', 600)],
+      [1700, () => go('stand', 400)],
+      ...backToPulling(2700),
+    ]);
+  };
+  setInterval(() => { if (Math.random() < .5) takeBreak(); }, 10000);
+
+  // three quick taps: he wins, briefly
+  const win = () => {
+    busy = true; waving = false; dFree = true;
+    run([
+      [0, () => go('yank', 260)],
+      [260, () => { go('fallen', 420); moveD([.3, -.04, -22], 420); }],
+      [1700, () => moveD([0, 0, 0], 650, back)],
+      [1800, () => go('stand', 500)],
+      [2400, () => { dFree = false; }],
+      ...backToPulling(2500),
+    ]);
+  };
+
+  let taps = [];
+  svg.addEventListener('click', () => {
+    const now = performance.now();
+    taps = [...taps.filter((t) => now - t < 1200), now];
+    if (mode === 'sleep') { // woken up: a big stretch, then back to work
+      busy = true;
+      run([[0, () => go('stretch', 700)], ...backToPulling(1500)]);
+      return;
+    }
+    if (taps.length >= 3 && !dFree) { taps = []; win(); return; }
+    if (dFree) return;
+    busy = true; waving = true; tappedAt = scrollY;
+    run([[0, () => go('jump', 220)], [450, () => { if (waving) go('wave', 380); }]]);
   });
   addEventListener('scroll', () => {
     if (!waving || Math.abs(scrollY - tappedAt) < 8) return;
     waving = false;
-    clearTimeout(hop);
-    go('reach', 650);                                   // turns back, slowly
-    hop = setTimeout(() => go('pull', 550), 700);       // grabs the "d" again
-    wake();
+    run(backToPulling(0));
   }, { passive: true });
+
+  // desktop: his head leans a little towards the mouse while he works
+  if (matchMedia('(pointer: fine)').matches) {
+    addEventListener('mousemove', (e) => {
+      const r = svg.getBoundingClientRect();
+      look = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 400));
+    }, { passive: true });
+  }
+
+  if (still.matches) draw(performance.now());
+  wake();
 })();
