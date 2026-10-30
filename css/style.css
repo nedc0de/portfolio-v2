@@ -10330,7 +10330,7 @@ html.fav-sheet-open { overflow: hidden; }
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 3.6;
+  stroke-width: 2.8;
   stroke-linecap: round;
   stroke-linejoin: round;
   color: var(--fourth-color);
