@@ -16,7 +16,7 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Act as a frontend developer; switch to full-stack (Netlify functions,
   APIs, data) when a feature needs a back end.
 - Commits are authored as Ned only: `git config user.name "Ned"` and
-  `git config user.email "70671308+nedcodev@users.noreply.github.com"`, with
+  `git config user.email "70671308+nedc0de@users.noreply.github.com"`, with
   no Co-Authored-By or Claude-Session lines.
 - Test every change for real before asking to merge: tap through it on a
   phone-size browser on every page it touches, including Netlify-style pretty
