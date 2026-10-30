@@ -3531,13 +3531,18 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 (() => {
   const stick = document.querySelector('.stick');
   if (!stick) return;
+  const d = document.querySelector('.hm-d'); // stops budging while he's not pushing it
   let timers = [];
   stick.addEventListener('click', () => {
     timers.forEach(clearTimeout);
     stick.dataset.pose = 'jump';
+    if (d) d.classList.add('is-still');
     timers = [
       setTimeout(() => { stick.dataset.pose = 'wave'; }, 450),
-      setTimeout(() => { stick.dataset.pose = 'push'; }, 2200),
+      setTimeout(() => {
+        stick.dataset.pose = 'push';
+        if (d) d.classList.remove('is-still');
+      }, 2200),
     ];
   });
 })();
