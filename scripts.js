@@ -3527,22 +3527,36 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   rolls.forEach((r) => io.observe(r));
 })();
 
-/*===== HOME: tap the stick figure: he jumps, waves at you, then goes back to pushing =====*/
+/*===== HOME: tap the stick figure: he jumps and waves at you until you
+   scroll, then slowly reaches back for the "d" =====*/
 (() => {
   const stick = document.querySelector('.stick');
   if (!stick) return;
-  const d = document.querySelector('.hm-d'); // stops budging while he's not pushing it
+  const d = document.querySelector('.hm-d'); // stays still while he's not pulling it
   let timers = [];
+  let waving = false;
+  let tappedAt = 0;
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+
   stick.addEventListener('click', () => {
     timers.forEach(clearTimeout);
+    timers = [];
+    waving = true;
+    tappedAt = scrollY;
     stick.dataset.pose = 'jump';
     if (d) d.classList.add('is-still');
-    timers = [
-      setTimeout(() => { stick.dataset.pose = 'wave'; }, 450),
-      setTimeout(() => {
-        stick.dataset.pose = 'push';
-        if (d) d.classList.remove('is-still');
-      }, 2200),
-    ];
+    later(450, () => { if (waving) stick.dataset.pose = 'wave'; });
   });
+
+  addEventListener('scroll', () => {
+    if (!waving || Math.abs(scrollY - tappedAt) < 8) return;
+    waving = false;
+    timers.forEach(clearTimeout);
+    timers = [];
+    later(150, () => { stick.dataset.pose = 'reach'; });
+    later(900, () => {
+      stick.dataset.pose = 'push';
+      if (d) d.classList.remove('is-still');
+    });
+  }, { passive: true });
 })();
