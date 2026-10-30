@@ -10317,3 +10317,44 @@ html.fav-sheet-open { overflow: hidden; }
   line-height: 1.6;
   color: rgb(179, 179, 179);
 }
+
+/*===== HOME: stick figure waving next to "Ned" (instead of the hand emoji) =====*/
+.stick {
+  width: .7em;
+  height: 1.1em;
+  margin-left: .14em;
+  vertical-align: -.16em;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4.6;
+  stroke-linecap: round;
+  color: var(--fourth-color);
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  animation: stick-hop .5s .3s cubic-bezier(.3, .7, .4, 1.4) both;
+}
+
+.stick-arm {
+  transform-box: view-box;
+  transform-origin: 22.5px 24.5px; /* the shoulder */
+  animation: stick-wave 1.5s .8s ease-in-out both;
+}
+
+.stick.is-waving .stick-arm { animation: stick-wave 1.5s ease-in-out both; }
+
+@keyframes stick-hop {
+  0% { transform: translateY(.18em) scaleY(.85); opacity: 0; }
+  60% { transform: translateY(-.06em) scaleY(1.04); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+@keyframes stick-wave {
+  0%, 100% { transform: rotate(0); }
+  15%, 45%, 75% { transform: rotate(32deg); }
+  30%, 60% { transform: rotate(-4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stick, .stick-arm, .stick.is-waving .stick-arm { animation: none; }
+}
