@@ -18,7 +18,7 @@ let unfilteredData = [
     mediaItems: [
       {
         type: 'threads',
-        url: 'https://www.threads.com/@nedcodev/post/DdlYrANlRqK',
+        url: 'https://www.threads.com/@nedc0de/post/DdlYrANlRqK',
       },
     ],
   },
@@ -30,7 +30,7 @@ let unfilteredData = [
     mediaItems: [
       {
         type: 'threads',
-        url: 'https://www.threads.com/@nedcodev/post/Ddmb_RLEwnd',
+        url: 'https://www.threads.com/@nedc0de/post/Ddmb_RLEwnd',
       },
     ],
   },
@@ -43,7 +43,7 @@ function formatNumber(num) {
 
 /*=============== THREADS EMBED HELPERS ===============*/
 // Pulls the post/share id out of a Threads URL, e.g.
-// https://www.threads.com/@nedcodev/post/DdlYrANlRqK  -> DdlYrANlRqK
+// https://www.threads.com/@nedc0de/post/DdlYrANlRqK  -> DdlYrANlRqK
 // https://www.threads.com/share/D_kobwCg2/            -> D_kobwCg2
 function extractThreadsId(url) {
   const cleanUrl = url.split('?')[0].replace(/\/+$/, '');
@@ -184,8 +184,8 @@ document.querySelectorAll('.footer-year').forEach((el) => {
   navMenu.insertAdjacentHTML('beforeend', `
     <div class="menu-foot">
       <a class="menu-cta" href="/contact.html">Let's talk</a>
-      <a class="menu-dm" href="https://www.threads.com/@nedcodev/" target="_blank" rel="noopener">
-        @nedcodev on Threads
+      <a class="menu-dm" href="https://www.threads.com/@nedc0de/" target="_blank" rel="noopener">
+        @nedc0de on Threads
       </a>
     </div>`);
 
