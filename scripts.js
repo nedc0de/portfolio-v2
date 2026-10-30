@@ -3528,14 +3528,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 })();
 
 /*===== HOME: the stick figure next to "Ned" =====*/
-// He's one skeleton (head, neck, shoulder, hip, two hands, two feet) drawn
-// from joint points. Every frame the points ease towards the current pose, so
-// he moves smoothly instead of snapping between drawings.
-// - pulling: slow tugs on the "d"; now and then his front foot slips (dust)
-// - every 20s or so he takes a break: wipes his forehead, shakes his arms out
-// - tap: a hop, then he waves until you scroll, then reaches back for the "d"
-// - tap three times fast: he yanks the "d" out, falls over holding it, it
-//   springs back into place and he gets up to try again
+// A tiny game character. Each pose only says where his joints *want* to be;
+// every joint is a spring that chases its target, so he overshoots, settles
+// and lags a little (his head trails his body). Arms and legs are two
+// segments with elbows and knees solved each frame (2-bone IK), so limbs bend
+// instead of sliding around as straight sticks.
+// - pulling: brace, heave back, strain (tremble), release; every third heave
+//   his front foot skids and kicks up dust
+// - every 20–30s a breather: wipes his forehead, shakes his arms out
+// - tap: crouch, hop, then he waves until you scroll and goes back to work
+// - tap three times fast: he yanks the "d" out, falls over holding it, the "d"
+//   springs back and he gets up to try again
 // - at night (the visitor's own time) he's asleep against the "d"; tap wakes him
 // - on desktop his head leans a little towards the mouse
 (() => {
@@ -3547,107 +3550,135 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b');
   const dust = [...svg.querySelectorAll('.sk-dust circle')];
 
-  // joint positions in the 40×64 drawing (ground at y 57): [x, y]
-  const P = (head, neck, sh, hip, ha, hb, fa, fb) => ({ head, neck, sh, hip, ha, hb, fa, fb });
+  // joint targets in the 40×64 drawing (ground y 57), plus which way elbows
+  // and knees bend (+1/-1, blended smoothly between poses)
+  const P = (head, neck, sh, hip, ha, hb, fa, fb, bend) => ({ head, neck, sh, hip, ha, hb, fa, fb, bend });
   const POSES = {
-    pull:    P([26, 12.5], [24.5, 21.5], [22.5, 27.5], [18.5, 39.5], [1.5, 28], [1.5, 33], [9, 57], [23.5, 57]),
-    reach:   P([23, 11.5], [22, 21], [21, 26.5], [19.5, 40], [7, 28.5], [7, 32], [13.5, 57], [24.5, 57]),
-    jump:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 17], [31.5, 17], [13, 54], [27, 54]),
-    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [11, 35.5], [32, 15], [12, 57], [28, 57]),
-    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [13, 35], [29, 35], [15, 57], [27, 57]),
-    wipe:    P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [14, 10], [29, 35], [15, 57], [27, 57]),
-    stretch: P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 5], [27, 5], [16, 57], [26, 57]),
-    yank:    P([31, 17], [28.5, 25], [26.5, 29.5], [20, 42], [1.5, 26], [1.5, 31], [7, 57], [21, 57]),
-    fallen:  P([36, 51], [31.5, 52], [28.5, 51.5], [17, 54.5], [16, 40], [21, 39], [6, 45], [10, 49]),
-    sleep:   P([7.5, 29], [6, 38], [6.5, 42], [8.5, 54], [15, 52], [17, 53.5], [27, 57], [29, 55.5]),
+    pull:    P([26, 12.5], [24.5, 21.5], [22.5, 27.5], [18.5, 39.5], [1.5, 28], [1.5, 33], [9, 57], [23.5, 57], [-1, -1, 1, 1]),
+    reach:   P([23, 11.5], [22, 21], [21, 26.5], [19.5, 40], [7, 28.5], [7, 32], [13.5, 57], [24.5, 57], [-1, -1, 1, 1]),
+    crouch:  P([20, 17], [20, 27], [20, 30], [20, 43], [11, 38], [29, 38], [12, 57], [28, 57], [1, -1, 1, -1]),
+    jump:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [14, 55], [26, 55], [1, -1, 1, -1]),
+    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12, 36], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
+    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14, 36], [28, 36], [15, 57], [27, 57], [1, -1, 1, -1]),
+    wipe:    P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [28, 36], [15, 57], [27, 57], [1, -1, 1, -1]),
+    stretch: P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [16, 57], [26, 57], [1, -1, 1, -1]),
+    windup:  P([22, 13.5], [21.5, 23], [20.5, 28.5], [17.5, 41], [2.5, 28], [2.5, 33], [9, 57], [23.5, 57], [-1, -1, 1, 1]),
+    yank:    P([32, 18], [29, 26], [27, 30], [21, 43], [3, 25], [3, 30], [7, 57], [21, 57], [-1, -1, 1, 1]),
+    fallen:  P([36, 51], [31.5, 52], [28.5, 51.5], [17, 54.5], [16, 40], [21, 39], [7, 44], [11, 47], [1, -1, -1, -1]),
+    sleep:   P([7.5, 29], [6, 38], [6.5, 42], [8.5, 54], [15, 52], [17, 53.5], [27, 57], [29, 55.5], [1, 1, -1, -1]),
   };
-  const KEYS = Object.keys(POSES.pull);
-  const copy = (p) => Object.fromEntries(KEYS.map((k) => [k, [...p[k]]]));
-  const inOut = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const back = (t) => 1 + 2.4 * Math.pow(t - 1, 3) + 1.4 * Math.pow(t - 1, 2); // springy overshoot
+  const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb'];
+  // spring stiffness per joint: feet planted, hands quick, head lazy
+  const K = { head: 95, neck: 150, sh: 160, hip: 170, ha: 230, hb: 230, fa: 420, fb: 420 };
+  const DAMP = .62; // below 1 = a little overshoot
+  const ARM = 10.9, LEG = 10.3; // segment lengths (upper = lower)
+
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const sleeping = new Date().getHours() < 6;
+  let mode = sleeping ? 'sleep' : 'pull', modeStart = performance.now();
+  const pos = {}, vel = {};
+  J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
+  let bend = [...POSES[mode].bend];
+  let look = 0, dustAt = -9e9, tugCount = 0, lastCycle = -1, slip = false, tug = 0;
+
   const rot = ([x, y], [cx, cy], a) => {
     const c = Math.cos(a), s = Math.sin(a);
     return [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c];
   };
-  const still = matchMedia('(prefers-reduced-motion: reduce)');
-  const hour = new Date().getHours();
-  let mode = hour < 6 ? 'sleep' : 'pull';
-  let from = copy(POSES[mode]), to = POSES[mode];
-  let blendStart = 0, blendMs = 1, modeStart = performance.now();
-  let tug = 0, tugCount = 0, lastCycle = -1, slip = 0, dustAt = -9e9;
-  let look = 0; // -1..1, where the mouse is (desktop)
+  const smooth = (t) => t * t * (3 - 2 * t);
 
-  // the "d": [x em, y em, degrees], tweened when he pulls it out
-  let dFrom = [0, 0, 0], dTo = [0, 0, 0], dStart = 0, dMs = 1, dEase = inOut, dFree = false;
-  const moveD = (target, ms, easeFn = inOut, now = performance.now()) => {
-    dFrom = dNow(now); dTo = target; dStart = now; dMs = still.matches ? 1 : ms; dEase = easeFn;
-  };
-  const dNow = (now) => {
-    const t = dEase(Math.min(1, (now - dStart) / dMs));
-    return dFrom.map((v, i) => v + (dTo[i] - v) * t);
-  };
+  // the "d": [x em, y em, degrees], also on a spring so it wobbles back
+  let dPos = [0, 0, 0], dVel = [0, 0, 0], dHeld = null; // dHeld = target while he has it
 
-  const go = (pose, ms, now = performance.now()) => {
-    from = current(now);
-    to = POSES[pose];
-    mode = pose;
-    blendStart = now;
-    blendMs = still.matches ? 1 : ms;
-    modeStart = now;
-  };
+  const go = (pose) => { mode = pose; modeStart = performance.now(); };
 
-  const current = (now) => {
-    const t = inOut(Math.min(1, (now - blendStart) / blendMs));
-    const p = {};
-    KEYS.forEach((k) => { p[k] = [from[k][0] + (to[k][0] - from[k][0]) * t, from[k][1] + (to[k][1] - from[k][1]) * t]; });
-    const age = (now - modeStart) / 1000;
+  // where each joint wants to be right now (pose + what he's doing)
+  const targets = (now) => {
+    const pose = POSES[mode], age = (now - modeStart) / 1000;
+    const t = {};
+    J.forEach((k) => { t[k] = [...pose[k]]; });
     tug = 0;
+    // always breathing a little
+    const br = Math.sin(now / 1000 * Math.PI * 2 / 3.2) * .35;
+    t.head[1] += br; t.neck[1] += br * .7; t.sh[1] += br * .6;
+
     if (mode === 'pull') {
-      // a slow tug every 2.4s: lean back, hold, ease off
-      const cycle = Math.floor(age / 2.4), c = (age % 2.4) / 2.4;
-      if (cycle !== lastCycle) { lastCycle = cycle; tugCount++; slip = tugCount % 3 === 0 ? 1 : 0; }
-      tug = (c < .55 ? Math.sin(Math.PI * c / .55) ** 2 : 0) * t;
-      // every third tug his front foot skids towards the "d" and kicks up dust
-      if (slip && c > .2 && c < .55) {
-        const k = Math.sin(Math.PI * (c - .2) / .35);
-        p.fa[0] -= 1.6 * k;
-        if (c > .26 && now - dustAt > 1500) dustAt = now;
+      // one heave every 2.6s: brace in, heave back hard, strain, let go
+      const cyc = Math.floor(age / 2.6), c = (age % 2.6) / 2.6;
+      if (cyc !== lastCycle) { lastCycle = cyc; tugCount++; slip = tugCount % 3 === 0; }
+      let lean;
+      if (c < .22) lean = -.25 * smooth(c / .22);                    // brace
+      else if (c < .38) lean = -.25 + 1.25 * smooth((c - .22) / .16); // heave
+      else if (c < .62) lean = 1 + Math.sin(age * 60) * .04;          // strain
+      else lean = 1 - smooth((c - .62) / .38);                       // release
+      tug = Math.max(0, lean);
+      const pivot = t.fa;
+      ['head', 'neck', 'sh', 'hip', 'fb'].forEach((k) => { t[k] = rot(t[k], pivot, lean * .17); });
+      t.hip[1] += tug * 1.6; // knees give as he leans back
+      // hands stay on the "d", which tilts towards him as he heaves
+      t.ha[0] += tug * 3.5; t.hb[0] += tug * 3.5;
+      if (slip && c > .3 && c < .62) {
+        t.fa[0] -= 2.2 * Math.sin(Math.PI * (c - .3) / .32);
+        if (now - dustAt > 1500) dustAt = now;
       }
-      KEYS.forEach((k) => { if (k !== 'fa') p[k] = rot(p[k], p.fa, tug * .15); });
-      p.head[0] += look * 1.2;
+      t.head[0] += look * 1.2;
     }
-    if (mode === 'wave') {
-      const a = (Math.sin(age * Math.PI * 2 / 1.1) * .5 + .5) * .6 * t; // outward only, clear of his head
-      p.hb = rot(p.hb, p.sh, a);
+    if (mode === 'wave') { // forearm swings from the elbow, outward only
+      const a = (Math.sin(age * Math.PI * 2 / 1) * .5 + .5) * .7;
+      t.hb = rot(t.hb, t.sh, a);
+      t.head[0] += .8; // tilts his head at you
     }
-    if (mode === 'jump') {
-      const up = Math.sin(Math.PI * Math.min(1, age / .45)) * 7;
-      KEYS.forEach((k) => { p[k][1] -= up; });
+    if (mode === 'jump') { // up fast, float, come down
+      const u = Math.min(1, age / .55);
+      const up = Math.sin(Math.PI * u) * 9;
+      J.forEach((k) => { t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
-    if (mode === 'wipe') p.ha[0] += Math.sin(age * Math.PI * 2 / .8) * 4 * t; // hand across the forehead
-    if (mode === 'stand') { // shaking his arms out
-      const j = Math.sin(age * Math.PI * 2 / .22) * 1.6 * t;
-      p.ha[1] += j; p.hb[1] -= j;
+    if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
+    if (mode === 'stand' && age < 1.1) { // shaking his arms out
+      const j = Math.sin(age * Math.PI * 2 / .2) * 2.2;
+      t.ha[1] += j; t.hb[1] -= j;
     }
-    if (mode === 'sleep') { // slow breathing
-      const b = Math.sin(age * Math.PI * 2 / 3.6) * .6;
-      p.head[1] += b; p.neck[1] += b * .6;
-    }
-    return p;
+    if (mode === 'sleep') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .7; t.head[1] += b; t.neck[1] += b * .6; }
+    return t;
   };
 
+  const step = (dt, now) => {
+    const t = targets(now);
+    J.forEach((k) => {
+      const kk = K[k], c = 2 * Math.sqrt(kk) * DAMP;
+      for (let i = 0; i < 2; i++) {
+        vel[k][i] += (kk * (t[k][i] - pos[k][i]) - c * vel[k][i]) * dt;
+        pos[k][i] += vel[k][i] * dt;
+      }
+    });
+    const tb = POSES[mode].bend;
+    bend = bend.map((b, i) => b + (tb[i] - b) * Math.min(1, dt * 8));
+    // the "d": follows his tug, or his hands while he holds it
+    const dt3 = dHeld || [tug * .04, 0, tug * 4.5];
+    for (let i = 0; i < 3; i++) {
+      dVel[i] += (180 * (dt3[i] - dPos[i]) - 2 * Math.sqrt(180) * .45 * dVel[i]) * dt;
+      dPos[i] += dVel[i] * dt;
+    }
+  };
+
+  // elbow/knee between a and b for a limb of two `len` segments
+  const joint = (a, b, len, sign) => {
+    const dx = b[0] - a[0], dy = b[1] - a[1], dist = Math.hypot(dx, dy) || 1;
+    const h = Math.sqrt(Math.max(0, len * len - (dist / 2) ** 2)) * sign;
+    return [(a[0] + b[0]) / 2 - dy / dist * h, (a[1] + b[1]) / 2 + dx / dist * h];
+  };
   const f2 = (n) => n.toFixed(2);
-  const line = (path, a, b) => path.setAttribute('d', `M${f2(a[0])} ${f2(a[1])}L${f2(b[0])} ${f2(b[1])}`);
+  const pts = (...p) => 'M' + p.map(([x, y]) => `${f2(x)} ${f2(y)}`).join('L');
+
   const draw = (now) => {
-    const p = current(now);
+    const p = pos;
     head.setAttribute('cx', f2(p.head[0]));
     head.setAttribute('cy', f2(p.head[1]));
-    line(body, p.neck, p.hip);
-    line(armA, p.sh, p.ha);
-    line(armB, p.sh, p.hb);
-    line(legA, p.hip, p.fa);
-    line(legB, p.hip, p.fb);
-    // dust: three little puffs drifting up and out from the front foot
+    body.setAttribute('d', pts(p.neck, p.hip));
+    armA.setAttribute('d', pts(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
+    armB.setAttribute('d', pts(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
+    legA.setAttribute('d', pts(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
+    legB.setAttribute('d', pts(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
     const da = (now - dustAt) / 700;
     dust.forEach((c, i) => {
       const on = da >= 0 && da < 1;
@@ -3657,55 +3688,52 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       c.style.opacity = on ? f2((1 - da) * .7) : '0';
     });
     if (d) {
-      const [x, y, r] = dFree ? dNow(now) : [tug * .035, 0, tug * 4];
-      d.style.transform = x || y || r ? `translate(${x.toFixed(4)}em, ${y.toFixed(4)}em) rotate(${r.toFixed(2)}deg)` : '';
+      const [x, y, r] = dPos;
+      d.style.transform = Math.abs(x) + Math.abs(y) + Math.abs(r) > .0005
+        ? `translate(${x.toFixed(4)}em, ${y.toFixed(4)}em) rotate(${r.toFixed(2)}deg)` : '';
     }
   };
 
-  let raf = 0, onScreen = true;
+  let raf = 0, last = 0, onScreen = true;
   const frame = (now) => {
+    let dt = Math.min(.05, (now - (last || now)) / 1000);
+    last = now;
+    while (dt > 0) { const h = Math.min(dt, 1 / 120); step(h, now); dt -= h; }
     draw(now);
     raf = onScreen && !document.hidden && !still.matches ? requestAnimationFrame(frame) : 0;
+    if (!raf) last = 0;
   };
   const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); }).observe(svg);
   document.addEventListener('visibilitychange', wake);
 
-  // timed sequences; starting a new one cancels whatever was queued
+  // reduced motion: jump straight to each pose
+  const snap = () => { if (!still.matches) return; const t = targets(performance.now()); J.forEach((k) => { pos[k] = t[k]; }); bend = [...POSES[mode].bend]; draw(performance.now()); };
+
   let queued = [];
   const run = (steps) => {
     queued.forEach(clearTimeout);
-    queued = steps.map(([ms, fn]) => setTimeout(() => { fn(); wake(); }, ms));
+    queued = steps.map(([ms, fn]) => setTimeout(() => { fn(); snap(); wake(); }, still.matches ? 0 : ms));
     wake();
   };
-
-  // breaks: every 20–26s of pulling he stops for a breather
   let busy = false, waving = false, tappedAt = 0;
-  const backToPulling = (delay = 0) => [
-    [delay, () => go('reach', 600)],
-    [delay + 650, () => { go('pull', 550); busy = false; }],
-  ];
-  const takeBreak = () => {
-    if (mode !== 'pull' || busy || document.hidden) return;
-    busy = true;
-    run([
-      [0, () => go('wipe', 600)],
-      [1700, () => go('stand', 400)],
-      ...backToPulling(2700),
-    ]);
-  };
-  setInterval(() => { if (Math.random() < .5) takeBreak(); }, 10000);
+  const backToWork = (at = 0) => [[at, () => go('reach')], [at + 550, () => { go('pull'); busy = false; }]];
 
-  // three quick taps: he wins, briefly
+  setInterval(() => {
+    if (mode !== 'pull' || busy || document.hidden || Math.random() < .5) return;
+    busy = true;
+    run([[0, () => go('wipe')], [1600, () => go('stand')], ...backToWork(2800)]);
+  }, 10000);
+
   const win = () => {
-    busy = true; waving = false; dFree = true;
+    busy = true; waving = false;
     run([
-      [0, () => go('yank', 260)],
-      [260, () => { go('fallen', 420); moveD([.3, -.04, -22], 420); }],
-      [1700, () => moveD([0, 0, 0], 650, back)],
-      [1800, () => go('stand', 500)],
-      [2400, () => { dFree = false; }],
-      ...backToPulling(2500),
+      [0, () => go('windup')],
+      [280, () => go('yank')],
+      [470, () => { go('fallen'); dHeld = [.3, -.04, -22]; }],
+      [1900, () => { dHeld = null; go('crouch'); }],
+      [2350, () => go('stand')],
+      ...backToWork(2800),
     ]);
   };
 
@@ -3713,23 +3741,18 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   svg.addEventListener('click', () => {
     const now = performance.now();
     taps = [...taps.filter((t) => now - t < 1200), now];
-    if (mode === 'sleep') { // woken up: a big stretch, then back to work
-      busy = true;
-      run([[0, () => go('stretch', 700)], ...backToPulling(1500)]);
-      return;
-    }
-    if (taps.length >= 3 && !dFree) { taps = []; win(); return; }
-    if (dFree) return;
+    if (mode === 'sleep') { busy = true; run([[0, () => go('stretch')], ...backToWork(1600)]); return; }
+    if (taps.length >= 3 && !dHeld) { taps = []; win(); return; }
+    if (dHeld) return;
     busy = true; waving = true; tappedAt = scrollY;
-    run([[0, () => go('jump', 220)], [450, () => { if (waving) go('wave', 380); }]]);
+    run([[0, () => go('crouch')], [140, () => go('jump')], [700, () => { if (waving) go('wave'); }]]);
   });
   addEventListener('scroll', () => {
     if (!waving || Math.abs(scrollY - tappedAt) < 8) return;
     waving = false;
-    run(backToPulling(0));
+    run(backToWork(0));
   }, { passive: true });
 
-  // desktop: his head leans a little towards the mouse while he works
   if (matchMedia('(pointer: fine)').matches) {
     addEventListener('mousemove', (e) => {
       const r = svg.getBoundingClientRect();
@@ -3737,6 +3760,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }, { passive: true });
   }
 
-  if (still.matches) draw(performance.now());
+  draw(performance.now());
   wake();
 })();
