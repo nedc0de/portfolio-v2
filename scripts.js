@@ -3531,7 +3531,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // A tiny game character. Each pose only says where his joints *want* to be;
 // every joint is a spring that chases its target, so he overshoots, settles
 // and lags a little (his head trails his body). Arms and legs are two
-// segments with elbows and knees solved each frame (2-bone IK).
+// segments with elbows and knees solved each frame (2-bone IK). His torso,
+// head and limbs keep their lengths, and his feet take steps (lift, arc,
+// plant) instead of sliding.
 // He picks what to do at random:
 // - pull at the "d": brace, heave back, strain, let go (now and then his
 //   front foot skids and kicks up dust)
@@ -3562,9 +3564,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     reach:   P([23, 11.5], [22, 21], [21, 26.5], [19.5, 40], [7, 28.5], [7, 32], [13.5, 57], [24.5, 57], [-1, -1, 1, 1]),
     crouch:  P([20, 17], [20, 27], [20, 30], [20, 43], [11, 38], [29, 38], [12, 57], [28, 57], [1, -1, 1, -1]),
     jump:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [14, 55], [26, 55], [1, -1, 1, -1]),
-    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12, 36], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
-    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14, 36], [28, 36], [15, 57], [27, 57], [1, -1, 1, -1]),
-    wipe:    P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [28, 36], [15, 57], [27, 57], [1, -1, 1, -1]),
+    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12.5, 44], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
+    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [27, 44.5], [15, 57], [27, 57], [1, -1, 1, -1]),
+    wipe:    P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27, 45], [15, 57], [27, 57], [1, -1, 1, -1]),
     stretch: P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [16, 57], [26, 57], [1, -1, 1, -1]),
     think:   P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [15, 57], [27, 57], [-1, -1, 1, -1]),
     grab:    P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
@@ -3577,8 +3579,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // spring stiffness per joint: feet planted, hands quick, head lazy
-  const K = { head: 95, neck: 150, sh: 160, hip: 170, ha: 230, hb: 230, fa: 420, fb: 420, l1: 200, l2: 200, l3: 160 };
-  const DAMP = .62; // below 1 = a little overshoot
+  const K = { head: 110, neck: 150, sh: 160, hip: 150, ha: 210, hb: 210, fa: 420, fb: 420, l1: 190, l2: 190, l3: 150 };
+  // damping: 1 = no overshoot; lower = more follow-through
+  const Z = { head: .58, neck: .78, sh: .78, hip: .82, ha: .7, hb: .7, fa: .9, fb: .9, l1: .75, l2: .75, l3: .65 };
+  const TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5; // fixed lengths: no rubbery stretching
+  const STANDING = new Set(['pull', 'reach', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'windup', 'grab']);
   const ARM = 10.9, LEG = 10.3; // segment lengths (upper = lower)
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3657,15 +3662,46 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     return t;
   };
 
+  // feet take real steps: lift, arc, plant (one at a time) instead of skating
+  const steps = { fa: null, fb: null };
+  const STEP_MS = 230;
+  const footStep = (k, target, now) => {
+    const other = k === 'fa' ? 'fb' : 'fa';
+    let st = steps[k];
+    if (!st && Math.hypot(target[0] - pos[k][0], target[1] - pos[k][1]) > 3 && !steps[other]) {
+      st = steps[k] = { from: [...pos[k]], to: target, t0: now };
+    }
+    if (!st) return false;
+    st.to = target;
+    const u = Math.min(1, (now - st.t0) / STEP_MS), e = smooth(u);
+    pos[k] = [st.from[0] + (st.to[0] - st.from[0]) * e, st.from[1] + (st.to[1] - st.from[1]) * e - Math.sin(Math.PI * u) * 3.2];
+    vel[k] = [0, 0];
+    if (u >= 1) steps[k] = null;
+    return true;
+  };
+
+  const len = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const toward = (a, b, l) => { const n = len(a, b); return [a[0] + (b[0] - a[0]) / n * l, a[1] + (b[1] - a[1]) / n * l]; };
+
   const step = (dt, now) => {
     const t = targets(now);
+    const walking = STANDING.has(mode);
     J.forEach((k) => {
-      const kk = K[k], c = 2 * Math.sqrt(kk) * DAMP;
+      if (walking && (k === 'fa' || k === 'fb') && footStep(k, t[k], now)) return;
+      if (!walking) steps[k] = null;
+      const kk = K[k], c = 2 * Math.sqrt(kk) * Z[k];
       for (let i = 0; i < 2; i++) {
         vel[k][i] += (kk * (t[k][i] - pos[k][i]) - c * vel[k][i]) * dt;
         pos[k][i] += vel[k][i] * dt;
       }
     });
+    // keep his proportions: torso, shoulders and head stay the same size,
+    // hands and feet can't reach further than his limbs
+    pos.neck = toward(pos.hip, pos.neck, TORSO);
+    pos.sh = toward(pos.neck, pos.hip, SH);
+    pos.head = toward(pos.neck, pos.head, NECK_HEAD);
+    ['ha', 'hb'].forEach((k) => { if (len(pos.sh, pos[k]) > ARM * 2) pos[k] = toward(pos.sh, pos[k], ARM * 2); });
+    ['fa', 'fb'].forEach((k) => { if (len(pos.hip, pos[k]) > LEG * 2) pos.hip = toward(pos[k], pos.hip, LEG * 2); });
     const tb = POSES[mode].bend;
     bend = bend.map((b, i) => b + (tb[i] - b) * Math.min(1, dt * 8));
     const dt3 = dHeld || [tug * .04, 0, tug * 4.5];
