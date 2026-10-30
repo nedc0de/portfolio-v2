@@ -3527,15 +3527,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   rolls.forEach((r) => io.observe(r));
 })();
 
-/*===== HOME: the stick figure waves again when tapped or hovered =====*/
+/*===== HOME: tap the stick figure: he jumps, waves at you, then goes back to pushing =====*/
 (() => {
   const stick = document.querySelector('.stick');
   if (!stick) return;
-  const wave = () => {
-    stick.classList.remove('is-waving');
-    void stick.getBoundingClientRect(); // restart the animation
-    stick.classList.add('is-waving');
-  };
-  stick.addEventListener('click', wave);
-  stick.addEventListener('mouseenter', wave);
+  let timers = [];
+  stick.addEventListener('click', () => {
+    timers.forEach(clearTimeout);
+    stick.dataset.pose = 'jump';
+    timers = [
+      setTimeout(() => { stick.dataset.pose = 'wave'; }, 450),
+      setTimeout(() => { stick.dataset.pose = 'push'; }, 2200),
+    ];
+  });
 })();
