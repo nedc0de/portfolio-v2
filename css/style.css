@@ -10320,6 +10320,7 @@ html.fav-sheet-open { overflow: hidden; }
 
 /*===== HOME: a stick figure next to "Ned", trying to shove the "d" =====*/
 .hm-d { display: inline-block; transform-origin: 20% 95%; animation: hm-d-shove 2.4s 1s ease-in-out infinite; }
+.hm-d.is-still { animation: none; } /* he's busy waving */
 
 .stick {
   width: .7em;
