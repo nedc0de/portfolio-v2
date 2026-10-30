@@ -3526,3 +3526,16 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   }), { threshold: 1 });
   rolls.forEach((r) => io.observe(r));
 })();
+
+/*===== HOME: the stick figure waves again when tapped or hovered =====*/
+(() => {
+  const stick = document.querySelector('.stick');
+  if (!stick) return;
+  const wave = () => {
+    stick.classList.remove('is-waving');
+    void stick.getBoundingClientRect(); // restart the animation
+    stick.classList.add('is-waving');
+  };
+  stick.addEventListener('click', wave);
+  stick.addEventListener('mouseenter', wave);
+})();
