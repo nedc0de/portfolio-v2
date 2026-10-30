@@ -10323,14 +10323,14 @@ html.fav-sheet-open { overflow: hidden; }
 .hm-d { display: inline-block; transform-origin: 15% 95%; will-change: transform; }
 
 .stick {
-  width: .7em;
-  height: 1.1em;
-  margin-left: -.06em; /* his hands grip the "d"'s stem */
-  vertical-align: -.16em;
+  width: .55em;
+  height: .86em;
+  margin-left: -.054em; /* his hands grip the "d"'s stem */
+  vertical-align: -.134em; /* feet on the baseline */
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.8;
+  stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
   color: var(--fourth-color);
