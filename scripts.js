@@ -3634,7 +3634,15 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
   let mugAt = null, onPhone = false, lifting = false, peekWave = false;
   let paintFrom = 0, paintTo = 0, paintStart = 0, paintMs = 1; // how much of the "d" is orange, 0–100
-  let planeAt = -9e9, planeFrom = null, lookAt = 0, flashAt = -9e9;
+  let planeAt = -9e9, planeFrom = null, lookAt = 0, flashAt = -9e9, loop = null, planePrev = null;
+  const PLANE_MS = 5200;
+  // the oval the plane flies: around the whole hero, kept inside the screen
+  const planLoop = (from) => {
+    const hero = (document.querySelector('.home-data') || svg).getBoundingClientRect(), r = svg.getBoundingClientRect(), u = r.width / 60;
+    const cx = (hero.left + hero.width / 2 - r.left) / u, cy = (hero.top + hero.height / 2 - r.top) / u;
+    const rx = Math.min(hero.width / 2 + 18, innerWidth / 2 - 14) / u, ry = (hero.height / 2 + 20) / u;
+    return { cx, cy, rx, ry, th0: Math.atan2((from[1] - cy) / ry, (from[0] - cx) / rx) };
+  };
   let peekLean = 0, peekVel = 0, peekTo = 0; // how far he leans out (0 upright, 1 head out)
   const PUNCHES = [[.15, 'ha'], [.55, 'ha'], [.95, 'hb'], [1.65, 'ha']];
   // a flurry: a dozen quick alternating punches
@@ -3881,16 +3889,19 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     flash.setAttribute('cx', f2(p.hb[0])); flash.setAttribute('cy', f2(p.hb[1] - 2)); flash.setAttribute('r', f2(4 + fl * 6));
     // the paper plane: in his hand, or flying a loop over "Ned" and back
     if (svg.classList.contains('has-plane')) {
-      const u = (now - planeAt) / 3400;
+      const u = (now - planeAt) / PLANE_MS;
       let x = p.hb[0] + 2, y = p.hb[1] - 1, ang = -10;
-      if (u >= 0 && u < 1 && planeFrom) {
-        const a = Math.PI * 2 * u, R = 34;
-        x = planeFrom[0] + Math.sin(a) * R * 1.9 - Math.sin(a * 2) * 6;
-        y = planeFrom[1] - (1 - Math.cos(a)) * R * .55 - Math.sin(a / 2) * 10;
-        const dx = Math.cos(a) * R * 1.9 - Math.cos(a * 2) * 12, dy = -Math.sin(a) * R * .55 - Math.cos(a / 2) * 5;
-        ang = Math.atan2(dy, dx) * 180 / Math.PI;
+      if (u >= 0 && u < 1 && loop) {
+        // one lap of an oval around the whole hero, easing out of his hand and back into it
+        const th = loop.th0 - Math.PI * 2 * smooth(u);
+        const ex = loop.cx + Math.cos(th) * loop.rx, ey = loop.cy + Math.sin(th) * loop.ry;
+        const k = smooth(Math.min(1, u / .1)) * smooth(Math.min(1, (1 - u) / .1));
+        x = p.hb[0] + (ex - p.hb[0]) * k;
+        y = p.hb[1] + (ey - p.hb[1]) * k + Math.sin(u * Math.PI * 6) * 3 * k; // a little bob as it glides
+        if (planePrev) ang = Math.atan2(y - planePrev[1], x - planePrev[0]) * 180 / Math.PI;
+        planePrev = [x, y];
         lookAt = Math.max(-1, Math.min(1, (x - p.head[0]) / 30));
-      } else lookAt = 0;
+      } else { lookAt = 0; planePrev = null; }
       plane.setAttribute('transform', `translate(${f2(x)} ${f2(y)}) rotate(${ang.toFixed(1)})`);
     }
     // painting the "d": orange fills it from the bottom up, stroke by stroke
@@ -4048,10 +4059,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     plane: () => [
       [0, () => go('stand')], [350, () => go('fold')], [1250, () => cls('has-plane', true)],
       [1600, () => go('windup')], [2050, () => go('throw')],
-      [2150, () => { planeAt = performance.now(); planeFrom = [pos.hb[0], pos.hb[1]]; }],
-      [3300, () => go('stand')], [4900, () => go('catch')], // reaches up to catch it
-      [5650, () => { go('stand'); }], [6300, () => cls('has-plane', false)],
-      [6600, next],
+      [2150, () => { planeAt = performance.now(); planeFrom = [pos.hb[0], pos.hb[1]]; loop = planLoop(planeFrom); }],
+      [3300, () => go('stand')], [2150 + 5200 - 700, () => go('catch')], // reaches up to catch it
+      [2150 + 5200 + 300, () => go('stand')], [2150 + 5200 + 900, () => cls('has-plane', false)],
+      [2150 + 5200 + 1200, next],
     ],
     selfie: () => [
       ...fromD(0, () => { onPhone = false; cls('has-phone', true); }),
