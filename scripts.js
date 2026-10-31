@@ -3578,6 +3578,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     phone:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [28.5, 14.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     // boxing stance, turned towards the "d": fists up by his chin, feet staggered
     guard:    P([11, 12.5], [11.8, 22], [12, 24.5], [13.5, 39], [5.5, 20], [8.5, 22.5], [7.5, 57], [19, 57], [-1, -1, 1, 1]),
+    // peeking round the "d": leaning out, one hand holding its edge
+    peek:     P([27, 13.5], [24.5, 22.5], [23.5, 25.5], [20, 39], [16, 44], [10.5, 30], [17.5, 57], [23, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3613,7 +3615,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
-  let mugAt = null, onPhone = false, lifting = false;
+  let mugAt = null, onPhone = false, lifting = false, peekWave = false;
   const PUNCHES = [[.15, 'ha'], [.55, 'ha'], [.95, 'hb'], [1.65, 'ha']];
   // a flurry: a dozen quick alternating punches
   const FLURRY = Array.from({ length: 12 }, (_, i) => [.1 + i * .13, i % 2 ? 'hb' : 'ha']);
@@ -3697,6 +3699,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
         if (u >= (fast ? .035 : .06) && lastHit !== id) { lastHit = id; hitAt = now; hitPower = fast ? .7 : hand === 'hb' ? 1.4 : 1; }
       });
     }
+    if (mode === 'peek') { // a curious head tilt, and a little wave from behind the "d" when he says hi
+      t.head[1] += Math.sin(age * 2.2) * .8; t.head[0] += Math.sin(age * 1.3) * .6;
+      if (peekWave) { const w = Math.sin(age * Math.PI * 2 / .9) * .5 + .5; t.hb = rot([t.sh[0] + 13, t.sh[1] - 11], t.sh, w * .5); } // out to the side, clear of his head
+    }
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
@@ -3755,6 +3761,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const v = 22 * dt, dx = oxTo - ox;
       ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
       walkPhase += v / 4.2;
+    } else if (ox !== oxTo) { // sliding out from behind the "d"
+      const v = 30 * dt, dx = oxTo - ox;
+      ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
     }
     glance = Math.max(0, glance - dt * .9);
     const t = targets(now);
@@ -3880,6 +3889,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (onPhone) { onPhone = false; cls('has-phone', false); }
     if (mugAt === 'hand') mugAt = [46.5, 57];
     oxTo = 0; if (ox) ox = 0;
+    man.removeAttribute('clip-path'); peekWave = false;
   };
 
   const sitDown = (at) => [[at, () => go('stand')], [at + 450, () => go('grab')], [at + 1000, () => go('sit')]];
@@ -3984,5 +3994,20 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   wake();
   // ?stick=coffee (or box, pushup, weights, phone, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
-  run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
+  if (first || still.matches || scrollY > 100) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
+  else {
+    // every visit: he's hiding behind the "d", peeks out at you, says hi, steps out
+    man.setAttribute('clip-path', 'url(#sk-behind-d)');
+    go('peek'); ox = oxTo = -40;
+    J.forEach((k) => { pos[k] = [POSES.peek[k][0] + (k[0] === 'l' ? 0 : ox), POSES.peek[k][1]]; });
+    activity = 'intro';
+    run([
+      [500, () => { oxTo = -25; }],                      // head pokes out
+      [1500, () => { oxTo = -30; }],                     // ducks back a little...
+      [1900, () => { oxTo = -20; peekWave = true; }],    // ...then out again with a wave
+      [3300, () => { peekWave = false; go('walk'); oxTo = 0; }], // steps out (a few strides)
+      [4300, () => { man.removeAttribute('clip-path'); go('wave'); }],
+      [6000, () => next('code')],
+    ]);
+  }
 })();
