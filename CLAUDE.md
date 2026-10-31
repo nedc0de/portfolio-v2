@@ -10,6 +10,7 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Ned reads on his phone: keep updates short and send screenshots.
 - Save tokens: answer questions briefly, without a long "Merge it?" recap.
   When Ned likes a design he'll say so ("go with that one and merge").
+- No videos of changes, just a screenshot or two (saves tokens).
 - Be creative, never generic: no AI-template looks (icon tiles, pill
   buttons, arrow symbols like ↗/→, emoji bullets, stock card grids). Each
   design should feel made for this site. Research how real sites do it first.
