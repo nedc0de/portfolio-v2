@@ -4005,7 +4005,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       ctx.font = `${fs.fontWeight} ${fs.fontSize} ${fs.fontFamily}`;
       const ink = d.getBoundingClientRect().left + ctx.measureText('d').actualBoundingBoxRight;
       const r = svg.getBoundingClientRect();
-      return (ink - r.left) / (r.width / 60) - .8; // a hair inside the stem
+      return (ink - r.left) / (r.width / 60) - 6; // well inside the stem: the "d" is drawn over him, so its stem hides him
     };
     let e = edge();
     const hideAt = () => { svg.querySelector('#sk-behind-d rect').setAttribute('x', e.toFixed(2)); };
@@ -4014,13 +4014,18 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     go('peek'); ox = oxTo = e - 40;
     J.forEach((k) => { pos[k] = [POSES.peek[k][0] + (k[0] === 'l' ? 0 : ox), POSES.peek[k][1]]; });
     activity = 'intro';
-    run([
-      [500, () => { e = edge(); hideAt(); oxTo = e - 24; }], // head pokes out (fonts are in by now)
-      [1500, () => { oxTo = e - 29; }],                  // ducks back a little...
-      [1900, () => { oxTo = e - 19; peekWave = true; }], // ...then out again with a wave
+    const steps = [
+      [500, () => { e = edge(); hideAt(); oxTo = e - 18; }], // head pokes out
+      [1500, () => { oxTo = e - 23; }],                  // ducks back a little...
+      [1900, () => { oxTo = e - 13; peekWave = true; }], // ...then out again with a wave
       [3300, () => { peekWave = false; go('walk'); oxTo = 0; }], // steps out (a few strides)
       [4300, () => { man.removeAttribute('clip-path'); go('wave'); }],
       [6000, () => next('code')],
-    ]);
+    ];
+    // measure the "d" only once its real font has loaded (phones can be slow)
+    let begun = false;
+    const begin = () => { if (begun) return; begun = true; e = edge(); hideAt(); ox = oxTo = e - 34; run(steps); };
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(begin);
+    setTimeout(begin, 2500);
   }
 })();
