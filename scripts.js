@@ -3579,7 +3579,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // boxing stance, turned towards the "d": fists up by his chin, feet staggered
     guard:    P([11, 12.5], [11.8, 22], [12, 24.5], [13.5, 39], [5.5, 20], [8.5, 22.5], [7.5, 57], [19, 57], [-1, -1, 1, 1]),
     // peeking round the "d": leaning out, one hand holding its edge
-    peek:     P([27, 13.5], [24.5, 22.5], [23.5, 25.5], [20, 39], [16, 44], [10.5, 30], [17.5, 57], [23, 57], [1, -1, -1, -1]),
+    // peeking round the "d": body tucked behind the stem, leaning so only his head shows
+    peek:     P([28, 18], [21.5, 23.5], [20, 25.5], [11, 39.5], [12, 44.5], [16, 31], [8, 57], [14, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3701,7 +3702,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }
     if (mode === 'peek') { // a curious head tilt, and a little wave from behind the "d" when he says hi
       t.head[1] += Math.sin(age * 2.2) * .8; t.head[0] += Math.sin(age * 1.3) * .6;
-      if (peekWave) { const w = Math.sin(age * Math.PI * 2 / .9) * .5 + .5; t.hb = rot([t.sh[0] + 13, t.sh[1] - 11], t.sh, w * .5); } // out to the side, clear of his head
+      if (peekWave) { const w = Math.sin(age * Math.PI * 2 / .9) * .5 + .5; t.hb = rot([t.sh[0] + 15, t.sh[1] - 2], t.sh, -w * .5); } // a hand pops out under his head and waves
     }
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
@@ -4015,16 +4016,18 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     J.forEach((k) => { pos[k] = [POSES.peek[k][0] + (k[0] === 'l' ? 0 : ox), POSES.peek[k][1]]; });
     activity = 'intro';
     const steps = [
-      [500, () => { e = edge(); hideAt(); oxTo = e - 18; }], // head pokes out
-      [1500, () => { oxTo = e - 23; }],                  // ducks back a little...
-      [1900, () => { oxTo = e - 13; peekWave = true; }], // ...then out again with a wave
-      [3300, () => { peekWave = false; go('walk'); oxTo = 0; }], // steps out (a few strides)
-      [4300, () => { man.removeAttribute('clip-path'); go('wave'); }],
-      [6000, () => next('code')],
+      [500, () => { e = edge(); hideAt(); oxTo = e - 15; }], // just his head peeks out...
+      [1300, () => { oxTo = e - 27; }],                  // ...ducks back
+      [1900, () => { oxTo = e - 15; }],                  // peeks again...
+      [2600, () => { oxTo = e - 27; }],                  // ...and back
+      [3200, () => { oxTo = e - 14; peekWave = true; }], // last peek, with a little wave
+      [4600, () => { peekWave = false; go('walk'); oxTo = 0; }], // then steps out
+      [5700, () => { man.removeAttribute('clip-path'); go('wave'); }],
+      [7400, () => next('code')],
     ];
     // measure the "d" only once its real font has loaded (phones can be slow)
     let begun = false;
-    const begin = () => { if (begun) return; begun = true; e = edge(); hideAt(); ox = oxTo = e - 34; run(steps); };
+    const begin = () => { if (begun) return; begun = true; e = edge(); hideAt(); ox = oxTo = e - 36; run(steps); };
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(begin);
     setTimeout(begin, 2500);
   }
