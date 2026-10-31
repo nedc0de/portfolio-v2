@@ -10364,7 +10364,7 @@ html.fav-sheet-open { overflow: hidden; }
   width: .66em;
   height: .7em;
   margin-left: .03em;
-  vertical-align: -.117em; /* feet on the baseline */
+  vertical-align: -.0766em; /* his ground (y 57 of 64) sits exactly on the letters' baseline */
   overflow: visible;
   fill: none;
   stroke: currentColor;
