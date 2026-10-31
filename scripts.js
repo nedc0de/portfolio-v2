@@ -3543,6 +3543,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - weights: dumbbell curls, a couple of overhead presses
 // - phone call: pacing a little, chatting with his free hand
 // - boxing: combos on the "d", which shakes with every hit
+// - painting the "d" orange (it fades back), a paper plane looping over
+//   "Ned", selfies with a peace sign and a flash
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
@@ -3556,6 +3558,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const bits = [...svg.querySelectorAll('.sk-code text')];
   const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone'), gloves = [...svg.querySelectorAll('.sk-glove')];
   const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
+  const brush = el('.sk-brush'), plane = el('.sk-plane'), peace = el('.sk-peace'), flash = el('.sk-flash');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
 
@@ -3585,6 +3588,15 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     dash:     P([28.5, 18], [26, 27], [25, 29.5], [20, 43], [9, 39], [12, 42], [26, 57], [16, 57], [1, -1, -1, -1]),
     // reaching into the "d" (his cupboard): the "d" is drawn over him, so his hand disappears inside it
     rummage:  P([19, 11.5], [19.5, 21.5], [19.5, 24.5], [21, 38.5], [15, 44.5], [-3, 29], [16.5, 57], [24.5, 57], [1, 1, 1, 1]),
+    // painting the "d": stood right by it, facing it, brush on the stem
+    paint:    P([16.5, 11.5], [17.5, 21.5], [17.5, 24.5], [19.5, 38.5], [13.5, 44], [2, 32], [15.5, 57], [23, 57], [1, 1, 1, 1]),
+    admire:   P([23.5, 12], [23, 21.5], [23, 25], [22, 38.5], [27.5, 38], [17, 40], [18.5, 57], [25.5, 57], [-1, 1, -1, -1]),
+    fold:     P([21, 12], [21, 21.5], [21, 25], [21, 38.5], [19.5, 33], [23.5, 33], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    windup:   P([18.5, 12], [19.5, 21.5], [19.5, 25], [21, 38.5], [14.5, 44.5], [7, 18], [16.5, 57], [25.5, 57], [1, 1, -1, -1]),
+    throw:    P([25, 12.5], [24, 22], [23.5, 25.5], [21.5, 38.5], [14.5, 44], [41, 20], [17, 57], [27, 57], [1, -1, -1, -1]),
+    catch:    P([22, 10.5], [21.5, 21], [21.5, 24.5], [21, 38.5], [14.5, 44.5], [33, 8], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    selfie:   P([20, 11.5], [21, 21.5], [21, 25], [21, 38.5], [11, 4.5], [38, 10], [17.5, 57], [24.5, 57], [-1, 1, -1, -1]),
+    selfie2:  P([23, 12.5], [22, 22], [22, 25.5], [21, 38.5], [16, 41], [38, 12], [16.5, 57], [25.5, 57], [1, 1, -1, -1]),
     think:    P([20, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [30, 5.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]), // elbow out, hand scratching the side of his head
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3611,7 +3623,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['paint', 'admire', 'fold', 'windup', 'throw', 'catch', 'selfie', 'selfie2', 'rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3621,6 +3633,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
   let mugAt = null, onPhone = false, lifting = false, peekWave = false;
+  let paintFrom = 0, paintTo = 0, paintStart = 0, paintMs = 1; // how much of the "d" is orange, 0–100
+  let planeAt = -9e9, planeFrom = null, lookAt = 0, flashAt = -9e9;
   let peekLean = 0, peekVel = 0, peekTo = 0; // how far he leans out (0 upright, 1 head out)
   const PUNCHES = [[.15, 'ha'], [.55, 'ha'], [.95, 'hb'], [1.65, 'ha']];
   // a flurry: a dozen quick alternating punches
@@ -3712,6 +3726,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       t.head[1] += Math.sin(age * 2.2) * .5 * peekLean;
     }
     if (mode === 'rummage') { t.hb[1] += Math.sin(age * 13) * 1.4; t.head[0] -= .8; } // feeling around inside
+    if (mode === 'paint') { // long brush strokes up and down the stem
+      const k = Math.sin(age * Math.PI * 2 / 1.1);
+      t.hb = [t.hb[0], 34 - k * 13]; t.head[1] -= k * .6; t.hip[1] += Math.abs(k) * .5;
+    }
+    if (mode === 'fold') { const j = Math.sin(age * 18) * 1.1; t.ha[0] += j; t.hb[0] -= j; t.head[1] += 1; } // folding
+    if (mode === 'catch' || mode === 'throw') t.head[0] += lookAt * 1.8;
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
@@ -3847,9 +3867,41 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
     mug.style.opacity = mugAt === 'hand' ? man.style.opacity : ''; // in his hand, it goes where he goes
     if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
-    if (onPhone) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .5)} ${f2(p.hb[1] - 1)}) rotate(-15)`);
-    phone.style.opacity = onPhone ? man.style.opacity : '';
+    const phoneOut = onPhone || svg.classList.contains('has-phone');
+    if (phoneOut) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .5)} ${f2(p.hb[1] - 1)}) rotate(${onPhone ? -15 : -5})`);
+    phone.style.opacity = phoneOut ? man.style.opacity : '';
     if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('cx', f2(h[0])); g.setAttribute('cy', f2(h[1])); });
+    // brush in his right hand, bristles pointing at the "d"
+    if (svg.classList.contains('has-brush')) brush.setAttribute('transform', `translate(${f2(p.hb[0])} ${f2(p.hb[1])})`);
+    // peace sign on his left hand
+    if (svg.classList.contains('has-peace')) peace.setAttribute('transform', `translate(${f2(p.ha[0])} ${f2(p.ha[1] - 1)})`);
+    // selfie flash at the phone
+    const fl = (now - flashAt) / 260;
+    flash.style.opacity = fl >= 0 && fl < 1 ? f2((1 - fl) * .95) : '0';
+    flash.setAttribute('cx', f2(p.hb[0])); flash.setAttribute('cy', f2(p.hb[1] - 2)); flash.setAttribute('r', f2(4 + fl * 6));
+    // the paper plane: in his hand, or flying a loop over "Ned" and back
+    if (svg.classList.contains('has-plane')) {
+      const u = (now - planeAt) / 3400;
+      let x = p.hb[0] + 2, y = p.hb[1] - 1, ang = -10;
+      if (u >= 0 && u < 1 && planeFrom) {
+        const a = Math.PI * 2 * u, R = 34;
+        x = planeFrom[0] + Math.sin(a) * R * 1.9 - Math.sin(a * 2) * 6;
+        y = planeFrom[1] - (1 - Math.cos(a)) * R * .55 - Math.sin(a / 2) * 10;
+        const dx = Math.cos(a) * R * 1.9 - Math.cos(a * 2) * 12, dy = -Math.sin(a) * R * .55 - Math.cos(a / 2) * 5;
+        ang = Math.atan2(dy, dx) * 180 / Math.PI;
+        lookAt = Math.max(-1, Math.min(1, (x - p.head[0]) / 30));
+      } else lookAt = 0;
+      plane.setAttribute('transform', `translate(${f2(x)} ${f2(y)}) rotate(${ang.toFixed(1)})`);
+    }
+    // painting the "d": orange fills it from the bottom up, stroke by stroke
+    if (d) {
+      const pu = Math.min(1, (now - paintStart) / paintMs), pv = paintFrom + (paintTo - paintFrom) * smooth(pu);
+      if (pv > .2) {
+        d.style.backgroundImage = `linear-gradient(to top, var(--fifteenth-color) ${pv.toFixed(1)}%, var(--fourth-color) ${pv.toFixed(1)}%)`;
+        d.style.webkitBackgroundClip = d.style.backgroundClip = 'text';
+        d.style.color = 'transparent';
+      } else if (d.style.backgroundImage) { d.style.backgroundImage = d.style.webkitBackgroundClip = d.style.backgroundClip = d.style.color = ''; }
+    }
     // the "d" takes the hit: knocked back, then wobbles to a stop
     if (d) {
       const h = (now - hitAt) / 1000;
@@ -3910,7 +3962,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     cls('is-thinking', false); cls('has-idea', false); cls('is-error', false);
     flags.code = false; flags.fast = false;
     if (lifting) { lifting = false; cls('has-weights', false); }
-    cls('has-gloves', false);
+    cls('has-gloves', false); cls('has-brush', false); cls('has-plane', false); cls('has-peace', false);
+    if (paintTo) { paintFrom = paintTo; paintTo = 0; paintStart = performance.now(); paintMs = 800; }
     if (onPhone) { onPhone = false; cls('has-phone', false); }
     if (mugAt === 'hand') mugAt = [46.5, 57];
     oxTo = 0; if (ox) ox = 0;
@@ -3983,6 +4036,31 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       ...intoD(D + 9000, () => { onPhone = false; cls('has-phone', false); }),
       [D * 2 + 9100, next],
     ],
+    paint: () => [
+      ...fromD(0, () => cls('has-brush', true)),
+      [D, () => { go('walk'); oxTo = -5; }],
+      [D + 450, () => { go('paint'); paintFrom = 0; paintTo = 100; paintStart = performance.now(); paintMs = 4400; }],
+      [D + 5000, () => { go('walk'); oxTo = 0; }], [D + 5450, () => go('admire')], // steps back to admire it
+      [D + 7000, () => { paintFrom = 100; paintTo = 0; paintStart = performance.now(); paintMs = 1300; }], // ...and it fades
+      ...intoD(D + 7500, () => cls('has-brush', false)),
+      [D * 2 + 7600, next],
+    ],
+    plane: () => [
+      [0, () => go('stand')], [350, () => go('fold')], [1250, () => cls('has-plane', true)],
+      [1600, () => go('windup')], [2050, () => go('throw')],
+      [2150, () => { planeAt = performance.now(); planeFrom = [pos.hb[0], pos.hb[1]]; }],
+      [3300, () => go('stand')], [4900, () => go('catch')], // reaches up to catch it
+      [5650, () => { go('stand'); }], [6300, () => cls('has-plane', false)],
+      [6600, next],
+    ],
+    selfie: () => [
+      ...fromD(0, () => { onPhone = false; cls('has-phone', true); }),
+      [D, () => { go('selfie'); cls('has-peace', true); }], [D + 900, () => { flashAt = performance.now(); }],
+      [D + 1600, () => { cls('has-peace', false); go('selfie2'); }], [D + 2300, () => { flashAt = performance.now(); }],
+      [D + 2900, () => go('stand')],
+      ...intoD(D + 3200, () => cls('has-phone', false)),
+      [D * 2 + 3300, next],
+    ],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
       [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
@@ -3993,7 +4071,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   function next(force) {
     tidy();
     const after = activity;
-    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'box', 'think', 'rest'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'box', 'paint', 'plane', 'selfie', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     let steps = ACTIVITIES[activity]();
     // between tasks he gets up and brushes his hands off before starting the next
@@ -4026,7 +4104,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or box, pushup, weights, phone, think, rest…) starts with that, for testing
+  // ?stick=coffee (or box, paint, plane, selfie, pushup, weights, phone, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   // he only peeks out on a first visit or a refresh; moving between pages of
   // the site, he just carries on with what he was doing
