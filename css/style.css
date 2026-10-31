@@ -10330,12 +10330,6 @@ html.fav-sheet-open { overflow: hidden; }
 .sk-lap-screen { stroke-width: 2.6; transition: stroke .35s, opacity .3s; }
 .stick.is-typing .sk-lap-screen { stroke: var(--fifteenth-color); }
 .stick.is-error .sk-lap-screen { stroke: #ff5a4f; }
-/* video call: the laptop turned towards you */
-.sk-lap-face, .sk-cam { opacity: 0; transition: opacity .35s; }
-.sk-lap-face { stroke-width: 2.2; fill: rgba(255, 122, 26, .1); }
-.sk-cam { fill: var(--fifteenth-color); stroke: none; }
-.stick.is-calling .sk-lap-face, .stick.is-calling .sk-cam { opacity: 1; }
-.stick.is-calling .sk-lap-base, .stick.is-calling .sk-lap-screen { opacity: 0; }
 /* coffee mug */
 .sk-mug { stroke-width: 1.5; opacity: 0; transition: opacity .3s; }
 .sk-mug path { fill: var(--thirteenth-color); }
