@@ -3543,7 +3543,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - weights: dumbbell curls, a couple of overhead presses
 // - phone call: pacing a little, chatting with his free hand
 // - boxing: combos on the "d", which shakes with every hit
-// - painting the "d" orange (it fades back), a paper plane looping over
+// - spray-painting the "d" orange (it fades back), a paper plane looping over
 //   "Ned", selfies with a peace sign and a flash
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
@@ -3558,6 +3558,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const bits = [...svg.querySelectorAll('.sk-code text')];
   const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone'), gloves = [...svg.querySelectorAll('.sk-glove')];
   const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
+  const mist = [...svg.querySelectorAll('.sk-mist circle')];
   const brush = el('.sk-brush'), plane = el('.sk-plane'), peace = el('.sk-peace'), flash = el('.sk-flash');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3588,8 +3589,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     dash:     P([28.5, 18], [26, 27], [25, 29.5], [20, 43], [9, 39], [12, 42], [26, 57], [16, 57], [1, -1, -1, -1]),
     // reaching into the "d" (his cupboard): the "d" is drawn over him, so his hand disappears inside it
     rummage:  P([19, 11.5], [19.5, 21.5], [19.5, 24.5], [21, 38.5], [15, 44.5], [-3, 29], [16.5, 57], [24.5, 57], [1, 1, 1, 1]),
-    // painting the "d": stood right by it, facing it, brush on the stem
-    paint:    P([16.5, 11.5], [17.5, 21.5], [17.5, 24.5], [19.5, 38.5], [13.5, 44], [2, 32], [15.5, 57], [23, 57], [1, 1, 1, 1]),
+    // spray painting the "d": arm out, can pointed at it, a step back from it
+    paint:    P([19, 11.5], [19.5, 21.5], [19.5, 24.5], [20.5, 38.5], [15.5, 44.5], [9, 28], [16.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    rattle:   P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [28, 20], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     admire:   P([23.5, 12], [23, 21.5], [23, 25], [22, 38.5], [27.5, 38], [17, 40], [18.5, 57], [25.5, 57], [-1, 1, -1, -1]),
     fold:     P([21, 12], [21, 21.5], [21, 25], [21, 38.5], [19.5, 33], [23.5, 33], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     windup:   P([18.5, 12], [19.5, 21.5], [19.5, 25], [21, 38.5], [14.5, 44.5], [7, 18], [16.5, 57], [25.5, 57], [1, 1, -1, -1]),
@@ -3623,7 +3625,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['paint', 'admire', 'fold', 'windup', 'throw', 'catch', 'selfie', 'selfie2', 'rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['paint', 'rattle', 'admire', 'fold', 'windup', 'throw', 'catch', 'selfie', 'selfie2', 'rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3735,9 +3737,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }
     if (mode === 'rummage') { t.hb[1] += Math.sin(age * 13) * 1.4; t.head[0] -= .8; } // feeling around inside
     if (mode === 'paint') { // long brush strokes up and down the stem
-      const k = Math.sin(age * Math.PI * 2 / 1.1);
-      t.hb = [t.hb[0], 34 - k * 13]; t.head[1] -= k * .6; t.hip[1] += Math.abs(k) * .5;
+      const k = Math.sin(age * Math.PI * 2 / 1.6); // sweeping the can up and down the stem
+      t.hb = [t.hb[0], 31 - k * 12]; t.head[1] -= k * .5;
     }
+    if (mode === 'rattle') t.hb[1] += Math.sin(age * 40) * 2.6; // shaking the can
     if (mode === 'fold') { const j = Math.sin(age * 18) * 1.1; t.ha[0] += j; t.hb[0] -= j; t.head[1] += 1; } // folding
     if (mode === 'catch' || mode === 'throw') t.head[0] += lookAt * 1.8;
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
@@ -3880,7 +3883,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     phone.style.opacity = phoneOut ? man.style.opacity : '';
     if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('cx', f2(h[0])); g.setAttribute('cy', f2(h[1])); });
     // brush in his right hand, bristles pointing at the "d"
-    if (svg.classList.contains('has-brush')) brush.setAttribute('transform', `translate(${f2(p.hb[0])} ${f2(p.hb[1])})`);
+    if (svg.classList.contains('has-brush')) brush.setAttribute('transform', `translate(${f2(p.hb[0])} ${f2(p.hb[1])}) rotate(${mode === 'paint' ? -90 : 0})`);
+    // spray mist: a cone of orange dots puffing from the nozzle onto the "d"
+    const spraying = mode === 'paint' && (now - modeStart) > 250;
+    mist.forEach((c) => {
+      if (!spraying) { c.setAttribute('r', '0'); return; }
+      const f = Math.random();
+      c.setAttribute('cx', f2(p.hb[0] - 6 - f * 9));
+      c.setAttribute('cy', f2(p.hb[1] + (Math.random() - .5) * (2 + f * 9)));
+      c.setAttribute('r', f2(.5 + Math.random() * 1.1));
+      c.style.opacity = f2(.25 + (1 - f) * .6);
+    });
     // peace sign on his left hand
     if (svg.classList.contains('has-peace')) peace.setAttribute('transform', `translate(${f2(p.ha[0])} ${f2(p.ha[1] - 1)})`);
     // selfie flash at the phone
@@ -4049,12 +4062,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     ],
     paint: () => [
       ...fromD(0, () => cls('has-brush', true)),
-      [D, () => { go('walk'); oxTo = -5; }],
-      [D + 450, () => { go('paint'); paintFrom = 0; paintTo = 100; paintStart = performance.now(); paintMs = 4400; }],
-      [D + 5000, () => { go('walk'); oxTo = 0; }], [D + 5450, () => go('admire')], // steps back to admire it
-      [D + 7000, () => { paintFrom = 100; paintTo = 0; paintStart = performance.now(); paintMs = 1300; }], // ...and it fades
-      ...intoD(D + 7500, () => cls('has-brush', false)),
-      [D * 2 + 7600, next],
+      [D, () => go('rattle')], // a good shake first
+      [D + 900, () => { go('paint'); paintFrom = 0; paintTo = 100; paintStart = performance.now() + 250; paintMs = 4400; }],
+      [D + 5600, () => go('admire')], // steps back to admire it
+      [D + 7100, () => { paintFrom = 100; paintTo = 0; paintStart = performance.now(); paintMs = 1300; }], // ...and it fades
+      ...intoD(D + 7600, () => cls('has-brush', false)),
+      [D * 2 + 7700, next],
     ],
     plane: () => [
       [0, () => go('stand')], [350, () => go('fold')], [1250, () => cls('has-plane', true)],
