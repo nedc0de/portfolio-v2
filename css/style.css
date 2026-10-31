@@ -10384,7 +10384,7 @@ circle.sk-cap-line { fill: #565656; stroke: none; }
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 5.4; /* sturdy limbs, not skinny */
+  stroke-width: 3.4; /* thin, bendy limbs under a big head */
   stroke-linecap: round;
   stroke-linejoin: round;
   color: #f2f2f2;
