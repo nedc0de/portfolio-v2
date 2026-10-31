@@ -3999,7 +3999,28 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   wake();
   // ?stick=coffee (or box, pushup, weights, phone, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
-  if (first || still.matches || scrollY > 100) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
+  // he only peeks out on a first visit or a refresh; moving between pages of
+  // the site, he just carries on with what he was doing
+  const KEY = 'nedcode-stick';
+  const navType = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0] || {}).type;
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+  const fromSite = (() => { try { return new URL(document.referrer).origin === location.origin; } catch (e) { return false; } })();
+  const carryOn = !first && saved && navType !== 'reload' && (fromSite || navType === 'back_forward');
+  addEventListener('pagehide', () => {
+    try { sessionStorage.setItem(KEY, JSON.stringify({ activity, mug: Array.isArray(mugAt) || mugAt === 'hand' })); } catch (e) {}
+  });
+  if (carryOn) {
+    if (saved.mug) { mugAt = [46.5, 57]; cls('has-mug', true); }
+    const was = ACTIVITIES[saved.activity] ? saved.activity : 'code';
+    if (was === 'code') { // already at his laptop: straight back to typing
+      go('type');
+      J.forEach((k) => { pos[k] = [...POSES.type[k]]; });
+      bend = [...POSES.type.bend];
+      activity = 'code';
+      run([[300, () => { flags.code = true; }], ...getUp(rand(6000, 10000)), [11500, next]]);
+    } else run([[300, () => next(was)]]);
+  } else if (first || still.matches || scrollY > 100) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
   else {
     // every visit: he's hiding behind the "d", peeks out at you, says hi, steps out
     // where the "d"'s stem really ends (the ink, not the letter box), in the
