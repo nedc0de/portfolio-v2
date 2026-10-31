@@ -3624,7 +3624,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const Z = { head: .42, neck: .58, sh: .58, hip: .62, ha: .5, hb: .5, fa: .85, fb: .85, l1: .6, l2: .6, l3: .5 };
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
-  const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
+  const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 6.6; // smaller head on a solid body
   const STANDING = new Set(['paint', 'rattle', 'admire', 'fold', 'windup', 'throw', 'catch', 'selfie', 'selfie2', 'rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 

@@ -10373,14 +10373,14 @@ html.fav-sheet-open { overflow: hidden; }
 .stick {
   position: relative;
   z-index: 0; /* behind the "d" */
-  width: .66em;
-  height: .7em;
+  width: .754em;
+  height: .8em;
   margin-left: .03em;
-  vertical-align: -.0766em; /* his ground (y 57 of 64) sits exactly on the letters' baseline */
+  vertical-align: -.0875em; /* his ground (y 57 of 64) sits exactly on the letters' baseline */
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 4.2;
+  stroke-width: 5.4; /* sturdy limbs, not skinny */
   stroke-linecap: round;
   stroke-linejoin: round;
   color: #f2f2f2;
