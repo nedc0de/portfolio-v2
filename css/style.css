@@ -10320,7 +10320,7 @@ html.fav-sheet-open { overflow: hidden; }
 
 /*===== HOME: a stick figure next to "Ned", busy with his laptop =====*/
 /* scripts.js moves his joints every frame, easing between poses */
-.hm-d { display: inline-block; transform-origin: 50% 92%; } /* shakes when he punches it */
+.hm-d { display: inline-block; position: relative; z-index: 1; transform-origin: 50% 92%; } /* shakes when he punches it; drawn in front of him, so he can hide behind its stem */
 /* his laptop: shut on the floor until he sits down with it */
 /* cartoon build: a solid white head */
 .sk-head { fill: currentColor; }
@@ -10359,10 +10359,12 @@ html.fav-sheet-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .sk-dots circle { animation: none; opacity: .8; } }
 
 .stick {
+  position: relative;
+  z-index: 0; /* behind the "d" */
   width: .66em;
   height: .7em;
   margin-left: .03em;
-  vertical-align: -.117em; /* feet on the baseline */
+  vertical-align: -.0766em; /* his ground (y 57 of 64) sits exactly on the letters' baseline */
   overflow: visible;
   fill: none;
   stroke: currentColor;
