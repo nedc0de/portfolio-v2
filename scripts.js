@@ -3542,7 +3542,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - charge: the battery dies, he plugs a cable into the "d", it lights up
 // - video call: turns the laptop to face you and waves
 // - think: hand on his chin, a thought bubble, then the idea
-// - nap: head on his shut laptop (and all night, the visitor's own time)
+// - push-ups
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
 (() => {
@@ -3561,15 +3561,14 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const SHUT = { l1: [56, 56.5], l2: [42, 56.5], l3: [55.5, 55.3] };
   const LAP = { l1: [36, 50.5], l2: [22, 50.5], l3: [39, 37.5] };
   const FLOOR = { l1: [44, 56.5], l2: [30, 56.5], l3: [46, 44] };
-  const PILLOW = { l1: [22, 56.5], l2: [10, 56.5], l3: [21.5, 55.3] };
   const P = (head, neck, sh, hip, ha, hb, fa, fb, bend, lap = SHUT) => ({ head, neck, sh, hip, ha, hb, fa, fb, bend, ...lap });
   const SIT = [[15, 30.5], [14, 39.5], [14.5, 43], [16, 55]];
   const POSES = {
-    stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [25, 45.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     crouch:   P([20, 21], [20, 31], [20, 34], [20, 46.5], [12, 44], [28, 44], [14, 57], [26, 57], [1, -1, -1, -1]),
     jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [16, 56], [24, 56], [1, -1, -1, -1]),
-    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [16, 45.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
-    wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [25, 46], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
+    wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
@@ -3578,11 +3577,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     fistpump: P([17.5, 29], [15, 39], [15.5, 42.5], [16, 55], [26, 48.5], [22.5, 21.5], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
     call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
-    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 46], [25.5, 15.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
-    hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [25.5, 15.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     plug:     P([8, 31], [11, 39.5], [11.5, 43], [16, 50.5], [1, 53], [3, 54.5], [6, 57], [25, 57], [-1, -1, 1, -1], FLOOR),
     floorwork: P(...SIT, [30, 54], [33, 54.5], [26, 56.5], [28, 56], [1, 1, -1, -1], FLOOR),
-    nap:      P([9, 51.5], [17.5, 54], [21, 54.5], [35, 55.5], [10, 55], [28, 53], [54.5, 56.5], [53, 54], [1, -1, -1, -1], PILLOW),
+    pushup:   P([7, 34], [14, 38], [17, 39.5], [33, 46.5], [16, 57], [19, 57], [52, 57], [50.5, 57], [-1, -1, 1, 1]),
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // cartoon timing: stiff springs snap into each pose with a small pop, then
@@ -3590,13 +3589,13 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const K = { head: 330, neck: 720, sh: 720, hip: 650, ha: 950, hb: 950, fa: 1200, fb: 1200, l1: 600, l2: 600, l3: 450 };
   const Z = { head: .42, neck: .58, sh: .58, hip: .62, ha: .5, hb: .5, fa: .85, fb: .85, l1: .6, l2: .6, l3: .5 };
   // limb segments sized so relaxed arms and standing legs are almost straight
-  const ARM = 10.5, LEG = 9.85, TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5;
+  // cartoon build: a big round head sitting right on the body, no neck gap
+  const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
   const STANDING = new Set(['stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
-  const night = new Date().getHours() < 6;
-  let mode = night ? 'nap' : 'stand', modeStart = performance.now();
+  let mode = 'stand', modeStart = performance.now();
   const pos = {}, vel = {};
   J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
   let bend = [...POSES[mode].bend];
@@ -3645,7 +3644,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
     if (mode === 'fistpump') { const k = Math.abs(Math.sin(age * 11)); t.hb[1] -= k * 4; t.head[1] -= k * 1.2; }
-    if (mode === 'nap') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .6; t.neck[1] -= b * .5; t.sh[1] -= b * .6; }
+    if (mode === 'pushup') { // down slow, up snappy, a beat at the top
+      const c = (age % 1.3) / 1.3, dn = c < .45 ? smooth(c / .45) : c < .62 ? 1 - smooth((c - .45) / .17) : 0;
+      t.head[1] += dn * 11; t.neck[1] += dn * 10.5; t.sh[1] += dn * 10; t.hip[1] += dn * 5.5;
+    }
     if (mode === 'walk') { // legs and arms swing in turn as he goes
       const ph = walkPhase, dir = Math.sign(oxTo - ox) || 1;
       // feet: one planted and sliding back, the other lifting and swinging through
@@ -3853,12 +3855,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
     ],
     rest: () => [[0, () => go('wipe')], [1600, () => go('stretch')], [2600, () => go('stand')], [3200, next]],
-    nap: () => [[0, () => go('stand')], [400, () => go('crouch')], [900, () => go('nap')], [rand(7000, 9000), () => go('stretch')], [rand(9800, 10200), next]],
+    pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [rand(7000, 9000), () => go('crouch')], [rand(9400, 9600), () => go('wipe')], [10800, next]],
   };
   let activity = mode;
   function next(force) {
     tidy();
-    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest', 'nap'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest', 'pushup'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     run(ACTIVITIES[activity]());
   }
@@ -3867,7 +3869,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let waving = false, tappedAt = 0;
   svg.addEventListener('click', () => {
     tidy();
-    if (mode === 'nap') { activity = 'wake'; run([[0, () => go('stretch')], [1300, () => next('code')]]); return; }
     waving = true; tappedAt = scrollY; activity = 'wave';
     run([[0, () => go('crouch')], [140, () => go('jump')], [700, () => { if (waving) go('wave'); }]]);
   });
@@ -3881,7 +3882,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or charge, call, think, nap…) starts with that, for testing
+  // ?stick=coffee (or charge, call, think, pushup…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
-  if (!night || first) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
+  run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();

@@ -10322,6 +10322,8 @@ html.fav-sheet-open { overflow: hidden; }
 /* scripts.js moves his joints every frame, easing between poses */
 .hm-d { display: inline-block; }
 /* his laptop: shut on the floor until he sits down with it */
+/* cartoon build: a solid white head */
+.sk-head { fill: currentColor; }
 /* motion smears on fast arm swings (cartoon style) */
 .sk-smear { fill: none; stroke-width: 5; opacity: 0; }
 .sk-lap-base { stroke-width: 3.2; transition: opacity .3s; }
@@ -10367,10 +10369,10 @@ html.fav-sheet-open { overflow: hidden; }
   overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 3.6;
+  stroke-width: 4.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: var(--fourth-color);
+  color: #f2f2f2;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
