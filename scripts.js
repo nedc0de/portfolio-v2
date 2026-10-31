@@ -3567,6 +3567,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [5, 9], [37, 9], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    dust:     P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [19, 40], [23.5, 40], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3592,7 +3593,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3602,7 +3603,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
   let mugAt = null;
-  let glance = 0, nodAt = -9e9;
+  let glance = 0, nodAt = -9e9, helloAt = -9e9;
   const flags = { code: false };
   const live = bits.map(() => ({ t0: -9e9 }));
   let nextBit = 0;
@@ -3643,6 +3644,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       J.forEach((k) => { if (k[0] !== 'l') t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
+    if (mode === 'dust') { const j = Math.sin(age * Math.PI * 2 / .24) * 2; t.ha[0] += j; t.hb[0] -= j; t.head[1] += 1; } // brushing his hands off
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
@@ -3661,6 +3663,15 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const bob = 1.2 - Math.abs(Math.cos(ph)) * 2.6;
       ['hip', 'neck', 'sh', 'head'].forEach((k) => { t[k][1] += bob; });
       t.head[0] += dir * 1.4; t.neck[0] += dir * .9; // leans into the walk
+    }
+    // left alone a while: he looks out at you and gives a little wave
+    const ha2 = (now - helloAt) / 1900;
+    if (ha2 >= 0 && ha2 < 1 && !['walk', 'pushup', 'jump', 'crouch'].includes(mode)) {
+      const k = Math.sin(Math.PI * Math.min(1, ha2 * 1.6)) ** .5 * (ha2 < .8 ? 1 : (1 - ha2) / .2);
+      t.head[0] += 1.4 * k; t.head[1] -= .8 * k;
+      const up = [t.sh[0] + 14, t.sh[1] - 10]; // out to the side, clear of his head
+      const w = rot(up, t.sh, Math.sin(ha2 * Math.PI * 6) * .35);
+      t.hb = [t.hb[0] + (w[0] - t.hb[0]) * k, t.hb[1] + (w[1] - t.hb[1]) * k];
     }
     // looking up at you when you scroll, nodding when you come back
     if (glance > 0) { t.head[1] -= 1.6 * glance; t.head[0] += 1.2 * glance; }
@@ -3838,12 +3849,19 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     ],
     rest: () => [[0, () => go('wipe')], [1600, () => go('stretch')], [2600, () => go('stand')], [3200, next]],
   };
-  let activity = mode;
+  let activity = mode, started = false;
   function next(force) {
     tidy();
+    const after = activity;
     const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
-    run(ACTIVITIES[activity]());
+    let steps = ACTIVITIES[activity]();
+    // between tasks he gets up and brushes his hands off before starting the next
+    if (started && after !== 'think' && after !== 'wave') {
+      steps = [[0, () => go('stand')], [380, () => go('dust')], ...steps.map(([ms, fn]) => [ms + 1250, fn])];
+    }
+    started = true;
+    run(steps);
   }
 
   // tap: a hop and a wave, until you scroll
@@ -3853,6 +3871,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     waving = true; tappedAt = scrollY; activity = 'wave';
     run([[0, () => go('crouch')], [140, () => go('jump')], [700, () => { if (waving) go('wave'); }]]);
   });
+  // nobody's touched the page for 20s: say hi (once per quiet spell)
+  let quiet = 0;
+  const poke = () => { clearTimeout(quiet); quiet = setTimeout(() => { if (onScreen && !document.hidden) { helloAt = performance.now(); wake(); } }, 20000); };
+  ['pointerdown', 'pointermove', 'keydown', 'scroll', 'touchstart'].forEach((e) => addEventListener(e, poke, { passive: true }));
+  poke();
   // scrolling: he glances up at you; come back to the top and he nods
   let awayAt = 0;
   addEventListener('scroll', () => {
