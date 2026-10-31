@@ -10320,7 +10320,7 @@ html.fav-sheet-open { overflow: hidden; }
 
 /*===== HOME: a stick figure next to "Ned", busy with his laptop =====*/
 /* scripts.js moves his joints every frame, easing between poses */
-.hm-d { display: inline-block; }
+.hm-d { display: inline-block; transform-origin: 50% 92%; } /* shakes when he punches it */
 /* his laptop: shut on the floor until he sits down with it */
 /* cartoon build: a solid white head */
 .sk-head { fill: currentColor; }

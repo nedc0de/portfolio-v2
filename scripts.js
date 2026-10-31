@@ -3542,6 +3542,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - push-ups: five slow reps, then a forehead wipe
 // - weights: dumbbell curls, a couple of overhead presses
 // - phone call: pacing a little, chatting with his free hand
+// - boxing: combos on the "d", which shakes with every hit
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
@@ -3554,6 +3555,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), mug = el('.sk-mug');
   const bits = [...svg.querySelectorAll('.sk-code text')];
   const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone');
+  const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
 
@@ -3574,6 +3576,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     curl:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15.5, 44.5], [26.5, 44.5], [17, 57], [25, 57], [-1, 1, -1, -1]),
     press:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [8, 24], [34, 24], [16, 57], [26, 57], [-1, 1, -1, -1]),
     phone:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [28.5, 14.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    // boxing stance, turned towards the "d": fists up by his chin, feet staggered
+    guard:    P([11, 12.5], [11.8, 22], [12, 24.5], [13.5, 39], [5.5, 20], [8.5, 22.5], [7.5, 57], [19, 57], [-1, -1, 1, 1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3585,6 +3589,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     sip:      P([19.5, 11], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [30, 15], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
   };
+  POSES.box = POSES.guard; // punching works off the guard stance
   // with the laptop he sits right up by the "d" and leans back against it
   ['sit', 'type', 'facepalm', 'fistpump'].forEach((n) => {
     const pz = POSES[n];
@@ -3599,7 +3604,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3609,6 +3614,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
   let mugAt = null, onPhone = false, lifting = false;
+  const PUNCHES = [[.15, 'ha'], [.55, 'ha'], [.95, 'hb'], [1.65, 'ha']];
+  let hitAt = -9e9, hitPower = 1, lastHit = -1;
   let glance = 0, nodAt = -9e9, helloAt = -9e9;
   const flags = { code: false };
   const live = bits.map(() => ({ t0: -9e9 }));
@@ -3667,6 +3674,23 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const g = Math.max(0, Math.sin(age * 2.3)) * Math.max(0, Math.sin(age * .9 + 1));
       t.ha = [t.ha[0] - 2 * g, t.ha[1] - 12 * g];
       t.head[1] += Math.sin(age * 4.1) * .4;
+    }
+    if (mode === 'guard' || mode === 'box') { // light on his feet
+      const b = Math.abs(Math.sin(age * Math.PI * 2 / .9));
+      ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k][1] += b * 1.1; });
+    }
+    if (mode === 'box') { // jab, jab, cross ... jab, every 2.4s; every punch lands on the "d"
+      const c = age % 2.4, cyc = Math.floor(age / 2.4);
+      PUNCHES.forEach(([at, hand], i) => {
+        const u = c - at;
+        if (u < 0 || u > .32) return;
+        const out = u < .07 ? smooth(u / .07) : u < .12 ? 1 : 1 - smooth((u - .12) / .2); // snap out, hold, pull back
+        const fist = hand === 'ha' ? [-1.5, 19.5] : [-1, 21.5];
+        t[hand] = [t[hand][0] + (fist[0] - t[hand][0]) * out, t[hand][1] + (fist[1] - t[hand][1]) * out];
+        ['head', 'neck', 'sh'].forEach((k) => { t[k][0] -= out * (hand === 'hb' ? 2.4 : 1.2); }); // lean into it
+        const id = cyc * 10 + i;
+        if (u >= .06 && lastHit !== id) { lastHit = id; hitAt = now; hitPower = hand === 'hb' ? 1.4 : 1; }
+      });
     }
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
@@ -3786,6 +3810,14 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
     if (onPhone) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .5)} ${f2(p.hb[1] - 1)}) rotate(-15)`);
     phone.style.opacity = onPhone ? man.style.opacity : '';
+    // the "d" takes the hit: knocked back, then wobbles to a stop
+    if (d) {
+      const h = (now - hitAt) / 1000;
+      if (h >= 0 && h < .7) {
+        const w = Math.exp(-h * 7) * Math.cos(h * 38) * hitPower;
+        d.style.transform = `translateX(${(-w * .045).toFixed(4)}em) rotate(${(-w * 7).toFixed(2)}deg)`;
+      } else if (d.style.transform) d.style.transform = '';
+    }
     // bits of code rising from the screen
     bits.forEach((b, i) => {
       const u = (now - live[i].t0) / 1600;
@@ -3877,6 +3909,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       ].map(([ms, fn]) => [ms + at, fn])];
     },
     pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
+    box: () => [
+      [0, () => go('stand')], [350, () => go('guard')], [900, () => go('box')],
+      [900 + 2400 * 3, () => go('guard')], [900 + 2400 * 3 + 600, () => go('stand')],
+      [900 + 2400 * 3 + 1100, () => go('wipe')], [900 + 2400 * 3 + 2400, next],
+    ],
     weights: () => [
       [0, () => go('crouch')], [450, () => { lifting = true; cls('has-weights', true); go('stand'); }],
       [900, () => go('curl')],
@@ -3904,7 +3941,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   function next(force) {
     tidy();
     const after = activity;
-    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'think', 'rest'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'box', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     let steps = ACTIVITIES[activity]();
     // between tasks he gets up and brushes his hands off before starting the next
@@ -3937,7 +3974,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or pushup, weights, phone, think, rest…) starts with that, for testing
+  // ?stick=coffee (or box, pushup, weights, phone, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
