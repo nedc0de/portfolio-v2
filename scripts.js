@@ -3539,7 +3539,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - code: bits of code float up out of the screen; now and then an error, a
 //   facepalm, a burst of typing and a fist pump
 // - coffee: walks off, comes back with a mug, sips, sets it down
-// - video call: turns the laptop to face you and waves
+// - push-ups: five slow reps, then a forehead wipe
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
@@ -3573,10 +3573,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     type:     P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     fistpump: P([17.5, 29], [15, 39], [15.5, 42.5], [16, 55], [26, 48.5], [22.5, 21.5], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
-    call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
+    // push-up, top position: a straight plank from heels to head, hands under his shoulders
+    pushup:   P([11.4, 34.8], [18, 38.6], [20.2, 39.9], [33.6, 47.6], [19, 57], [21.5, 57], [50, 57], [49, 57], [-1, -1, 1, 1]),
     sip:      P([19.5, 11], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [30, 15], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
   };
+  // with the laptop he sits right up by the "d" and leans back against it
+  ['sit', 'type', 'facepalm', 'fistpump'].forEach((n) => {
+    const pz = POSES[n];
+    Object.keys(pz).forEach((k) => { if (k !== 'bend') pz[k] = [pz[k][0] - 7, pz[k][1]]; });
+    ['head', 'neck', 'sh'].forEach((k) => { pz[k][0] -= 3.5; });
+  });
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // cartoon timing: stiff springs snap into each pose with a small pop, then
   // hold; his head is looser so it follows half a beat behind
@@ -3609,7 +3616,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const go = (pose) => {
     mode = pose; modeStart = performance.now();
     cls('is-typing', ['type', 'sit', 'facepalm', 'fistpump'].includes(pose));
-    cls('is-calling', pose === 'call');
   };
 
   const targets = (now) => {
@@ -3627,7 +3633,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       if (age % 4 > 3.3) t.head[0] += 1.2; // leans in to read something
     }
     if (mode === 'think') { t.ha[1] += Math.max(0, Math.sin(age * 7)) * .9; t.head[1] -= .8; t.head[0] += Math.sin(age * .9) * .6; }
-    if (mode === 'wave' || mode === 'call') {
+    if (mode === 'wave') {
       const a = (Math.sin(age * Math.PI * 2 / 1) * .5 + .5) * .7;
       t.hb = rot(t.hb, t.sh, a);
       t.head[0] += .8;
@@ -3637,6 +3643,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       J.forEach((k) => { if (k[0] !== 'l') t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
+    if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
+      const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
+      ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
+    }
     if (mode === 'fistpump') { const k = Math.abs(Math.sin(age * 11)); t.hb[1] -= k * 4; t.head[1] -= k * 1.2; }
     if (mode === 'walk') { // legs and arms swing in turn as he goes
       const ph = walkPhase, dir = Math.sign(oxTo - ox) || 1;
@@ -3821,7 +3831,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
       [8300, () => next('code')],
     ],
-    call: () => [...sitDown(0), [1600, () => go('call')], [6200, () => go('sit')], ...getUp(6900), [8300, next]],
+    pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
       [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
@@ -3831,7 +3841,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let activity = mode;
   function next(force) {
     tidy();
-    const bag = ['code', 'code', 'code', 'coffee', 'call', 'think', 'rest'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     run(ACTIVITIES[activity]());
   }
@@ -3853,7 +3863,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or call, think, rest…) starts with that, for testing
+  // ?stick=coffee (or pushup, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
