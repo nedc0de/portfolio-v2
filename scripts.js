@@ -3539,7 +3539,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - code: bits of code float up out of the screen; now and then an error, a
 //   facepalm, a burst of typing and a fist pump
 // - coffee: walks off, comes back with a mug, sips, sets it down
-// - charge: the battery dies, he plugs a cable into the "d", it lights up
 // - video call: turns the laptop to face you and waves
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
@@ -3550,7 +3549,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const el = (c) => svg.querySelector(c);
   const man = el('.sk-man'), head = el('.sk-head'), body = el('.sk-body'),
     armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
-    lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), cable = el('.sk-cable'), mug = el('.sk-mug');
+    lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), mug = el('.sk-mug');
   const bits = [...svg.querySelectorAll('.sk-code text')];
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3559,7 +3558,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // bend, and the laptop as three points (front end, hinge end, screen top)
   const SHUT = { l1: [56, 56.5], l2: [42, 56.5], l3: [55.5, 55.3] };
   const LAP = { l1: [36, 50.5], l2: [22, 50.5], l3: [39, 37.5] };
-  const FLOOR = { l1: [44, 56.5], l2: [30, 56.5], l3: [46, 44] };
   const P = (head, neck, sh, hip, ha, hb, fa, fb, bend, lap = SHUT) => ({ head, neck, sh, hip, ha, hb, fa, fb, bend, ...lap });
   const SIT = [[15, 30.5], [14, 39.5], [14.5, 43], [16, 55]];
   const POSES = {
@@ -3578,8 +3576,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
     sip:      P([19.5, 11], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [30, 15], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
-    plug:     P([8, 31], [11, 39.5], [11.5, 43], [16, 50.5], [1, 53], [3, 54.5], [6, 57], [25, 57], [-1, -1, 1, -1], FLOOR),
-    floorwork: P(...SIT, [30, 54], [33, 54.5], [26, 56.5], [28, 56], [1, 1, -1, -1], FLOOR),
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // cartoon timing: stiff springs snap into each pose with a small pop, then
@@ -3598,7 +3594,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
-  let mugAt = null, plugged = false, carrying = false;
+  let mugAt = null;
   let glance = 0, nodAt = -9e9;
   const flags = { code: false };
   const live = bits.map(() => ({ t0: -9e9 }));
@@ -3612,7 +3608,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const cls = (name, on) => svg.classList.toggle(name, on);
   const go = (pose) => {
     mode = pose; modeStart = performance.now();
-    cls('is-typing', ['type', 'sit', 'facepalm', 'fistpump', 'floorwork'].includes(pose) && !svg.classList.contains('is-lowbat'));
+    cls('is-typing', ['type', 'sit', 'facepalm', 'fistpump'].includes(pose));
     cls('is-calling', pose === 'call');
   };
 
@@ -3623,7 +3619,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const br = Math.sin(now / 1000 * Math.PI * 2 / 3.2) * .35; // always breathing a little
     t.head[1] += br; t.neck[1] += br * .7; t.sh[1] += br * .6;
 
-    if (mode === 'type' || mode === 'floorwork') { // pecking at the keys
+    if (mode === 'type') { // pecking at the keys
       const fast = flags.fast ? 2 : 1;
       t.ha[1] -= Math.max(0, Math.sin(age * 23 * fast)) * 1.6;
       t.hb[1] -= Math.max(0, Math.sin(age * 19 * fast + 2)) * 1.6;
@@ -3742,11 +3738,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // the mug: in his hand, or where he put it down
     const m = mugAt === 'hand' ? [p.hb[0] + 1, p.hb[1] + 2.5] : mugAt;
     if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
-    // the cable: from the laptop's hinge to his hand, or plugged into the "d"
-    if (plugged || carrying) {
-      const a = p.l2, b = carrying ? p.ha : [-.5, 55];
-      cable.setAttribute('d', `M${f2(a[0])} ${f2(a[1])}Q${f2((a[0] + b[0]) / 2)} ${f2(Math.max(a[1], b[1]) + 3)} ${f2(b[0])} ${f2(b[1])}`);
-    }
     // bits of code rising from the screen
     bits.forEach((b, i) => {
       const u = (now - live[i].t0) / 1600;
@@ -3796,9 +3787,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   };
   const rand = (a, b) => a + Math.random() * (b - a);
   const tidy = () => { // whatever he was in the middle of, put it away
-    cls('is-thinking', false); cls('has-idea', false); cls('is-error', false); cls('is-lowbat', false);
-    flags.code = false; flags.fast = false; carrying = false;
-    if (plugged) { plugged = false; cls('has-cable', false); }
+    cls('is-thinking', false); cls('has-idea', false); cls('is-error', false);
+    flags.code = false; flags.fast = false;
     if (mugAt === 'hand') mugAt = [46.5, 57];
     oxTo = 0; if (ox) ox = 0;
   };
@@ -3831,18 +3821,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
       [8300, () => next('code')],
     ],
-    charge: () => [
-      ...sitDown(0),
-      [1700, () => { go('type'); flags.code = true; }],
-      [3600, () => { flags.code = false; cls('is-lowbat', true); go('sit'); }],
-      [4800, () => go('floorwork')],
-      [5600, () => go('stand')],
-      [6000, () => { carrying = true; cls('has-cable', true); go('plug'); }],
-      [7200, () => { carrying = false; plugged = true; cls('is-lowbat', false); cls('is-typing', true); }],
-      [7900, () => go('stand')],
-      [8400, () => { go('floorwork'); flags.code = true; }],
-      [rand(13000, 15000), next],
-    ],
     call: () => [...sitDown(0), [1600, () => go('call')], [6200, () => go('sit')], ...getUp(6900), [8300, next]],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
@@ -3853,7 +3831,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let activity = mode;
   function next(force) {
     tidy();
-    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'call', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     run(ACTIVITIES[activity]());
   }
@@ -3875,7 +3853,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or charge, call, think, rest…) starts with that, for testing
+  // ?stick=coffee (or call, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
