@@ -3540,6 +3540,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 //   facepalm, a burst of typing and a fist pump
 // - coffee: walks off, comes back with a mug, sips, sets it down
 // - push-ups: five slow reps, then a forehead wipe
+// - weights: dumbbell curls, a couple of overhead presses
+// - phone call: pacing a little, chatting with his free hand
 // - think: hand on his chin, a thought bubble, then the idea
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
@@ -3551,6 +3553,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
     lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), mug = el('.sk-mug');
   const bits = [...svg.querySelectorAll('.sk-code text')];
+  const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
 
@@ -3568,6 +3571,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [5, 9], [37, 9], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     dust:     P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [19, 40], [23.5, 40], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    curl:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15.5, 44.5], [26.5, 44.5], [17, 57], [25, 57], [-1, 1, -1, -1]),
+    press:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [8, 24], [34, 24], [16, 57], [26, 57], [-1, 1, -1, -1]),
+    phone:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [28.5, 14.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3593,7 +3599,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3602,7 +3608,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
   let bend = [...POSES[mode].bend];
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
-  let mugAt = null;
+  let mugAt = null, onPhone = false, lifting = false;
   let glance = 0, nodAt = -9e9, helloAt = -9e9;
   const flags = { code: false };
   const live = bits.map(() => ({ t0: -9e9 }));
@@ -3645,6 +3651,23 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
     if (mode === 'dust') { const j = Math.sin(age * Math.PI * 2 / .24) * 2; t.ha[0] += j; t.hb[0] -= j; t.head[1] += 1; } // brushing his hands off
+    if (mode === 'curl') { // alternating curls: forearm up to the shoulder, elbow stays tucked
+      const up = (o) => Math.max(0, Math.sin(age * Math.PI * 2 / 1.5 + o)) ** .7;
+      const a = up(0), b = up(Math.PI);
+      t.ha = [t.ha[0] - .5 * a, t.ha[1] + (24 - t.ha[1]) * a];
+      t.hb = [t.hb[0] + .5 * b, t.hb[1] + (24 - t.hb[1]) * b];
+      t.head[1] += (a + b) * .3;
+    }
+    if (mode === 'press') { // both up overhead, then back to the shoulders
+      const u = Math.max(0, Math.sin(age * Math.PI * 2 / 1.6)) ** .6;
+      t.ha = [t.ha[0] + 1 * u, t.ha[1] - 18 * u]; t.hb = [t.hb[0] - 1 * u, t.hb[1] - 18 * u]; // wide, clear of his head
+      t.head[1] += .6 * u;
+    }
+    if (mode === 'phone') { // chatting: free hand talks, head nods along
+      const g = Math.max(0, Math.sin(age * 2.3)) * Math.max(0, Math.sin(age * .9 + 1));
+      t.ha = [t.ha[0] - 2 * g, t.ha[1] - 12 * g];
+      t.head[1] += Math.sin(age * 4.1) * .4;
+    }
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
@@ -3658,7 +3681,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       t.fb = [21 - dir * 6.6 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 4.5];
       // arms swing opposite to the legs, hanging straight
       t.ha = [21 - dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
-      t.hb = mugAt ? [27, 34] : [21 + dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
+      t.hb = onPhone ? [28.5, 14.5] : mugAt ? [27, 34] : [21 + dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
       // cartoon bounce: down on each contact, up as the legs pass
       const bob = 1.2 - Math.abs(Math.cos(ph)) * 2.6;
       ['hip', 'neck', 'sh', 'head'].forEach((k) => { t[k][1] += bob; });
@@ -3722,7 +3745,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     pos.head = toward(pos.neck, pos.head, NECK_HEAD);
     ['ha', 'hb'].forEach((k) => { if (len(pos.sh, pos[k]) > ARM * 2) pos[k] = toward(pos.sh, pos[k], ARM * 2); });
     ['fa', 'fb'].forEach((k) => { if (len(pos.hip, pos[k]) > LEG * 2) pos.hip = toward(pos[k], pos.hip, LEG * 2); });
-    const tb = mode === 'walk' ? [1, -1, -(Math.sign(oxTo - ox) || 1), -(Math.sign(oxTo - ox) || 1)] : POSES[mode].bend; // walking: knees bend the way he's going
+    const tb = mode === 'walk' ? [1, onPhone ? 1 : -1, -(Math.sign(oxTo - ox) || 1), -(Math.sign(oxTo - ox) || 1)] : POSES[mode].bend; // walking: knees bend the way he's going
     bend = bend.map((b, i) => b + (tb[i] - b) * Math.min(1, dt * 8));
   };
 
@@ -3760,6 +3783,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const m = mugAt === 'hand' ? [p.hb[0] + 1, p.hb[1] + 2.5] : mugAt;
     if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
     mug.style.opacity = mugAt === 'hand' ? man.style.opacity : ''; // in his hand, it goes where he goes
+    if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
+    if (onPhone) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .5)} ${f2(p.hb[1] - 1)}) rotate(-15)`);
+    phone.style.opacity = onPhone ? man.style.opacity : '';
     // bits of code rising from the screen
     bits.forEach((b, i) => {
       const u = (now - live[i].t0) / 1600;
@@ -3811,6 +3837,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const tidy = () => { // whatever he was in the middle of, put it away
     cls('is-thinking', false); cls('has-idea', false); cls('is-error', false);
     flags.code = false; flags.fast = false;
+    if (lifting) { lifting = false; cls('has-weights', false); }
+    if (onPhone) { onPhone = false; cls('has-phone', false); }
     if (mugAt === 'hand') mugAt = [46.5, 57];
     oxTo = 0; if (ox) ox = 0;
   };
@@ -3849,6 +3877,23 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       ].map(([ms, fn]) => [ms + at, fn])];
     },
     pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
+    weights: () => [
+      [0, () => go('crouch')], [450, () => { lifting = true; cls('has-weights', true); go('stand'); }],
+      [900, () => go('curl')],
+      [900 + 1500 * 4, () => go('press')],
+      [900 + 1500 * 4 + 1600 * 2, () => go('stand')],
+      [900 + 1500 * 4 + 1600 * 2 + 400, () => go('crouch')],
+      [900 + 1500 * 4 + 1600 * 2 + 800, () => { lifting = false; cls('has-weights', false); go('stand'); }],
+      [900 + 1500 * 4 + 1600 * 2 + 1300, () => go('wipe')],
+      [900 + 1500 * 4 + 1600 * 2 + 2600, next],
+    ],
+    phone: () => [
+      [0, () => go('stand')], [400, () => { onPhone = true; cls('has-phone', true); go('phone'); }],
+      [3200, () => { oxTo = 9; go('walk'); }], [3700, () => go('phone')],
+      [5800, () => { oxTo = 0; go('walk'); }], [6300, () => go('phone')],
+      [9000, () => go('stand')], [9400, () => { onPhone = false; cls('has-phone', false); }],
+      [9900, next],
+    ],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
       [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
@@ -3859,7 +3904,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   function next(force) {
     tidy();
     const after = activity;
-    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'think', 'rest'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     let steps = ACTIVITIES[activity]();
     // between tasks he gets up and brushes his hands off before starting the next
@@ -3892,7 +3937,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or pushup, think, rest…) starts with that, for testing
+  // ?stick=coffee (or pushup, weights, phone, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
