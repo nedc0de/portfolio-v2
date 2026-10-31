@@ -3759,6 +3759,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // the mug: in his hand, or where he put it down
     const m = mugAt === 'hand' ? [p.hb[0] + 1, p.hb[1] + 2.5] : mugAt;
     if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
+    mug.style.opacity = mugAt === 'hand' ? man.style.opacity : ''; // in his hand, it goes where he goes
     // bits of code rising from the screen
     bits.forEach((b, i) => {
       const u = (now - live[i].t0) / 1600;
@@ -3833,15 +3834,20 @@ document.querySelectorAll('.hc-list').forEach((list) => {
         [len + 1500, next],
       ];
     },
-    coffee: () => [
-      [0, () => go('stand')],
-      [400, () => { oxTo = 42; go('walk'); }],
-      [2400, () => { mugAt = 'hand'; cls('has-mug', true); oxTo = 0; }],
-      [3900, () => go('hold')],
-      [4300, () => go('sip')], [5200, () => go('hold')], [6000, () => go('sip')], [6800, () => go('hold')],
-      [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
-      [8300, () => next('code')],
-    ],
+    coffee: () => {
+      // last cup still on the floor? he picks it up and takes it with him
+      const pick = Array.isArray(mugAt) ? [[0, () => go('grab')], [450, () => { mugAt = 'hand'; }], [800, () => go('stand')]] : [];
+      const at = pick.length ? 900 : 0;
+      return [...pick, ...[
+        [0, () => go('stand')],
+        [400, () => { oxTo = 42; go('walk'); }],
+        [2400, () => { mugAt = 'hand'; cls('has-mug', true); oxTo = 0; }], // back with a fresh one
+        [3900, () => go('hold')],
+        [4300, () => go('sip')], [5200, () => go('hold')], [6000, () => go('sip')], [6800, () => go('hold')],
+        [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
+        [8300, () => next('code')],
+      ].map(([ms, fn]) => [ms + at, fn])];
+    },
     pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
