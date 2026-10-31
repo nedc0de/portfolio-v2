@@ -10337,8 +10337,10 @@ html.fav-sheet-open { overflow: hidden; }
 .stick.has-phone .sk-phone { opacity: 1; }
 /* paint brush, paper plane, peace sign and the selfie flash */
 .sk-brush, .sk-plane, .sk-peace, .sk-flash { opacity: 0; transition: opacity .25s; }
-.sk-brush { stroke-width: 1.8; }
-.sk-bristle { stroke: var(--fifteenth-color); stroke-width: 3; }
+/* spray can (orange cap) and its mist */
+.sk-brush { stroke-width: 1.2; fill: #f2f2f2; }
+.sk-bristle { stroke: var(--fifteenth-color); stroke-width: 2.4; }
+.sk-mist circle { fill: var(--fifteenth-color); stroke: none; }
 .stick.has-brush .sk-brush { opacity: 1; }
 .sk-plane { fill: #f2f2f2; stroke-width: .8; }
 .stick.has-plane .sk-plane { opacity: 1; }
