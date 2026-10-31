@@ -3554,7 +3554,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
     lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), mug = el('.sk-mug');
   const bits = [...svg.querySelectorAll('.sk-code text')];
-  const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone');
+  const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone'), gloves = [...svg.querySelectorAll('.sk-glove')];
   const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3615,6 +3615,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
   let mugAt = null, onPhone = false, lifting = false;
   const PUNCHES = [[.15, 'ha'], [.55, 'ha'], [.95, 'hb'], [1.65, 'ha']];
+  // a flurry: a dozen quick alternating punches
+  const FLURRY = Array.from({ length: 12 }, (_, i) => [.1 + i * .13, i % 2 ? 'hb' : 'ha']);
+  let rounds = [];
   let hitAt = -9e9, hitPower = 1, lastHit = -1;
   let glance = 0, nodAt = -9e9, helloAt = -9e9;
   const flags = { code: false };
@@ -3679,17 +3682,19 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const b = Math.abs(Math.sin(age * Math.PI * 2 / .9));
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k][1] += b * 1.1; });
     }
-    if (mode === 'box') { // jab, jab, cross ... jab, every 2.4s; every punch lands on the "d"
-      const c = age % 2.4, cyc = Math.floor(age / 2.4);
-      PUNCHES.forEach(([at, hand], i) => {
-        const u = c - at;
-        if (u < 0 || u > .32) return;
-        const out = u < .07 ? smooth(u / .07) : u < .12 ? 1 : 1 - smooth((u - .12) / .2); // snap out, hold, pull back
+    if (mode === 'box') { // rounds of 2.4s: jab, jab, cross, jab, or now and then a fast flurry
+      const c = age % 2.4, cyc = Math.floor(age / 2.4), fast = rounds[cyc];
+      (fast ? FLURRY : PUNCHES).forEach(([at, hand], i) => {
+        const u = c - at, span = fast ? .14 : .32;
+        if (u < 0 || u > span) return;
+        const out = fast
+          ? (u < .04 ? smooth(u / .04) : u < .06 ? 1 : 1 - smooth((u - .06) / .08))
+          : (u < .07 ? smooth(u / .07) : u < .12 ? 1 : 1 - smooth((u - .12) / .2)); // snap out, hold, pull back
         const fist = hand === 'ha' ? [-1.5, 19.5] : [-1, 21.5];
         t[hand] = [t[hand][0] + (fist[0] - t[hand][0]) * out, t[hand][1] + (fist[1] - t[hand][1]) * out];
         ['head', 'neck', 'sh'].forEach((k) => { t[k][0] -= out * (hand === 'hb' ? 2.4 : 1.2); }); // lean into it
         const id = cyc * 10 + i;
-        if (u >= .06 && lastHit !== id) { lastHit = id; hitAt = now; hitPower = hand === 'hb' ? 1.4 : 1; }
+        if (u >= (fast ? .035 : .06) && lastHit !== id) { lastHit = id; hitAt = now; hitPower = fast ? .7 : hand === 'hb' ? 1.4 : 1; }
       });
     }
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
@@ -3810,6 +3815,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
     if (onPhone) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .5)} ${f2(p.hb[1] - 1)}) rotate(-15)`);
     phone.style.opacity = onPhone ? man.style.opacity : '';
+    if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('cx', f2(h[0])); g.setAttribute('cy', f2(h[1])); });
     // the "d" takes the hit: knocked back, then wobbles to a stop
     if (d) {
       const h = (now - hitAt) / 1000;
@@ -3870,6 +3876,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     cls('is-thinking', false); cls('has-idea', false); cls('is-error', false);
     flags.code = false; flags.fast = false;
     if (lifting) { lifting = false; cls('has-weights', false); }
+    cls('has-gloves', false);
     if (onPhone) { onPhone = false; cls('has-phone', false); }
     if (mugAt === 'hand') mugAt = [46.5, 57];
     oxTo = 0; if (ox) ox = 0;
@@ -3910,9 +3917,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     },
     pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
     box: () => [
-      [0, () => go('stand')], [350, () => go('guard')], [900, () => go('box')],
+      [0, () => { go('stand'); rounds = [Math.random() < .35, Math.random() < .5, Math.random() < .35]; }],
+      [350, () => { cls('has-gloves', true); go('guard'); }], [900, () => go('box')],
       [900 + 2400 * 3, () => go('guard')], [900 + 2400 * 3 + 600, () => go('stand')],
-      [900 + 2400 * 3 + 1100, () => go('wipe')], [900 + 2400 * 3 + 2400, next],
+      [900 + 2400 * 3 + 1100, () => { cls('has-gloves', false); go('wipe'); }], [900 + 2400 * 3 + 2400, next],
     ],
     weights: () => [
       [0, () => go('crouch')], [450, () => { lifting = true; cls('has-weights', true); go('stand'); }],
