@@ -10324,10 +10324,9 @@ html.fav-sheet-open { overflow: hidden; }
 /* his laptop: shut on the floor until he sits down with it */
 /* cartoon build: a solid white head */
 .sk-head { fill: currentColor; }
-/* his baseball cap: grey, with a seam, band and button in a darker grey */
-.sk-cap-crown, .sk-cap-brim { fill: #7d7d7d; stroke: none; }
-.sk-cap-line { fill: none; stroke: #565656; stroke-width: 1; }
-circle.sk-cap-line { fill: #565656; stroke: none; }
+/* his baseball cap: worn low and tilted, with a big bill; mid grey so it reads on his white head and the dark page */
+.sk-cap-crown, .sk-cap-brim { fill: #8c8c8c; stroke: #8c8c8c; stroke-width: .6; stroke-linejoin: round; }
+.sk-cap-brim { fill: #767676; stroke: #767676; }
 /* motion smears on fast arm swings (cartoon style) */
 .sk-smear { fill: none; stroke-width: 5; opacity: 0; }
 .sk-lap-base { stroke-width: 3.2; transition: opacity .3s; }
