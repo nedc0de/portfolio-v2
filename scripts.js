@@ -3542,7 +3542,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // - charge: the battery dies, he plugs a cable into the "d", it lights up
 // - video call: turns the laptop to face you and waves
 // - think: hand on his chin, a thought bubble, then the idea
-// - push-ups
 // He glances up when you scroll and nods when you come back.
 // Tap him: crouch, hop, he waves until you scroll.
 (() => {
@@ -3566,10 +3565,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const POSES = {
     stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     crouch:   P([20, 21], [20, 31], [20, 34], [20, 46.5], [12, 44], [28, 44], [14, 57], [26, 57], [1, -1, -1, -1]),
-    jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [16, 56], [24, 56], [1, -1, -1, -1]),
+    jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [4.5, 13], [35.5, 13], [16, 56], [24, 56], [1, -1, -1, -1]),
     wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
-    stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [5, 9], [37, 9], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3577,11 +3576,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     fistpump: P([17.5, 29], [15, 39], [15.5, 42.5], [16, 55], [26, 48.5], [22.5, 21.5], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
     call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
-    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [25.5, 15.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    sip:      P([19.5, 11], [21, 22], [21, 25.5], [21, 39], [14.5, 44.5], [30, 15], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     plug:     P([8, 31], [11, 39.5], [11.5, 43], [16, 50.5], [1, 53], [3, 54.5], [6, 57], [25, 57], [-1, -1, 1, -1], FLOOR),
     floorwork: P(...SIT, [30, 54], [33, 54.5], [26, 56.5], [28, 56], [1, 1, -1, -1], FLOOR),
-    pushup:   P([7, 34], [14, 38], [17, 39.5], [33, 46.5], [16, 57], [19, 57], [52, 57], [50.5, 57], [-1, -1, 1, 1]),
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // cartoon timing: stiff springs snap into each pose with a small pop, then
@@ -3644,10 +3642,6 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
     if (mode === 'fistpump') { const k = Math.abs(Math.sin(age * 11)); t.hb[1] -= k * 4; t.head[1] -= k * 1.2; }
-    if (mode === 'pushup') { // down slow, up snappy, a beat at the top
-      const c = (age % 1.3) / 1.3, dn = c < .45 ? smooth(c / .45) : c < .62 ? 1 - smooth((c - .45) / .17) : 0;
-      t.head[1] += dn * 11; t.neck[1] += dn * 10.5; t.sh[1] += dn * 10; t.hip[1] += dn * 5.5;
-    }
     if (mode === 'walk') { // legs and arms swing in turn as he goes
       const ph = walkPhase, dir = Math.sign(oxTo - ox) || 1;
       // feet: one planted and sliding back, the other lifting and swinging through
@@ -3855,12 +3849,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
     ],
     rest: () => [[0, () => go('wipe')], [1600, () => go('stretch')], [2600, () => go('stand')], [3200, next]],
-    pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [rand(7000, 9000), () => go('crouch')], [rand(9400, 9600), () => go('wipe')], [10800, next]],
   };
   let activity = mode;
   function next(force) {
     tidy();
-    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest', 'pushup'].filter((a) => a !== activity);
+    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     run(ACTIVITIES[activity]());
   }
@@ -3882,7 +3875,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   draw(performance.now());
   wake();
-  // ?stick=coffee (or charge, call, think, pushup…) starts with that, for testing
+  // ?stick=coffee (or charge, call, think, rest…) starts with that, for testing
   const first = new URLSearchParams(location.search).get('stick');
   run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
