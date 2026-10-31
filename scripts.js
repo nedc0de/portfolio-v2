@@ -3561,21 +3561,21 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const P = (head, neck, sh, hip, ha, hb, fa, fb, bend, lap = SHUT) => ({ head, neck, sh, hip, ha, hb, fa, fb, bend, ...lap });
   const SIT = [[15, 30.5], [14, 39.5], [14.5, 43], [16, 55]];
   const POSES = {
-    stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [27, 44.5], [15, 57], [27, 57], [1, -1, 1, -1]),
-    crouch:   P([20, 17], [20, 27], [20, 30], [20, 43], [11, 38], [29, 38], [12, 57], [28, 57], [1, -1, 1, -1]),
-    jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [14, 55], [26, 55], [1, -1, 1, -1]),
-    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12.5, 44], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
-    wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27, 45], [15, 57], [27, 57], [1, -1, 1, -1]),
-    stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [16, 57], [26, 57], [1, -1, 1, -1]),
-    think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [15, 57], [27, 57], [-1, -1, 1, -1]),
+    stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [25, 45.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    crouch:   P([20, 17], [20, 27], [20, 30], [20, 43], [14, 46], [26, 46], [15, 57], [25, 57], [1, -1, -1, -1]),
+    jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [16, 56], [24, 56], [1, -1, -1, -1]),
+    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [16, 45.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
+    wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [25, 46], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     type:     P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     fistpump: P([16.5, 30], [14.5, 39.5], [15, 43], [16, 55], [26, 48.5], [22, 23], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
     call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
-    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [15, 44.5], [25.5, 15.5], [15, 57], [27, 57], [1, 1, 1, -1]),
-    hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [29, 33], [15, 57], [27, 57], [1, 1, 1, -1]),
+    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 46], [25.5, 15.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     plug:     P([8, 31], [11, 39.5], [11.5, 43], [16, 50.5], [1, 53], [3, 54.5], [6, 57], [25, 57], [-1, -1, 1, -1], FLOOR),
     floorwork: P(...SIT, [30, 54], [33, 54.5], [26, 56.5], [28, 56], [1, 1, -1, -1], FLOOR),
     nap:      P([9, 51.5], [17.5, 54], [21, 54.5], [35, 55.5], [10, 55], [28, 53], [54.5, 56.5], [53, 54], [1, -1, -1, -1], PILLOW),
@@ -3583,7 +3583,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   const K = { head: 110, neck: 150, sh: 160, hip: 150, ha: 210, hb: 210, fa: 420, fb: 420, l1: 190, l2: 190, l3: 150 };
   const Z = { head: .58, neck: .78, sh: .78, hip: .82, ha: .7, hb: .7, fa: .9, fb: .9, l1: .75, l2: .75, l3: .65 };
-  const ARM = 10.9, LEG = 10.3, TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5;
+  // limb segments sized so relaxed arms and standing legs are almost straight
+  const ARM = 10.5, LEG = 9.85, TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5;
   const STANDING = new Set(['stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
@@ -3640,12 +3641,16 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (mode === 'fistpump') t.hb[1] -= Math.abs(Math.sin(age * 9)) * 2.5;
     if (mode === 'nap') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .6; t.neck[1] -= b * .5; t.sh[1] -= b * .6; }
     if (mode === 'walk') { // legs and arms swing in turn as he goes
-      const ph = walkPhase;
-      t.fa = [21 - 4.5 * Math.cos(ph), 57 - Math.max(0, Math.sin(ph)) * 2.6];
-      t.fb = [21 + 4.5 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 2.6];
-      t.ha = [21 + 4 * Math.cos(ph), 44];
-      if (!mugAt) t.hb = [21 - 4 * Math.cos(ph), 44]; else t.hb = [27, 34];
-      t.hip[1] -= Math.abs(Math.sin(ph)) * .8;
+      const ph = walkPhase, dir = Math.sign(oxTo - ox) || 1;
+      // feet: one planted and sliding back, the other lifting and swinging through
+      // stride matches his speed, so the planted foot stays put on the ground
+      t.fa = [21 + dir * 6.6 * Math.cos(ph), 57 - Math.max(0, Math.sin(ph)) * 3];
+      t.fb = [21 - dir * 6.6 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 3];
+      // arms swing opposite to the legs, hanging straight
+      t.ha = [21 - dir * 4.5 * Math.cos(ph), 45.5];
+      t.hb = mugAt ? [27, 34] : [21 + dir * 4.5 * Math.cos(ph), 45.5];
+      t.hip[1] += .4 - Math.abs(Math.cos(ph)) * .9; // a little bob: lowest mid-stride
+      t.head[0] += dir * .8; t.neck[0] += dir * .5; // leans into the walk
     }
     // looking up at you when you scroll, nodding when you come back
     if (glance > 0) { t.head[1] -= 1.6 * glance; t.head[0] += 1.2 * glance; }
@@ -3674,7 +3679,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   const step = (dt, now) => {
     if (mode === 'walk') { // steady pace towards where he's going
-      const v = 26 * dt, dx = oxTo - ox;
+      const v = 22 * dt, dx = oxTo - ox;
       ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
       walkPhase += v / 4.2;
     }
@@ -3683,6 +3688,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const stepping = STANDING.has(mode);
     J.forEach((k) => {
       if (stepping && (k === 'fa' || k === 'fb') && footStep(k, t[k], now)) return;
+      if (mode === 'walk' && (k === 'fa' || k === 'fb')) { pos[k] = t[k]; vel[k] = [0, 0]; return; } // feet follow the stride exactly
       if (!stepping) steps[k] = null;
       const kk = K[k], c = 2 * Math.sqrt(kk) * Z[k];
       for (let i = 0; i < 2; i++) {
@@ -3695,7 +3701,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     pos.head = toward(pos.neck, pos.head, NECK_HEAD);
     ['ha', 'hb'].forEach((k) => { if (len(pos.sh, pos[k]) > ARM * 2) pos[k] = toward(pos.sh, pos[k], ARM * 2); });
     ['fa', 'fb'].forEach((k) => { if (len(pos.hip, pos[k]) > LEG * 2) pos.hip = toward(pos[k], pos.hip, LEG * 2); });
-    const tb = POSES[mode === 'walk' ? 'stand' : mode].bend;
+    const tb = mode === 'walk' ? [1, -1, -(Math.sign(oxTo - ox) || 1), -(Math.sign(oxTo - ox) || 1)] : POSES[mode].bend; // walking: knees bend the way he's going
     bend = bend.map((b, i) => b + (tb[i] - b) * Math.min(1, dt * 8));
   };
 
