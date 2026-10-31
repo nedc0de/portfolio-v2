@@ -10322,6 +10322,8 @@ html.fav-sheet-open { overflow: hidden; }
 /* scripts.js moves his joints every frame, easing between poses */
 .hm-d { display: inline-block; }
 /* his laptop: shut on the floor until he sits down with it */
+/* motion smears on fast arm swings (cartoon style) */
+.sk-smear { fill: none; stroke-width: 5; opacity: 0; }
 .sk-lap-base { stroke-width: 3.2; transition: opacity .3s; }
 .sk-lap-screen { stroke-width: 2.6; transition: stroke .35s, opacity .3s; }
 .stick.is-typing .sk-lap-screen { stroke: var(--fifteenth-color); }

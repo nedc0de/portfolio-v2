@@ -3528,7 +3528,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 })();
 
 /*===== HOME: the stick figure next to "Ned" =====*/
-// A tiny game character with a laptop. Each pose only says where his joints
+// A tiny cartoon character with a laptop, animated like a stick-figure
+// cartoon: he snaps into strong poses with a little pop, holds them, and fast
+// moves leave smears. Each pose only says where his joints
 // *want* to be; every joint is a spring that chases its target, so he
 // overshoots, settles and lags a little. Arms and legs are two segments with
 // elbows and knees solved each frame (2-bone IK); torso, head and limbs keep
@@ -3551,6 +3553,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
     lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), cable = el('.sk-cable'), mug = el('.sk-mug');
   const bits = [...svg.querySelectorAll('.sk-code text')];
+  const smears = [...svg.querySelectorAll('.sk-smear')];
+  const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
 
   // joint targets in the 60×64 drawing (ground y 57), the way elbows/knees
   // bend, and the laptop as three points (front end, hinge end, screen top)
@@ -3562,7 +3566,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const SIT = [[15, 30.5], [14, 39.5], [14.5, 43], [16, 55]];
   const POSES = {
     stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [25, 45.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
-    crouch:   P([20, 17], [20, 27], [20, 30], [20, 43], [14, 46], [26, 46], [15, 57], [25, 57], [1, -1, -1, -1]),
+    crouch:   P([20, 21], [20, 31], [20, 34], [20, 46.5], [12, 44], [28, 44], [14, 57], [26, 57], [1, -1, -1, -1]),
     jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [16, 56], [24, 56], [1, -1, -1, -1]),
     wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [16, 45.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [25, 46], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
@@ -3572,7 +3576,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     type:     P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
-    fistpump: P([16.5, 30], [14.5, 39.5], [15, 43], [16, 55], [26, 48.5], [22, 23], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
+    fistpump: P([17.5, 29], [15, 39], [15.5, 42.5], [16, 55], [26, 48.5], [22.5, 21.5], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
     call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
     sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 46], [25.5, 15.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [17, 45.5], [29, 33], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
@@ -3581,8 +3585,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     nap:      P([9, 51.5], [17.5, 54], [21, 54.5], [35, 55.5], [10, 55], [28, 53], [54.5, 56.5], [53, 54], [1, -1, -1, -1], PILLOW),
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
-  const K = { head: 110, neck: 150, sh: 160, hip: 150, ha: 210, hb: 210, fa: 420, fb: 420, l1: 190, l2: 190, l3: 150 };
-  const Z = { head: .58, neck: .78, sh: .78, hip: .82, ha: .7, hb: .7, fa: .9, fb: .9, l1: .75, l2: .75, l3: .65 };
+  // cartoon timing: stiff springs snap into each pose with a small pop, then
+  // hold; his head is looser so it follows half a beat behind
+  const K = { head: 330, neck: 720, sh: 720, hip: 650, ha: 950, hb: 950, fa: 1200, fb: 1200, l1: 600, l2: 600, l3: 450 };
+  const Z = { head: .42, neck: .58, sh: .58, hip: .62, ha: .5, hb: .5, fa: .85, fb: .85, l1: .6, l2: .6, l3: .5 };
   // limb segments sized so relaxed arms and standing legs are almost straight
   const ARM = 10.5, LEG = 9.85, TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5;
   const STANDING = new Set(['stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
@@ -3634,23 +3640,25 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       t.head[0] += .8;
     }
     if (mode === 'jump') {
-      const up = Math.sin(Math.PI * Math.min(1, age / .55)) * 9;
+      const u = Math.min(1, age / .5), up = (u < .4 ? 1 - (1 - u / .4) ** 2 : 1 - ((u - .4) / .6) ** 2) * 15; // fast up, hang, drop
       J.forEach((k) => { if (k[0] !== 'l') t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
-    if (mode === 'fistpump') t.hb[1] -= Math.abs(Math.sin(age * 9)) * 2.5;
+    if (mode === 'fistpump') { const k = Math.abs(Math.sin(age * 11)); t.hb[1] -= k * 4; t.head[1] -= k * 1.2; }
     if (mode === 'nap') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .6; t.neck[1] -= b * .5; t.sh[1] -= b * .6; }
     if (mode === 'walk') { // legs and arms swing in turn as he goes
       const ph = walkPhase, dir = Math.sign(oxTo - ox) || 1;
       // feet: one planted and sliding back, the other lifting and swinging through
       // stride matches his speed, so the planted foot stays put on the ground
-      t.fa = [21 + dir * 6.6 * Math.cos(ph), 57 - Math.max(0, Math.sin(ph)) * 3];
-      t.fb = [21 - dir * 6.6 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 3];
+      t.fa = [21 + dir * 6.6 * Math.cos(ph), 57 - Math.max(0, Math.sin(ph)) * 4.5];
+      t.fb = [21 - dir * 6.6 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 4.5];
       // arms swing opposite to the legs, hanging straight
-      t.ha = [21 - dir * 4.5 * Math.cos(ph), 45.5];
-      t.hb = mugAt ? [27, 34] : [21 + dir * 4.5 * Math.cos(ph), 45.5];
-      t.hip[1] += .4 - Math.abs(Math.cos(ph)) * .9; // a little bob: lowest mid-stride
-      t.head[0] += dir * .8; t.neck[0] += dir * .5; // leans into the walk
+      t.ha = [21 - dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
+      t.hb = mugAt ? [27, 34] : [21 + dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
+      // cartoon bounce: down on each contact, up as the legs pass
+      const bob = 1.2 - Math.abs(Math.cos(ph)) * 2.6;
+      ['hip', 'neck', 'sh', 'head'].forEach((k) => { t[k][1] += bob; });
+      t.head[0] += dir * 1.4; t.neck[0] += dir * .9; // leans into the walk
     }
     // looking up at you when you scroll, nodding when you come back
     if (glance > 0) { t.head[1] -= 1.6 * glance; t.head[0] += 1.2 * glance; }
@@ -3668,8 +3676,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (!st && Math.hypot(target[0] - pos[k][0], target[1] - pos[k][1]) > 3 && !steps[other]) st = steps[k] = { from: [...pos[k]], to: target, t0: now };
     if (!st) return false;
     st.to = target;
-    const u = Math.min(1, (now - st.t0) / 230), e = smooth(u);
-    pos[k] = [st.from[0] + (st.to[0] - st.from[0]) * e, st.from[1] + (st.to[1] - st.from[1]) * e - Math.sin(Math.PI * u) * 3.2];
+    const u = Math.min(1, (now - st.t0) / 150), e = smooth(u);
+    pos[k] = [st.from[0] + (st.to[0] - st.from[0]) * e, st.from[1] + (st.to[1] - st.from[1]) * e - Math.sin(Math.PI * u) * 4];
     vel[k] = [0, 0];
     if (u >= 1) steps[k] = null;
     return true;
@@ -3722,6 +3730,16 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armB.setAttribute('d', pts(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
     legA.setAttribute('d', pts(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
     legB.setAttribute('d', pts(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
+    // smears: a quick arm swing leaves a short fading streak behind the hand
+    ['ha', 'hb'].forEach((k, i) => {
+      const tr = trail[k];
+      tr.push([...p[k]]);
+      if (tr.length > 5) tr.shift();
+      const old = tr[0], speed = len(old, p[k]);
+      const on = speed > 5 && !still.matches;
+      smears[i].style.opacity = on ? f2(Math.min(.35, (speed - 5) / 20)) : '0';
+      if (on) smears[i].setAttribute('d', pts(old, p[k]));
+    });
     lapBase.setAttribute('d', pts(p.l2, p.l1));
     lapScreen.setAttribute('d', pts(p.l1, p.l3));
     man.style.opacity = ox > 30 ? f2(Math.max(0, 1 - (ox - 30) / 10)) : '';
