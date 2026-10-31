@@ -3528,123 +3528,106 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 })();
 
 /*===== HOME: the stick figure next to "Ned" =====*/
-// A tiny game character. Each pose only says where his joints *want* to be;
-// every joint is a spring that chases its target, so he overshoots, settles
-// and lags a little (his head trails his body). Arms and legs are two
-// segments with elbows and knees solved each frame (2-bone IK). His torso,
-// head and limbs keep their lengths, and his feet take steps (lift, arc,
-// plant) instead of sliding.
+// A tiny game character with a laptop. Each pose only says where his joints
+// *want* to be; every joint is a spring that chases its target, so he
+// overshoots, settles and lags a little. Arms and legs are two segments with
+// elbows and knees solved each frame (2-bone IK); torso, head and limbs keep
+// their lengths, and his feet take steps instead of sliding.
 // He picks what to do at random:
-// - pull at the "d": brace, heave back, strain, let go (now and then his
-//   front foot skids and kicks up dust)
-// - sit down cross-legged with his laptop and type
-// - stop and think: hand on his chin, a thought bubble fills with dots, then
-//   the idea (a tiny "d") and he goes back to pulling
-// - a breather: wipes his forehead, shakes his arms out
-// Tap him: crouch, hop, he waves until you scroll. Three quick taps while he
-// pulls: he yanks the "d" out, falls over with it, it springs back.
-// At night (the visitor's own time) he's asleep against the "d".
-// On desktop his head leans a little towards the mouse.
+// - code: bits of code float up out of the screen; now and then an error, a
+//   facepalm, a burst of typing and a fist pump
+// - coffee: walks off, comes back with a mug, sips, sets it down
+// - charge: the battery dies, he plugs a cable into the "d", it lights up
+// - video call: turns the laptop to face you and waves
+// - think: hand on his chin, a thought bubble, then the idea
+// - nap: head on his shut laptop (and all night, the visitor's own time)
+// He glances up when you scroll and nods when you come back.
+// Tap him: crouch, hop, he waves until you scroll.
 (() => {
   const svg = document.querySelector('.stick');
   if (!svg) return;
-  const d = document.querySelector('.hm-d');
   const el = (c) => svg.querySelector(c);
-  const head = el('.sk-head'), body = el('.sk-body'), armA = el('.sk-arm-a'),
-    armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
-    lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen');
-  const dust = [...svg.querySelectorAll('.sk-dust circle')];
+  const man = el('.sk-man'), head = el('.sk-head'), body = el('.sk-body'),
+    armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
+    lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), cable = el('.sk-cable'), mug = el('.sk-mug');
+  const bits = [...svg.querySelectorAll('.sk-code text')];
 
-  // joint targets in the 60×64 drawing (ground y 57); elbows/knees bend sign;
-  // the laptop is three points (hinge-side base end, front end, screen top)
-  const SHUT = { l1: [56, 56.5], l2: [42, 56.5], l3: [55.5, 55.3] }; // shut, on the floor
+  // joint targets in the 60×64 drawing (ground y 57), the way elbows/knees
+  // bend, and the laptop as three points (front end, hinge end, screen top)
+  const SHUT = { l1: [56, 56.5], l2: [42, 56.5], l3: [55.5, 55.3] };
+  const LAP = { l1: [36, 50.5], l2: [22, 50.5], l3: [39, 37.5] };
+  const FLOOR = { l1: [44, 56.5], l2: [30, 56.5], l3: [46, 44] };
+  const PILLOW = { l1: [22, 56.5], l2: [10, 56.5], l3: [21.5, 55.3] };
   const P = (head, neck, sh, hip, ha, hb, fa, fb, bend, lap = SHUT) => ({ head, neck, sh, hip, ha, hb, fa, fb, bend, ...lap });
+  const SIT = [[15, 30.5], [14, 39.5], [14.5, 43], [16, 55]];
   const POSES = {
-    pull:    P([26, 12.5], [24.5, 21.5], [22.5, 27.5], [18.5, 39.5], [1.5, 28], [1.5, 33], [9, 57], [23.5, 57], [-1, -1, 1, 1]),
-    reach:   P([23, 11.5], [22, 21], [21, 26.5], [19.5, 40], [7, 28.5], [7, 32], [13.5, 57], [24.5, 57], [-1, -1, 1, 1]),
-    crouch:  P([20, 17], [20, 27], [20, 30], [20, 43], [11, 38], [29, 38], [12, 57], [28, 57], [1, -1, 1, -1]),
-    jump:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [14, 55], [26, 55], [1, -1, 1, -1]),
-    wave:    P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12.5, 44], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
-    stand:   P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [27, 44.5], [15, 57], [27, 57], [1, -1, 1, -1]),
-    wipe:    P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27, 45], [15, 57], [27, 57], [1, -1, 1, -1]),
-    stretch: P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [16, 57], [26, 57], [1, -1, 1, -1]),
-    think:   P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [15, 57], [27, 57], [-1, -1, 1, -1]),
-    grab:    P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
-    sit:     P([15, 30.5], [14, 39.5], [14.5, 43], [16, 55], [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], { l1: [36, 50.5], l2: [22, 50.5], l3: [39, 37.5] }),
-    type:    P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], { l1: [36, 50.5], l2: [22, 50.5], l3: [39, 37.5] }),
-    windup:  P([22, 13.5], [21.5, 23], [20.5, 28.5], [17.5, 41], [2.5, 28], [2.5, 33], [9, 57], [23.5, 57], [-1, -1, 1, 1]),
-    yank:    P([32, 18], [29, 26], [27, 30], [21, 43], [3, 25], [3, 30], [7, 57], [21, 57], [-1, -1, 1, 1]),
-    fallen:  P([36, 51], [31.5, 52], [28.5, 51.5], [17, 54.5], [16, 40], [21, 39], [7, 44], [11, 47], [1, -1, -1, -1]),
-    sleep:   P([7.5, 29], [6, 38], [6.5, 42], [8.5, 54], [15, 52], [17, 53.5], [27, 57], [29, 55.5], [1, 1, -1, -1]),
+    stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [27, 44.5], [15, 57], [27, 57], [1, -1, 1, -1]),
+    crouch:   P([20, 17], [20, 27], [20, 30], [20, 43], [11, 38], [29, 38], [12, 57], [28, 57], [1, -1, 1, -1]),
+    jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [8.5, 15], [31.5, 15], [14, 55], [26, 55], [1, -1, 1, -1]),
+    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [12.5, 44], [31, 14], [13, 57], [27, 57], [1, 1, 1, -1]),
+    wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27, 45], [15, 57], [27, 57], [1, -1, 1, -1]),
+    stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [15, 3], [27, 3], [16, 57], [26, 57], [1, -1, 1, -1]),
+    think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [15, 57], [27, 57], [-1, -1, 1, -1]),
+    grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
+    sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
+    type:     P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
+    facepalm: P([15.5, 32], [14.5, 40.5], [15, 44], [16, 55], [17.5, 31], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
+    fistpump: P([16.5, 30], [14.5, 39.5], [15, 43], [16, 55], [26, 48.5], [22, 23], [36, 56.5], [38, 56], [1, -1, -1, -1], LAP),
+    call:     P([15, 30], [14, 39.5], [14.5, 43], [16, 55], [24, 43], [26, 21], [36, 56.5], [38, 56], [1, -1, -1, -1], { l1: [30, 40], l2: [30, 40], l3: [30, 40] }),
+    sip:      P([21, 11.5], [21, 22], [21, 25.5], [21, 39], [15, 44.5], [25.5, 15.5], [15, 57], [27, 57], [1, 1, 1, -1]),
+    hold:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [29, 33], [15, 57], [27, 57], [1, 1, 1, -1]),
+    plug:     P([8, 31], [11, 39.5], [11.5, 43], [16, 50.5], [1, 53], [3, 54.5], [6, 57], [25, 57], [-1, -1, 1, -1], FLOOR),
+    floorwork: P(...SIT, [30, 54], [33, 54.5], [26, 56.5], [28, 56], [1, 1, -1, -1], FLOOR),
+    nap:      P([9, 51.5], [17.5, 54], [21, 54.5], [35, 55.5], [10, 55], [28, 53], [54.5, 56.5], [53, 54], [1, -1, -1, -1], PILLOW),
   };
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
-  // spring stiffness per joint: feet planted, hands quick, head lazy
   const K = { head: 110, neck: 150, sh: 160, hip: 150, ha: 210, hb: 210, fa: 420, fb: 420, l1: 190, l2: 190, l3: 150 };
-  // damping: 1 = no overshoot; lower = more follow-through
   const Z = { head: .58, neck: .78, sh: .78, hip: .82, ha: .7, hb: .7, fa: .9, fb: .9, l1: .75, l2: .75, l3: .65 };
-  const TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5; // fixed lengths: no rubbery stretching
-  const STANDING = new Set(['pull', 'reach', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'windup', 'grab']);
-  const ARM = 10.9, LEG = 10.3; // segment lengths (upper = lower)
+  const ARM = 10.9, LEG = 10.3, TORSO = 17.5, SH = 4.5, NECK_HEAD = 9.5;
+  const STANDING = new Set(['stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
-  const sleeping = new Date().getHours() < 6;
-  let mode = sleeping ? 'sleep' : 'pull', modeStart = performance.now();
+  const night = new Date().getHours() < 6;
+  let mode = night ? 'nap' : 'stand', modeStart = performance.now();
   const pos = {}, vel = {};
   J.forEach((k) => { pos[k] = [...POSES[mode][k]]; vel[k] = [0, 0]; });
   let bend = [...POSES[mode].bend];
-  let look = 0, dustAt = -9e9, tugCount = 0, lastCycle = -1, slip = false, tug = 0;
+  let ox = 0, oxTo = 0, walkPhase = 0;       // walking off and back (coffee)
+  let mugAt = null, plugged = false, carrying = false;
+  let glance = 0, nodAt = -9e9;
+  const flags = { code: false };
+  const live = bits.map(() => ({ t0: -9e9 }));
+  let nextBit = 0;
 
   const rot = ([x, y], [cx, cy], a) => {
     const c = Math.cos(a), s = Math.sin(a);
     return [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c];
   };
   const smooth = (t) => t * t * (3 - 2 * t);
-
-  // the "d": [x em, y em, degrees], also on a spring so it wobbles back
-  let dPos = [0, 0, 0], dVel = [0, 0, 0], dHeld = null;
-
+  const cls = (name, on) => svg.classList.toggle(name, on);
   const go = (pose) => {
     mode = pose; modeStart = performance.now();
-    svg.classList.toggle('is-typing', pose === 'type');
+    cls('is-typing', ['type', 'sit', 'facepalm', 'fistpump', 'floorwork'].includes(pose) && !svg.classList.contains('is-lowbat'));
+    cls('is-calling', pose === 'call');
   };
 
   const targets = (now) => {
-    const pose = POSES[mode], age = (now - modeStart) / 1000;
+    const pose = POSES[mode] || POSES.stand, age = (now - modeStart) / 1000; // walking: standing, plus a stride
     const t = {};
     J.forEach((k) => { t[k] = [...pose[k]]; });
-    tug = 0;
     const br = Math.sin(now / 1000 * Math.PI * 2 / 3.2) * .35; // always breathing a little
     t.head[1] += br; t.neck[1] += br * .7; t.sh[1] += br * .6;
 
-    if (mode === 'pull') {
-      const cyc = Math.floor(age / 2.6), c = (age % 2.6) / 2.6;
-      if (cyc !== lastCycle) { lastCycle = cyc; tugCount++; slip = tugCount % 3 === 0; }
-      let lean;
-      if (c < .22) lean = -.25 * smooth(c / .22);                    // brace
-      else if (c < .38) lean = -.25 + 1.25 * smooth((c - .22) / .16); // heave
-      else if (c < .62) lean = 1 + Math.sin(age * 60) * .04;          // strain
-      else lean = 1 - smooth((c - .62) / .38);                       // release
-      tug = Math.max(0, lean);
-      ['head', 'neck', 'sh', 'hip', 'fb'].forEach((k) => { t[k] = rot(t[k], t.fa, lean * .17); });
-      t.hip[1] += tug * 1.6;
-      t.ha[0] += tug * 3.5; t.hb[0] += tug * 3.5;
-      if (slip && c > .3 && c < .62) {
-        t.fa[0] -= 2.2 * Math.sin(Math.PI * (c - .3) / .32);
-        if (now - dustAt > 1500) dustAt = now;
-      }
-      t.head[0] += look * 1.2;
-    }
-    if (mode === 'type') { // pecking at the keys, head bobbing along
-      const k1 = Math.max(0, Math.sin(age * 23)), k2 = Math.max(0, Math.sin(age * 19 + 2));
-      t.ha[1] -= k1 * 1.6; t.hb[1] -= k2 * 1.6;
+    if (mode === 'type' || mode === 'floorwork') { // pecking at the keys
+      const fast = flags.fast ? 2 : 1;
+      t.ha[1] -= Math.max(0, Math.sin(age * 23 * fast)) * 1.6;
+      t.hb[1] -= Math.max(0, Math.sin(age * 19 * fast + 2)) * 1.6;
       t.head[1] += Math.sin(age * 2.1) * .5;
       if (age % 4 > 3.3) t.head[0] += 1.2; // leans in to read something
     }
-    if (mode === 'think') { // taps his chin, looks up a little
-      t.ha[1] += Math.max(0, Math.sin(age * 7)) * .9;
-      t.head[1] -= .8; t.head[0] += Math.sin(age * .9) * .6;
-    }
-    if (mode === 'wave') {
+    if (mode === 'think') { t.ha[1] += Math.max(0, Math.sin(age * 7)) * .9; t.head[1] -= .8; t.head[0] += Math.sin(age * .9) * .6; }
+    if (mode === 'wave' || mode === 'call') {
       const a = (Math.sin(age * Math.PI * 2 / 1) * .5 + .5) * .7;
       t.hb = rot(t.hb, t.sh, a);
       t.head[0] += .8;
@@ -3654,66 +3637,71 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       J.forEach((k) => { if (k[0] !== 'l') t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
-    if (mode === 'stand' && age < 1.1 && shaking) {
-      const j = Math.sin(age * Math.PI * 2 / .2) * 2.2;
-      t.ha[1] += j; t.hb[1] -= j;
+    if (mode === 'fistpump') t.hb[1] -= Math.abs(Math.sin(age * 9)) * 2.5;
+    if (mode === 'nap') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .6; t.neck[1] -= b * .5; t.sh[1] -= b * .6; }
+    if (mode === 'walk') { // legs and arms swing in turn as he goes
+      const ph = walkPhase;
+      t.fa = [21 - 4.5 * Math.cos(ph), 57 - Math.max(0, Math.sin(ph)) * 2.6];
+      t.fb = [21 + 4.5 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 2.6];
+      t.ha = [21 + 4 * Math.cos(ph), 44];
+      if (!mugAt) t.hb = [21 - 4 * Math.cos(ph), 44]; else t.hb = [27, 34];
+      t.hip[1] -= Math.abs(Math.sin(ph)) * .8;
     }
-    if (mode === 'sleep') { const b = Math.sin(age * Math.PI * 2 / 3.6) * .7; t.head[1] += b; t.neck[1] += b * .6; }
+    // looking up at you when you scroll, nodding when you come back
+    if (glance > 0) { t.head[1] -= 1.6 * glance; t.head[0] += 1.2 * glance; }
+    const na = (now - nodAt) / 900;
+    if (na >= 0 && na < 1) t.head[1] += Math.sin(na * Math.PI * 4) * 1.4 * (1 - na);
+    // walking offset applies to him (not to the laptop on the floor)
+    if (ox) ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb'].forEach((k) => { t[k][0] += ox; });
     return t;
   };
 
-  // feet take real steps: lift, arc, plant (one at a time) instead of skating
   const steps = { fa: null, fb: null };
-  const STEP_MS = 230;
   const footStep = (k, target, now) => {
     const other = k === 'fa' ? 'fb' : 'fa';
     let st = steps[k];
-    if (!st && Math.hypot(target[0] - pos[k][0], target[1] - pos[k][1]) > 3 && !steps[other]) {
-      st = steps[k] = { from: [...pos[k]], to: target, t0: now };
-    }
+    if (!st && Math.hypot(target[0] - pos[k][0], target[1] - pos[k][1]) > 3 && !steps[other]) st = steps[k] = { from: [...pos[k]], to: target, t0: now };
     if (!st) return false;
     st.to = target;
-    const u = Math.min(1, (now - st.t0) / STEP_MS), e = smooth(u);
+    const u = Math.min(1, (now - st.t0) / 230), e = smooth(u);
     pos[k] = [st.from[0] + (st.to[0] - st.from[0]) * e, st.from[1] + (st.to[1] - st.from[1]) * e - Math.sin(Math.PI * u) * 3.2];
     vel[k] = [0, 0];
     if (u >= 1) steps[k] = null;
     return true;
   };
-
   const len = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
   const toward = (a, b, l) => { const n = len(a, b); return [a[0] + (b[0] - a[0]) / n * l, a[1] + (b[1] - a[1]) / n * l]; };
 
   const step = (dt, now) => {
+    if (mode === 'walk') { // steady pace towards where he's going
+      const v = 26 * dt, dx = oxTo - ox;
+      ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
+      walkPhase += v / 4.2;
+    }
+    glance = Math.max(0, glance - dt * .9);
     const t = targets(now);
-    const walking = STANDING.has(mode);
+    const stepping = STANDING.has(mode);
     J.forEach((k) => {
-      if (walking && (k === 'fa' || k === 'fb') && footStep(k, t[k], now)) return;
-      if (!walking) steps[k] = null;
+      if (stepping && (k === 'fa' || k === 'fb') && footStep(k, t[k], now)) return;
+      if (!stepping) steps[k] = null;
       const kk = K[k], c = 2 * Math.sqrt(kk) * Z[k];
       for (let i = 0; i < 2; i++) {
         vel[k][i] += (kk * (t[k][i] - pos[k][i]) - c * vel[k][i]) * dt;
         pos[k][i] += vel[k][i] * dt;
       }
     });
-    // keep his proportions: torso, shoulders and head stay the same size,
-    // hands and feet can't reach further than his limbs
     pos.neck = toward(pos.hip, pos.neck, TORSO);
     pos.sh = toward(pos.neck, pos.hip, SH);
     pos.head = toward(pos.neck, pos.head, NECK_HEAD);
     ['ha', 'hb'].forEach((k) => { if (len(pos.sh, pos[k]) > ARM * 2) pos[k] = toward(pos.sh, pos[k], ARM * 2); });
     ['fa', 'fb'].forEach((k) => { if (len(pos.hip, pos[k]) > LEG * 2) pos.hip = toward(pos[k], pos.hip, LEG * 2); });
-    const tb = POSES[mode].bend;
+    const tb = POSES[mode === 'walk' ? 'stand' : mode].bend;
     bend = bend.map((b, i) => b + (tb[i] - b) * Math.min(1, dt * 8));
-    const dt3 = dHeld || [tug * .04, 0, tug * 4.5];
-    for (let i = 0; i < 3; i++) {
-      dVel[i] += (180 * (dt3[i] - dPos[i]) - 2 * Math.sqrt(180) * .45 * dVel[i]) * dt;
-      dPos[i] += dVel[i] * dt;
-    }
   };
 
-  const joint = (a, b, len, sign) => {
+  const joint = (a, b, l, sign) => {
     const dx = b[0] - a[0], dy = b[1] - a[1], dist = Math.hypot(dx, dy) || 1;
-    const h = Math.sqrt(Math.max(0, len * len - (dist / 2) ** 2)) * sign;
+    const h = Math.sqrt(Math.max(0, l * l - (dist / 2) ** 2)) * sign;
     return [(a[0] + b[0]) / 2 - dy / dist * h, (a[1] + b[1]) / 2 + dx / dist * h];
   };
   const f2 = (n) => n.toFixed(2);
@@ -3730,18 +3718,32 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     legB.setAttribute('d', pts(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
     lapBase.setAttribute('d', pts(p.l2, p.l1));
     lapScreen.setAttribute('d', pts(p.l1, p.l3));
-    const da = (now - dustAt) / 700;
-    dust.forEach((c, i) => {
-      const on = da >= 0 && da < 1;
-      c.setAttribute('cx', f2(p.fa[0] - 2 - i * 5 * da - da * 3));
-      c.setAttribute('cy', f2(56 - da * (5 + i * 3)));
-      c.setAttribute('r', on ? f2(2.4 + da * (3 + i)) : '0');
-      c.style.opacity = on ? f2((1 - da) * .7) : '0';
+    man.style.opacity = ox > 30 ? f2(Math.max(0, 1 - (ox - 30) / 10)) : '';
+    // the mug: in his hand, or where he put it down
+    const m = mugAt === 'hand' ? [p.hb[0] + 1, p.hb[1] + 2.5] : mugAt;
+    if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
+    // the cable: from the laptop's hinge to his hand, or plugged into the "d"
+    if (plugged || carrying) {
+      const a = p.l2, b = carrying ? p.ha : [-.5, 55];
+      cable.setAttribute('d', `M${f2(a[0])} ${f2(a[1])}Q${f2((a[0] + b[0]) / 2)} ${f2(Math.max(a[1], b[1]) + 3)} ${f2(b[0])} ${f2(b[1])}`);
+    }
+    // bits of code rising from the screen
+    bits.forEach((b, i) => {
+      const u = (now - live[i].t0) / 1600;
+      if (u < 0 || u > 1) { b.style.opacity = '0'; return; }
+      b.setAttribute('x', f2(live[i].x + u * 3));
+      b.setAttribute('y', f2(live[i].y - u * 16));
+      b.style.opacity = f2(Math.sin(Math.PI * u) * .9);
     });
-    if (d) {
-      const [x, y, r] = dPos;
-      d.style.transform = Math.abs(x) + Math.abs(y) + Math.abs(r) > .0005
-        ? `translate(${x.toFixed(4)}em, ${y.toFixed(4)}em) rotate(${r.toFixed(2)}deg)` : '';
+    if (flags.code && now > nextBit && !document.hidden) {
+      const i = bits.findIndex((_, j) => (now - live[j].t0) > 1600);
+      if (i >= 0) {
+        live[i] = { t0: now, x: p.l3[0] - 6 + Math.random() * 4, y: p.l3[1] - 1 };
+        bits[i].textContent = flags.err ? 'err' : CODE[Math.floor(Math.random() * CODE.length)];
+        bits[i].classList.toggle('is-err', !!flags.err);
+        flags.err = false;
+      }
+      nextBit = now + 450 + Math.random() * 500;
     }
   };
 
@@ -3757,79 +3759,105 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) wake(); }).observe(svg);
   document.addEventListener('visibilitychange', wake);
-  const snap = () => { if (!still.matches) return; const t = targets(performance.now()); J.forEach((k) => { pos[k] = t[k]; }); bend = [...POSES[mode].bend]; draw(performance.now()); };
+  const snap = () => {
+    if (!still.matches) return;
+    ox = oxTo;
+    const t = targets(performance.now());
+    J.forEach((k) => { pos[k] = t[k]; });
+    bend = [...POSES[mode === 'walk' ? 'stand' : mode].bend];
+    draw(performance.now());
+  };
 
-  // timed steps; starting new ones cancels whatever was queued
   let queued = [];
-  const run = (steps) => {
+  const run = (list) => {
     queued.forEach(clearTimeout);
-    queued = steps.map(([ms, fn]) => setTimeout(() => { fn(); snap(); wake(); }, still.matches ? 0 : ms));
+    queued = list.map(([ms, fn]) => setTimeout(() => { fn(); snap(); wake(); }, still.matches ? 0 : ms));
     wake();
   };
-  const bubble = (on, idea = false) => { svg.classList.toggle('is-thinking', on); svg.classList.toggle('has-idea', idea); };
-  let shaking = false, activity = mode, waving = false, tappedAt = 0;
   const rand = (a, b) => a + Math.random() * (b - a);
-
-  // what he does next, picked at random (never the same thing twice in a row)
-  const ACTIVITIES = {
-    pull: () => [[0, () => go('reach')], [550, () => go('pull')], [rand(9000, 15000), next]],
-    type: () => [
-      [0, () => go('stand')], [450, () => go('grab')], [1000, () => go('sit')], [1700, () => go('type')],
-      [rand(6500, 10000), () => go('sit')], [rand(10800, 11200), () => go('grab')], [11800, () => go('stand')], [12300, next],
-    ],
-    think: () => [
-      [0, () => go('stand')], [400, () => { go('think'); bubble(true); }],
-      [3200, () => bubble(true, true)], [4300, () => { bubble(false); next('pull'); }],
-    ],
-    rest: () => [[0, () => go('wipe')], [1600, () => { shaking = true; go('stand'); }], [2800, () => { shaking = false; next('pull'); }]],
+  const tidy = () => { // whatever he was in the middle of, put it away
+    cls('is-thinking', false); cls('has-idea', false); cls('is-error', false); cls('is-lowbat', false);
+    flags.code = false; flags.fast = false; carrying = false;
+    if (plugged) { plugged = false; cls('has-cable', false); }
+    if (mugAt === 'hand') mugAt = [46.5, 57];
+    oxTo = 0; if (ox) ox = 0;
   };
+
+  const sitDown = (at) => [[at, () => go('stand')], [at + 450, () => go('grab')], [at + 1000, () => go('sit')]];
+  const getUp = (at) => [[at, () => { flags.code = false; go('sit'); }], [at + 500, () => go('grab')], [at + 1100, () => go('stand')]];
+  const ACTIVITIES = {
+    code: () => {
+      const len = rand(9000, 13000), oops = Math.random() < .5;
+      return [
+        ...sitDown(0),
+        [1700, () => { go('type'); flags.code = true; }],
+        ...(oops ? [
+          [4200, () => { flags.err = true; nextBit = 0; cls('is-error', true); }],
+          [4700, () => { cls('is-error', false); flags.code = false; go('facepalm'); }],
+          [5900, () => { go('type'); flags.fast = true; flags.code = true; }],
+          [7300, () => { flags.fast = false; go('fistpump'); }],
+          [8300, () => go('type')],
+        ] : []),
+        ...getUp(len),
+        [len + 1500, next],
+      ];
+    },
+    coffee: () => [
+      [0, () => go('stand')],
+      [400, () => { oxTo = 42; go('walk'); }],
+      [2400, () => { mugAt = 'hand'; cls('has-mug', true); oxTo = 0; }],
+      [3900, () => go('hold')],
+      [4300, () => go('sip')], [5200, () => go('hold')], [6000, () => go('sip')], [6800, () => go('hold')],
+      [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
+      [8300, () => next('code')],
+    ],
+    charge: () => [
+      ...sitDown(0),
+      [1700, () => { go('type'); flags.code = true; }],
+      [3600, () => { flags.code = false; cls('is-lowbat', true); go('sit'); }],
+      [4800, () => go('floorwork')],
+      [5600, () => go('stand')],
+      [6000, () => { carrying = true; cls('has-cable', true); go('plug'); }],
+      [7200, () => { carrying = false; plugged = true; cls('is-lowbat', false); cls('is-typing', true); }],
+      [7900, () => go('stand')],
+      [8400, () => { go('floorwork'); flags.code = true; }],
+      [rand(13000, 15000), next],
+    ],
+    call: () => [...sitDown(0), [1600, () => go('call')], [6200, () => go('sit')], ...getUp(6900), [8300, next]],
+    think: () => [
+      [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
+      [3200, () => cls('has-idea', true)], [4300, () => { cls('is-thinking', false); next('code'); }],
+    ],
+    rest: () => [[0, () => go('wipe')], [1600, () => go('stretch')], [2600, () => go('stand')], [3200, next]],
+    nap: () => [[0, () => go('stand')], [400, () => go('crouch')], [900, () => go('nap')], [rand(7000, 9000), () => go('stretch')], [rand(9800, 10200), next]],
+  };
+  let activity = mode;
   function next(force) {
-    const pick = typeof force === 'string' ? force : (() => {
-      const bag = ['pull', 'pull', 'type', 'type', 'think', 'rest'].filter((a) => a !== activity);
-      return bag[Math.floor(Math.random() * bag.length)];
-    })();
-    activity = pick;
-    bubble(false);
-    run(ACTIVITIES[pick]());
+    tidy();
+    const bag = ['code', 'code', 'code', 'coffee', 'charge', 'call', 'think', 'rest', 'nap'].filter((a) => a !== activity);
+    activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
+    run(ACTIVITIES[activity]());
   }
 
-  const win = () => {
-    waving = false; activity = 'win';
-    run([
-      [0, () => go('windup')],
-      [280, () => go('yank')],
-      [470, () => { go('fallen'); dHeld = [.3, -.04, -22]; }],
-      [1900, () => { dHeld = null; go('crouch'); }],
-      [2350, () => go('stand')],
-      [2800, () => next('pull')],
-    ]);
-  };
-
-  let taps = [];
+  // tap: a hop and a wave, until you scroll
+  let waving = false, tappedAt = 0;
   svg.addEventListener('click', () => {
-    const now = performance.now();
-    taps = [...taps.filter((t) => now - t < 1200), now];
-    if (mode === 'sleep') { activity = 'wake'; run([[0, () => go('stretch')], [1600, () => next('pull')]]); return; }
-    if (taps.length >= 3 && !dHeld && (mode === 'pull' || mode === 'wave' || mode === 'jump' || mode === 'crouch')) { taps = []; win(); return; }
-    if (dHeld) return;
-    bubble(false);
+    tidy();
+    if (mode === 'nap') { activity = 'wake'; run([[0, () => go('stretch')], [1300, () => next('code')]]); return; }
     waving = true; tappedAt = scrollY; activity = 'wave';
     run([[0, () => go('crouch')], [140, () => go('jump')], [700, () => { if (waving) go('wave'); }]]);
   });
+  // scrolling: he glances up at you; come back to the top and he nods
+  let awayAt = 0;
   addEventListener('scroll', () => {
-    if (!waving || Math.abs(scrollY - tappedAt) < 8) return;
-    waving = false;
-    next();
+    if (waving && Math.abs(scrollY - tappedAt) > 8) { waving = false; next(); }
+    if (scrollY > 40) { if (!awayAt) { awayAt = performance.now(); glance = 1; } }
+    else if (awayAt) { if (performance.now() - awayAt > 1500) nodAt = performance.now(); awayAt = 0; }
   }, { passive: true });
-
-  if (matchMedia('(pointer: fine)').matches) {
-    addEventListener('mousemove', (e) => {
-      const r = svg.getBoundingClientRect();
-      look = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 400));
-    }, { passive: true });
-  }
 
   draw(performance.now());
   wake();
-  if (mode === 'pull') run([[rand(7000, 11000), next]]);
+  // ?stick=coffee (or charge, call, think, nap…) starts with that, for testing
+  const first = new URLSearchParams(location.search).get('stick');
+  if (!night || first) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
 })();
