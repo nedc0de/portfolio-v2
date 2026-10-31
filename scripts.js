@@ -3581,6 +3581,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // peeking round the "d": leaning out, one hand holding its edge
     // hiding behind the "d", standing upright; he peeks by leaning out from the hips
     peek:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [16, 45], [24, 42], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    // dashing out from behind the "d": low, leaning into it, arms trailing
+    dash:     P([28.5, 18], [26, 27], [25, 29.5], [20, 43], [9, 39], [12, 42], [26, 57], [16, 57], [1, -1, -1, -1]),
     think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3765,6 +3767,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const v = 22 * dt, dx = oxTo - ox;
       ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
       walkPhase += v / 4.2;
+    } else if (mode === 'dash') { // a quick slide out, easing off at the end
+      const dx = oxTo - ox, v = Math.max(18, Math.min(150, Math.abs(dx) * 9)) * dt;
+      ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
     } else if (ox !== oxTo) { // sliding out from behind the "d"
       const v = 30 * dt, dx = oxTo - ox;
       ox = Math.abs(dx) <= v ? oxTo : ox + Math.sign(dx) * v;
@@ -4047,9 +4052,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       [2700, () => { peekTo = 0; }],                     // ...and back
       [3300, () => { peekTo = 1.08; peekWave = true; }], // last peek, a bit further, with a little wave
       [4700, () => { peekTo = 0; peekWave = false; }],   // straightens up...
-      [5100, () => { go('walk'); oxTo = 0; }],           // ...and steps out
-      [6450, () => { man.removeAttribute('clip-path'); go('wave'); }], // fully out now
-      [8100, () => next('code')],
+      [5000, () => { go('dash'); oxTo = 0; }],           // ...and dashes out
+      [5450, () => go('stand')],                         // skids to a stop
+      [5600, () => { man.removeAttribute('clip-path'); go('wave'); }], // fully out now
+      [7300, () => next('code')],
     ];
     // measure the "d" only once its real font has loaded (phones can be slow)
     let begun = false;
