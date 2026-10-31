@@ -3997,14 +3997,27 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   if (first || still.matches || scrollY > 100) run([[600, () => next(ACTIVITIES[first] ? first : 'code')]]);
   else {
     // every visit: he's hiding behind the "d", peeks out at you, says hi, steps out
+    // where the "d"'s stem really ends (the ink, not the letter box), in the
+    // drawing's units: he hides behind it and peeks out right from that edge
+    const edge = () => {
+      if (!d) return 0;
+      const fs = getComputedStyle(d), ctx = document.createElement('canvas').getContext('2d');
+      ctx.font = `${fs.fontWeight} ${fs.fontSize} ${fs.fontFamily}`;
+      const ink = d.getBoundingClientRect().left + ctx.measureText('d').actualBoundingBoxRight;
+      const r = svg.getBoundingClientRect();
+      return (ink - r.left) / (r.width / 60) - .8; // a hair inside the stem
+    };
+    let e = edge();
+    const hideAt = () => { svg.querySelector('#sk-behind-d rect').setAttribute('x', e.toFixed(2)); };
+    hideAt();
     man.setAttribute('clip-path', 'url(#sk-behind-d)');
-    go('peek'); ox = oxTo = -40;
+    go('peek'); ox = oxTo = e - 40;
     J.forEach((k) => { pos[k] = [POSES.peek[k][0] + (k[0] === 'l' ? 0 : ox), POSES.peek[k][1]]; });
     activity = 'intro';
     run([
-      [500, () => { oxTo = -25; }],                      // head pokes out
-      [1500, () => { oxTo = -30; }],                     // ducks back a little...
-      [1900, () => { oxTo = -20; peekWave = true; }],    // ...then out again with a wave
+      [500, () => { e = edge(); hideAt(); oxTo = e - 24; }], // head pokes out (fonts are in by now)
+      [1500, () => { oxTo = e - 29; }],                  // ducks back a little...
+      [1900, () => { oxTo = e - 19; peekWave = true; }], // ...then out again with a wave
       [3300, () => { peekWave = false; go('walk'); oxTo = 0; }], // steps out (a few strides)
       [4300, () => { man.removeAttribute('clip-path'); go('wave'); }],
       [6000, () => next('code')],
