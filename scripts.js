@@ -3804,16 +3804,28 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   };
   const f2 = (n) => n.toFixed(2);
   const pts = (...p) => 'M' + p.map(([x, y]) => `${f2(x)} ${f2(y)}`).join('L');
+  // rubber-hose limbs: one smooth curve through the elbow/knee instead of a
+  // sharp corner (the control point makes the curve pass through the joint)
+  const hose = (a, j, b) => {
+    const c = [2 * j[0] - (a[0] + b[0]) / 2, 2 * j[1] - (a[1] + b[1]) / 2];
+    return `M${f2(a[0])} ${f2(a[1])}Q${f2(c[0])} ${f2(c[1])} ${f2(b[0])} ${f2(b[1])}`;
+  };
+  // the spine bows a little towards where his head is leaning
+  const spine = (n, h, head) => {
+    const mx = (n[0] + h[0]) / 2, my = (n[1] + h[1]) / 2;
+    const lean = (head[0] - n[0]) * .35;
+    return `M${f2(n[0])} ${f2(n[1])}Q${f2(mx + lean)} ${f2(my)} ${f2(h[0])} ${f2(h[1])}`;
+  };
 
   const draw = (now) => {
     const p = pos;
     head.setAttribute('cx', f2(p.head[0]));
     head.setAttribute('cy', f2(p.head[1]));
-    body.setAttribute('d', pts(p.neck, p.hip));
-    armA.setAttribute('d', pts(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
-    armB.setAttribute('d', pts(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
-    legA.setAttribute('d', pts(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
-    legB.setAttribute('d', pts(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
+    body.setAttribute('d', spine(p.neck, p.hip, p.head));
+    armA.setAttribute('d', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
+    armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
+    legA.setAttribute('d', hose(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
+    legB.setAttribute('d', hose(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
     // smears: a quick arm swing leaves a short fading streak behind the hand
     ['ha', 'hb'].forEach((k, i) => {
       const tr = trail[k];
