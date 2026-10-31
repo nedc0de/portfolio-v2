@@ -3538,7 +3538,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // He picks what to do at random:
 // - code: bits of code float up out of the screen; now and then an error, a
 //   facepalm, a burst of typing and a fist pump
-// - coffee: walks off, comes back with a mug, sips, sets it down
+// - coffee: takes a mug out of the "d" (his cupboard), sips, puts it back
 // - push-ups: five slow reps, then a forehead wipe
 // - weights: dumbbell curls, a couple of overhead presses
 // - phone call: pacing a little, chatting with his free hand
@@ -3583,7 +3583,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     peek:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [16, 45], [24, 42], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     // dashing out from behind the "d": low, leaning into it, arms trailing
     dash:     P([28.5, 18], [26, 27], [25, 29.5], [20, 43], [9, 39], [12, 42], [26, 57], [16, 57], [1, -1, -1, -1]),
-    think:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [24, 18.5], [24.5, 30], [17.5, 57], [24.5, 57], [-1, -1, -1, -1]),
+    // reaching into the "d" (his cupboard): the "d" is drawn over him, so his hand disappears inside it
+    rummage:  P([19, 11.5], [19.5, 21.5], [19.5, 24.5], [21, 38.5], [15, 44.5], [-3, 29], [16.5, 57], [24.5, 57], [1, 1, 1, 1]),
+    think:    P([20, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [30, 5.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]), // elbow out, hand scratching the side of his head
     grab:     P([33, 18], [32, 28], [32, 31], [31, 43], [42, 50], [47, 51], [26, 57], [37, 57], [1, 1, 1, -1]),
     sit:      P(...SIT, [24, 49], [27, 49.5], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
     type:     P([16.5, 31], [14.5, 40], [15, 43.5], [16, 55], [26, 48.5], [29.5, 49], [36, 56.5], [38, 56], [1, 1, -1, -1], LAP),
@@ -3609,7 +3611,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // limb segments sized so relaxed arms and standing legs are almost straight
   // cartoon build: a big round head sitting right on the body, no neck gap
   const ARM = 10.5, LEG = 9.45, TORSO = 18, SH = 2.5, NECK_HEAD = 7.6;
-  const STANDING = new Set(['guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
+  const STANDING = new Set(['rummage', 'guard', 'box', 'curl', 'press', 'phone', 'dust', 'stand', 'think', 'wave', 'wipe', 'stretch', 'crouch', 'grab', 'sip', 'hold']);
   const CODE = ['</>', '{ }', '=>', '.css', '<div>', '++', 'fn()', '//', ':root', '0px'];
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -3655,7 +3657,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       t.head[1] += Math.sin(age * 2.1) * .5;
       if (age % 4 > 3.3) t.head[0] += 1.2; // leans in to read something
     }
-    if (mode === 'think') { t.ha[1] += Math.max(0, Math.sin(age * 7)) * .9; t.head[1] -= .8; t.head[0] += Math.sin(age * .9) * .6; }
+    if (mode === 'think') { t.hb[0] += Math.sin(age * 15) * 1.2; t.hb[1] += Math.abs(Math.sin(age * 7.5)) * 1.6; t.head[0] -= .6 + Math.sin(age * .9) * .5; } // scratching his head
     if (mode === 'wave') {
       const a = (Math.sin(age * Math.PI * 2 / 1) * .5 + .5) * .7;
       t.hb = rot(t.hb, t.sh, a);
@@ -3709,6 +3711,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       ['head', 'neck', 'sh', 'ha', 'hb'].forEach((k) => { t[k] = rot(t[k], t.hip, a); });
       t.head[1] += Math.sin(age * 2.2) * .5 * peekLean;
     }
+    if (mode === 'rummage') { t.hb[1] += Math.sin(age * 13) * 1.4; t.head[0] -= .8; } // feeling around inside
     if (mode === 'pushup') { // lower slowly, push up fast, a beat at the top; hands stay planted
       const c = (age % 1.4) / 1.4, dn = c < .5 ? smooth(c / .5) : c < .68 ? 1 - smooth((c - .5) / .18) : 0;
       ['head', 'neck', 'sh', 'hip'].forEach((k) => { t[k] = rot(t[k], t.fa, -dn * .28); });
@@ -3916,6 +3919,16 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   const sitDown = (at) => [[at, () => go('stand')], [at + 450, () => go('grab')], [at + 1000, () => go('sit')]];
   const getUp = (at) => [[at, () => { flags.code = false; go('sit'); }], [at + 500, () => go('grab')], [at + 1100, () => go('stand')]];
+  // the "d" is his cupboard: walk over, reach in, take something out (or put it back)
+  const fromD = (at, got) => [
+    [at, () => { go('walk'); oxTo = -9; }], [at + 550, () => go('rummage')],
+    [at + 1300, () => { got(); go('walk'); oxTo = 0; }], [at + 1800, () => go('stand')],
+  ];
+  const intoD = (at, gone) => [
+    [at, () => { go('walk'); oxTo = -9; }], [at + 550, () => go('rummage')],
+    [at + 1100, gone], [at + 1300, () => { go('walk'); oxTo = 0; }], [at + 1800, () => go('stand')],
+  ];
+  const D = 2000; // a trip to the cupboard and back
   const ACTIVITIES = {
     code: () => {
       const len = rand(9000, 13000), oops = Math.random() < .5;
@@ -3933,43 +3946,42 @@ document.querySelectorAll('.hc-list').forEach((list) => {
         [len + 1500, next],
       ];
     },
-    coffee: () => {
-      // last cup still on the floor? he picks it up and takes it with him
-      const pick = Array.isArray(mugAt) ? [[0, () => go('grab')], [450, () => { mugAt = 'hand'; }], [800, () => go('stand')]] : [];
-      const at = pick.length ? 900 : 0;
-      return [...pick, ...[
-        [0, () => go('stand')],
-        [400, () => { oxTo = 42; go('walk'); }],
-        [2400, () => { mugAt = 'hand'; cls('has-mug', true); oxTo = 0; }], // back with a fresh one
-        [3900, () => go('hold')],
-        [4300, () => go('sip')], [5200, () => go('hold')], [6000, () => go('sip')], [6800, () => go('hold')],
-        [7400, () => go('crouch')], [7800, () => { mugAt = [46.5, 57]; go('stand'); }],
-        [8300, () => next('code')],
-      ].map(([ms, fn]) => [ms + at, fn])];
-    },
+    coffee: () => [
+      ...(Array.isArray(mugAt) ? [[0, () => go('grab')], [450, () => { mugAt = null; cls('has-mug', false); go('stand'); }]] : []), // tidies up the last cup
+      ...fromD(700, () => { mugAt = 'hand'; cls('has-mug', true); }),
+      [700 + D, () => go('hold')],
+      [700 + D + 400, () => go('sip')], [700 + D + 1300, () => go('hold')], [700 + D + 2100, () => go('sip')], [700 + D + 2900, () => go('hold')],
+      ...intoD(700 + D + 3400, () => { mugAt = null; cls('has-mug', false); }),
+      [700 + D * 2 + 3500, () => next('code')],
+    ],
     pushup: () => [[0, () => go('stand')], [350, () => go('crouch')], [750, () => go('pushup')], [750 + 1400 * 5, () => go('crouch')], [750 + 1400 * 5 + 450, () => go('stand')], [750 + 1400 * 5 + 900, () => go('wipe')], [750 + 1400 * 5 + 2300, next]],
     box: () => [
-      [0, () => { go('stand'); rounds = [Math.random() < .35, Math.random() < .5, Math.random() < .35]; }],
-      [350, () => { cls('has-gloves', true); go('guard'); }], [900, () => go('box')],
-      [900 + 2400 * 3, () => go('guard')], [900 + 2400 * 3 + 600, () => go('stand')],
-      [900 + 2400 * 3 + 1100, () => { cls('has-gloves', false); go('wipe'); }], [900 + 2400 * 3 + 2400, next],
+      [0, () => { rounds = [Math.random() < .35, Math.random() < .5, Math.random() < .35]; }],
+      ...fromD(0, () => cls('has-gloves', true)),
+      [D, () => go('guard')], [D + 550, () => go('box')],
+      [D + 550 + 2400 * 3, () => go('guard')], [D + 550 + 2400 * 3 + 600, () => go('stand')],
+      ...intoD(D + 550 + 2400 * 3 + 900, () => cls('has-gloves', false)),
+      [D * 2 + 550 + 2400 * 3 + 1000, () => go('wipe')], [D * 2 + 550 + 2400 * 3 + 2300, next],
     ],
-    weights: () => [
-      [0, () => go('crouch')], [450, () => { lifting = true; cls('has-weights', true); go('stand'); }],
-      [900, () => go('curl')],
-      [900 + 1500 * 4, () => go('press')],
-      [900 + 1500 * 4 + 1600 * 2, () => go('stand')],
-      [900 + 1500 * 4 + 1600 * 2 + 400, () => go('crouch')],
-      [900 + 1500 * 4 + 1600 * 2 + 800, () => { lifting = false; cls('has-weights', false); go('stand'); }],
-      [900 + 1500 * 4 + 1600 * 2 + 1300, () => go('wipe')],
-      [900 + 1500 * 4 + 1600 * 2 + 2600, next],
-    ],
+    weights: () => {
+      const W = D + 1500 * 4 + 1600 * 2; // fetch, curls, presses
+      return [
+        ...fromD(0, () => { lifting = true; cls('has-weights', true); }),
+        [D, () => go('curl')],
+        [D + 1500 * 4, () => go('press')],
+        [W, () => go('stand')],
+        ...intoD(W + 400, () => { lifting = false; cls('has-weights', false); }),
+        [W + 400 + D, () => go('wipe')], [W + 400 + D + 1300, next],
+      ];
+    },
     phone: () => [
-      [0, () => go('stand')], [400, () => { onPhone = true; cls('has-phone', true); go('phone'); }],
-      [3200, () => { oxTo = 9; go('walk'); }], [3700, () => go('phone')],
-      [5800, () => { oxTo = 0; go('walk'); }], [6300, () => go('phone')],
-      [9000, () => go('stand')], [9400, () => { onPhone = false; cls('has-phone', false); }],
-      [9900, next],
+      ...fromD(0, () => { onPhone = true; cls('has-phone', true); }),
+      [D, () => go('phone')],
+      [D + 2800, () => { oxTo = 9; go('walk'); }], [D + 3300, () => go('phone')],
+      [D + 5400, () => { oxTo = 0; go('walk'); }], [D + 5900, () => go('phone')],
+      [D + 8600, () => go('stand')],
+      ...intoD(D + 9000, () => { onPhone = false; cls('has-phone', false); }),
+      [D * 2 + 9100, next],
     ],
     think: () => [
       [0, () => go('stand')], [400, () => { go('think'); cls('is-thinking', true); }],
