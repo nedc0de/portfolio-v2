@@ -3559,6 +3559,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone'), gloves = [...svg.querySelectorAll('.sk-glove')];
   const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
   const mist = [...svg.querySelectorAll('.sk-mist circle')];
+  const cap = el('.sk-cap');
+  const FACING_D = new Set(['rummage', 'paint', 'guard', 'box', 'pushup']); // turned towards the "d" (left)
   const brush = el('.sk-brush'), plane = el('.sk-plane'), peace = el('.sk-peace'), flash = el('.sk-flash');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3855,6 +3857,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const p = pos;
     head.setAttribute('cx', f2(p.head[0]));
     head.setAttribute('cy', f2(p.head[1]));
+    // cap: sits on his head, tilts with it, brim faces the way he's facing
+    const tilt = Math.atan2(p.head[1] - p.neck[1], p.head[0] - p.neck[0]) * 180 / Math.PI + 90;
+    cap.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)}) scale(${FACING_D.has(mode) ? -1 : 1} 1)`);
     body.setAttribute('d', spine(p.neck, p.hip, p.head));
     armA.setAttribute('d', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
     armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
