@@ -4195,3 +4195,56 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     setTimeout(begin, 2500);
   }
 })();
+
+/*===== HOME: section labels start as their own code =====*/
+// Each home section's label first types out as the HTML that makes it,
+// <p class="hm-label">Selected work</p>, then the tags fade, it snaps into the
+// styled label and the section shows up under it: code turning into the page.
+// Once per visit; reduced motion, no IntersectionObserver or no JS skip it.
+(() => {
+  const labels = [...document.querySelectorAll('.hm-home .hm-block .hm-label')];
+  if (!labels.length || !('IntersectionObserver' in window)
+    || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  const play = async (label) => {
+    const block = label.closest('.hm-block');
+    const text = label.textContent.trim();
+    // the source, as [class, text] pieces
+    const parts = [['lc-t', '<p '], ['lc-t lc-a', 'class='], ['lc-t lc-s', '"hm-label"'], ['lc-t', '>'],
+      ['', text], ['lc-t', '</p>']];
+    const total = parts.reduce((n, [, s]) => n + s.length, 0);
+    label.classList.add('is-code');
+    for (let n = 0; n <= total; n += 2) {
+      let left = n, html = '';
+      for (const [cls, s] of parts) {
+        if (left <= 0) break;
+        const bit = esc(s.slice(0, left));
+        html += cls ? `<span class="${cls}">${bit}</span>` : bit;
+        left -= s.length;
+      }
+      label.innerHTML = `${html}<span class="lc-c"></span>`;
+      await wait(26);
+    }
+    await wait(350);
+    label.querySelector('.lc-c')?.remove();
+    label.classList.add('is-strip');
+    await wait(300);
+    // rendered: the plain label in its own style, then the section under it
+    label.classList.remove('is-code', 'is-strip');
+    label.textContent = text;
+    block.classList.add('is-built');
+    block.classList.remove('is-src');
+  };
+
+  labels.forEach((l) => l.closest('.hm-block').classList.add('is-src'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting || !e.target.offsetHeight) return;
+      io.unobserve(e.target);
+      play(e.target);
+    });
+  }, { rootMargin: '0px 0px -12% 0px' });
+  labels.forEach((l) => io.observe(l));
+})();

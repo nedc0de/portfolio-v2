@@ -10393,3 +10393,30 @@ html.fav-sheet-open { overflow: hidden; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+
+/*===== HOME: section labels start as their own code =====*/
+/* As a section scrolls in, its label types out as the HTML that makes it,
+   the tags fade, the text snaps into the styled label and the section shows
+   under it (scripts.js). No JS or reduced motion: just the page. */
+.hm-label.is-code {
+  font: 500 .76rem/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #e6e6e6;
+}
+.hm-label .lc-t { color: #ff7a1a; transition: opacity .25s; }
+.hm-label .lc-a { color: #8a8a8a; }
+.hm-label .lc-s { color: #f2c29b; }
+.hm-label.is-strip .lc-t { opacity: 0; }
+.hm-label .lc-c {
+  display: inline-block;
+  width: .5em;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: -.2em;
+  background: #ff7a1a;
+  animation: lc-blink .8s steps(1) infinite;
+}
+@keyframes lc-blink { 50% { opacity: 0; } }
+.hm-block.is-src > :not(.hm-label):not(:has(.hm-label)) { opacity: 0; transform: translateY(10px); }
+.hm-block.is-built > :not(.hm-label):not(:has(.hm-label)) { transition: opacity .5s, transform .5s cubic-bezier(.22, .61, .36, 1); }
