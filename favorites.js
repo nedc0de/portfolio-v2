@@ -1039,8 +1039,10 @@
       // "See details") and the details panel slides up
       const open = () => {
         if (picking) return;
-        if (hero && current !== item) select(item);
-        else openSheet(item);
+        if (hero && current !== item) {
+          select(item);
+          if (!heroInView()) openSheet(item); // the preview is scrolled away: show the pick here
+        } else openSheet(item);
       };
       card.addEventListener('click', open);
       card.addEventListener('keydown', (e) => {
@@ -1134,6 +1136,7 @@
       <div class="fav-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="favSheetTitle">
         <button type="button" class="fav-sheet-x" data-close aria-label="Close">&times;</button>
         <span class="fav-sheet-grab" aria-hidden="true"></span>
+        <span class="fav-sheet-slash" aria-hidden="true"></span>
         <div class="fav-sheet-body">
           <span class="fav-sheet-poster"><img alt="" width="342" height="513"></span>
           <div class="fav-sheet-info">
@@ -1171,7 +1174,7 @@
     if (!sheet) buildSheet();
     const f = item.fav;
     const q = (c) => sheet.querySelector(c);
-    q('.fav-sheet-kicker').textContent = f === FEATURED ? 'Just watched' : TYPE_NAME[f.type];
+    q('.fav-sheet-kicker').textContent = `P1 · ${f === FEATURED ? 'Just watched' : TYPE_NAME[f.type]}`;
     q('.fav-sheet-title').textContent = f.title;
     q('.fav-sheet-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     q('.fav-sheet-by').textContent = f.by ? (f.type === 'book' ? 'by ' : 'Directed by ') + f.by : '';
@@ -1215,8 +1218,9 @@
   /*---------- the select screen's big preview ----------*/
   // Like a fighting game's character select: the poster you pick lights up
   // in the grid (with a P1 tag) and shows big up here, with its stars, its
-  // summary (desktop) and a button to its details. It stays pinned under the
-  // menus while you scroll the grid. It starts on the latest movie.
+  // summary (desktop) and a button to its details. Picked further down, with
+  // the preview scrolled away, the details panel opens instead. It starts on
+  // the latest movie.
   const FEATURED = FAVORITES.find((f) => f.type === 'movie');
   let hero = null;
   let current = null;
@@ -1244,6 +1248,10 @@
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     select(item, 'Just watched');
   }
+  const heroInView = () => {
+    const r = hero.getBoundingClientRect();
+    return r.top > -r.height / 2 && r.bottom < innerHeight + r.height / 2;
+  };
   function select(item, kicker) {
     if (!hero) return;
     if (current) { current.el.classList.remove('is-selected'); current.el.setAttribute('aria-pressed', 'false'); }
@@ -1332,7 +1340,8 @@
         picking = false;
         // then it's the pick, like tapping it
         const item = cards.find((c) => c.el === card);
-        if (hero) select(item); else setTimeout(() => openSheet(item), 500);
+        if (hero) select(item);
+        if (!hero || !heroInView()) setTimeout(() => openSheet(item), 500);
       },
       visible || reduceMotion.matches ? 0 : 450,
     );
