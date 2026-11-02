@@ -10642,3 +10642,41 @@ h1.section-title .about-title-color::before {
   box-shadow: none;
 }
 .fav-sheet-x:hover { border-color: var(--fifteenth-color); color: var(--fifteenth-color); }
+
+/* the menus' lists with a mouse (favorites.js): the site's dark card, the
+   current choice in the orange selection box */
+.fav-dd {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 60;
+  display: grid;
+  min-width: 100%;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  background: #121212;
+  box-shadow: 0 16px 34px -12px rgba(0, 0, 0, .85);
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a transparent;
+}
+.fav-dd-opt {
+  padding: .45rem .7rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  font: 500 .88rem var(--body-font);
+  color: #cfcfcf;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fav-dd-opt:hover { background: #1d1d1d; color: #f2f2f2; }
+.fav-dd-opt[aria-selected="true"] {
+  border-color: var(--fifteenth-color);
+  border-radius: 0;
+  background: #22170f;
+  color: var(--fifteenth-color);
+}
