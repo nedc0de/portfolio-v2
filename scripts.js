@@ -3452,8 +3452,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
 /*===== HOME: the stick figure next to "Ned" =====*/
 // A tiny character with a laptop, drawn like a pencil sketch (a blank
-// mannequin head, inked limbs with faint orange construction lines, scratchy
-// hatching behind) and animated like a stick-figure cartoon: he snaps into strong poses with a little pop, holds them, and fast
+// mannequin head, inked limbs with faint orange construction lines) and
+// animated like a stick-figure cartoon: he snaps into strong poses with a little pop, holds them, and fast
 // moves leave smears. Each pose only says where his joints
 // *want* to be; every joint is a spring that chases its target, so he
 // overshoots, settles and lags a little. Arms and legs are two segments with

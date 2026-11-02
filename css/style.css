@@ -10752,9 +10752,7 @@ h1.section-title .about-title-color::before {
 /*===== HOME: the figure drawn like a pencil sketch =====*/
 /* a blank mannequin: light limbs with some body, a dark ink outline
    underneath (drawn by scripts.js), faint orange construction lines along
-   the limbs and across the head, and scratchy hatching behind him */
-.stick .sk-hatch { stroke: #fff; stroke-width: .3; opacity: .12; stroke-linecap: round; }
-.stick .sk-hatch-b { stroke-width: .5; opacity: .07; }
+   the limbs and across the head */
 .stick .sk-man > path:not(.sk-smear):not(.sk-ink):not(.sk-guide) { stroke: #dedede; }
 .stick .sk-arm-a, .stick .sk-arm-b, .stick .sk-leg-a, .stick .sk-leg-b { stroke-width: 3.3; }
 .stick .sk-body { stroke-width: 5.6; }
