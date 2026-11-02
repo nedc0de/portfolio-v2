@@ -3527,6 +3527,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       case 'think': return [h[0] + 9, h[1] - 12];
       case 'stretch': return [h[0] + 3, h[1] - 14];
       case 'wipe': case 'dust': return [h[0] + 6, h[1] + 14];
+      case 'fold': return [h[0] + 12, h[1] + 1];
       case 'phone': return [h[0] + 12, h[1] + 3 + Math.sin(age * .8) * 4]; // on a call: looks ahead, phone at the ear behind
       case 'peek': case 'dash': case 'grab': return [h[0] + 12, h[1] + (mode === 'grab' ? 10 : 0)];
       default: return onPhone ? [h[0] + 12, h[1] + 3] : [h[0] + (Math.sin(now / 2300) > -.35 ? 12 : -10), h[1] + 1 - 4 * glance]; // idle: glances about (up when you scroll)
@@ -3549,10 +3550,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [29.5, 7], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [5, 9], [37, 9], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
-    dust:     P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [19, 40], [23.5, 40], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    dust:     P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [25, 38.5], [27, 39], [19, 57], [23.5, 57], [1, 1, -1, -1]), // side-on: hands together in front of him, elbows back
     curl:     P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [15.5, 44.5], [26.5, 44.5], [17, 57], [25, 57], [-1, 1, -1, -1]),
     press:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [8, 24], [34, 24], [16, 57], [26, 57], [-1, 1, -1, -1]),
-    phone:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [28.5, 14.5], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
+    phone:    P([22, 11.5], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [26.5, 18], [17.5, 57], [24.5, 57], [1, 1, -1, -1]), // on speaker: phone up in front of his mouth, elbow down
     // boxing stance, turned towards the "d": fists up by his chin, feet staggered
     guard:    P([11, 12.5], [11.8, 22], [12, 24.5], [13.5, 39], [5.5, 20], [8.5, 22.5], [7.5, 57], [19, 57], [-1, -1, 1, 1]),
     // peeking round the "d": leaning out, one hand holding its edge
@@ -3566,7 +3567,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     paint:    P([19, 11.5], [19.5, 21.5], [19.5, 24.5], [20.5, 38.5], [15.5, 44.5], [9, 28], [16.5, 57], [24.5, 57], [1, 1, -1, -1]),
     rattle:   P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [15, 44.5], [28, 20], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
     admire:   P([23.5, 12], [23, 21.5], [23, 25], [22, 38.5], [27.5, 38], [17, 40], [18.5, 57], [25.5, 57], [-1, 1, -1, -1]),
-    fold:     P([21, 12], [21, 21.5], [21, 25], [21, 38.5], [19.5, 33], [23.5, 33], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
+    fold:     P([21, 12], [21, 21.5], [21, 25], [21, 38.5], [25.5, 31], [26.5, 32], [18.8, 57], [23.4, 57], [1, 1, -1, -1]), // side-on: forearms folded across his chest, elbows back
     windup:   P([18.5, 12], [19.5, 21.5], [19.5, 25], [21, 38.5], [14.5, 44.5], [7, 18], [16.5, 57], [25.5, 57], [1, 1, -1, -1]),
     throw:    P([25, 12.5], [24, 22], [23.5, 25.5], [21.5, 38.5], [14.5, 44], [41, 20], [17, 57], [27, 57], [1, -1, -1, -1]),
     catch:    P([22, 10.5], [21.5, 21], [21.5, 24.5], [21, 38.5], [14.5, 44.5], [33, 8], [17.5, 57], [24.5, 57], [1, 1, -1, -1]),
@@ -3666,7 +3667,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       if (age % 4 > 3.3) t.head[0] += 1.2; // leans in to read something
     }
     if (mode === 'think') { t.hb[0] += Math.sin(age * 15) * 1.2; t.hb[1] += Math.abs(Math.sin(age * 7.5)) * 1.6; t.head[0] -= .6 + Math.sin(age * .9) * .5; } // scratching his head
-    if (mode === 'phone') t.hb = [t.head[0] - 1.4, t.head[1] + 2.2]; // phone at his ear, not his face
+    if (mode === 'phone') t.hb = [t.head[0] + 5, t.head[1] + 8.4]; // on speaker: phone in front of his mouth (at his ear, his arm covered his face)
     if (mode === 'wave') { // hand up by his head, the forearm swinging side to side from the elbow
       const elbow = [t.sh[0] + 7.5, t.sh[1] - 1];
       t.hb = rot(t.hb, elbow, (Math.sin(age * Math.PI * 2 / .7) * .5 + .5) * .5); // only outwards, never over his head
@@ -3676,7 +3677,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       J.forEach((k) => { if (k[0] !== 'l') t[k][1] -= up * (k === 'fa' || k === 'fb' ? .85 : 1); });
     }
     if (mode === 'wipe') t.ha[0] += Math.sin(age * Math.PI * 2 / .75) * 4;
-    if (mode === 'dust') { const j = Math.sin(age * Math.PI * 2 / .24) * 2; t.ha[0] += j; t.hb[0] -= j; t.head[1] += 1; } // brushing his hands off
+    if (mode === 'dust') { const j = Math.sin(age * Math.PI * 2 / .24) * 1.4; t.ha[1] += j; t.hb[1] -= j; t.head[1] += 1; } // brushing his hands off, in front of him
     if (mode === 'curl') { // alternating curls: forearm up to the shoulder, elbow stays tucked
       const up = (o) => Math.max(0, Math.sin(age * Math.PI * 2 / 1.5 + o)) ** .7;
       const a = up(0), b = up(Math.PI);
@@ -3740,7 +3741,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       t.fb = [21 - dir * 6.6 * Math.cos(ph), 57 - Math.max(0, -Math.sin(ph)) * 4.5];
       // arms swing opposite to the legs, hanging straight
       t.ha = [21 - dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
-      t.hb = onPhone ? [t.head[0] - 1.4, t.head[1] + 2.2] : mugAt ? [27, 34] : [21 + dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
+      t.hb = onPhone ? [t.head[0] + 5, t.head[1] + 8.4] : mugAt ? [27, 34] : [21 + dir * 7 * Math.cos(ph), 44 - Math.abs(Math.cos(ph)) * 2];
       // cartoon bounce: down on each contact, up as the legs pass
       const bob = 1.2 - Math.abs(Math.cos(ph)) * 2.6;
       ['hip', 'neck', 'sh', 'head'].forEach((k) => { t[k][1] += bob; });
@@ -3902,7 +3903,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
     const phoneOut = onPhone || svg.classList.contains('has-phone');
     const atEar = onPhone || mode === 'phone';
-    if (phoneOut) phone.setAttribute('transform', `translate(${f2(p.hb[0] + (atEar ? 0 : .5))} ${f2(p.hb[1] - (atEar ? 2 : 1))}) rotate(${atEar ? -12 : -5})`);
+    if (phoneOut) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .4)} ${f2(p.hb[1] - (atEar ? .4 : 1))}) rotate(${atEar ? 12 : -5})`);
     phone.style.opacity = phoneOut ? man.style.opacity : '';
     if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('cx', f2(h[0])); g.setAttribute('cy', f2(h[1])); });
     // brush in his right hand, bristles pointing at the "d"
