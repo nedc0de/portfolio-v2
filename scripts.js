@@ -3487,6 +3487,26 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const cap = el('.sk-cap');
   const FACING_D = new Set(['rummage', 'paint', 'guard', 'box', 'pushup']); // turned towards the "d" (left)
   const capF = el('.sk-glasses-f');
+  // body parts as layers: the far arm and leg go behind his body (a shade
+  // darker), the near ones in front; which is which flips when he turns.
+  // A near hand up by his head (phone, mug, thinking) is drawn over his head.
+  const LIMB = { armA: el('.sk-limb-arm-a'), armB: el('.sk-limb-arm-b'), legA: el('.sk-limb-leg-a'), legB: el('.sk-limb-leg-b'), body: el('.sk-limb-body') };
+  const coreG = el('.sk-core');
+  const hands = [LIMB.armA, LIMB.armB].map((g) => g && g.querySelector('.sk-hand'));
+  const feet = [LIMB.legA, LIMB.legB].map((g) => g && [g.querySelector('.sk-foot-ink'), g.querySelector('.sk-foot')]);
+  let layerKey = '';
+  const layer = (front, side, upA, upB) => {
+    const key = `${front}|${side}|${upA}|${upB}`;
+    if (key === layerKey || !LIMB.armA) return;
+    layerKey = key;
+    const nearArm = side > 0 ? LIMB.armB : LIMB.armA, farArm = side > 0 ? LIMB.armA : LIMB.armB;
+    const nearLeg = side > 0 ? LIMB.legB : LIMB.legA, farLeg = side > 0 ? LIMB.legA : LIMB.legB;
+    const nearUp = side > 0 ? upB : upA;
+    [farArm, farLeg, nearLeg, LIMB.body, ...(nearUp ? [] : [nearArm])].forEach((g) => man.insertBefore(g, coreG));
+    if (nearUp) man.appendChild(nearArm);
+    [farArm, farLeg].forEach((g) => g.classList.toggle('is-far', !front));
+    [nearArm, nearLeg].forEach((g) => g.classList.remove('is-far'));
+  };
   // Where he's looking: at whatever he's busy with. His glasses turn and
   // tilt towards it (the laptop screen, the "d" he boxes or paints, the
   // dumbbell going up, his mug, the phone in his selfie, the paper plane in
@@ -3569,6 +3589,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const pz = POSES[n];
     Object.keys(pz).forEach((k) => { if (k !== 'bend') pz[k] = [pz[k][0] - 7, pz[k][1]]; });
     ['head', 'neck', 'sh'].forEach((k) => { pz[k][0] -= 3.5; });
+  });
+  // He's mostly seen side-on now (his head turns to what he's doing), so in
+  // the relaxed poses his arms hang at his sides and his feet sit close,
+  // a little staggered, instead of splayed out like a front-on stick figure.
+  // Poses that really face out or spread on purpose keep their shape.
+  const SPREAD = new Set(['wave', 'jump', 'crouch', 'stretch', 'press', 'curl', 'sit', 'type', 'facepalm', 'fistpump', 'pushup', 'grab', 'dash', 'guard', 'box', 'fold', 'dust']);
+  Object.entries(POSES).forEach(([n, pz]) => {
+    if (SPREAD.has(n)) return;
+    if (pz.ha[1] >= 41 && pz.ha[0] < pz.sh[0] - 3) pz.ha = [pz.sh[0] - 2.2, pz.ha[1] - .5];
+    if (pz.hb[1] >= 41 && pz.hb[0] > pz.sh[0] + 3) pz.hb = [pz.sh[0] + 2.6, pz.hb[1] - .5];
+    if (pz.fa[1] >= 56 && pz.fb[1] >= 56 && pz.fb[0] - pz.fa[0] > 6) { pz.fa = [pz.hip[0] - 2.2, pz.fa[1]]; pz.fb = [pz.hip[0] + 2.4, pz.fb[1]]; }
   });
   const J = ['head', 'neck', 'sh', 'hip', 'ha', 'hb', 'fa', 'fb', 'l1', 'l2', 'l3'];
   // cartoon timing: stiff springs snap into each pose with a small pop, then
@@ -3835,6 +3866,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       if (inks[i]) inks[i].setAttribute('d', d);
       if (cores[i]) cores[i].setAttribute('d', d);
     });
+    // hands and shoes; shoes point the way he faces (outwards when he faces you)
+    hands.forEach((hd, i) => { if (!hd) return; const h = i ? p.hb : p.ha; hd.setAttribute('cx', f2(h[0])); hd.setAttribute('cy', f2(h[1])); });
+    const isFront = svg.classList.contains('is-front');
+    feet.forEach((fp, i) => {
+      if (!fp) return;
+      const f = i ? p.fb : p.fa, dir = isFront ? (i ? 1 : -1) : facing;
+      const d = `M${f2(f[0] - dir * .7)} ${f2(f[1] - 1)}L${f2(f[0] + dir * 2.3)} ${f2(f[1] - .9)}`;
+      fp[0].setAttribute('d', d); fp[1].setAttribute('d', d);
+    });
+    const nearHead = (h) => Math.hypot(h[0] - p.head[0], h[1] - p.head[1]) < 9.2;
+    layer(isFront, isFront ? 1 : facing, nearHead(p.ha), nearHead(p.hb));
     if (guide) {
       const [hx, hy] = p.head;
       const off = svg.classList.contains('is-front') ? 0 : facing * 1.4; // the face's centre line
