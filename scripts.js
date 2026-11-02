@@ -4124,9 +4124,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'box', 'paint', 'plane', 'selfie', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
     let steps = ACTIVITIES[activity]();
-    // between tasks he gets up and brushes his hands off before starting the next
+    // between tasks he stands for a moment before starting the next
     if (started && after !== 'think' && after !== 'wave') {
-      steps = [[0, () => go('stand')], [380, () => go('dust')], ...steps.map(([ms, fn]) => [ms + 1250, fn])];
+      steps = [[0, () => go('stand')], ...steps.map(([ms, fn]) => [ms + 700, fn])]; // a short breather (the hand-brushing looked like shaking side-on)
     }
     started = true;
     run(steps);
