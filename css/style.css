@@ -10394,74 +10394,9 @@ html.fav-sheet-open { overflow: hidden; }
   -webkit-tap-highlight-color: transparent;
 }
 
-/*===== HOME: "On my screen" code card + Inspect mode =====*/
-.cd-card {
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  background: #101010;
-  overflow: hidden;
-}
-.cd-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .75rem;
-  padding: .55rem .9rem;
-  border-bottom: 1px solid #222;
-  background: #161616;
-}
-.cd-file {
-  font: 600 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  color: #bdbdbd;
-}
-.cd-file::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: .5rem;
-  border-radius: 50%;
-  background: #ff7a1a;
-  vertical-align: 1px;
-}
-.cd-inspect {
-  font: 600 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  padding: .3rem .6rem;
-  border: 1px solid #3a3a3a;
-  border-radius: 6px;
-  background: transparent;
-  color: #e6e6e6;
-  cursor: pointer;
-}
-.cd-inspect:hover { border-color: #ff7a1a; }
-.cd-inspect[aria-pressed="true"] { background: #ff7a1a; border-color: #ff7a1a; color: #111; }
-.cd-pre {
-  margin: 0;
-  padding: 1rem .9rem 1.1rem;
-  min-height: 9.6em;
-  font: 500 .74rem/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  color: #d6d6d6;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.cd-pre .k { color: #ff7a1a; }
-.cd-pre .s { color: #f2c29b; }
-.cd-pre .n { color: #ffb27a; }
-.cd-pre .c { color: #6f6f6f; }
-.cd-pre .p { color: #9fc5ff; }
-.cd-caret {
-  display: inline-block;
-  width: .5em;
-  height: 1.15em;
-  vertical-align: -.22em;
-  background: #ff7a1a;
-  animation: cd-blink .8s steps(1) infinite;
-}
-@keyframes cd-blink { 50% { opacity: 0; } }
-.cd-note { margin: .6rem 0 0; font-size: .75rem; color: #6f6f6f; }
-
-/* Inspect mode: an outline and a tag with the real size, font and colours
-   of whatever is under the pointer (desktop only, scripts.js) */
+/*===== INSPECT (desktop): hover anything to see its size, font and colours =====*/
+/* an outline and a tag with the real size, font and colours of whatever is
+   under the pointer, on every page (mouse and trackpad only, scripts.js) */
 .ix-box {
   position: fixed;
   z-index: 2147483000;
@@ -10497,4 +10432,3 @@ html.fav-sheet-open { overflow: hidden; }
   vertical-align: -1px;
   text-decoration: none;
 }
-html.is-inspecting, html.is-inspecting * { cursor: crosshair !important; }

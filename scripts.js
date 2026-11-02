@@ -4196,99 +4196,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   }
 })();
 
-/*===== HOME: "On my screen" =====*/
-// Real snippets from this site's own code type themselves out in the card,
-// one after another, while it's on screen. Reduced motion or no JS: the
-// first snippet just sits there, finished.
+/*===== INSPECT (desktop) =====*/
+// Always on with a mouse or trackpad, on every page: hover anything to see
+// its real tag, size, font and colours, like the browser's developer tools.
+// Phones and tablets don't get it (nothing to hover with).
 (() => {
-  const pre = document.querySelector('.cd-pre code');
-  if (!pre) return;
-  const file = document.querySelector('.cd-file');
-  const SNIPS = [
-    ['scripts.js', `// Keeps the copyright year current
-document.querySelectorAll('.footer-year').forEach((el) => {
-  el.textContent = new Date().getFullYear();
-});`],
-    ['style.css', `/* the N in the logo stutters off and on */
-@keyframes neon-n {
-  0%, 88% { opacity: 1; }
-  88.4% { opacity: .1; }
-  89.3% { opacity: .15; }
-  90.4%, 100% { opacity: 1; }
-}`],
-    ['scripts.js', `// numbers in blog charts count up, fast then slow
-const DURATION = 1200;
-const ease = (t) => 1 - Math.pow(1 - t, 3);`],
-    ['style.css', `.hm-label {
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #8a8a8a;
-}`],
-  ];
-  // split into [class, text] pieces: comments, strings, numbers, keywords
-  const RE = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('[^']*'|`[^`]*`|"[^"]*")|(#[0-9a-f]{3,6}\b|-?\d*\.?\d+%?)|\b(const|let|return|new|@keyframes)\b|(@keyframes)|([a-z-]+)(?=:\s)/gi;
-  const tokens = (src) => {
-    const out = []; let last = 0, m;
-    RE.lastIndex = 0;
-    while ((m = RE.exec(src))) {
-      if (m.index > last) out.push(['', src.slice(last, m.index)]);
-      out.push([m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : (m[4] || m[5]) ? 'k' : 'p', m[0]]);
-      last = m.index + m[0].length;
-    }
-    out.push(['', src.slice(last)]);
-    return out;
-  };
-  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  const paint = (parts, upto, caret) => {
-    let left = upto, html = '';
-    for (const [cls, s] of parts) {
-      if (left <= 0) break;
-      const bit = esc(s.slice(0, left));
-      html += cls ? `<span class="${cls}">${bit}</span>` : bit;
-      left -= s.length;
-    }
-    pre.innerHTML = html + (caret ? '<span class="cd-caret"></span>' : '');
-  };
-  // the finished first snippet, coloured, for reduced motion and before it plays
-  paint(tokens(SNIPS[0][1]), Infinity, false);
-  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  let visible = false, running = false;
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const until = async () => { while (!visible) await wait(300); };
-  const run = async () => {
-    running = true;
-    for (let i = 0; ; i = (i + 1) % SNIPS.length) {
-      const [name, src] = SNIPS[i];
-      const parts = tokens(src);
-      file.textContent = name;
-      for (let n = 0; n <= src.length; n++) {
-        await until();
-        paint(parts, n, true);
-        // a beat after each line, like someone thinking
-        await wait(src[n - 1] === '\n' ? 220 : 18 + Math.random() * 30);
-      }
-      await wait(3200);
-    }
-  };
-  new IntersectionObserver((e) => {
-    visible = e.some((x) => x.isIntersecting);
-    if (visible && !running) run();
-  }, { threshold: .4 }).observe(pre);
-})();
-
-/*===== INSPECT MODE (desktop) =====*/
-// The "Inspect this page" button in the code card: hover anything to see its
-// real tag, size, font and colours, like the browser's developer tools.
-// Esc or the button again turns it off. Mouse and trackpad only.
-(() => {
-  const btn = document.querySelector('.cd-inspect');
-  if (!btn || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  btn.hidden = false;
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const root = document.documentElement; // not body: body's transform breaks position: fixed
   const box = document.createElement('div');
   const tag = document.createElement('div');
   box.className = 'ix-box'; tag.className = 'ix-tag';
+  box.setAttribute('aria-hidden', 'true'); tag.setAttribute('aria-hidden', 'true');
   box.hidden = tag.hidden = true;
   root.append(box, tag);
 
@@ -4298,12 +4216,14 @@ const ease = (t) => 1 - Math.pow(1 - t, 3);`],
     return '#' + m.slice(0, 3).map((v) => (+v).toString(16).padStart(2, '0')).join('');
   };
   const swatch = (label, c) => `<span><s style="background:${c}"></s>${label} ${c}</span>`;
-  let on = false, frame = 0, last = null;
+  const hide = () => { box.hidden = tag.hidden = true; };
+  let frame = 0, last = null;
 
   const show = (el) => {
-    if (!el || el === root || el === document.body || el.closest('.ix-tag')) return;
+    if (!el || el === root || el === document.body) return hide();
     const r = el.getBoundingClientRect();
-    if (r.width > innerWidth * .95 && r.height > innerHeight * .9) return;
+    // page-sized wrappers aren't interesting to inspect
+    if (!r.width || (r.width > innerWidth * .95 && r.height > innerHeight * .9)) return hide();
     const s = getComputedStyle(el);
     const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/)[0] : '';
     const font = s.fontFamily.split(',')[0].replace(/["']/g, '');
@@ -4322,19 +4242,11 @@ const ease = (t) => 1 - Math.pow(1 - t, 3);`],
     tag.style.left = `${Math.min(Math.max(8, r.left), innerWidth - tw - 8)}px`;
     tag.style.top = `${y}px`;
   };
-  const move = (e) => {
+  const update = () => { frame = 0; show(last); };
+  addEventListener('mousemove', (e) => {
     last = e.target;
-    if (!frame) frame = requestAnimationFrame(() => { frame = 0; show(last); });
-  };
-  const set = (v) => {
-    on = v;
-    btn.setAttribute('aria-pressed', String(v));
-    btn.textContent = v ? 'Inspecting · Esc' : 'Inspect this page';
-    root.classList.toggle('is-inspecting', v);
-    if (v) addEventListener('mousemove', move);
-    else { removeEventListener('mousemove', move); box.hidden = tag.hidden = true; }
-  };
-  addEventListener('scroll', () => { if (on && last) show(last); }, { passive: true });
-  btn.addEventListener('click', () => set(!on));
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && on) set(false); });
+    if (!frame) frame = requestAnimationFrame(update);
+  });
+  addEventListener('scroll', () => { if (last && !frame) frame = requestAnimationFrame(update); }, { passive: true });
+  document.addEventListener('mouseleave', () => { last = null; hide(); });
 })();
