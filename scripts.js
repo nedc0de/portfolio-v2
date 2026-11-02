@@ -4195,3 +4195,87 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     setTimeout(begin, 2500);
   }
 })();
+
+/*===== HOME: sections get "built" as they scroll in =====*/
+// Once per section, one cursor drags a selection box open over it (the
+// section is revealed under the box), the box shows the section's real size
+// and types one line of its CSS, with a swatch when it's a colour, then it
+// fades and leaves the real thing. Plays once per visit; reduced motion,
+// no IntersectionObserver or no JS shows the page as normal.
+(() => {
+  const blocks = [...document.querySelectorAll('.hm-home .hm-block')];
+  if (!blocks.length || !('IntersectionObserver' in window)
+    || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const LINES = [
+    ['grid', 'gap', '1.5rem'],
+    ['card', 'background', '#1c1c1c'],
+    ['tile', 'aspect-ratio', '4 / 3'],
+    ['signoff', 'color', '#ff7a1a'],
+  ];
+  const CUR = '<svg class="bx-cur" viewBox="0 0 16 20"><path d="M1 1v15.5l4.2-4 2.8 6.3 2.6-1.1-2.8-6.2H14z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+  const ease = (x) => 1 - Math.pow(1 - x, 3);
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const tween = (ms, fn) => new Promise((done) => {
+    const t0 = performance.now();
+    const tick = (now) => {
+      const x = Math.min(1, (now - t0) / ms);
+      fn(ease(x));
+      if (x < 1) requestAnimationFrame(tick); else done();
+    };
+    requestAnimationFrame(tick);
+  });
+
+  const build = async (el, i) => {
+    const r = el.getBoundingClientRect();
+    const host = document.body.getBoundingClientRect();
+    const W = Math.round(r.width), H = Math.round(r.height);
+    const [name, prop, val] = LINES[i % LINES.length];
+    const hex = /^#[0-9a-f]{6}$/i.test(val);
+    const bx = document.createElement('div');
+    bx.className = 'bx';
+    bx.setAttribute('aria-hidden', 'true');
+    Object.assign(bx.style, { left: `${r.left - host.left}px`, top: `${r.top - host.top}px`, width: `${W}px`, height: `${H}px` });
+    bx.innerHTML = `<div class="bx-box"><span class="bx-h"></span><span class="bx-h"></span><span class="bx-h"></span><span class="bx-h"></span>
+      <span class="bx-tag">.${name}<i>0 × 0</i></span>
+      <span class="bx-code">${hex ? `<s style="background:${val}"></s>` : ''}<span><b>${prop}</b>: <em></em></span><u></u></span></div>${CUR}`;
+    document.body.append(bx);
+    const box = bx.querySelector('.bx-box'), size = bx.querySelector('.bx-tag i');
+    const code = bx.querySelector('.bx-code'), typed = bx.querySelector('.bx-code em');
+    const cur = bx.querySelector('.bx-cur');
+
+    // drag the box open from the top-left corner; the section shows under it
+    el.style.clipPath = 'inset(0 100% 100% 0)';
+    el.style.opacity = '';
+    await tween(650, (k) => {
+      const w = Math.round(W * k), h = Math.round(H * k);
+      box.style.width = `${w}px`; box.style.height = `${h}px`;
+      cur.style.transform = `translate(${w}px, ${h}px)`;
+      size.textContent = `${w} × ${h}`;
+      el.style.clipPath = `inset(0 ${W - w}px ${H - h}px 0)`;
+    });
+    el.style.clipPath = '';
+    cur.style.opacity = '0';
+    // type one line of its CSS
+    code.classList.add('is-on');
+    for (let n = 1; n <= val.length + 1; n++) {
+      typed.textContent = (val + ';').slice(0, n);
+      await wait(45);
+    }
+    await wait(650);
+    bx.classList.add('is-out');
+    await wait(400);
+    bx.remove();
+  };
+
+  // hidden with opacity, not a clip: a fully clipped section never counts as on screen
+  blocks.forEach((el) => { el.style.opacity = '0'; });
+  let n = 0;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting || !e.target.offsetHeight) return;
+      io.unobserve(e.target);
+      build(e.target, n++);
+    });
+  }, { threshold: .15 });
+  blocks.forEach((el) => io.observe(el));
+})();
