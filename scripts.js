@@ -3486,6 +3486,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const mist = [...svg.querySelectorAll('.sk-mist circle')];
   const cap = el('.sk-cap');
   const FACING_D = new Set(['rummage', 'paint', 'guard', 'box', 'pushup']); // turned towards the "d" (left)
+  // poses drawn side-on (glasses in profile); in every other pose his body
+  // faces you, so his glasses do too
+  const SIDE_ON = new Set([...FACING_D, 'sit', 'type', 'facepalm', 'fistpump', 'dash', 'grab', 'windup', 'throw']);
+  const capF = el('.sk-glasses-f');
   const brush = el('.sk-brush'), plane = el('.sk-plane'), peace = el('.sk-peace'), flash = el('.sk-flash');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3500,7 +3504,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     stand:    P([21, 11], [21, 21.5], [21, 25], [21, 38.5], [14.5, 44.5], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     crouch:   P([20, 21], [20, 31], [20, 34], [20, 46.5], [12, 44], [28, 44], [14, 57], [26, 57], [1, -1, -1, -1]),
     jump:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [4.5, 13], [35.5, 13], [16, 56], [24, 56], [1, -1, -1, -1]),
-    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [31, 14], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
+    wave:     P([20, 11], [20, 21.5], [20, 25], [20, 38.5], [13.5, 44.5], [29.5, 7], [16.5, 57], [23.5, 57], [1, 1, -1, -1]),
     wipe:     P([21.5, 11.5], [21, 22], [21, 25.5], [21, 39], [17, 9], [27.5, 44.5], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     stretch:  P([21, 10], [21, 20.5], [21, 24], [21, 38], [5, 9], [37, 9], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
     dust:     P([21, 11.5], [21, 21.5], [21, 25], [21, 38.5], [19, 40], [23.5, 40], [17.5, 57], [24.5, 57], [1, -1, -1, -1]),
@@ -3609,10 +3613,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       if (age % 4 > 3.3) t.head[0] += 1.2; // leans in to read something
     }
     if (mode === 'think') { t.hb[0] += Math.sin(age * 15) * 1.2; t.hb[1] += Math.abs(Math.sin(age * 7.5)) * 1.6; t.head[0] -= .6 + Math.sin(age * .9) * .5; } // scratching his head
-    if (mode === 'wave') {
-      const a = (Math.sin(age * Math.PI * 2 / 1) * .5 + .5) * .7;
-      t.hb = rot(t.hb, t.sh, a);
-      t.head[0] += .8;
+    if (mode === 'wave') { // hand up by his head, the forearm swinging side to side from the elbow
+      const elbow = [t.sh[0] + 7.5, t.sh[1] - 1];
+      t.hb = rot(t.hb, elbow, (Math.sin(age * Math.PI * 2 / .7) * .5 + .5) * .5); // only outwards, never over his head
     }
     if (mode === 'jump') {
       const u = Math.min(1, age / .5), up = (u < .4 ? 1 - (1 - u / .4) ** 2 : 1 - ((u - .4) / .6) ** 2) * 15; // fast up, hang, drop
@@ -3785,6 +3788,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // cap: sits on his head, tilts with it, brim faces the way he's facing
     const tilt = Math.atan2(p.head[1] - p.neck[1], p.head[0] - p.neck[0]) * 180 / Math.PI + 90;
     cap.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)}) scale(${FACING_D.has(mode) ? -1 : 1} 1)`);
+    const front = !SIDE_ON.has(mode);
+    svg.classList.toggle('is-front', front);
+    if (capF) capF.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)})`);
     body.setAttribute('d', spine(p.neck, p.hip, p.head));
     armA.setAttribute('d', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
     armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
@@ -3799,7 +3805,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     });
     if (guide) {
       const [hx, hy] = p.head;
-      guide.setAttribute('d', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + 1.4)} ${f2(hy - 6.7)}Q${f2(hx + 3.6)} ${f2(hy)} ${f2(hx + 1.4)} ${f2(hy + 6.7)}`);
+      const off = SIDE_ON.has(mode) ? (FACING_D.has(mode) ? -1.4 : 1.4) : 0; // the face's centre line
+      guide.setAttribute('d', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + off)} ${f2(hy - 6.7)}Q${f2(hx + off * 2.6)} ${f2(hy)} ${f2(hx + off)} ${f2(hy + 6.7)}`);
     }
     // smears: a quick arm swing leaves a short fading streak behind the hand
     ['ha', 'hb'].forEach((k, i) => {

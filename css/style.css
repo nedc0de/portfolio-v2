@@ -10771,3 +10771,7 @@ h1.section-title .about-title-color::before {
 /* fast arm swings leave thin dashed speed lines (a thick streak looked like
    a ghost limb on the sketched figure) */
 .stick .sk-smear { stroke: #dedede; stroke-width: 1; stroke-dasharray: 2.4 2; }
+
+/* glasses in profile for side-on poses, from the front when he faces you */
+.stick .sk-glasses, .stick .sk-glasses-f { transition: opacity .12s; }
+.stick.is-front .sk-glasses, .stick:not(.is-front) .sk-glasses-f { opacity: 0; }
