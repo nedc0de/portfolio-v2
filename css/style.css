@@ -10748,3 +10748,19 @@ h1.section-title .about-title-color::before {
 .ix-switch:hover { border-color: #555; color: #e6e6e6; }
 .ix-switch[aria-pressed="true"] { color: #ff7a1a; }
 .ix-switch[aria-pressed="true"]:hover { border-color: #ff7a1a; }
+
+/*===== HOME: the figure drawn like a pencil sketch =====*/
+/* a blank mannequin: light limbs with some body, a dark ink outline
+   underneath (drawn by scripts.js), faint orange construction lines along
+   the limbs and across the head, and scratchy hatching behind him */
+.stick .sk-hatch { stroke: #fff; stroke-width: .3; opacity: .12; stroke-linecap: round; }
+.stick .sk-hatch-b { stroke-width: .5; opacity: .07; }
+.stick .sk-man > path:not(.sk-smear):not(.sk-ink):not(.sk-guide) { stroke: #dedede; }
+.stick .sk-arm-a, .stick .sk-arm-b, .stick .sk-leg-a, .stick .sk-leg-b { stroke-width: 3.3; }
+.stick .sk-body { stroke-width: 5.6; }
+.stick .sk-man > path.sk-ink { stroke: #0c0c0c; stroke-width: 5; }
+.stick .sk-man > path.sk-ink-body { stroke-width: 7.4; }
+.stick .sk-core path { stroke: var(--fifteenth-color); stroke-width: .35; opacity: .55; }
+.stick .sk-core path:first-child { opacity: 0; }
+.stick .sk-head { fill: #dedede; stroke: #0c0c0c; stroke-width: 1.1; }
+.stick .sk-guide { fill: none; stroke: var(--fifteenth-color); stroke-width: .35; opacity: .6; }

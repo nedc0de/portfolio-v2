@@ -3451,8 +3451,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 })();
 
 /*===== HOME: the stick figure next to "Ned" =====*/
-// A tiny cartoon character with a laptop, animated like a stick-figure
-// cartoon: he snaps into strong poses with a little pop, holds them, and fast
+// A tiny character with a laptop, drawn like a pencil sketch (a blank
+// mannequin head, inked limbs with faint orange construction lines, scratchy
+// hatching behind) and animated like a stick-figure cartoon: he snaps into strong poses with a little pop, holds them, and fast
 // moves leave smears. Each pose only says where his joints
 // *want* to be; every joint is a spring that chases its target, so he
 // overshoots, settles and lags a little. Arms and legs are two segments with
@@ -3478,6 +3479,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const man = el('.sk-man'), head = el('.sk-head'), body = el('.sk-body'),
     armA = el('.sk-arm-a'), armB = el('.sk-arm-b'), legA = el('.sk-leg-a'), legB = el('.sk-leg-b'),
     lapBase = el('.sk-lap-base'), lapScreen = el('.sk-lap-screen'), mug = el('.sk-mug');
+  const inks = ['body', 'arm-a', 'arm-b', 'leg-a', 'leg-b'].map((k) => svg.querySelector(`.sk-ink[data-for="${k}"]`)), cores = [...svg.querySelectorAll('.sk-core path')], guide = el('.sk-guide');
   const bits = [...svg.querySelectorAll('.sk-code text')];
   const dbs = [...svg.querySelectorAll('.sk-db')], phone = el('.sk-phone'), gloves = [...svg.querySelectorAll('.sk-glove')];
   const d = document.querySelector('.hm-d'); // his punching bag, when he boxes
@@ -3788,6 +3790,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
     legA.setAttribute('d', hose(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
     legB.setAttribute('d', hose(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
+    // sketch look: each limb again underneath as its dark ink outline, and a
+    // faint orange construction line along it; guide lines on the blank head
+    [body, armA, armB, legA, legB].forEach((part, i) => {
+      const d = part.getAttribute('d');
+      if (inks[i]) inks[i].setAttribute('d', d);
+      if (cores[i]) cores[i].setAttribute('d', d);
+    });
+    if (guide) {
+      const [hx, hy] = p.head;
+      guide.setAttribute('d', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + 1.4)} ${f2(hy - 6.7)}Q${f2(hx + 3.6)} ${f2(hy)} ${f2(hx + 1.4)} ${f2(hy + 6.7)}`);
+    }
     // smears: a quick arm swing leaves a short fading streak behind the hand
     ['ha', 'hb'].forEach((k, i) => {
       const tr = trail[k];
