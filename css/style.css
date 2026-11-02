@@ -10393,3 +10393,108 @@ html.fav-sheet-open { overflow: hidden; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+
+/*===== HOME: "On my screen" code card + Inspect mode =====*/
+.cd-card {
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  background: #101010;
+  overflow: hidden;
+}
+.cd-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .55rem .9rem;
+  border-bottom: 1px solid #222;
+  background: #161616;
+}
+.cd-file {
+  font: 600 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: #bdbdbd;
+}
+.cd-file::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: .5rem;
+  border-radius: 50%;
+  background: #ff7a1a;
+  vertical-align: 1px;
+}
+.cd-inspect {
+  font: 600 .72rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  padding: .3rem .6rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: transparent;
+  color: #e6e6e6;
+  cursor: pointer;
+}
+.cd-inspect:hover { border-color: #ff7a1a; }
+.cd-inspect[aria-pressed="true"] { background: #ff7a1a; border-color: #ff7a1a; color: #111; }
+.cd-pre {
+  margin: 0;
+  padding: 1rem .9rem 1.1rem;
+  min-height: 9.6em;
+  font: 500 .74rem/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: #d6d6d6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cd-pre .k { color: #ff7a1a; }
+.cd-pre .s { color: #f2c29b; }
+.cd-pre .n { color: #ffb27a; }
+.cd-pre .c { color: #6f6f6f; }
+.cd-pre .p { color: #9fc5ff; }
+.cd-caret {
+  display: inline-block;
+  width: .5em;
+  height: 1.15em;
+  vertical-align: -.22em;
+  background: #ff7a1a;
+  animation: cd-blink .8s steps(1) infinite;
+}
+@keyframes cd-blink { 50% { opacity: 0; } }
+.cd-note { margin: .6rem 0 0; font-size: .75rem; color: #6f6f6f; }
+
+/* Inspect mode: an outline and a tag with the real size, font and colours
+   of whatever is under the pointer (desktop only, scripts.js) */
+.ix-box {
+  position: fixed;
+  z-index: 2147483000;
+  pointer-events: none;
+  border: 1px solid #ff7a1a;
+  background: rgba(255, 122, 26, .08);
+  transition: all .08s ease-out;
+}
+.ix-tag {
+  position: fixed;
+  z-index: 2147483001;
+  pointer-events: none;
+  display: grid;
+  gap: 4px;
+  padding: 7px 9px;
+  border: 1px solid #333;
+  border-radius: 7px;
+  background: #0d0d0d;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .5);
+  font: 500 11px/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: #d6d6d6;
+  white-space: nowrap;
+}
+.ix-tag b { color: #ff7a1a; font-weight: 600; }
+.ix-tag i { font-style: normal; color: #8a8a8a; }
+.ix-tag s {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 3px;
+  border: 1px solid #555;
+  vertical-align: -1px;
+  text-decoration: none;
+}
+html.is-inspecting, html.is-inspecting * { cursor: crosshair !important; }
