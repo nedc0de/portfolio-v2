@@ -1013,7 +1013,7 @@
       card.setAttribute('aria-pressed', 'false');
       card.setAttribute(
         'aria-label',
-        `${f.title}, ${TYPE_NAME[f.type]}, rated ${rating} out of 5. Show details`,
+        `${f.title}, ${TYPE_NAME[f.type]}, rated ${rating} out of 5`,
       );
       const meta = [TYPE_NAME[f.type], f.year, f.genre]
         .filter(Boolean)
@@ -1035,10 +1035,12 @@
           </span>
         </span>`;
       const item = { el: card, fav: f, rating, shelf: null };
-      // tap: the details panel slides up (bigger poster, details, take)
+      // tap: picks it, so it shows big in the preview; tap it again (or
+      // "See details") and the details panel slides up
       const open = () => {
         if (picking) return;
-        openSheet(item);
+        if (hero && current !== item) select(item);
+        else openSheet(item);
       };
       card.addEventListener('click', open);
       card.addEventListener('keydown', (e) => {
@@ -1210,47 +1212,77 @@
     if (lastFocus) lastFocus.focus({ preventScroll: true });
   }
 
-  /*---------- featured banner ----------*/
-  // The latest movie (the list's newest is at the top) as a wide banner above
-  // the menus: its poster, blurred behind, the title, stars and a button to
-  // its details.
+  /*---------- the select screen's big preview ----------*/
+  // Like a fighting game's character select: the poster you pick lights up
+  // in the grid (with a P1 tag) and shows big up here, with its stars, its
+  // summary (desktop) and a button to its details. It stays pinned under the
+  // menus while you scroll the grid. It starts on the latest movie.
   const FEATURED = FAVORITES.find((f) => f.type === 'movie');
+  let hero = null;
+  let current = null;
+  let paintId = 0;
   function buildBanner() {
     const bar = document.querySelector('.fav-bar');
     const item = cards.find((c) => c.fav === FEATURED);
     if (!bar || !item) return;
-    const f = FEATURED;
-    const hero = document.createElement('div');
+    hero = document.createElement('div');
     hero.className = 'fav-hero';
+    hero.setAttribute('aria-live', 'polite');
     hero.innerHTML = `
       <span class="fav-hero-bg" aria-hidden="true"></span>
+      <span class="fav-hero-slash" aria-hidden="true"></span>
       <span class="fav-hero-poster"><img alt="" width="342" height="513"></span>
       <div class="fav-hero-info">
-        <span class="fav-hero-kicker">Just watched</span>
-        <h2 class="fav-hero-title">${escapeHTML(f.title)}</h2>
-        <span class="fav-hero-meta">${escapeHTML([f.year, f.genre].filter(Boolean).join(' · '))}</span>
-        <span class="fav-hero-rate">${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span></span>
+        <span class="fav-hero-kicker"></span>
+        <h2 class="fav-hero-title"></h2>
+        <span class="fav-hero-meta"></span>
+        <span class="fav-hero-rate"></span>
         <p class="fav-hero-sum"></p>
         <button type="button" class="fav-hero-go">See details</button>
       </div>`;
-    bar.before(hero);
-    hero.querySelector('.fav-hero-go').addEventListener('click', () => openSheet(item));
-    // desktop: the movie's own wide still drifts slowly behind the banner,
+    bar.after(hero);
+    hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
+    select(item, 'Just watched');
+  }
+  function select(item, kicker) {
+    if (!hero) return;
+    if (current) { current.el.classList.remove('is-selected'); current.el.setAttribute('aria-pressed', 'false'); }
+    current = item;
+    item.el.classList.add('is-selected');
+    item.el.setAttribute('aria-pressed', 'true');
+    const f = item.fav;
+    const id = ++paintId; // a slow cover for an earlier pick never lands on this one
+    hero.querySelector('.fav-hero-kicker').textContent = `P1 · ${kicker || TYPE_NAME[f.type]}`;
+    hero.querySelector('.fav-hero-title').textContent = f.title;
+    hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
+    hero.querySelector('.fav-hero-rate').innerHTML = `${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span>`;
+    hero.querySelector('.fav-hero-sum').textContent = '';
+    hero.classList.remove('has-cover', 'has-backdrop');
+    hero.style.removeProperty('--backdrop');
+    // a quick flash, like the portrait swapping in
+    hero.classList.remove('is-swap');
+    void hero.offsetWidth;
+    hero.classList.add('is-swap');
+    // desktop: the title's own wide still drifts slowly behind the banner,
     // with its summary beside the poster
     infoFor(f).then((info) => {
+      if (id !== paintId) return;
       hero.querySelector('.fav-hero-sum').textContent = info.summary || '';
       if (!info.backdrop) return;
       const still = new Image();
       still.onload = () => {
+        if (id !== paintId) return;
         hero.style.setProperty('--backdrop', `url("${info.backdrop}")`);
         hero.classList.add('has-backdrop');
       };
       still.src = info.backdrop;
     }).catch(() => {});
+    const img = hero.querySelector('img');
+    img.removeAttribute('srcset');
+    img.removeAttribute('src');
     coverFor(f).then((url) => {
-      if (!url) return;
-      const img = hero.querySelector('img');
-      img.onload = () => hero.classList.add('has-cover');
+      if (!url || id !== paintId) return;
+      img.onload = () => { if (id === paintId) hero.classList.add('has-cover'); };
       const set = coverSrcset(url);
       if (set) { img.sizes = '(min-width: 768px) 160px, 30vw'; img.srcset = set; }
       img.src = url;
@@ -1298,8 +1330,9 @@
         card.classList.add('is-picked');
         setTimeout(() => card.classList.remove('is-picked'), 1600);
         picking = false;
-        // then its details open, like tapping it
-        setTimeout(() => openSheet(cards.find((c) => c.el === card)), 500);
+        // then it's the pick, like tapping it
+        const item = cards.find((c) => c.el === card);
+        if (hero) select(item); else setTimeout(() => openSheet(item), 500);
       },
       visible || reduceMotion.matches ? 0 : 450,
     );

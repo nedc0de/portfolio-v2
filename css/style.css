@@ -10507,3 +10507,108 @@ h1.section-title .about-title-color::before {
   background: #22170f; /* solid, a dark orange tint */
   color: var(--fifteenth-color);
 }
+
+/*===== FAVORITES: character select =====*/
+/* Like a fighting game's select screen: every poster sits in a tight grid,
+   tinted orange, and the one you pick lights up in colour with a P1 tag and
+   shows big in the preview pinned at the top (favorites.js). */
+.fav-bar { margin-bottom: .6rem; }
+
+/* the preview: pinned under the menus, an orange slash behind the poster */
+.fav-hero {
+  position: sticky;
+  top: 3.6rem;
+  z-index: 15;
+  margin: 0 0 1rem;
+  padding: .8rem;
+  gap: .9rem;
+  border: 1px solid #262626;
+  border-radius: 0;
+  box-shadow: 0 12px 24px -12px rgba(0, 0, 0, .8);
+}
+.fav-hero-slash {
+  position: absolute;
+  left: -2rem;
+  top: 22%;
+  width: clamp(120px, 40vw, 260px);
+  height: 62%;
+  z-index: -1;
+  background: var(--fifteenth-color);
+  transform: skewX(-14deg);
+  opacity: .9;
+}
+.fav-hero-poster { width: clamp(74px, 22vw, 150px); border-radius: 0; }
+.fav-hero-kicker {
+  padding: 3px 6px;
+  background: var(--fifteenth-color);
+  color: #111;
+  letter-spacing: .08em;
+}
+.fav-hero-title { font-size: clamp(1.1rem, 5vw, 1.9rem); font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+.fav-hero.is-swap .fav-hero-poster,
+.fav-hero.is-swap .fav-hero-title { animation: fav-swap .35s ease-out; }
+@keyframes fav-swap {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: none; }
+}
+@media (min-width: 900px) {
+  .fav-hero { top: 4rem; min-height: 0; padding: 1.2rem; }
+}
+
+/* the grid: every shelf wraps into rows instead of scrolling sideways */
+.fav-row {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  overflow: visible;
+  scroll-snap-type: none;
+  padding: 2px 2px 8px;
+  -webkit-mask: none;
+  mask: none;
+}
+@media (min-width: 600px) { .fav-row { grid-template-columns: repeat(7, 1fr); } }
+@media (min-width: 1000px) { .fav-row { grid-template-columns: repeat(9, 1fr); } }
+.fav-shelf-nav,
+.fav-shelf.is-scrollable .fav-shelf-nav { display: none; }
+.fav-row .fav-score { display: none; }
+
+/* tiles: square corners, grey with an orange tint until picked */
+.fav-row .fav-card,
+.fav-row .fav-face { border-radius: 0; }
+.fav-row .fav-card:hover,
+.fav-row .fav-card.is-hopping { transform: none; }
+.fav-row .fav-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--fifteenth-color);
+  mix-blend-mode: color;
+  opacity: .85;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.fav-row .fav-cover { filter: grayscale(1) contrast(1.1) brightness(.72); transition: filter .2s, opacity .3s; }
+.fav-row .fav-placeholder-title { font-size: 9px; line-height: 1.15; }
+@media (hover: hover) {
+  .fav-row .fav-card:hover .fav-front::after { opacity: .25; }
+  .fav-row .fav-card:hover .fav-cover { filter: grayscale(.3) brightness(.9); }
+}
+.fav-row .fav-card.is-hopping .fav-front::after { opacity: 0; }
+.fav-row .fav-card.is-hopping .fav-cover { filter: none; }
+
+/* the pick: full colour, the orange box and its P1 tag */
+.fav-row .fav-card.is-selected { z-index: 1; outline: 2px solid var(--fifteenth-color); outline-offset: 1px; }
+.fav-row .fav-card.is-selected .fav-front::after { opacity: 0; }
+.fav-row .fav-card.is-selected .fav-cover { filter: none; }
+.fav-row .fav-card.is-selected::before {
+  content: "P1";
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  padding: 3px 5px;
+  background: var(--fifteenth-color);
+  color: #111;
+  font: 700 9px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
