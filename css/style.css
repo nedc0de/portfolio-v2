@@ -3926,7 +3926,7 @@ details>summary {
   height: 2.4rem;
   padding: 0 .9rem;
   border: 2px solid var(--fifteenth-color);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--fifteenth-color);
   font-size: .9rem;
   font-weight: 700;
@@ -9895,7 +9895,7 @@ html.is-frozen .egg-crash * {
   margin-top: .4rem;
   padding: .45rem .9rem;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px; /* same corners as the site's other buttons */
   background: var(--fifteenth-color);
   font: 700 .78rem var(--body-font);
   color: #111;
