@@ -10078,49 +10078,38 @@ html.fav-sheet-open { overflow: hidden; }
   to { transform: scale(1.18) translate(-3%, -2%); }
 }
 
-/*===== DESKTOP MENU: laser scan =====*/
-/* calm grey words, white for the page you're on and the one you point at;
-   a soft laser line (scripts.js) replaces the brush underline and the tilt */
-.nav-laser { display: none; }
-
+/*===== DESKTOP MENU: the page you're on is "selected" =====*/
+/* calm grey words, white for the page you're on and the one you point at.
+   The page you're on sits in the same orange box the site's Inspect draws
+   (scripts.js), with its little tag underneath, like a selected element. */
 @media screen and (min-width: 768px) {
-  .nav-list { position: relative; }
-  .nav-link { font-weight: 500; transition: color .25s, text-shadow .45s; }
-  .nav-link:hover { transform: none; color: #f2f2f2; transition: color .25s, text-shadow .45s; }
+  .nav-link { font-weight: 500; transition: color .25s; }
+  .nav-link:hover { transform: none; color: #f2f2f2; transition: color .25s; }
   .nav-link.active { color: #f2f2f2; }
-  .nav-link.active::after { display: none; }
-
-  /* a word the line is passing under warms up a little */
-  .nav-link.is-lit { transition: color .1s; }
-
-  .nav-laser {
+  .nav-link.active::after {
+    content: "a.active";
     display: block;
     position: absolute;
-    left: 0;
-    top: var(--y, 2.4rem);
-    width: 0;
-    height: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .3s;
+    left: -.45em;
+    top: calc(100% + .45em);
+    width: auto;
+    height: auto;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #ff7a1a;
+    color: #111;
+    font: 600 10px/1.2 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    transform: none;
+    opacity: 1;
   }
-  .nav-laser.is-on { opacity: 1; }
-
-  /* the line: one soft yellow, with the same short fade at both ends under
-     every word, so it looks alike on every page whatever the word's length */
-  .nav-laser-trail {
+  .nav-link.active::before {
+    content: "";
     position: absolute;
-    top: -1px;
-    left: 0;
-    width: var(--w, 0px);
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, rgba(255, 122, 26, 0), rgba(255, 122, 26, .45) 12px, rgba(255, 122, 26, .45) calc(100% - 12px), rgba(255, 122, 26, 0));
-    box-shadow: 0 0 6px rgba(255, 122, 26, .14);
-    transform: translateX(var(--x, 0px));
-    transition: transform .6s cubic-bezier(.3, .7, .2, 1), width .6s cubic-bezier(.3, .7, .2, 1);
+    inset: -.2em -.45em;
+    border: 1px solid #ff7a1a;
+    background: rgba(255, 122, 26, .08);
+    pointer-events: none;
   }
-  .nav-laser.is-instant .nav-laser-trail { transition: none; }
 }
 
 
