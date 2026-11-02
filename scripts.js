@@ -4126,12 +4126,36 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 (() => {
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const root = document.documentElement; // not body: body's transform breaks position: fixed
+  // The switch in the corner turns it off: it stays off from page to page
+  // (this tab only) until it's clicked again or the page is refreshed.
+  const KEY = 'nedcode-inspect-off';
+  const store = (v) => { try { v ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch (e) {} };
+  const reload = performance.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
+  if (reload) store(false);
+  let on = true;
+  try { on = sessionStorage.getItem(KEY) !== '1'; } catch (e) {}
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'ix-switch';
+  toggle.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/><path class="ix-switch-arrow" d="M6.5 6.5l5 2-2.1.8-.8 2.1z"/></svg><span></span>';
   const box = document.createElement('div');
   const tag = document.createElement('div');
   box.className = 'ix-box'; tag.className = 'ix-tag';
   box.setAttribute('aria-hidden', 'true'); tag.setAttribute('aria-hidden', 'true');
   box.hidden = tag.hidden = true;
-  root.append(box, tag);
+  root.append(box, tag, toggle);
+  const paintSwitch = () => {
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.querySelector('span').textContent = on ? 'Inspect on' : 'Inspect off';
+    toggle.title = on ? 'Turn off Inspect' : 'Turn Inspect back on';
+  };
+  paintSwitch();
+  toggle.addEventListener('click', () => {
+    on = !on;
+    store(!on);
+    paintSwitch();
+    if (!on) hide();
+  });
 
   const hex = (c) => {
     const m = c.match(/[\d.]+/g);
@@ -4143,7 +4167,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let frame = 0, last = null;
 
   const show = (el) => {
-    if (!el || el === root || el === document.body) return hide();
+    if (!on || !el || el === root || el === document.body || el.closest('.ix-switch')) return hide();
     const r = el.getBoundingClientRect();
     // page-sized wrappers aren't interesting to inspect
     if (!r.width || (r.width > innerWidth * .95 && r.height > innerHeight * .9)) return hide();
