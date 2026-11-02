@@ -10446,3 +10446,47 @@ html.fav-sheet-open { overflow: hidden; }
   vertical-align: -1px;
   text-decoration: none;
 }
+
+/*===== Page titles: the orange word is "selected", like Inspect =====*/
+/* the same orange box as the menu's current page, with the title's own tag
+   (h1) on its top edge, in place of the underline */
+h1.section-title .about-title-color {
+  position: relative;
+  z-index: 0;
+  padding: 0 .1em;
+}
+h1.section-title .about-title-color::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -.02em;
+  width: auto;
+  height: auto;
+  margin: 0;
+  border: 1px solid #ff7a1a;
+  border-radius: 0;
+  background: rgba(255, 122, 26, .08);
+  background-image: none;
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+  z-index: -1;
+}
+h1.section-title .about-title-color::before {
+  content: "h1";
+  position: absolute;
+  left: -1px;
+  top: auto;
+  bottom: 100%;
+  margin: 0;
+  transform: none;
+  padding: 2px 5px;
+  border-radius: 3px 3px 3px 0;
+  background: #ff7a1a;
+  color: #111;
+  font: 600 10px/1.2 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0;
+  text-transform: none;
+}
