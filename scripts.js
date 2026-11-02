@@ -3486,10 +3486,32 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const mist = [...svg.querySelectorAll('.sk-mist circle')];
   const cap = el('.sk-cap');
   const FACING_D = new Set(['rummage', 'paint', 'guard', 'box', 'pushup']); // turned towards the "d" (left)
-  // poses drawn side-on (glasses in profile); in every other pose his body
-  // faces you, so his glasses do too
-  const SIDE_ON = new Set([...FACING_D, 'sit', 'type', 'facepalm', 'fistpump', 'dash', 'grab', 'windup', 'throw']);
   const capF = el('.sk-glasses-f');
+  // Where he's looking: at whatever he's busy with. His glasses turn and
+  // tilt towards it (the laptop screen, the "d" he boxes or paints, the
+  // dumbbell going up, his mug, the phone in his selfie, the paper plane in
+  // flight, his thought bubble). Idle, he glances about. He only turns to
+  // face you when he waves.
+  let facing = 1, lookAng = 0, lookPrev = 0, planeXY = null, tapHop = false; // tapHop: the hop before a wave, also to you
+  const lookTarget = (p, now) => {
+    const age = (now - modeStart) / 1000, h = p.head, D_AT = [2, 30];
+    switch (mode) {
+      case 'sit': case 'type': case 'facepalm': return p.l3 ? [p.l3[0], p.l3[1] + 3] : [h[0] + 10, h[1] + 8];
+      case 'fistpump': return p.hb;
+      case 'rummage': case 'paint': case 'guard': case 'box': case 'admire': case 'rattle': return mode === 'rattle' ? p.hb : D_AT;
+      case 'pushup': return [h[0] - 9, 57];
+      case 'curl': return [p.hb[0] + 4, Math.min(p.hb[1], h[1] + 16)]; // watches his near arm (no flipping every rep)
+      case 'press': return [h[0] + 4, h[1] - 14];
+      case 'sip': case 'hold': case 'selfie': case 'selfie2': return p.hb;
+      case 'windup': case 'throw': case 'catch': return planeXY || p.hb;
+      case 'think': return [h[0] + 9, h[1] - 12];
+      case 'stretch': return [h[0] + 3, h[1] - 14];
+      case 'wipe': case 'dust': return [h[0] + 6, h[1] + 14];
+      case 'phone': return [h[0] + (Math.sin(age * .8) > -.2 ? 12 : -10), h[1] + 3];
+      case 'peek': case 'dash': case 'grab': return [h[0] + 12, h[1] + (mode === 'grab' ? 10 : 0)];
+      default: return [h[0] + (Math.sin(now / 2300) > -.35 ? 12 : -10), h[1] + 1 - 4 * glance]; // idle: glances about (up when you scroll)
+    }
+  };
   const brush = el('.sk-brush'), plane = el('.sk-plane'), peace = el('.sk-peace'), flash = el('.sk-flash');
   const smears = [...svg.querySelectorAll('.sk-smear')];
   const trail = { ha: [], hb: [] }; // recent hand positions, for motion smears
@@ -3787,10 +3809,19 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     head.setAttribute('cy', f2(p.head[1]));
     // cap: sits on his head, tilts with it, brim faces the way he's facing
     const tilt = Math.atan2(p.head[1] - p.neck[1], p.head[0] - p.neck[0]) * 180 / Math.PI + 90;
-    cap.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)}) scale(${FACING_D.has(mode) ? -1 : 1} 1)`);
-    const front = !SIDE_ON.has(mode);
+    const front = mode === 'wave' || (tapHop && (mode === 'jump' || mode === 'crouch'));
     svg.classList.toggle('is-front', front);
     if (capF) capF.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)})`);
+    if (!front) {
+      const [tx, ty] = lookTarget(p, now);
+      const dx = tx - p.head[0], dy = ty - p.head[1];
+      if (Math.abs(dx) > 1.5) facing = dx > 0 ? 1 : -1; // small moves don't flip him
+      // the angle up or down to it, from the way he's facing, kept natural
+      const want = Math.max(-38, Math.min(38, Math.atan2(dy, Math.abs(dx) || .01) * 180 / Math.PI));
+      const ldt = Math.min(.05, (now - (lookPrev || now)) / 1000); lookPrev = now;
+      lookAng += (want - lookAng) * Math.min(1, ldt * 9);
+      cap.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${(tilt + lookAng * facing).toFixed(1)}) scale(${facing} 1)`);
+    }
     body.setAttribute('d', spine(p.neck, p.hip, p.head));
     armA.setAttribute('d', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
     armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
@@ -3805,7 +3836,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     });
     if (guide) {
       const [hx, hy] = p.head;
-      const off = SIDE_ON.has(mode) ? (FACING_D.has(mode) ? -1.4 : 1.4) : 0; // the face's centre line
+      const off = svg.classList.contains('is-front') ? 0 : facing * 1.4; // the face's centre line
       guide.setAttribute('d', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + off)} ${f2(hy - 6.7)}Q${f2(hx + off * 2.6)} ${f2(hy)} ${f2(hx + off)} ${f2(hy + 6.7)}`);
     }
     // smears: a quick arm swing leaves a short fading streak behind the hand
@@ -3862,7 +3893,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
         if (planePrev) ang = Math.atan2(y - planePrev[1], x - planePrev[0]) * 180 / Math.PI;
         planePrev = [x, y];
         lookAt = Math.max(-1, Math.min(1, (x - p.head[0]) / 30));
-      } else { lookAt = 0; planePrev = null; }
+        planeXY = [x, y];
+      } else { lookAt = 0; planePrev = null; planeXY = null; }
       plane.setAttribute('transform', `translate(${f2(x)} ${f2(y)}) rotate(${ang.toFixed(1)})`);
     }
     // painting the "d": orange fills it from the bottom up, stroke by stroke
@@ -4042,6 +4074,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let activity = mode, started = false;
   function next(force) {
     tidy();
+    tapHop = false;
     const after = activity;
     const bag = ['code', 'code', 'code', 'coffee', 'pushup', 'weights', 'phone', 'box', 'paint', 'plane', 'selfie', 'think', 'rest'].filter((a) => a !== activity);
     activity = typeof force === 'string' ? force : bag[Math.floor(Math.random() * bag.length)];
@@ -4058,7 +4091,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   let waving = false, tappedAt = 0;
   svg.addEventListener('click', () => {
     tidy();
-    waving = true; tappedAt = scrollY; activity = 'wave';
+    waving = true; tapHop = true; tappedAt = scrollY; activity = 'wave';
     run([[0, () => go('crouch')], [140, () => go('jump')], [700, () => { if (waving) go('wave'); }]]);
   });
   // nobody's touched the page for 20s: say hi (once per quiet spell)
@@ -4069,7 +4102,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   // scrolling: he glances up at you; come back to the top and he nods
   let awayAt = 0;
   addEventListener('scroll', () => {
-    if (waving && Math.abs(scrollY - tappedAt) > 8) { waving = false; next(); }
+    if (waving && Math.abs(scrollY - tappedAt) > 8) { waving = false; tapHop = false; next(); }
     if (scrollY > 40) { if (!awayAt) { awayAt = performance.now(); glance = 1; } }
     else if (awayAt) { if (performance.now() - awayAt > 1500) nodAt = performance.now(); awayAt = 0; }
   }, { passive: true });
