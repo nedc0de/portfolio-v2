@@ -10753,12 +10753,18 @@ h1.section-title .about-title-color::before {
 /* a blank mannequin: light limbs with some body, a dark ink outline
    underneath (drawn by scripts.js), faint orange construction lines along
    the limbs and across the head */
-.stick .sk-man > path:not(.sk-smear):not(.sk-ink):not(.sk-guide) { stroke: #dedede; }
+.stick .sk-body, .stick .sk-arm-b, .stick .sk-leg-b { stroke: #dedede; }
 .stick .sk-arm-a, .stick .sk-arm-b, .stick .sk-leg-a, .stick .sk-leg-b { stroke-width: 3.3; }
 .stick .sk-body { stroke-width: 5.6; }
 .stick .sk-man > path.sk-ink { stroke: #0c0c0c; stroke-width: 5; }
 .stick .sk-man > path.sk-ink-body { stroke-width: 7.4; }
 .stick .sk-core path { stroke: var(--fifteenth-color); stroke-width: .35; opacity: .55; }
 .stick .sk-core path:first-child { opacity: 0; }
+/* depth: his far arm sits behind his body and, with his far leg, a shade
+   darker, so in side poses the two arms don't stack on one side */
+.stick .sk-arm-a,
+.stick .sk-leg-a { stroke: #9c9c9c; }
+.stick .sk-core path:nth-child(2),
+.stick .sk-core path:nth-child(4) { opacity: .3; }
 .stick .sk-head { fill: #dedede; stroke: #0c0c0c; stroke-width: 1.1; }
 .stick .sk-guide { fill: none; stroke: var(--fifteenth-color); stroke-width: .35; opacity: .6; }
