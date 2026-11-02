@@ -10342,7 +10342,7 @@ html.fav-sheet-open { overflow: hidden; }
 .sk-phone { stroke-width: 1.3; fill: #1a1a1a; opacity: 0; transition: opacity .25s; }
 .stick.has-phone .sk-phone { opacity: 1; }
 /* paint brush, paper plane, peace sign and the selfie flash */
-.sk-brush, .sk-plane, .sk-peace, .sk-flash { opacity: 0; transition: opacity .25s; }
+.sk-brush, .sk-plane, .sk-peace, .sk-flash { opacity: 0; transition: opacity .25s; pointer-events: none; }
 /* spray can (orange cap) and its mist */
 .sk-brush { stroke-width: 1.2; fill: #f2f2f2; }
 .sk-bristle { stroke: var(--fifteenth-color); stroke-width: 2.4; }

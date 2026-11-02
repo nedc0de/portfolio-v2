@@ -3904,7 +3904,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     // selfie flash at the phone
     const fl = (now - flashAt) / 260;
     flash.style.opacity = fl >= 0 && fl < 1 ? f2((1 - fl) * .95) : '0';
-    flash.setAttribute('cx', f2(p.hb[0])); flash.setAttribute('cy', f2(p.hb[1] - 2)); flash.setAttribute('r', f2(4 + fl * 6));
+    flash.setAttribute('cx', f2(p.hb[0])); flash.setAttribute('cy', f2(p.hb[1] - 2)); flash.setAttribute('r', fl >= 0 && fl < 1 ? f2(4 + fl * 6) : '0'); // only during the flash: unclamped it grew huge and blocked taps
     // the paper plane: in his hand, or flying a loop over "Ned" and back
     if (svg.classList.contains('has-plane')) {
       const u = (now - planeAt) / PLANE_MS;
