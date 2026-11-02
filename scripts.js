@@ -4173,3 +4173,78 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   addEventListener('scroll', () => { if (last && !frame) frame = requestAnimationFrame(update); }, { passive: true });
   document.addEventListener('mouseleave', () => { last = null; hide(); });
 })();
+
+/*===== DROPDOWN LISTS (mouse and trackpad) =====*/
+// The browser's own dropdown list can't be styled, so with a mouse every
+// menu on the site (Favorites' filters, the Lab's receipt printer…) opens a
+// list in the site's style instead: a dark card, the current choice in the
+// orange selection box. The real <select> stays underneath (keyboard and
+// screen readers use it as normal) and phones keep their own picker. The
+// list reads the options when it opens, so menus filled later just work.
+(() => {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  let open = null;
+  const close = () => {
+    if (!open) return;
+    open.list.remove();
+    open.select.setAttribute('aria-expanded', 'false');
+    open = null;
+  };
+  const show = (select) => {
+    close();
+    const list = document.createElement('div');
+    list.className = 'dd';
+    list.setAttribute('role', 'listbox');
+    // groups (<optgroup>) keep their headings
+    let group = null;
+    [...select.options].forEach((o) => {
+      if (o.hidden) return;
+      const og = o.parentElement.tagName === 'OPTGROUP' ? o.parentElement : null;
+      if (og && og !== group) {
+        const h = document.createElement('span');
+        h.className = 'dd-group';
+        h.textContent = og.label;
+        list.append(h);
+      }
+      group = og;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'dd-opt';
+      b.disabled = o.disabled;
+      b.setAttribute('role', 'option');
+      b.setAttribute('aria-selected', String(o.value === select.value));
+      b.textContent = o.dataset.label || o.textContent;
+      b.addEventListener('click', () => {
+        close();
+        if (select.value === o.value) return;
+        select.value = o.value;
+        select.dispatchEvent(new Event('input', { bubbles: true }));
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      list.append(b);
+    });
+    // fixed to the screen under the menu (on <html>: body's transform breaks position: fixed)
+    const r = select.getBoundingClientRect();
+    Object.assign(list.style, { left: `${r.left}px`, top: `${r.bottom + 6}px`, minWidth: `${r.width}px` });
+    document.documentElement.append(list);
+    // no room below: open upwards
+    if (r.bottom + 6 + list.offsetHeight > innerHeight - 8 && r.top > list.offsetHeight + 14) list.style.top = `${r.top - 6 - list.offsetHeight}px`;
+    if (r.left + list.offsetWidth > innerWidth - 8) list.style.left = `${Math.max(8, innerWidth - 8 - list.offsetWidth)}px`;
+    select.setAttribute('aria-expanded', 'true');
+    open = { list, select };
+    list.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+  };
+  document.addEventListener('mousedown', (e) => {
+    const select = e.target.closest('select');
+    if (select && !select.multiple && !select.disabled && e.button === 0) {
+      e.preventDefault(); // no browser list
+      select.focus({ preventScroll: true });
+      if (open && open.select === select) close(); else show(select);
+      return;
+    }
+    if (open && !e.target.closest('.dd')) close();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  addEventListener('scroll', (e) => { if (open && !(e.target instanceof Element && e.target.closest('.dd'))) close(); }, { passive: true, capture: true });
+  addEventListener('resize', close);
+})();

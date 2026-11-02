@@ -1311,57 +1311,6 @@
     genreSelect.addEventListener('change', () => { genre = genreSelect.value; refilter(); });
   }
 
-  /*---------- the two menus' lists (mouse and trackpad) ----------*/
-  // The browser's own dropdown list can't be styled, so with a mouse the
-  // menus open a list in the site's style instead: the current choice in the
-  // orange selection box. The real <select> stays underneath (keyboard and
-  // screen readers use it as normal), and phones keep their own picker.
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    let openMenu = null;
-    const close = () => {
-      if (!openMenu) return;
-      openMenu.list.remove();
-      openMenu.select.setAttribute('aria-expanded', 'false');
-      openMenu = null;
-    };
-    const show = (select) => {
-      close();
-      const list = document.createElement('div');
-      list.className = 'fav-dd';
-      list.setAttribute('role', 'listbox');
-      [...select.options].forEach((o) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'fav-dd-opt';
-        b.setAttribute('role', 'option');
-        b.setAttribute('aria-selected', String(o.value === select.value));
-        b.textContent = o.dataset.label || o.textContent;
-        b.addEventListener('click', () => {
-          close();
-          if (select.value === o.value) return;
-          select.value = o.value;
-          select.dispatchEvent(new Event('change'));
-        });
-        list.append(b);
-      });
-      select.parentElement.append(list);
-      select.setAttribute('aria-expanded', 'true');
-      openMenu = { list, select };
-      list.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
-    };
-    document.querySelectorAll('.fav-select select').forEach((select) => {
-      select.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // no browser list
-        select.focus({ preventScroll: true });
-        if (openMenu && openMenu.select === select) close(); else show(select);
-      });
-    });
-    document.addEventListener('mousedown', (e) => {
-      if (openMenu && !e.target.closest('.fav-select')) close();
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-  }
-
   /*---------- pick for me ----------*/
   let picking = false;
   const pickButton = document.getElementById('favPick');
