@@ -10689,9 +10689,9 @@ h1.section-title .about-title-color::before {
 }
 .dd-group:first-child { padding-top: .35rem; }
 
-/*===== Frames: square corners and a thin line everywhere =====*/
-/* cards, panels and blog visuals all use the same frame as the Favorites
-   preview and the Inspect boxes: no rounded corners, a 1px dark line */
+/*===== Frames: square corners everywhere =====*/
+/* cards, panels and blog visuals have square corners, like the Favorites
+   preview and the Inspect boxes (no added outline) */
 .hm-card,
 .xb-card,
 .bl-feature,
@@ -10707,7 +10707,6 @@ h1.section-title .about-title-color::before {
 .ps-faq,
 .pt-col {
   border-radius: 0;
-  border: 1px solid #262626;
 }
 /* what sits inside them: covers, previews, small cards */
 .hm-card img,
