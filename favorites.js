@@ -1273,6 +1273,7 @@
     hero.innerHTML = `
       <span class="fav-hero-bg" aria-hidden="true"></span>
       <span class="fav-hero-video" aria-hidden="true"></span>
+      <button type="button" class="fav-hero-sound" aria-pressed="false" aria-label="Turn trailer sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fhs-spk" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="fhs-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="fhs-off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
       <span class="fav-hero-slash" aria-hidden="true"></span>
       <span class="fav-hero-poster"><img alt="" width="342" height="513"></span>
       <div class="fav-hero-info">
@@ -1285,6 +1286,7 @@
       </div>`;
     bar.after(hero);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
+    hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
     select(item, 'Just watched');
   }
   const heroInView = () => {
@@ -1302,9 +1304,28 @@
     const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
     if (typeof state !== 'number') return;
     clearTimeout(hero.videoHide);
-    if (state === 1) hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 250); // a beat in, past the first frame's overlay
+    if (state === 1) {
+      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 250); // a beat in, past the first frame's overlay
+      if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
+    }
     else hero.classList.remove('has-video');
   });
+  // the one control: sound on or off (the trailer starts muted). The choice
+  // carries over when you pick another title.
+  let soundOn = false;
+  const ytCommand = (func, args = []) => {
+    const fr = hero && hero.querySelector('.fav-hero-video iframe');
+    if (fr) try { fr.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*'); } catch (e) {}
+  };
+  const paintSound = () => {
+    const b = hero && hero.querySelector('.fav-hero-sound');
+    if (!b) return;
+    b.setAttribute('aria-pressed', String(soundOn));
+    b.setAttribute('aria-label', soundOn ? 'Mute trailer' : 'Turn trailer sound on');
+  };
+  const applySound = () => {
+    if (soundOn) { ytCommand('unMute'); ytCommand('setVolume', [70]); ytCommand('playVideo'); } else ytCommand('mute');
+  };
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
