@@ -1285,6 +1285,9 @@
         <button type="button" class="fav-hero-go">See details</button>
       </div>`;
     bar.after(hero);
+    // the banner pins just under the sticky menus (desktop): keep that gap exact
+    const barH = () => hero.style.setProperty('--fav-bar-h', `${bar.offsetHeight}px`);
+    barH(); addEventListener('resize', barH);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
     select(item, 'Just watched');
