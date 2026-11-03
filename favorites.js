@@ -103,6 +103,14 @@
     // ----- Movies -----
     {
       type: 'movie',
+      title: 'There Will Be Blood',
+      year: 2007,
+      by: 'Paul Thomas Anderson',
+      genre: 'Drama',
+      rating: 5,
+    },
+    {
+      type: 'movie',
       title: 'Animals',
       year: 2026,
       by: 'Ben Affleck',
