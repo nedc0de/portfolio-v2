@@ -1579,7 +1579,8 @@
     const show = (i, smooth = false) => {
       at = i;
       const pick = deck[i];
-      homeCard.querySelector('.tk3-label').textContent = i === 0 ? 'Just watched' : 'Recently watched';
+      const label = homeCard.querySelector('.tk3-label');
+      if (label) label.textContent = i === 0 ? 'Just watched' : 'Recently watched';
       back.querySelector('.tk3-bt').textContent = pick.title;
       back.querySelector('.tk3-by').textContent = pick.year || '';
       back.querySelector('.tk3-genre').textContent = pick.genre || '—';
