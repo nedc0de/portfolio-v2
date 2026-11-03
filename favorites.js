@@ -1309,7 +1309,7 @@
     clearTimeout(hero.videoHide);
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 1400); // wait out the controls YouTube flashes as it starts
+      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 3500); // wait out the pause icon YouTube shows for a few seconds as it starts
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
     else hero.classList.remove('has-video');
