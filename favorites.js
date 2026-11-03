@@ -1304,8 +1304,9 @@
     const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
     if (typeof state !== 'number') return;
     clearTimeout(hero.videoHide);
+    if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 250); // a beat in, past the first frame's overlay
+      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 1400); // wait out the controls YouTube flashes as it starts
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
     else hero.classList.remove('has-video');
@@ -1324,7 +1325,7 @@
     b.setAttribute('aria-label', soundOn ? 'Mute trailer' : 'Turn trailer sound on');
   };
   const applySound = () => {
-    if (soundOn) { ytCommand('unMute'); ytCommand('setVolume', [70]); ytCommand('playVideo'); } else ytCommand('mute');
+    if (soundOn) { ytCommand('unMute'); ytCommand('setVolume', [70]); } else ytCommand('mute');
   };
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
@@ -1333,7 +1334,7 @@
     trailerFor(f).then((v) => {
       if (!v || id !== paintId) return;
       const fr = document.createElement('iframe');
-      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&loop=1&playlist=${v}&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
       fr.title = `${f.title} trailer`;
       fr.allow = 'autoplay; encrypted-media';
       fr.tabIndex = -1;
