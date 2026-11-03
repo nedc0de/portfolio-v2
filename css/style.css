@@ -10801,13 +10801,18 @@ h1.section-title .about-title-color::before {
   .fav-hero-video { transition: opacity .6s; }
   .fav-hero.has-video .fav-hero-video { opacity: 1; }
   /* a 16:9 player scaled to cover the space, so no black bars */
+  /* YouTube's play/pause icon always sits dead centre of its player, so the
+     player is made twice the slot's width and its centre parked just past
+     the slot's left edge: the icon can never show, and the title bar (top)
+     and logo (bottom right) fall outside the slot too. We see the right half
+     of the frame. */
   .fav-hero-video iframe {
     position: absolute;
     top: 50%;
-    left: 50%;
-    width: 100%;
-    aspect-ratio: 16 / 9; /* the banner's right side is wider than 16:9, so this covers it */
-    transform: translate(-50%, -50%) scale(1.6); /* crops YouTube's title, logo and edge buttons out of view */
+    left: -80px;
+    width: calc(200% + 160px);
+    aspect-ratio: 16 / 9;
+    transform: translate(-50%, -50%);
     border: 0;
   }
 }
