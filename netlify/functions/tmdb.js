@@ -9,6 +9,7 @@
  *   /.netlify/functions/tmdb?kind=movie&id=27205
  *   /.netlify/functions/tmdb?kind=tv&q=Severance&year=2022
  *   /.netlify/functions/tmdb?kind=tv&id=136557
+ *   /.netlify/functions/tmdb?kind=movie&id=27205&videos=1   (its trailers)
  *
  * Only whitelisted TMDB paths are reachable through this proxy; arbitrary
  * URLs cannot be fetched.
@@ -32,7 +33,8 @@ exports.handler = async (event) => {
   let tmdbPath;
   if (params.id && /^\d{1,10}$/.test(params.id)) {
     // Direct lookup by TMDB id, e.g. ?kind=movie&id=27205
-    tmdbPath = `/${kind}/${params.id}`;
+    // (add &videos=1 for its trailers: ?kind=movie&id=27205&videos=1)
+    tmdbPath = `/${kind}/${params.id}${params.videos === '1' ? '/videos' : ''}`;
   } else if (params.q && params.q.trim().length > 0) {
     // Search, e.g. ?kind=movie&q=Inception&year=2010
     const q = encodeURIComponent(params.q.trim().slice(0, 200));

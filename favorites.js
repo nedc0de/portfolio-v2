@@ -1109,8 +1109,9 @@
       }
     }
     if (!hit) return { summary: '', backdrop: '' };
+    const tmdb = /^\d{1,10}$/.test(String(hit.id)) ? String(hit.id) : '';
     const back = typeof hit.backdrop_path === 'string' && /^\/[A-Za-z0-9._-]+$/.test(hit.backdrop_path) ? hit.backdrop_path : '';
-    return { summary: plain(hit.overview), backdrop: back ? `https://image.tmdb.org/t/p/w1280${back}` : '' };
+    return { summary: plain(hit.overview), backdrop: back ? `https://image.tmdb.org/t/p/w1280${back}` : '', tmdb, kind };
   }
   async function findBookInfo(f) {
     const q = `title=${encodeURIComponent(f.title)}` + (f.by ? `&author=${encodeURIComponent(f.by)}` : '');
@@ -1127,10 +1128,31 @@
     if (!summary && doc.first_sentence) summary = plain([].concat(doc.first_sentence)[0]);
     return { summary, backdrop: '' };
   }
+  // The official YouTube trailer of a movie or show (TMDB lists them),
+  // as its 11-character video id; '' when there isn't one. Kept a month.
+  const TRAILER_KEY = 'nedcode-fav-trailers-v1';
+  let trailers = {};
+  try { trailers = JSON.parse(localStorage.getItem(TRAILER_KEY)) || {}; } catch (e) { trailers = {}; }
+  async function trailerFor(f) {
+    if (f.type === 'book') return '';
+    const id = cacheId(f), hit = trailers[id];
+    if (hit && Date.now() - hit.t < 30 * 86400000) return hit.v;
+    const info = await infoFor(f);
+    let v = '';
+    if (info.tmdb) {
+      const data = await getJSON(`/.netlify/functions/tmdb?kind=${info.kind || 'movie'}&id=${info.tmdb}&videos=1`);
+      const yt = (data.results || []).filter((r) => r.site === 'YouTube' && /^[\w-]{11}$/.test(r.key || ''));
+      const best = yt.find((r) => r.type === 'Trailer' && r.official) || yt.find((r) => r.type === 'Trailer') || yt.find((r) => r.type === 'Teaser');
+      v = best ? best.key : '';
+    }
+    trailers[id] = { v, t: Date.now() };
+    try { localStorage.setItem(TRAILER_KEY, JSON.stringify(trailers)); } catch (e) {}
+    return v;
+  }
   async function infoFor(f) {
     const id = cacheId(f);
     const hit = infoCache[id];
-    if (hit && Date.now() - hit.t < 30 * 86400000) return hit;
+    if (hit && Date.now() - hit.t < 30 * 86400000 && (f.type === 'book' || 'tmdb' in hit)) return hit;
     const info = f.type === 'book' ? await findBookInfo(f) : await findScreenInfo(f);
     infoCache[id] = { ...info, t: Date.now() };
     try { localStorage.setItem(INFO_CACHE_KEY, JSON.stringify(infoCache)); } catch (e) {}
@@ -1250,6 +1272,7 @@
     hero.setAttribute('aria-live', 'polite');
     hero.innerHTML = `
       <span class="fav-hero-bg" aria-hidden="true"></span>
+      <span class="fav-hero-video" aria-hidden="true"></span>
       <span class="fav-hero-slash" aria-hidden="true"></span>
       <span class="fav-hero-poster"><img alt="" width="342" height="513"></span>
       <div class="fav-hero-info">
@@ -1268,6 +1291,26 @@
     const r = hero.getBoundingClientRect();
     return r.top > -r.height / 2 && r.bottom < innerHeight + r.height / 2;
   };
+  // desktop: the pick's trailer plays muted on a loop on the right of the
+  // banner, over its still (YouTube's no-cookie player; it can't be clicked)
+  const wide = matchMedia('(min-width: 900px)');
+  function playTrailer(f, id) {
+    const slot = hero.querySelector('.fav-hero-video');
+    slot.replaceChildren();
+    if (!wide.matches || reduceMotion.matches) return;
+    trailerFor(f).then((v) => {
+      if (!v || id !== paintId) return;
+      const fr = document.createElement('iframe');
+      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&loop=1&playlist=${v}&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1`;
+      fr.title = `${f.title} trailer`;
+      fr.allow = 'autoplay; encrypted-media';
+      fr.tabIndex = -1;
+      fr.loading = 'lazy';
+      // give it a moment to start, so the player's black loading frame never shows
+      fr.onload = () => setTimeout(() => { if (id === paintId) hero.classList.add('has-video'); }, 1800);
+      slot.append(fr);
+    }).catch(() => {});
+  }
   function select(item, kicker) {
     if (!hero) return;
     if (current) { current.el.classList.remove('is-selected'); current.el.setAttribute('aria-pressed', 'false'); }
@@ -1281,7 +1324,8 @@
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     hero.querySelector('.fav-hero-rate').innerHTML = `${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span>`;
     hero.querySelector('.fav-hero-sum').textContent = '';
-    hero.classList.remove('has-cover', 'has-backdrop');
+    hero.classList.remove('has-cover', 'has-backdrop', 'has-video');
+    playTrailer(f, id);
     hero.style.removeProperty('--backdrop');
     // a quick flash, like the portrait swapping in
     hero.classList.remove('is-swap');

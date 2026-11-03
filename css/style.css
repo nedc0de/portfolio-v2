@@ -10778,3 +10778,35 @@ h1.section-title .about-title-color::before {
 /* glasses in profile for side-on poses, from the front when he faces you */
 .stick .sk-glasses, .stick .sk-glasses-f { transition: opacity .12s; }
 .stick.is-front .sk-glasses, .stick:not(.is-front) .sk-glasses-f { opacity: 0; }
+
+/* Favorites banner, desktop: the pick's trailer plays muted on the right,
+   faded into the banner from the left (favorites.js) */
+.fav-hero-video { display: none; }
+@media (min-width: 900px) {
+  .fav-hero-video {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 62%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 35%);
+    mask: linear-gradient(90deg, transparent, #000 35%);
+  }
+  .fav-hero.has-video .fav-hero-video { opacity: 1; }
+  /* a 16:9 player scaled to cover the space, so no black bars */
+  .fav-hero-video iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* the banner's right side is wider than 16:9, so this covers it */
+    transform: translate(-50%, -50%) scale(1.25); /* crops YouTube's title bar and edges */
+    border: 0;
+  }
+}
