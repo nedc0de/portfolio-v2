@@ -663,6 +663,14 @@
     },
 
     // ----- TV shows -----
+    {
+      type: 'tv',
+      title: 'The Diplomat',
+      year: 2023,
+      genre: 'Thriller',
+      rating: 5,
+      take: 'Seasons 1 to 4. Very good.',
+    },
     { type: 'tv', title: 'The First', year: 2018, genre: 'Sci-fi', rating: 5 },
     {
       type: 'tv',
