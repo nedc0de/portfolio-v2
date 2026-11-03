@@ -1294,6 +1294,17 @@
   // desktop: the pick's trailer plays muted on a loop on the right of the
   // banner, over its still (YouTube's no-cookie player; it can't be clicked)
   const wide = matchMedia('(min-width: 900px)');
+  addEventListener('message', (e) => {
+    if (!hero || !/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+    const fr = hero.querySelector('.fav-hero-video iframe');
+    if (!fr || e.source !== fr.contentWindow) return;
+    let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
+    const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
+    if (typeof state !== 'number') return;
+    clearTimeout(hero.videoHide);
+    if (state === 1) hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 250); // a beat in, past the first frame's overlay
+    else hero.classList.remove('has-video');
+  });
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
@@ -1301,13 +1312,15 @@
     trailerFor(f).then((v) => {
       if (!v || id !== paintId) return;
       const fr = document.createElement('iframe');
-      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&loop=1&playlist=${v}&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1`;
+      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&loop=1&playlist=${v}&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
       fr.title = `${f.title} trailer`;
       fr.allow = 'autoplay; encrypted-media';
       fr.tabIndex = -1;
       fr.loading = 'lazy';
-      // give it a moment to start, so the player's black loading frame never shows
-      fr.onload = () => setTimeout(() => { if (id === paintId) hero.classList.add('has-video'); }, 1800);
+      // the player tells us its state: the video only shows while it's
+      // actually playing, so YouTube's play button, loading spinner, pause
+      // and end screens never appear (the still shows instead)
+      fr.onload = () => { try { fr.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); } catch (e) {} };
       slot.append(fr);
     }).catch(() => {});
   }
