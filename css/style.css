@@ -10858,7 +10858,8 @@ h1.section-title .about-title-color::before {
 
 /*===== PROJECTS: phones show each site right under its row =====*/
 /* Desktop keeps the hover card; on phones the floating card covered other
-   rows, so each project shows a plain screenshot of the site instead */
+   rows, so each project plays its preview right under it. Every preview is
+   the same 960x600 animated image (browser window or phone on a dark stage) */
 .hc-shot { display: none; }
 
 @media (hover: none), (max-width: 768px) {
@@ -10866,57 +10867,10 @@ h1.section-title .about-title-color::before {
   .hc-shot {
     display: block;
     margin-top: .9rem;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    background: #1c1c1c;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 16px 32px -18px rgba(0, 0, 0, .9);
-  }
-  .hc-shot::before { /* a slim browser bar with three dots */
-    content: "";
-    display: block;
-    height: 16px;
-    background:
-      radial-gradient(circle, #3d3d3d 2.6px, transparent 3.2px) 10px 50% / 10px 10px no-repeat,
-      radial-gradient(circle, #3d3d3d 2.6px, transparent 3.2px) 22px 50% / 10px 10px no-repeat,
-      radial-gradient(circle, #3d3d3d 2.6px, transparent 3.2px) 34px 50% / 10px 10px no-repeat,
-      #1c1c1c;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .06);
   }
   .hc-shot img { display: block; width: 100%; height: auto; }
-  /* the icon pack is a phone, not a website: no browser bar. It shows the
-     real home screens and cycles through the colours, like the shop */
-  .hc-shot--phone { width: 46%; background: none; box-shadow: none; }
-  .hc-shot--phone::before { content: none; }
-  .hc-shot--cycle {
-    position: relative;
-    aspect-ratio: 270 / 585;
-    border: 6px solid #0b0a09;
-    border-radius: 26px;
-    background: #0b0a09;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .07), 0 18px 34px -18px rgba(0, 0, 0, .95);
-  }
-  .hc-shot--cycle img {
-    position: absolute;
-    inset: 0;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px;
-    opacity: 0;
-    animation: hc-cycle 24s infinite;
-  }
-  .hc-shot--cycle img:first-child { opacity: 1; }
-  .hc-shot--cycle img:nth-child(2) { animation-delay: 3s; }
-  .hc-shot--cycle img:nth-child(3) { animation-delay: 6s; }
-  .hc-shot--cycle img:nth-child(4) { animation-delay: 9s; }
-  .hc-shot--cycle img:nth-child(5) { animation-delay: 12s; }
-  .hc-shot--cycle img:nth-child(6) { animation-delay: 15s; }
-  .hc-shot--cycle img:nth-child(7) { animation-delay: 18s; }
-  .hc-shot--cycle img:nth-child(8) { animation-delay: 21s; }
-  @keyframes hc-cycle {
-    0%, 14.5% { opacity: 1; }
-    16.5%, 98% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hc-shot--cycle img { animation: none; }
-  }
 }
+
