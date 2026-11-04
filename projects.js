@@ -104,3 +104,11 @@ touchMode.addEventListener("change", () => {
   preview.classList.remove("is-on", "at-top");
   update();
 });
+
+/*===== PHONE: each preview fades in once it has loaded =====*/
+document.querySelectorAll(".hc-shot img").forEach(img => {
+  const shot = img.parentElement;
+  const done = () => shot.classList.add("is-loaded");
+  if (img.complete && img.naturalWidth) done();
+  else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
+});

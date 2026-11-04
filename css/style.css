@@ -7566,6 +7566,28 @@ html.is-frozen .egg-crash * {
   transition: opacity .25s var(--node-delay), transform .35s cubic-bezier(.34, 1.56, .64, 1) var(--node-delay), box-shadow .3s;
 }
 
+/* Projects page: as each node lights up, its project eases in one piece at
+   a time (title, description, stack, then the preview window), and each
+   preview fades in once it has loaded, over a soft shimmer */
+.hc-list-full.will-draw .hc-body > * { opacity: 0; transform: translateY(14px); }
+.hc-list-full.will-draw .hc-shot { transform: translateY(22px) scale(.97); transform-origin: 50% 0; }
+.hc-list-full.will-draw > li.is-lit .hc-body > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .55s ease calc(var(--node-delay) + var(--d, 0s)), transform .7s cubic-bezier(.22, .61, .36, 1) calc(var(--node-delay) + var(--d, 0s));
+}
+.hc-list-full .hc-top { --d: .08s; }
+.hc-list-full .hc-desc { --d: .16s; }
+.hc-list-full .hc-stack { --d: .24s; }
+.hc-list-full .hc-shot { --d: .34s; }
+.hc-list-full.will-draw .hc-shot img { opacity: 0; transition: opacity .6s ease; }
+.hc-list-full.will-draw .hc-shot.is-loaded img { opacity: 1; }
+.hc-list-full.will-draw .hc-shot:not(.is-loaded) {
+  background: linear-gradient(100deg, #1c1c1c 30%, #262626 50%, #1c1c1c 70%) 0 0 / 300% 100%, #1c1c1c;
+  animation: hc-shimmer 1.4s linear infinite;
+}
+@keyframes hc-shimmer { to { background-position: -150% 0, 0 0; } }
+
 /*===== HOME: Explore, live previews of the other pages =====*/
 /* Favorites (the latest pick's poster) runs full width on top; About (six
    words rolling by) and Lab (a working flip board) sit side by side below */
