@@ -10897,22 +10897,8 @@ h1.section-title .about-title-color::before {
   .hc-shot img { display: block; width: 100%; height: auto; }
 }
 
-/*===== PROJECTS: previews rest under the same orange tint as Favorites'
-   posters and clear to full colour while that project is in view =====*/
+/*===== PROJECTS: previews in full colour (no tint) =====*/
 .hc-shot { position: relative; }
-.hc-shot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--fifteenth-color);
-  mix-blend-mode: color;
-  opacity: .6;
-  transition: opacity .7s ease;
-  pointer-events: none;
-}
-.hc-shot img { filter: grayscale(1) contrast(1.1) brightness(.34); /* sites are mostly white, so darker than the posters to land on the same copper look */ transition: filter .7s ease, opacity .6s ease; }
-.hc-shot.is-clear::after { opacity: 0; }
-.hc-shot.is-clear img { filter: none; }
 
 /*===== PROJECTS (phones): the four latest get big previews; older projects
    are compact rows with a small still thumbnail on the right =====*/
@@ -10920,14 +10906,13 @@ h1.section-title .about-title-color::before {
   .hc-compact .hc-body {
     display: grid;
     grid-template-columns: 1fr 34%;
-    grid-template-areas: "top shot" "desc shot" "stack shot";
+    grid-template-areas: "top top" "desc shot" "stack shot";
     column-gap: .9rem;
     align-items: start;
   }
-  .hc-compact .hc-top { grid-area: top; }
+  .hc-compact .hc-top { grid-area: top; } /* name and year across the top, like the featured rows */
   .hc-compact .hc-desc { grid-area: desc; font-size: .88rem; }
   .hc-compact .hc-stack { grid-area: stack; }
-  .hc-compact .hc-year { display: none; }
   .hc-compact .hc-shot { grid-area: shot; margin-top: .35rem; border-radius: 8px; align-self: center; }
   .hc-compact .hc-shot::before { height: 9px; background-size: 6px 6px; background-position: 5px 50%, 12px 50%, 19px 50%, 0 0; }
 }

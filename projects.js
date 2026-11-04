@@ -113,11 +113,10 @@ document.querySelectorAll(".hc-shot img").forEach(img => {
   else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
 });
 
-/*===== PHONE: a preview clears from its orange tint while it's in view =====*/
+/*===== PHONE: only the preview in view plays =====*/
 if ("IntersectionObserver" in window) {
   const clearIO = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      e.target.classList.toggle("is-clear", e.isIntersecting);
       // only the preview in view plays; the others rest on a still frame
       const img = e.target.querySelector("img[data-anim]");
       if (!img) return;
