@@ -116,7 +116,15 @@ document.querySelectorAll(".hc-shot img").forEach(img => {
 /*===== PHONE: a preview clears from its orange tint while it's in view =====*/
 if ("IntersectionObserver" in window) {
   const clearIO = new IntersectionObserver(entries => {
-    entries.forEach(e => e.target.classList.toggle("is-clear", e.isIntersecting));
+    entries.forEach(e => {
+      e.target.classList.toggle("is-clear", e.isIntersecting);
+      // only the preview in view plays; the others rest on a still frame
+      const img = e.target.querySelector("img[data-anim]");
+      if (!img) return;
+      if (!img.dataset.still) img.dataset.still = img.getAttribute("src");
+      const want = e.isIntersecting ? img.dataset.anim : img.dataset.still;
+      if (img.getAttribute("src") !== want) img.setAttribute("src", want);
+    });
   }, { rootMargin: "-30% 0px -30% 0px" }); // the middle of the screen
   document.querySelectorAll(".hc-shot").forEach(s => clearIO.observe(s));
 }
