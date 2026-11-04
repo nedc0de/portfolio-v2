@@ -112,3 +112,11 @@ document.querySelectorAll(".hc-shot img").forEach(img => {
   if (img.complete && img.naturalWidth) done();
   else { img.addEventListener("load", done, { once: true }); img.addEventListener("error", done, { once: true }); }
 });
+
+/*===== PHONE: a preview clears from its orange tint while it's in view =====*/
+if ("IntersectionObserver" in window) {
+  const clearIO = new IntersectionObserver(entries => {
+    entries.forEach(e => e.target.classList.toggle("is-clear", e.isIntersecting));
+  }, { rootMargin: "-30% 0px -30% 0px" }); // the middle of the screen
+  document.querySelectorAll(".hc-shot").forEach(s => clearIO.observe(s));
+}
