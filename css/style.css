@@ -10907,3 +10907,35 @@ h1.section-title .about-title-color::before {
   .hc-shot img { display: block; width: 100%; height: auto; }
 }
 
+
+/*===== PROJECTS: a soft orange fade behind the list, and a warm glow behind
+   each project's node as it lights up =====*/
+.hl-wrap { position: relative; isolation: isolate; }
+.hl-wrap::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 40px;
+  width: min(760px, 130vw);
+  height: 520px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 122, 26, .16), rgba(255, 122, 26, .06) 55%, transparent);
+}
+.hc-list-full > li { position: relative; }
+.hc-list-full > li::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -40px;
+  top: -30px;
+  width: 220px;
+  height: 220px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 122, 26, .12), transparent);
+  opacity: 0;
+  transition: opacity .8s ease var(--node-delay, 0s);
+}
+.hc-list-full > li.is-lit::before,
+.hc-list-full:not(.will-draw) > li::before { opacity: 1; }
