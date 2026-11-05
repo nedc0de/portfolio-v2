@@ -4286,6 +4286,17 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     if (y + th > innerHeight - 8) y = Math.max(8, r.top - th - 8);
     tag.style.left = `${Math.min(Math.max(8, r.left), innerWidth - tw - 8)}px`;
     tag.style.top = `${y}px`;
+    // never draw over the floating project preview (Projects page): the
+    // outline and its label hide wherever they'd cross the card
+    const card = document.querySelector('.hl-preview.is-on');
+    if (card) {
+      const c = card.getBoundingClientRect();
+      const hits = (b) => b.left < c.right && b.right > c.left && b.top < c.bottom && b.bottom > c.top;
+      if (hits(box.getBoundingClientRect())) box.hidden = true;
+      if (hits(tag.getBoundingClientRect())) tag.hidden = true;
+      // the card glides after the cursor, so keep checking while it's up
+      if (!frame) frame = requestAnimationFrame(update);
+    }
   };
   const update = () => { frame = 0; show(last); };
   addEventListener('mousemove', (e) => {
