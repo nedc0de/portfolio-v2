@@ -10921,3 +10921,22 @@ h1.section-title .about-title-color::before {
   .hc-compact .hc-shot { grid-area: shot; margin-top: .35rem; border-radius: 8px; align-self: center; }
   .hc-compact .hc-shot::before { height: 9px; background-size: 6px 6px; background-position: 5px 50%, 12px 50%, 19px 50%, 0 0; }
 }
+
+/*===== FAVORITES: "pick for me" and the panel's close button are just
+   their icons, no box =====*/
+.fav-bar .fav-pick,
+.fav-sheet-x {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: .4rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.fav-bar .fav-pick { color: var(--fifteenth-color); }
+.fav-bar .fav-pick svg { width: 20px; height: 20px; }
+.fav-bar .fav-pick:hover { background: none; color: #f2f2f2; }
+.fav-sheet-x { font-size: 1.9rem; line-height: 1; color: #e6e6e6; }
+.fav-sheet-x:hover { background: none; color: var(--fifteenth-color); }
