@@ -10,7 +10,6 @@
  *   /.netlify/functions/tmdb?kind=tv&q=Severance&year=2022
  *   /.netlify/functions/tmdb?kind=tv&id=136557
  *   /.netlify/functions/tmdb?kind=movie&id=27205&videos=1   (its trailers)
- *   /.netlify/functions/tmdb?kind=movie&id=27205&credits=1  (its cast and crew)
  *
  * Only whitelisted TMDB paths are reachable through this proxy; arbitrary
  * URLs cannot be fetched.
@@ -35,8 +34,7 @@ exports.handler = async (event) => {
   if (params.id && /^\d{1,10}$/.test(params.id)) {
     // Direct lookup by TMDB id, e.g. ?kind=movie&id=27205
     // (add &videos=1 for its trailers: ?kind=movie&id=27205&videos=1)
-    // (or &credits=1 for its cast and crew: ?kind=movie&id=27205&credits=1)
-    tmdbPath = `/${kind}/${params.id}${params.videos === '1' ? '/videos' : params.credits === '1' ? '/credits' : ''}`;
+    tmdbPath = `/${kind}/${params.id}${params.videos === '1' ? '/videos' : ''}`;
   } else if (params.q && params.q.trim().length > 0) {
     // Search, e.g. ?kind=movie&q=Inception&year=2010
     const q = encodeURIComponent(params.q.trim().slice(0, 200));
