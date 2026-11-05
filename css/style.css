@@ -9903,21 +9903,21 @@ html.is-frozen .egg-crash * {
 .fav-hero-rate { display: flex; align-items: center; gap: .45rem; font-size: .8rem; color: #bbb; }
 .fav-hero-rate b { color: #f2f2f2; }
 
-.fav-hero-go { /* just the words, in orange, with a soft underline */
+.fav-hero-go { /* just the words, in white, with an orange underline (like links in posts) */
   margin-top: .4rem;
   padding: .2rem 0;
   border: 0;
   background: none;
   font: 700 .82rem var(--body-font);
-  color: var(--fifteenth-color);
+  color: #f2f2f2;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 122, 26, .45);
+  text-decoration-color: rgba(255, 122, 26, .7);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 4px;
   cursor: pointer;
   transition: color .2s, text-decoration-color .2s;
 }
-.fav-hero-go:hover { color: #f2f2f2; text-decoration-color: var(--fifteenth-color); }
+.fav-hero-go:hover { color: #fff; text-decoration-color: var(--fifteenth-color); }
 
 /*===== FAVORITES: menus stick under the top of the screen =====*/
 .fav-bar {
