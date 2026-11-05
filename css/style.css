@@ -10827,7 +10827,7 @@ h1.section-title .about-title-color::before {
 }
 
 /* the trailer's one control: sound on/off, bottom right of the banner,
-   only while the trailer is showing */
+   only while the trailer is showing. Just the icon, no box */
 .fav-hero-sound { display: none; }
 @media (min-width: 900px) {
   .fav-hero-sound {
@@ -10839,22 +10839,22 @@ h1.section-title .about-title-color::before {
     width: 36px;
     height: 36px;
     padding: 0;
-    border: 1px solid rgba(255, 255, 255, .22);
-    border-radius: 8px;
-    background: rgba(14, 14, 14, .55);
+    border: 0;
+    background: none;
     color: #e6e6e6;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .8)); /* readable on bright trailer frames */
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
-    transition: opacity .4s, border-color .2s, color .2s;
+    transition: opacity .4s, color .2s;
   }
   .fav-hero.has-video .fav-hero-sound { opacity: 1; pointer-events: auto; }
-  .fav-hero-sound:hover { border-color: #ff7a1a; color: #ff7a1a; }
-  .fav-hero-sound svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fav-hero-sound:hover { color: #ff7a1a; }
+  .fav-hero-sound svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .fav-hero-sound .fhs-spk { fill: currentColor; }
   .fav-hero-sound[aria-pressed="true"] .fhs-off,
   .fav-hero-sound[aria-pressed="false"] .fhs-on { display: none; }
-  .fav-hero-sound[aria-pressed="true"] { color: #ff7a1a; border-color: #ff7a1a; }
+  .fav-hero-sound[aria-pressed="true"] { color: #ff7a1a; }
 }
 
 /* desktop: the banner stays pinned under the menus while you scroll the
