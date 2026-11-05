@@ -1644,6 +1644,42 @@
     }));
     let at = 0;
 
+    // the poster's billing block: the tiny credits at the bottom of a real
+    // one-sheet (stars, "a ... film", written by, music by...), set from the
+    // movie's actual cast and crew on TMDB. It's meant to be too small to read.
+    const credits = homeCard.querySelector('.tk3-credits');
+    const castLine = homeCard.querySelector('.tk3-cast'); // the stars' names run across the top
+    const billingCache = {};
+    const billingHTML = (pick, c) => {
+      const crew = (job) => (c.crew || []).filter((p) => p.job === job).map((p) => p.name).slice(0, 2).join(' & ');
+      const cast = (c.cast || []).slice(0, 4).map((p) => p.name);
+      const dir = crew('Director') || pick.by || '';
+      const row = (k, v) => (v ? `<i>${k}</i> ${v}` : '');
+      const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+      const lines = [
+        dir ? `<i>a</i> ${esc(dir)} <i>film</i>` : '',
+        [row('music by', esc(crew('Original Music Composer'))), row('edited by', esc(crew('Editor'))),
+          row('director of photography', esc(crew('Director of Photography')))].filter(Boolean).join(' '),
+        [row('produced by', esc(crew('Producer'))), row('written by', esc(crew('Screenplay') || crew('Writer'))),
+          row('directed by', esc(dir))].filter(Boolean).join(' '),
+      ].filter(Boolean).map((l) => `<em>${l}</em>`).join('');
+      return { cast: cast.map((n) => `<b>${esc(n)}</b>`).join(''), lines };
+    };
+    const billing = async (pick) => {
+      if (!credits) return;
+      const key = pick.title + pick.year;
+      const paint = (c) => { const h = billingHTML(pick, c); credits.innerHTML = h.lines; if (castLine) castLine.innerHTML = h.cast; };
+      paint(billingCache[key] || {});
+      if (billingCache[key]) return;
+      try {
+        const info = await findScreenInfo(pick);
+        if (!info.tmdb) return;
+        const c = await getJSON(`/.netlify/functions/tmdb?kind=movie&id=${info.tmdb}&credits=1`);
+        billingCache[key] = c;
+        paint(c);
+      } catch (e) { /* keeps the director-only block */ }
+    };
+
     // a poster into an <img>, sharp on every screen; ok() runs once it shows
     const setPoster = (el, url, sizes, ok) => {
       el.onload = ok || null;
@@ -1667,6 +1703,7 @@
       back.querySelector('.tk3-by').textContent = pick.year || '';
       back.querySelector('.tk3-genre').textContent = pick.genre || '—';
       back.querySelector('.tk3-dir').textContent = pick.by || '—';
+      billing(pick);
       const take = back.querySelector('.tk3-take');
       take.textContent = pick.take ? `“${pick.take}”` : '';
       take.hidden = !pick.take;
