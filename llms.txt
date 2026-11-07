@@ -1,0 +1,45 @@
+# NEDCODE
+
+> NEDCODE (nedcode.com) is the personal site of Ned, a frontend developer based in Montreal, Canada. It has his projects, a blog with gaming and tech news and honest gear reviews, small interactive experiments, and his favourite movies, shows and books. NEDCODE is not NeetCode, netcode or nedcodes.dev.
+
+- Owner: Ned, frontend developer, Montreal
+- Threads: https://www.threads.com/@nedc0de
+- GitHub: https://github.com/nedc0de
+
+## Pages
+
+- [Home](https://nedcode.com/): who Ned is, latest posts, selected work
+- [About](https://nedcode.com/about): how Ned works and what he likes
+- [Projects](https://nedcode.com/projects): sites and tools Ned has built, 2021 to 2026
+- [Blog](https://nedcode.com/blog): gaming and tech news, explainers and reviews
+- [Lab](https://nedcode.com/lab): small interactive experiments
+- [Favorites](https://nedcode.com/favorites): movies, shows and books Ned rated
+- [Contact](https://nedcode.com/contact): message Ned
+
+## Projects
+
+- [Cuisine Sensoria](https://cuisinesensoria.com): a private chef and gourmet caterer in Montreal (2026, design, Squarespace)
+- [Iconette Studio](https://iconettestudio.com): soft pastel icons and wallpapers for iPhone (2026)
+- [Wall of Okay](https://wallofokay.com): calm Notion templates for ADHD brains (2026)
+- [Real or Rendered?](https://nedc0de.github.io/real-or-rendered/): a Florida headline game (2026)
+- [AI Novel Pro](https://ainovelpro.com): AI-powered fiction and non-fiction writing community (2024)
+
+## Blog
+
+- [What Is Huffman Coding? How BANANA Fits in 9 Bits](https://nedcode.com/blog/what-is-huffman-coding-how-banana-fits-in-9-bits)
+- [ADHD Notion Templates: How Wall of Okay Works](https://nedcode.com/blog/adhd-notion-templates-how-wall-of-okay-works)
+- [What Is PHP2Shell? The PHP Flaw Explained Simply](https://nedcode.com/blog/what-is-php2shell-the-php-flaw-explained-simply)
+- [Tesla Roadster Flip Explained: Is It SpaceX Tech?](https://nedcode.com/blog/tesla-roadster-flip-explained-is-it-spacex-tech)
+- [Real Monet Mocked as AI Art: The X Prank Explained](https://nedcode.com/blog/real-monet-mocked-as-ai-art-the-x-prank-explained)
+- [How Does a Phone Touchscreen Work? The Simple Answer](https://nedcode.com/blog/how-does-a-phone-touchscreen-work)
+- [Why Are SSDs So Expensive? Blame AI Data Centers](https://nedcode.com/blog/why-are-ssds-so-expensive-blame-ai-data-centers)
+- [iPhone 18 Pro Freezing? How to Fix the Face ID Bug](https://nedcode.com/blog/iphone-18-pro-freezing-how-to-fix-the-face-id-bug)
+- [Cyberleek Threatens to Leak All of GTA 6 Unless Discs Return](https://nedcode.com/blog/cyberleek-threatens-to-leak-all-of-gta-6-unless-discs-return)
+- [AI Game Mashups: How Modders Put Minecraft in Elden Ring](https://nedcode.com/blog/ai-game-mashups-how-modders-put-minecraft-in-elden-ring)
+- [What Is GTA RP? A Beginner's Guide to GTA Roleplay](https://nedcode.com/blog/what-is-gta-rp-beginners-guide-to-gta-roleplay)
+- [Is Sony Killing PS5 Discs? What Changes in 2028](https://nedcode.com/blog/is-sony-killing-ps5-discs-what-changes-in-2028)
+- [iPhone Duo Release Date, Price & What to Expect](https://nedcode.com/blog/iphone-duo-release-date-price-what-to-expect)
+- [Does GTA 6 Have Online at Launch? The Short Answer: No](https://nedcode.com/blog/does-gta-6-have-online-at-launch)
+- [GTA 6 Leaks Again: Cyberleek Drops 25 Minutes of Gameplay](https://nedcode.com/blog/gta-6-leak-cyberleek-extended-leek-explained)
+- [Apple Watch Metal Band Review: Hairy-Arm Approved](https://nedcode.com/blog/the-apple-watch-band-that-completely-won-me-over)
+- [Portable Door Lock Review: Hotel & Airbnb Safety in Seconds](https://nedcode.com/blog/a-must-have-portable-door-lock-for-every-traveler)
