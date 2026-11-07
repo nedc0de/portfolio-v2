@@ -95,7 +95,7 @@ creator.
   with no `.html` (Netlify redirects any capital letters to lowercase), so
   the canonical, `og:url`, JSON-LD, sitemap entry and every link to the post
   use `https://nedcode.com/blog/title-words-like-this` (links: `blog/title-words-like-this`).
-- Add the URL to `sitemap.xml`; make it the featured post on `blog.html`
+- Add the URL to `sitemap.xml` and to the Blog list in `llms.txt` (new projects go in its Projects list too); make it the featured post on `blog.html`
   (move the previous one into "More posts"); the home page's ticker and
   "Latest posts" row (newest first) read blog.html, so they update by themselves; link related posts to each other (every post ends
   with a `.ps-related` "Keep reading" box of 2 posts; update the others' boxes
