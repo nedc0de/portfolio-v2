@@ -652,180 +652,6 @@ width: 40px;
   cursor: pointer;
 }
 
-/* .unfiltered-title {
-  font-size: var(--big-font-size);
-  margin-top: 0;
-  margin-bottom: -50px;
-  text-align: center;
-  padding: 1rem;
-} */
-
-
-
-/* --- Unfiltered Feed Component Styles --- */
-
-.unfiltered-threads-container iframe {
-  width: 100% !important;
-  max-width: 100% !important;
-  display: block;
-}
-
-.unfiltered-section {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.unfiltered-media-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background-color: #000000;
-  user-select: none;
-  isolation: isolate;
-}
-
-.unfiltered-media-track {
-  display: flex;
-  transition: transform 0.3s ease-in-out;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  align-items: stretch;
-}
-
-.unfiltered-slide {
-  min-width: 100%;
-  height: 100%;
-  position: relative;
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background-color: #000000;
-  flex-shrink: 0;
-}
-
-.unfiltered-slide img,
-.unfiltered-slide video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  z-index: 2;
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
-.unfiltered-dots {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-  z-index: 5;
-  background: transparent;
-  padding: 0;
-  backdrop-filter: none;
-}
-
-.unfiltered-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  border: none;
-}
-
-.unfiltered-dot.active {
-  background-color: #ffffff;
-  transform: scale(1.2);
-}
-
-.unfiltered-carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 6;
-  opacity: 0.8;
-}
-
-@media (hover: hover) { /* mouse only: on phones a hover reveal swallows the first tap */
-  .unfiltered-carousel-btn:hover { opacity: 1; }
-}
-.unfiltered-carousel-btn.prev { left: 10px; }
-.unfiltered-carousel-btn.next { right: 10px; }
-.unfiltered-carousel-btn.hidden { display: none; }
-
-.unfiltered-post-content {
-  padding: 16px;
-}
-
-.unfiltered-meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.unfiltered-date {
-  font-size: 0.75rem;
-  color: #888888;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.unfiltered-stats {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.unfiltered-stat-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #888888;
-  font-size: 0.9rem;
-}
-
-.unfiltered-like-btn {
-  background: none;
-  border: none;
-  color: #888888;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.unfiltered-like-btn:hover { transform: scale(1.15); }
-.unfiltered-like-btn.liked { color: #ff3b30; }
-
-.unfiltered-caption {
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: #e0e0e0;
-}
-
 /* Back to Top Button */
 .back-to-top-btn {
   position: fixed;
@@ -2903,7 +2729,6 @@ details>summary {
 
 
 /* Fix header alignment and spacing to prevent clipping */
-.unfiltered-section,
 .home-data,
 .blog-title,
 .section-title {
@@ -2912,7 +2737,6 @@ details>summary {
 }
 
 /* Ensure headings have proper line height and breathing room */
-.unfiltered-section .feed-title,
 .blog-header-title,
 .home-title {
     line-height: 1.3;
