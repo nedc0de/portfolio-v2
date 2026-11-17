@@ -10890,6 +10890,26 @@ html::after {
   mask-composite: intersect;
 }
 
+/* the caps scripts.js adds: thin dark bars on the top and bottom edges of
+   phones and tablets. Safari tints its status bar and toolbar with their
+   colour, so the bars match the screen's dark edge instead of showing the
+   page through them. */
+.crt-cap { display: none; }
+@media (pointer: coarse) {
+  .crt-cap {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 6px;
+    z-index: 10001;
+    pointer-events: none;
+    background-color: var(--crt-edge-color);
+  }
+  .crt-cap-top { top: 0; }
+  .crt-cap-bottom { bottom: 0; }
+}
+
 /* power-on: an orange line, then the screen opens from the middle with a
    flicker. Layers: the line, then the top and bottom black halves. The
    class comes from the small script in each page's <head>. */

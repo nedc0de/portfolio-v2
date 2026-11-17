@@ -8,6 +8,18 @@ const firebaseConfig = {
   appId: '1:683098380380:web:895ae95a6e75133dabee99',
 };
 
+/*=============== CRT SCREEN: edge caps for the browser's bars ===============*/
+// Safari on iPhone and iPad won't draw the screen effect under its status bar
+// or toolbar. It does tint those bars with the colour of a thin fixed bar
+// touching the top or bottom of the page, so these two dark caps (css: "CRT
+// SCREEN") make the bars the same dark as the screen's edge.
+['top', 'bottom'].forEach((edge) => {
+  const cap = document.createElement('div');
+  cap.className = 'crt-cap crt-cap-' + edge;
+  cap.setAttribute('aria-hidden', 'true');
+  document.body.append(cap);
+});
+
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
   navToggle = document.getElementById('nav-toggle'),
