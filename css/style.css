@@ -10777,3 +10777,80 @@ h1.section-title .about-title-color::before {
 @media screen and (min-width: 768px) {
   .hm-signoff .ab-cta p { font-size: 2.6rem; }
 }
+
+/*===== CRT SCREEN: scanlines, black fade, rounded glass, rolling light, power-on =====*/
+/* the glass: fine scanlines, a warm centre and dark rounded edges */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 4px #000, inset 0 0 30px 10px rgba(0, 0, 0, .8);
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .7) 100%),
+    radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
+}
+/* a soft band of light that slowly rolls down the screen */
+body::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 90px;
+  z-index: 9998;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(255, 255, 255, .035), transparent);
+  transform: translateY(-100px);
+  animation: crt-roll 9s linear infinite;
+}
+@keyframes crt-roll { to { transform: translateY(100vh); } }
+
+/* power-on: an orange line, then the screen opens from the middle with a flicker.
+   The class comes from the small script in each page's <head>. */
+html.crt-boot::before,
+html.crt-boot::after {
+  content: "";
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+}
+html.crt-boot::before {
+  inset: 0;
+  background:
+    linear-gradient(#000 0 0) top / 100% 50% no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% 50% no-repeat;
+  animation: crt-open .9s cubic-bezier(.7, 0, .2, 1) both;
+}
+html.crt-boot::after {
+  left: 0;
+  right: 0;
+  top: 50vh;
+  height: 2px;
+  margin-top: -1px;
+  background: #fff;
+  box-shadow: 0 0 12px 3px rgba(255, 150, 60, .9), 0 0 40px 10px rgba(255, 122, 26, .5);
+  animation: crt-line .9s ease-out both;
+}
+@keyframes crt-open {
+  0%, 35% { background-size: 100% 50%, 100% 50%; background-color: transparent; }
+  50% { background-color: rgba(255, 200, 150, .12); }
+  60% { background-color: transparent; }
+  70% { background-color: rgba(255, 200, 150, .07); }
+  80%, 100% { background-size: 100% 0, 100% 0; background-color: transparent; }
+}
+@keyframes crt-line {
+  0% { transform: scaleX(0); opacity: 1; }
+  30%, 42% { transform: scaleX(1); opacity: 1; }
+  55%, 100% { transform: scaleX(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; opacity: 0; }
+  html.crt-boot::before, html.crt-boot::after { content: none; }
+}
+@media print {
+  body::before, body::after { content: none; }
+}

@@ -12,6 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Main stylesheet and favicon -->
+  <!-- CRT power-on: plays on a first visit or a refresh, not between pages (css: "CRT SCREEN") -->
+  <script>try{var n=(performance.getEntriesByType("navigation")[0]||{}).type,r=document.referrer&&new URL(document.referrer).origin===location.origin;if(n==="reload"||!sessionStorage.getItem("nedcode-on")||!(r||n==="back_forward"))document.documentElement.classList.add("crt-boot");sessionStorage.setItem("nedcode-on","1")}catch(e){}</script>
   <link rel="stylesheet" href="./css/style.css">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
 
