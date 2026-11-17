@@ -10965,7 +10965,9 @@ html.crt-boot body::before {
    red and blue fringes, then snaps into place */
 html.crt-boot .l-header,
 html.crt-boot .l-main > :first-child {
-  animation: crt-split .36s steps(1, end) .4s both;
+  /* backwards, not both: once it's over nothing may stay on the header. Even a
+     zero translate would trap the phone menu (position: fixed) inside it */
+  animation: crt-split .36s steps(1, end) .4s backwards;
 }
 @keyframes crt-split {
   0% { translate: -3px 0; filter: drop-shadow(3px 0 rgb(255 40 40 / .55)) drop-shadow(-3px 0 rgb(40 150 255 / .55)); }
