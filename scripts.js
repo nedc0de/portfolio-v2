@@ -221,7 +221,7 @@ const countCharacters = () => {
     } else if (counter < 50) {
       characterCounter.style.color = 'var(--fifteenth-color)';
     } else {
-      characterCounter.style.color = 'var(--second-color)';
+      characterCounter.style.color = ''; // its readable grey from style.css
     }
   }
 };

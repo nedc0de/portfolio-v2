@@ -10,11 +10,14 @@ const previewImg = preview.querySelector("img");
 const touchMode = matchMedia("(hover: none), (max-width: 768px)");
 const title = document.querySelector("#projects .section-title");
 
-// Preload GIFs once the page has loaded, so the preview swaps instantly
-// without slowing down the first paint
+// With a mouse, preload the GIFs once the page has loaded so the hover
+// preview swaps instantly. Phones skip this (about 3 MB on mobile data): each
+// GIF loads when its row comes up.
 const preloadGifs = () => rows.forEach(row => { new Image().src = row.dataset.img; });
-if (document.readyState === "complete") preloadGifs();
-else addEventListener("load", preloadGifs, { once: true });
+if (!touchMode.matches) {
+  if (document.readyState === "complete") preloadGifs();
+  else addEventListener("load", preloadGifs, { once: true });
+}
 
 /*===== DESKTOP: cursor-following preview =====*/
 let x = 0, y = 0, cx = 0, cy = 0;
