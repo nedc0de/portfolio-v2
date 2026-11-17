@@ -2852,12 +2852,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 /*===== Text links: rolling text =====*/
 // "Get to know me", "Play with it", "See all picks", "All posts", "Read post",
 // the 404 links and the footer's "Back to top": wrap the words so CSS can roll them up to a white copy
-// (see .roll in style.css). Phones have no hover, so each one rolls up and
-// back once when it scrolls into view.
+// (see .roll in style.css). With a mouse they roll on hover; on phones they
+// stay still (no roll when they scroll into view).
 (() => {
   const links = document.querySelectorAll('.xb-go, .hm-all, .bl-read, .nf-go, .footer-top');
   if (!links.length) return;
-  const rolls = [...links].map((el) => {
+  [...links].forEach((el) => {
     const text = el.textContent.trim();
     el.textContent = '';
     const roll = document.createElement('span');
@@ -2866,20 +2866,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     inner.textContent = text;
     roll.append(inner);
     el.append(roll);
-    return roll;
   });
-  const touch = matchMedia('(hover: none)').matches;
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!touch || still || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-    if (!e.isIntersecting) return;
-    io.unobserve(e.target);
-    setTimeout(() => {
-      e.target.classList.add('is-rolled');
-      setTimeout(() => e.target.classList.remove('is-rolled'), 1100);
-    }, 350);
-  }), { threshold: 1 });
-  rolls.forEach((r) => io.observe(r));
 })();
 
 /*===== HOME: the stick figure next to "Ned" =====*/

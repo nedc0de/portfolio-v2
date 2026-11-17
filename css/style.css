@@ -10092,8 +10092,8 @@ html.fav-sheet-open { overflow: hidden; }
 /*===== Text links: rolling text instead of a trailing arrow =====*/
 /* scripts.js wraps the words in .roll > span. The span carries a white copy of
    itself one line below (text-shadow); rolling it up swaps yellow for white.
-   Desktop rolls on hover; phones roll up and back once when the link scrolls
-   into view (.is-rolled). Without JS the links are plain yellow text. */
+   Desktop rolls on hover; on phones the links stay still. Without JS the
+   links are plain yellow text. */
 .roll {
   display: inline-block;
   overflow: hidden;
@@ -10108,7 +10108,6 @@ html.fav-sheet-open { overflow: hidden; }
   transition: transform .4s cubic-bezier(.65, 0, .25, 1);
 }
 
-.roll.is-rolled > span,
 .nf-go:focus-visible .roll > span,
 .footer-top:focus-visible .roll > span,
 .hm-all:focus-visible .roll > span {
