@@ -7017,8 +7017,8 @@ html.is-frozen .egg-crash * {
 
 /* Small credits line at the bottom of the blog page */
 .bl-credit {
-  margin-top: 2.5rem;
-  font-size: .72rem;
+  margin-top: 5.5rem; /* well clear of the newsletter */
+  font-size: .62rem;
   color: #6f6f6f;
 }
 
