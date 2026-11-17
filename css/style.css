@@ -85,6 +85,7 @@
    over it by scripts.js (.bg-math). */
 html {
   --edge-fade: min(22vw, 360px);
+  --crt-edge-color: #0a0a0a; /* #151515 under the screen's darkest edge */
   scroll-behavior: smooth;
   background:
     /* soft fade around the edges: the grid shows in the middle and melts
@@ -94,7 +95,12 @@ html {
     linear-gradient(transparent, var(--thirteenth-color)) 0 100% / 100% 280px no-repeat,
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.028' font-family='ui-monospace,Menlo,Consolas,monospace' font-size='7' text-anchor='middle'%3E%3Ctext x='12' y='14.5'%3E0%3C/text%3E%3Ctext x='36' y='14.5'%3E0%3C/text%3E%3Ctext x='60' y='14.5'%3E1%3C/text%3E%3Ctext x='84' y='14.5'%3E1%3C/text%3E%3Ctext x='108' y='14.5'%3E1%3C/text%3E%3Ctext x='132' y='14.5'%3E0%3C/text%3E%3Ctext x='12' y='38.5'%3E0%3C/text%3E%3Ctext x='36' y='38.5'%3E1%3C/text%3E%3Ctext x='60' y='38.5'%3E0%3C/text%3E%3Ctext x='84' y='38.5'%3E0%3C/text%3E%3Ctext x='108' y='38.5'%3E1%3C/text%3E%3Ctext x='132' y='38.5'%3E1%3C/text%3E%3Ctext x='12' y='62.5'%3E0%3C/text%3E%3Ctext x='36' y='62.5'%3E1%3C/text%3E%3Ctext x='60' y='62.5'%3E1%3C/text%3E%3Ctext x='84' y='62.5'%3E1%3C/text%3E%3Ctext x='108' y='62.5'%3E0%3C/text%3E%3Ctext x='132' y='62.5'%3E0%3C/text%3E%3Ctext x='12' y='86.5'%3E1%3C/text%3E%3Ctext x='36' y='86.5'%3E0%3C/text%3E%3Ctext x='60' y='86.5'%3E0%3C/text%3E%3Ctext x='84' y='86.5'%3E0%3C/text%3E%3Ctext x='108' y='86.5'%3E0%3C/text%3E%3Ctext x='132' y='86.5'%3E0%3C/text%3E%3Ctext x='12' y='110.5'%3E1%3C/text%3E%3Ctext x='36' y='110.5'%3E0%3C/text%3E%3Ctext x='60' y='110.5'%3E0%3C/text%3E%3Ctext x='84' y='110.5'%3E0%3C/text%3E%3Ctext x='108' y='110.5'%3E0%3C/text%3E%3Ctext x='132' y='110.5'%3E0%3C/text%3E%3Ctext x='12' y='134.5'%3E0%3C/text%3E%3Ctext x='36' y='134.5'%3E1%3C/text%3E%3Ctext x='60' y='134.5'%3E0%3C/text%3E%3Ctext x='84' y='134.5'%3E0%3C/text%3E%3Ctext x='108' y='134.5'%3E0%3C/text%3E%3Ctext x='132' y='134.5'%3E0%3C/text%3E%3C/g%3E%3C/svg%3E") 0 0 / 144px 144px,
     radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
-    var(--thirteenth-color);
+    /* the page colour is painted as a layer; the background *colour* below it
+       is the darker edge of the CRT screen (see "CRT SCREEN"), which browsers
+       show around the page: overscroll, beside a zoomed-out page on iPad,
+       behind the status bar */
+    linear-gradient(var(--thirteenth-color) 0 0),
+    var(--crt-edge-color);
 }
 
 /* phones: the same 0s and 1s, no maths notes (calmer) */
@@ -108,7 +114,8 @@ html {
       linear-gradient(transparent, var(--thirteenth-color)) 0 100% / 100% 280px no-repeat,
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Cg fill='%23fff' fill-opacity='.028' font-family='ui-monospace,Menlo,Consolas,monospace' font-size='7' text-anchor='middle'%3E%3Ctext x='12' y='14.5'%3E0%3C/text%3E%3Ctext x='36' y='14.5'%3E0%3C/text%3E%3Ctext x='60' y='14.5'%3E1%3C/text%3E%3Ctext x='84' y='14.5'%3E1%3C/text%3E%3Ctext x='108' y='14.5'%3E1%3C/text%3E%3Ctext x='132' y='14.5'%3E0%3C/text%3E%3Ctext x='12' y='38.5'%3E0%3C/text%3E%3Ctext x='36' y='38.5'%3E1%3C/text%3E%3Ctext x='60' y='38.5'%3E0%3C/text%3E%3Ctext x='84' y='38.5'%3E0%3C/text%3E%3Ctext x='108' y='38.5'%3E1%3C/text%3E%3Ctext x='132' y='38.5'%3E1%3C/text%3E%3Ctext x='12' y='62.5'%3E0%3C/text%3E%3Ctext x='36' y='62.5'%3E1%3C/text%3E%3Ctext x='60' y='62.5'%3E1%3C/text%3E%3Ctext x='84' y='62.5'%3E1%3C/text%3E%3Ctext x='108' y='62.5'%3E0%3C/text%3E%3Ctext x='132' y='62.5'%3E0%3C/text%3E%3Ctext x='12' y='86.5'%3E1%3C/text%3E%3Ctext x='36' y='86.5'%3E0%3C/text%3E%3Ctext x='60' y='86.5'%3E0%3C/text%3E%3Ctext x='84' y='86.5'%3E0%3C/text%3E%3Ctext x='108' y='86.5'%3E0%3C/text%3E%3Ctext x='132' y='86.5'%3E0%3C/text%3E%3Ctext x='12' y='110.5'%3E1%3C/text%3E%3Ctext x='36' y='110.5'%3E0%3C/text%3E%3Ctext x='60' y='110.5'%3E0%3C/text%3E%3Ctext x='84' y='110.5'%3E0%3C/text%3E%3Ctext x='108' y='110.5'%3E0%3C/text%3E%3Ctext x='132' y='110.5'%3E0%3C/text%3E%3Ctext x='12' y='134.5'%3E0%3C/text%3E%3Ctext x='36' y='134.5'%3E1%3C/text%3E%3Ctext x='60' y='134.5'%3E0%3C/text%3E%3Ctext x='84' y='134.5'%3E0%3C/text%3E%3Ctext x='108' y='134.5'%3E0%3C/text%3E%3Ctext x='132' y='134.5'%3E0%3C/text%3E%3C/g%3E%3C/svg%3E") 0 0 / 144px 144px,
       radial-gradient(640px 460px at 85% 220px, rgba(255, 106, 31, .035), transparent) no-repeat,
-      var(--thirteenth-color);
+      linear-gradient(var(--thirteenth-color) 0 0),
+      var(--crt-edge-color);
   }
 
   .bg-math { display: none; }
@@ -10784,30 +10791,31 @@ h1.section-title .about-title-color::before {
    strips at the sides. Each layer also reaches 20vw past the left and right
    edges, so no browser or zoom level can show a gap there. */
 
-/* the glass: a soft rolling band of light, fine scanlines, a dark fade at
-   the sides and a warm centre. It melts away at the very top and bottom so
-   phone browsers' bars meet the plain page colour with no visible band. */
+/* the glass: a soft rolling band of light, fine scanlines, a warm centre
+   and a black fade on all four edges. The edges end on the same colour as
+   html's background colour (--crt-edge-color), which browsers paint
+   around the page, so the screen meets them with no seam. It reaches 200px
+   below the screen too, under phone browsers' floating toolbars. */
 html::after {
   content: "";
   position: fixed;
   top: 0;
-  bottom: 0;
+  bottom: -200px;
   left: -20vw;
   right: -20vw;
   z-index: 9999;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 110px), transparent);
-  mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 110px), transparent);
   background:
     linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 -100px / 100% 90px no-repeat,
     repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px),
     linear-gradient(90deg, rgba(0, 0, 0, .5) 20vw, rgba(0, 0, 0, .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgba(0, 0, 0, .15) calc(100% - 34vw), rgba(0, 0, 0, .5) calc(100% - 20vw)),
+    linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .15) 90px, transparent 200px, transparent calc(100% - 420px), rgba(0, 0, 0, .15) calc(100% - 310px), rgba(0, 0, 0, .5) calc(100% - 200px)),
     radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   animation: crt-roll 9s linear infinite;
 }
 @keyframes crt-roll {
-  from { background-position: 0 -100px, 0 0, 0 0, 0 0; }
-  to { background-position: 0 100vh, 0 0, 0 0, 0 0; }
+  from { background-position: 0 -100px, 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: 0 100vh, 0 0, 0 0, 0 0, 0 0; }
 }
 
 /* power-on: an orange line, then the screen opens from the middle with a
