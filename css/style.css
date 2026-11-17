@@ -10819,9 +10819,7 @@ body::after {
   background:
     linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
     linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
-    linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
     radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
-  animation: crt-roll 9s linear infinite;
 }
 /* tablets and computers: the sides darken over a longer stretch, so where
    the page meets the browser's plain surround (iPad shows it beside the
@@ -10831,7 +10829,6 @@ body::after {
     background:
       linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
       linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
-      linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
   html::after {
@@ -10853,7 +10850,6 @@ body::after {
     background:
       linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
       linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
-      linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
@@ -10862,14 +10858,26 @@ body::after {
     background:
       linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
       linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
-      linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
-@keyframes crt-roll {
-  from { background-position: 0 0, 0 0, 0 100px, 0 0; }
-  to { background-position: 0 0, 0 0, 0 calc(100vh + 200px), 0 0; }
+/* the rolling band of light (an element scripts.js adds): moved with
+   transform only, under the edge fade */
+.crt-band {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 90px;
+  z-index: 9997;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(255, 255, 255, .035), transparent);
+  transform: translateY(-100px);
+  animation: crt-roll 9s linear infinite;
+  will-change: transform;
 }
+@keyframes crt-roll { to { transform: translateY(100vh); } }
+
 html::after {
   content: "";
   position: fixed;
@@ -10888,6 +10896,49 @@ html::after {
     linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
     linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px));
   mask-composite: intersect;
+}
+
+/* channel change: moving between pages of the site, the new page comes in
+   through a quick burst of static (the full power-on is only for a first
+   visit or a refresh). The class comes from the script in each page's <head>. */
+html.crt-chan::before {
+  content: "";
+  position: fixed;
+  inset: -200px -20vw;
+  z-index: 10000;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(255 200 150 / .5), rgb(255 200 150 / .5)) center / 100% 2px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9  0 0 0 0 .8  0 0 0 0 .7  0 0 0 1.4 -.3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px,
+    #0b0b0b;
+  animation: crt-chan .32s steps(1, end) both;
+}
+@keyframes crt-chan {
+  0% { opacity: 1; background-position: center, 0 0; }
+  20% { opacity: 1; background-position: center, 37px 61px; }
+  40% { opacity: .8; background-position: center, 91px 13px; }
+  60% { opacity: .45; background-position: center, 23px 117px; }
+  80% { opacity: .15; background-position: center, 140px 80px; }
+  100% { opacity: 0; }
+}
+
+/* the phone menu: opening it flashes like a screen switching to another
+   input, a bright line that opens into the menu */
+@media screen and (max-width: 767px) {
+  .nav-menu.show-menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(transparent, rgb(255 200 150 / .5), transparent) center / 100% 2px no-repeat;
+    animation: crt-menu .3s ease-out both;
+  }
+}
+@keyframes crt-menu {
+  0% { background-size: 30% 2px; opacity: 1; }
+  40% { background-size: 100% 2px; opacity: 1; }
+  100% { background-size: 100% 100%; opacity: 0; }
 }
 
 /* the caps scripts.js adds: thin dark bars on the top and bottom edges of
@@ -10990,7 +11041,8 @@ html.crt-boot .nav-logo-group {
   70%, 100% { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  body::after { animation: none; }
+  .crt-band { display: none; }
+  html.crt-chan::before { content: none; }
   html.crt-boot::before, html.crt-boot body::before { content: none; }
   html.crt-boot .l-header, html.crt-boot .l-main > :first-child, html.crt-boot .nav-logo-group { animation: none; }
 }
