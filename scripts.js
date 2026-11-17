@@ -3638,20 +3638,18 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 })();
 
 /*===== INSPECT (desktop) =====*/
-// Always on with a mouse or trackpad, on every page: hover anything to see
-// its real tag, size, font and colours, like the browser's developer tools.
+// Off when you arrive. Click the switch in the corner (mouse or trackpad
+// only) to turn it on: then hover anything to see its real tag, size, font
+// and colours, like the browser's developer tools. It stays on from page to
+// page, and through a refresh, until it's clicked off again (this tab only).
 // Phones and tablets don't get it (nothing to hover with).
 (() => {
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const root = document.documentElement; // not body: body's transform breaks position: fixed
-  // The switch in the corner turns it off: it stays off from page to page
-  // (this tab only) until it's clicked again or the page is refreshed.
-  const KEY = 'nedcode-inspect-off';
+  const KEY = 'nedcode-inspect-on';
   const store = (v) => { try { v ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch (e) {} };
-  const reload = performance.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
-  if (reload) store(false);
-  let on = true;
-  try { on = sessionStorage.getItem(KEY) !== '1'; } catch (e) {}
+  let on = false;
+  try { on = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'ix-switch';
@@ -3665,12 +3663,12 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   const paintSwitch = () => {
     toggle.setAttribute('aria-pressed', String(on));
     toggle.querySelector('span').textContent = on ? 'Inspect on' : 'Inspect off';
-    toggle.title = on ? 'Turn off Inspect' : 'Turn Inspect back on';
+    toggle.title = on ? 'Turn off Inspect' : 'Turn on Inspect';
   };
   paintSwitch();
   toggle.addEventListener('click', () => {
     on = !on;
-    store(!on);
+    store(on);
     paintSwitch();
     if (!on) hide();
   });
