@@ -3799,3 +3799,33 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   addEventListener('scroll', (e) => { if (open && !(e.target instanceof Element && e.target.closest('.dd'))) close(); }, { passive: true, capture: true });
   addEventListener('resize', close);
 })();
+
+/*===== SCREEN CHECK (only with ?screen-check in the address) =====*/
+// A troubleshooting panel for the CRT screen's edges on a given device: a
+// red frame marks the browser's fixed-position area (where the screen
+// effect is drawn) and the numbers say how the browser sizes the page.
+// Nobody sees it unless they add ?screen-check to the address.
+(() => {
+  if (!/[?&]screen-check\b/.test(location.search)) return;
+  const frame = document.createElement('div');
+  frame.style.cssText = 'position:fixed;inset:0;z-index:2147483646;pointer-events:none;box-shadow:inset 0 0 0 4px red';
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483647;margin:0;padding:12px 14px;background:#fff;color:#000;font:13px/1.45 ui-monospace,Menlo,monospace;border-radius:8px;max-width:92vw;white-space:pre-wrap';
+  document.documentElement.append(frame, box);
+  const paint = () => {
+    const v = visualViewport || {};
+    const cs = getComputedStyle(document.documentElement);
+    const ov = getComputedStyle(document.documentElement, '::after');
+    box.textContent = [
+      'window ' + innerWidth + ' x ' + innerHeight + '  (outer ' + outerWidth + ' x ' + outerHeight + ')',
+      'page width ' + document.documentElement.clientWidth + '  scroll width ' + document.documentElement.scrollWidth,
+      'visual ' + Math.round(v.width) + ' x ' + Math.round(v.height) + '  zoom ' + (v.scale || 1).toFixed(3) + '  left ' + Math.round(v.offsetLeft || 0),
+      'screen ' + screen.width + ' x ' + screen.height + '  pixel ratio ' + devicePixelRatio,
+      'page colour ' + cs.backgroundColor + '  screen layer ' + ov.content + ' ' + ov.left + ' / ' + ov.right,
+      navigator.userAgent,
+    ].join('\n');
+  };
+  paint();
+  addEventListener('resize', paint);
+  if (window.visualViewport) visualViewport.addEventListener('resize', paint);
+})();
