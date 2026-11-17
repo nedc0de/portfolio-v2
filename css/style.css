@@ -10844,15 +10844,16 @@ body::after {
       linear-gradient(transparent 200px, #000 248px, #000 calc(100% - 248px), transparent calc(100% - 200px));
   }
 }
-/* phones and tablets: the page fades softly into the dark at the top and
-   bottom of the screen, so content never looks cut off under the status bar
+/* phones and tablets: the page fades softly into the dark at the top (a
+   short fade just under the status bar, clear of the logo) and bottom of
+   the screen, so content never looks cut off under the status bar
    or next to the browser's bottom bar (the safe-area insets are the status
    bar and home bar, when the browser reports them) */
 @media (pointer: coarse) {
   body::after {
     background:
       linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / .85) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / .55) calc(200px + env(safe-area-inset-top, 0px) + 60px), rgb(11 11 11 / .25) calc(200px + env(safe-area-inset-top, 0px) + 110px), transparent calc(200px + env(safe-area-inset-top, 0px) + 170px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / .5) calc(200px + env(safe-area-inset-top, 0px) + 12px), rgb(11 11 11 / .15) calc(200px + env(safe-area-inset-top, 0px) + 30px), transparent calc(200px + env(safe-area-inset-top, 0px) + 50px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
@@ -10861,7 +10862,7 @@ body::after {
   body::after {
     background:
       linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / .85) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / .55) calc(200px + env(safe-area-inset-top, 0px) + 60px), rgb(11 11 11 / .25) calc(200px + env(safe-area-inset-top, 0px) + 110px), transparent calc(200px + env(safe-area-inset-top, 0px) + 170px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / .5) calc(200px + env(safe-area-inset-top, 0px) + 12px), rgb(11 11 11 / .15) calc(200px + env(safe-area-inset-top, 0px) + 30px), transparent calc(200px + env(safe-area-inset-top, 0px) + 50px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
