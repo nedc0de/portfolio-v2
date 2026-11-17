@@ -10794,6 +10794,9 @@ h1.section-title .about-title-color::before {
 /* The glass, in two layers. Both reach 20vw past the sides and 200px below
    the screen (under phone browsers' floating toolbars).
 
+   They also reach 200px above it, under a phone's status bar: some phone
+   browsers (Brave on iPhone) show the page through that bar.
+
    1. body::after: the shading. A soft rolling band of light, a warm centre
       and a black fade on all four edges. It's smooth (no texture), and the
       very edge comes out at html's background colour (--crt-edge-color),
@@ -10805,27 +10808,27 @@ h1.section-title .about-title-color::before {
 body::after {
   content: "";
   position: fixed;
-  top: 0;
+  top: -200px;
   bottom: -200px;
   left: -20vw;
   right: -20vw;
   z-index: 9998;
   pointer-events: none;
   background:
-    linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 -100px / 100% 90px no-repeat,
+    linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 100px / 100% 90px no-repeat,
     linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
-    linear-gradient(var(--crt-edge-color), rgb(11 11 11 / .5) 12px, rgb(11 11 11 / .15) 90px, transparent 200px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+    linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
     radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   animation: crt-roll 9s linear infinite;
 }
 @keyframes crt-roll {
-  from { background-position: 0 -100px, 0 0, 0 0, 0 0; }
-  to { background-position: 0 100vh, 0 0, 0 0, 0 0; }
+  from { background-position: 0 100px, 0 0, 0 0, 0 0; }
+  to { background-position: 0 calc(100vh + 200px), 0 0, 0 0, 0 0; }
 }
 html::after {
   content: "";
   position: fixed;
-  top: 0;
+  top: -200px;
   bottom: -200px;
   left: -20vw;
   right: -20vw;
@@ -10834,11 +10837,11 @@ html::after {
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
   -webkit-mask-image:
     linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
-    linear-gradient(transparent, #000 48px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+    linear-gradient(transparent 200px, #000 248px, #000 calc(100% - 248px), transparent calc(100% - 200px));
   -webkit-mask-composite: source-in;
   mask-image:
     linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
-    linear-gradient(transparent, #000 48px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+    linear-gradient(transparent 200px, #000 248px, #000 calc(100% - 248px), transparent calc(100% - 200px));
   mask-composite: intersect;
 }
 
@@ -10848,8 +10851,8 @@ html::after {
 html.crt-boot::before {
   content: "";
   position: fixed;
-  top: 0;
-  bottom: 0;
+  top: -200px;
+  bottom: -200px;
   left: -20vw;
   right: -20vw;
   z-index: 10000;
