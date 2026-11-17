@@ -85,7 +85,7 @@
    over it by scripts.js (.bg-math). */
 html {
   --edge-fade: min(22vw, 360px);
-  --crt-edge-color: #0a0a0a; /* #151515 under the screen's darkest edge */
+  --crt-edge-color: #0b0b0b; /* #151515 under the screen's darkest edge */
   scroll-behavior: smooth;
   background:
     /* soft fade around the edges: the grid shows in the middle and melts
@@ -10791,11 +10791,37 @@ h1.section-title .about-title-color::before {
    strips at the sides. Each layer also reaches 20vw past the left and right
    edges, so no browser or zoom level can show a gap there. */
 
-/* the glass: a soft rolling band of light, fine scanlines, a warm centre
-   and a black fade on all four edges. The edges end on the same colour as
-   html's background colour (--crt-edge-color), which browsers paint
-   around the page, so the screen meets them with no seam. It reaches 200px
-   below the screen too, under phone browsers' floating toolbars. */
+/* The glass, in two layers. Both reach 20vw past the sides and 200px below
+   the screen (under phone browsers' floating toolbars).
+
+   1. body::after: the shading. A soft rolling band of light, a warm centre
+      and a black fade on all four edges. It's smooth (no texture), and the
+      very edge comes out at html's background colour (--crt-edge-color),
+      which browsers paint around the page (beside a zoomed-out page on
+      iPad, overscroll, behind the status bar), so the two meet with no seam.
+   2. html::after: the fine scanlines. They fade out over the last 48px at
+      every edge, so the texture never stops at a hard line where the page
+      meets the browser's surround. */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: -200px;
+  left: -20vw;
+  right: -20vw;
+  z-index: 9998;
+  pointer-events: none;
+  background:
+    linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 -100px / 100% 90px no-repeat,
+    linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
+    linear-gradient(var(--crt-edge-color), rgb(11 11 11 / .5) 12px, rgb(11 11 11 / .15) 90px, transparent 200px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+    radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
+  animation: crt-roll 9s linear infinite;
+}
+@keyframes crt-roll {
+  from { background-position: 0 -100px, 0 0, 0 0, 0 0; }
+  to { background-position: 0 100vh, 0 0, 0 0, 0 0; }
+}
 html::after {
   content: "";
   position: fixed;
@@ -10805,17 +10831,15 @@ html::after {
   right: -20vw;
   z-index: 9999;
   pointer-events: none;
-  background:
-    linear-gradient(transparent, rgba(255, 255, 255, .035), transparent) 0 -100px / 100% 90px no-repeat,
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px),
-    linear-gradient(90deg, rgba(0, 0, 0, .5) 20vw, rgba(0, 0, 0, .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgba(0, 0, 0, .15) calc(100% - 34vw), rgba(0, 0, 0, .5) calc(100% - 20vw)),
-    linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .15) 90px, transparent 200px, transparent calc(100% - 420px), rgba(0, 0, 0, .15) calc(100% - 310px), rgba(0, 0, 0, .5) calc(100% - 200px)),
-    radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
-  animation: crt-roll 9s linear infinite;
-}
-@keyframes crt-roll {
-  from { background-position: 0 -100px, 0 0, 0 0, 0 0, 0 0; }
-  to { background-position: 0 100vh, 0 0, 0 0, 0 0, 0 0; }
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
+    linear-gradient(transparent, #000 48px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
+    linear-gradient(transparent, #000 48px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+  mask-composite: intersect;
 }
 
 /* power-on: an orange line, then the screen opens from the middle with a
@@ -10848,9 +10872,9 @@ html.crt-boot::before {
   80%, 100% { background-size: 100% 0, 100% 0, 100% 0; background-color: transparent; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html::after { animation: none; }
+  body::after { animation: none; }
   html.crt-boot::before { content: none; }
 }
 @media print {
-  html::after { content: none; }
+  html::after, body::after { content: none; }
 }
