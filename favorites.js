@@ -1347,9 +1347,10 @@
     clearTimeout(hero.videoHide);
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      // show it 3 seconds after the pick (the still shows until then), and at
-      // least 1.5 s after it starts, to wait out the icon YouTube flashes
-      const wait = Math.max(1500, 3000 - (Date.now() - (hero.pickedAt || 0)));
+      // YouTube shows its own title, pause button and "Watch on YouTube" for
+      // the first few seconds of play (and they can't be turned off), so the
+      // still stays up until they've faded: 4 s after it starts playing
+      const wait = Math.max(4000, 3000 - (Date.now() - (hero.pickedAt || 0)));
       hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, wait);
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
