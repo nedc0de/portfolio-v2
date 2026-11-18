@@ -11575,3 +11575,7 @@ html.crt-boot .nav-logo-group {
    so animating them no longer repaints the whole page */
 .stick { will-change: transform; }
 .nav-logo1, .nav-logo2, .nav-logo5, .nav-logo6 { will-change: opacity; }
+
+/* no static burst when moving between pages (the power-on on a first visit
+   or a refresh stays) */
+html.crt-chan::before { content: none; animation: none; }
