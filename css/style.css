@@ -12009,3 +12009,12 @@ main { counter-reset: hm-ch; }
   .fav-search-list button, .bl-search-list a { flex-direction: column; align-items: flex-start; gap: .15rem; }
   .fav-search-list b, .bl-search-list b { max-width: 100%; }
 }
+
+/*===== FAVORITES: the banner opens the details =====*/
+.fav-hero { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fav-hero:focus-visible { outline: 1px solid var(--fifteenth-color); outline-offset: 3px; }
+/* (no press scale: a transform on the banner would unpin the mini player
+   and the docked trailer, which are fixed to the screen from inside it) */
+@media (hover: hover) {
+  .fav-hero:hover .fav-hero-go { text-decoration-color: var(--fifteenth-color); color: #fff; }
+}

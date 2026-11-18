@@ -1503,6 +1503,17 @@
     };
     addEventListener('scroll', () => { if (!stuckFrame) stuckFrame = requestAnimationFrame(checkStuck); }, { passive: true });
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
+    // the whole banner opens the details too (its own buttons keep their jobs)
+    hero.setAttribute('role', 'button');
+    hero.tabIndex = 0;
+    hero.setAttribute('aria-label', 'See details');
+    hero.addEventListener('click', (e) => {
+      if (e.target.closest('button, a') || hero.classList.contains('is-docked') || !current) return;
+      openSheet(current);
+    });
+    hero.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === hero && current) { e.preventDefault(); openSheet(current); }
+    });
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => {
       soundOn = !soundOn;
       try { soundOn ? localStorage.setItem(SOUND_KEY, '1') : localStorage.removeItem(SOUND_KEY); } catch (e) {}
