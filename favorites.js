@@ -1635,54 +1635,88 @@
         hero.classList.add('is-placed');
       }
     } catch (e) {}
+    // Like YouTube's and the iPhone's picture-in-picture: it sticks to your
+    // finger (one update per screen frame), and when you let go it keeps the
+    // momentum of your flick and glides into the nearest corner. Flung hard
+    // off the screen, it closes.
     let sx = null, sy = 0, dx = 0, dy = 0, swiped = false, startRect = null;
+    let vx = 0, vy = 0, lastX = 0, lastY = 0, lastT = 0, dragFrame = 0, settle = null;
+    const outBy = (x, y) => Math.max(
+      Math.max(0, -x, x + startRect.width - innerWidth) / startRect.width,
+      Math.max(0, -y, y + startRect.height - innerHeight) / startRect.height);
     tvEl.addEventListener('touchstart', (e) => {
       if (!hero.classList.contains('is-mini')) return;
-      sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = dy = 0; swiped = false;
+      if (settle) { settle.commitStyles && settle.commitStyles(); settle.cancel(); settle = null; }
+      sx = lastX = e.touches[0].clientX; sy = lastY = e.touches[0].clientY;
+      dx = dy = vx = vy = 0; swiped = false; lastT = performance.now();
       startRect = tvEl.getBoundingClientRect();
+      tvEl.style.transform = '';
       tvEl.style.transition = 'none';
     }, { passive: true });
     tvEl.addEventListener('touchmove', (e) => {
       if (sx === null) return;
-      dx = e.touches[0].clientX - sx;
-      dy = e.touches[0].clientY - sy;
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) swiped = true;
+      const cx = e.touches[0].clientX, cy = e.touches[0].clientY, now = performance.now();
+      const dt = Math.max(1, now - lastT);
+      vx = .6 * vx + .4 * ((cx - lastX) / dt); // px per ms, smoothed
+      vy = .6 * vy + .4 * ((cy - lastY) / dt);
+      lastX = cx; lastY = cy; lastT = now;
+      dx = cx - sx; dy = cy - sy;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) swiped = true;
       if (e.cancelable) e.preventDefault(); // the page doesn't scroll while you drag it
-      tvEl.style.transform = `translate(${dx}px, ${dy}px)`;
-      // fading as it leaves the screen
-      const x = startRect.left + dx, y = startRect.top + dy;
-      const outX = Math.max(0, -x, x + startRect.width - innerWidth) / startRect.width;
-      const outY = Math.max(0, -y, y + startRect.height - innerHeight) / startRect.height;
-      tvEl.style.opacity = String(Math.max(.25, 1 - Math.max(outX, outY) * 1.2));
+      if (!dragFrame) dragFrame = requestAnimationFrame(() => {
+        dragFrame = 0;
+        if (sx === null) return;
+        tvEl.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+        tvEl.style.opacity = String(Math.max(.35, 1 - outBy(startRect.left + dx, startRect.top + dy) * 1.1));
+      });
     }, { passive: false });
-    tvEl.addEventListener('touchend', () => {
+    const finish = () => {
       if (sx === null) return;
       sx = null;
+      cancelAnimationFrame(dragFrame); dragFrame = 0;
       if (!swiped) { tvEl.style.transform = tvEl.style.opacity = tvEl.style.transition = ''; return; }
+      // a stale velocity (finger held still before letting go) doesn't count
+      if (performance.now() - lastT > 80) vx = vy = 0;
       const x = startRect.left + dx, y = startRect.top + dy;
-      const outX = Math.max(0, -x, x + startRect.width - innerWidth) / startRect.width;
-      const outY = Math.max(0, -y, y + startRect.height - innerHeight) / startRect.height;
-      tvEl.style.transition = 'transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s';
-      if (Math.max(outX, outY) > .45) {
-        // flicked off the screen: close it
-        tvEl.style.transform = `translate(${dx * 1.8}px, ${dy * 1.8}px)`;
-        tvEl.style.opacity = '0';
-        setTimeout(() => {
+      // where the flick would carry it
+      const px = x + vx * 180, py = y + vy * 180;
+      // closes only when it's already partly off the screen and still heading
+      // out, or thrown hard straight out; a quick move across the screen
+      // just lands in a corner
+      const outNow = outBy(x, y);
+      const throwSpeed = Math.hypot(vx, vy);
+      if ((outNow > .3 && outBy(px, py) > outNow) || (throwSpeed > 2.4 && outBy(px, py) > 1.2)) {
+        // flung off the screen: it flies out and closes
+        const fly = tvEl.animate([
+          { transform: `translate3d(${dx}px, ${dy}px, 0)`, opacity: tvEl.style.opacity || 1 },
+          { transform: `translate3d(${dx + vx * 260}px, ${dy + vy * 260}px, 0)`, opacity: 0 },
+        ], { duration: 260, easing: 'cubic-bezier(.2, .7, .4, 1)', fill: 'forwards' });
+        fly.finished.then(() => {
           miniClosed = true;
           ytCommand('pauseVideo');
           paint();
+          fly.cancel();
           tvEl.style.transition = tvEl.style.transform = tvEl.style.opacity = '';
-        }, 280);
+        }, () => {});
         return;
       }
-      // dropped: it stays there (kept on screen), the move eased in
-      const [nx, ny] = place(x, y);
-      tvEl.style.transform = `translate(${x - nx}px, ${y - ny}px)`;
-      tvEl.style.opacity = '';
-      requestAnimationFrame(() => { tvEl.style.transform = ''; });
-      setTimeout(() => { tvEl.style.transition = ''; queueHole(); }, 300);
+      // the nearest corner to where the flick was heading
+      const bd = bounds(startRect.width, startRect.height);
+      const tx = px + startRect.width / 2 < innerWidth / 2 ? bd.minX : bd.maxX;
+      const ty = py + startRect.height / 2 < innerHeight / 2 ? bd.minY : bd.maxY;
+      const [nx, ny] = place(tx, ty);
+      // it now sits in the corner; animate from where your finger left it
+      tvEl.style.transform = tvEl.style.opacity = tvEl.style.transition = '';
+      const speed = Math.hypot(vx, vy);
+      settle = tvEl.animate([
+        { transform: `translate3d(${x - nx}px, ${y - ny}px, 0)` },
+        { transform: 'translate3d(0, 0, 0)' },
+      ], { duration: Math.round(Math.max(260, Math.min(460, 420 - speed * 90))), easing: 'cubic-bezier(.18, .9, .3, 1.04)' });
+      settle.finished.then(() => { settle = null; queueHole(); }, () => {});
       try { localStorage.setItem(POS_KEY, JSON.stringify({ fx: nx / innerWidth, fy: ny / innerHeight })); } catch (e) {}
-    });
+    };
+    tvEl.addEventListener('touchend', finish);
+    tvEl.addEventListener('touchcancel', finish);
     // keep it on screen when the phone turns
     addEventListener('resize', () => {
       if (!hero.classList.contains('is-placed') || !hero.classList.contains('is-mini')) return;
