@@ -2056,24 +2056,36 @@
   let picking = false;
   const pickButton = document.getElementById('favPick');
 
+  // the part of the screen the posters can really be seen in: below the
+  // sticky menus and, on computers, below the pinned banner and its fade
+  function clearTop() {
+    let top = 0;
+    const bar = document.querySelector('.fav-bar');
+    if (bar) top = Math.max(top, bar.getBoundingClientRect().bottom);
+    if (hero && getComputedStyle(hero).position === 'sticky') top = Math.max(top, hero.getBoundingClientRect().bottom + 40);
+    return top;
+  }
   function onScreen(el) {
     const r = el.getBoundingClientRect();
     const row = el.parentElement.getBoundingClientRect();
-    return r.bottom > 0 && r.top < window.innerHeight && r.width > 0 &&
+    return r.top >= clearTop() && r.bottom <= window.innerHeight && r.width > 0 &&
       r.right > row.left && r.left < row.right;
   }
 
   function land(card) {
     const r = card.getBoundingClientRect();
     const row = card.parentElement.getBoundingClientRect();
-    const visible = r.top >= 0 && r.bottom <= window.innerHeight &&
+    const top = clearTop();
+    const visible = r.top >= top && r.bottom <= window.innerHeight &&
       r.left >= row.left && r.right <= row.right;
-    if (!visible)
-      card.scrollIntoView({
-        behavior: reduceMotion.matches ? 'auto' : 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
+    // not fully in sight (under the banner, or off screen): scroll so it sits
+    // in the middle of the space left under the menus and the banner
+    if (!visible) {
+      const room = window.innerHeight - top;
+      const to = scrollY + r.top - top - Math.max(0, (room - r.height) / 2);
+      window.scrollTo({ top: Math.max(0, to), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      if (r.left < row.left || r.right > row.right) card.parentElement.scrollBy({ left: r.left - row.left - (row.width - r.width) / 2, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
     setTimeout(
       () => {
         card.classList.add('is-picked');
