@@ -907,6 +907,33 @@
   const genreSelect = document.getElementById('favGenre');
   let genre = 'any';
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // "Ned's 5 stars": a slim row of the must-watches (and must-reads) at the
+  // top, for whatever's being shown. Tapping one is like tapping its poster.
+  let topRow = null;
+  function buildTopRow(shown) {
+    if (topRow) topRow.remove();
+    const top = shown.filter((c) => c.rating >= 5).sort((a, b) => (b.fav.year || 0) - (a.fav.year || 0));
+    if (top.length < 3) { topRow = null; return; }
+    topRow = document.createElement('section');
+    topRow.className = 'fav-top';
+    topRow.innerHTML = `<div class="fav-shelf-head"><h2 class="fav-shelf-title">Ned's 5 stars</h2><span class="fav-shelf-count">${top.length}</span></div><div class="fav-top-row"></div>`;
+    const row = topRow.querySelector('.fav-top-row');
+    top.forEach((c) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'fav-top-item';
+      b.setAttribute('aria-label', `${c.fav.title}, 5 stars`);
+      b.innerHTML = `<img alt="" width="92" height="138" loading="lazy"><span>${escapeHTML(c.fav.title)}</span>`;
+      const img = b.querySelector('img');
+      coverFor(c.fav).then((url) => { if (url) { img.onload = () => b.classList.add('has-cover'); img.src = url; } }).catch(() => {});
+      b.addEventListener('click', () => {
+        b.classList.remove('is-tapped'); void b.offsetWidth; b.classList.add('is-tapped');
+        c.el.click();
+      });
+      row.append(b);
+    });
+    grid.prepend(topRow);
+  }
   function makeShelf(name, list) {
     const s = { name, cards: list.map((c) => c.el) };
     s.el = document.createElement('section');
@@ -974,6 +1001,7 @@
       : [];
     if (rest.length) SHELVES.push(makeShelf(big.length ? 'Everything else' : `All ${TYPE_PLURAL[filter]}`, rest.sort(best)));
     SHELVES.forEach((s) => { grid.appendChild(s.el); s.ends(); });
+    buildTopRow(shown);
     // each shelf rises in as it's scrolled to, its posters fanning in after
     if (!still && 'IntersectionObserver' in window) {
       SHELVES.forEach((s) => {
@@ -1962,6 +1990,10 @@
       () => {
         card.classList.add('is-picked');
         setTimeout(() => card.classList.remove('is-picked'), 1600);
+        // the reveal: every other poster dims for a moment, a spotlight on the pick
+        grid.classList.add('is-revealing');
+        clearTimeout(grid.revealEnd);
+        grid.revealEnd = setTimeout(() => grid.classList.remove('is-revealing'), 1300);
         picking = false;
         if (pickButton) pickButton.classList.remove('is-picking');
         // then it's the pick, like tapping it
@@ -1971,6 +2003,57 @@
       },
       visible || reduceMotion.matches ? 0 : 450,
     );
+  }
+
+  /*---------- search ----------*/
+  // the magnifier opens a field over the menus; type a few letters and the
+  // matching titles show under it. Picking one clears the filters if they
+  // hide it, then jumps to it like the shuffle does.
+  const findButton = document.getElementById('favFind');
+  if (findButton) {
+    const bar = findButton.closest('.fav-bar');
+    const box = document.createElement('div');
+    box.className = 'fav-search';
+    box.hidden = true;
+    box.innerHTML = `<input type="search" placeholder="Search movies, shows, books" aria-label="Search favorites" autocomplete="off" enterkeyhint="go"><button type="button" class="fav-search-x" aria-label="Close search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button><ul class="fav-search-list" role="listbox"></ul>`;
+    bar.append(box);
+    const input = box.querySelector('input');
+    const list = box.querySelector('.fav-search-list');
+    const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    const close = () => { box.hidden = true; bar.classList.remove('is-searching'); findButton.setAttribute('aria-expanded', 'false'); input.value = ''; list.replaceChildren(); };
+    const open = () => { box.hidden = false; bar.classList.add('is-searching'); findButton.setAttribute('aria-expanded', 'true'); input.focus(); };
+    const go = (item) => {
+      close();
+      if (!item.shelf) { // hidden by the filters: show everything again
+        filter = 'all'; genre = 'any';
+        if (typeSelect) typeSelect.value = 'all';
+        refilter();
+      }
+      requestAnimationFrame(() => land(item.el));
+    };
+    findButton.addEventListener('click', () => (box.hidden ? open() : close()));
+    box.querySelector('.fav-search-x').addEventListener('click', close);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'Enter') { const first = list.querySelector('button'); if (first) first.click(); }
+    });
+    input.addEventListener('input', () => {
+      const q = norm(input.value);
+      list.replaceChildren();
+      if (!q) return;
+      const hits = cards.filter((c) => norm(`${c.fav.title} ${c.fav.by || ''}`).includes(q))
+        .sort((a, b) => norm(a.fav.title).indexOf(q) - norm(b.fav.title).indexOf(q) || b.rating - a.rating)
+        .slice(0, 6);
+      if (!hits.length) { list.innerHTML = '<li class="fav-search-none">Not on the list (yet)</li>'; return; }
+      hits.forEach((c) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<button type="button"><b></b><span></span></button>`;
+        li.querySelector('b').textContent = c.fav.title;
+        li.querySelector('span').textContent = [TYPE_NAME[c.fav.type], c.fav.year, `${c.rating}\u2605`].filter(Boolean).join(' \u00b7 ');
+        li.querySelector('button').addEventListener('click', () => go(c));
+        list.append(li);
+      });
+    });
   }
 
   if (pickButton) {

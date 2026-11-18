@@ -15,7 +15,7 @@
     type="text/css" />
   <!-- CRT power-on on a first visit or a refresh; a quick channel change between pages (css: "CRT SCREEN") -->
   <script>try{var n=(performance.getEntriesByType("navigation")[0]||{}).type,r=document.referrer&&new URL(document.referrer).origin===location.origin;document.documentElement.classList.add(n==="reload"||!sessionStorage.getItem("nedcode-on")||!(r||n==="back_forward")?"crt-boot":"crt-chan");sessionStorage.setItem("nedcode-on","1")}catch(e){}</script>
-  <link rel="stylesheet" href="./css/style.css?v=40">
+  <link rel="stylesheet" href="./css/style.css?v=41">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
   <title>Ned’s Top Picks: Movies, Shows and Books | NEDCODE</title>
   <meta name="description" content="A personal, regularly updated list of the movies, shows and books Ned loves. Can’t decide what to watch? Let it pick for you.">
@@ -132,6 +132,9 @@
           <label class="fav-select"><span class="sr-only">Genre</span>
             <select id="favGenre"><option value="any">Any genre</option></select>
           </label>
+          <button type="button" class="fav-find" id="favFind" aria-label="Search favorites" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5L21 21" /></svg>
+          </button>
           <button type="button" class="fav-pick" id="favPick" aria-label="Pick for me">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h3c4 0 6 10 10 10h5" /><path d="M3 17h3c1.6 0 2.8-1.6 4-3.6" /><path d="M14 9.6c1.2-1.6 2.4-2.6 4-2.6h3" /><path d="M18 4l3 3l-3 3" /><path d="M18 14l3 3l-3 3" /></svg>
           </button>
