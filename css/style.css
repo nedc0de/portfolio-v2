@@ -9881,7 +9881,7 @@ html.fav-sheet-open { overflow: hidden; }
 .fav-sheet .fav-stars { margin: 0; font-size: 18px; }
 
 /*===== FAVORITES: summaries and the moving backdrop =====*/
-.fav-sheet-sum { margin: 1.1rem 0 0; font-size: .9rem; line-height: 1.55; color: #cfcfcf; }
+.fav-sheet-sum { margin: 2rem 0 0; /* clear of the poster and its orange slash */ font-size: .9rem; line-height: 1.55; color: #cfcfcf; }
 .fav-sheet-sum:empty:not(.is-loading) { display: none; }
 .fav-sheet-sum.is-loading {
   height: 3.6em;
