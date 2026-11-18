@@ -1398,11 +1398,24 @@
     hero.undock = () => {
       if (!docked) return;
       docked = false;
-      hero.querySelector('.fav-hero-tv').style.animation = '';
+      // closing: the picture glides back up into the mini player (or the
+      // banner), shrinking as it goes
+      const tv = hero.querySelector('.fav-hero-tv');
+      const vid = hero.querySelector('.fav-hero-video');
+      const first = tv.getBoundingClientRect();
+      tv.style.animation = 'none'; // no slide-in for the mini player: the picture flies into it
+      setTimeout(() => { tv.style.animation = ''; }, 500);
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
       if (panel) panel.style.maxHeight = '';
       paint();
+      const last = vid.getBoundingClientRect();
+      if (!reduceMotion.matches && last.width > 0 && last.bottom > 0 && last.top < innerHeight) {
+        vid.animate([
+          { transformOrigin: '0 0', transform: `translate(${first.left - last.left}px, ${first.top - last.top}px) scale(${first.width / last.width})`, zIndex: 5 },
+          { transformOrigin: '0 0', transform: 'none', zIndex: 5 },
+        ], { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' }).finished.then(queueHole, () => {});
+      }
     };
     addEventListener('resize', () => docked && dockTop());
     const paint = () => {
