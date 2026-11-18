@@ -10818,6 +10818,13 @@ h1.section-title .about-title-color::before {
     border-bottom: 1px solid rgba(255, 122, 26, .35);
   }
   .fav-hero-screen { background: #111; } /* until the pick's still loads */
+  /* the title and stars always stay beside the poster: a long title
+     (Spider-Man: Brand New Day) used to drop under the poster, over the
+     orange slash, where it was hard to read */
+  .fav-hero-info { flex: 1 1 0; min-width: 0; }
+  .fav-hero-title { overflow-wrap: anywhere; }
+  .fav-hero-rate { flex-wrap: wrap; row-gap: .15rem; }
+  .fav-hero .fav-stars { flex: none; white-space: nowrap; } /* the five stars never split */
   .fav-hero.no-trailer .fav-hero-screen { display: none; } /* books: no video frame */
   .fav-hero-tv { display: block; position: absolute; inset: 0; }
   .fav-hero-video {
