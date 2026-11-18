@@ -12018,3 +12018,16 @@ main { counter-reset: hm-ch; }
 @media (hover: hover) {
   .fav-hero:hover .fav-hero-go { text-decoration-color: var(--fifteenth-color); color: #fff; }
 }
+
+/* the shuffle button matches the search button next to it: just the icon,
+   no box on hover, press or while it picks (it lights up instead) */
+.fav-bar .fav-pick,
+.fav-bar .fav-pick:hover,
+.fav-bar .fav-pick:focus-visible,
+.fav-bar .fav-pick.is-shuffling {
+  border-color: transparent;
+  background: none;
+}
+.fav-bar .fav-pick:hover, .fav-bar .fav-find:hover { color: #ffb37a; }
+.fav-bar .fav-pick:focus-visible, .fav-bar .fav-find:focus-visible { outline: 1px solid var(--fifteenth-color); outline-offset: 2px; }
+.fav-bar .fav-pick.is-shuffling { color: #ffb37a; }
