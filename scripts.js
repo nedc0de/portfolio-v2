@@ -866,14 +866,57 @@ const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
     chips.append(b);
   });
   chips.hidden = false;
+  // the topic chip and the search both narrow the list
+  let topic = 'All', query = '';
+  const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  posts.forEach((a) => { a.dataset.find = norm(a.textContent); });
+  const none = document.querySelector('.bl-none');
+  const sections = [...document.querySelectorAll('.bl-block')];
+  const apply = () => {
+    const words = norm(query).split(' ').filter(Boolean);
+    let shown = 0;
+    posts.forEach((a) => {
+      const ok = (topic === 'All' || a.dataset.topic === topic) && words.every((w) => a.dataset.find.includes(w));
+      a.hidden = !ok;
+      if (ok) shown++;
+    });
+    soon.forEach((r) => { r.hidden = topic !== 'All' || !!words.length; });
+    // a section with nothing left in it hides its heading too
+    sections.forEach((sec) => { sec.hidden = !sec.querySelector('a.bl-row:not([hidden]), .bl-row.is-soon:not([hidden])'); });
+    if (none) none.hidden = shown > 0;
+  };
   chips.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
-    const t = b.dataset.topic;
+    topic = b.dataset.topic;
     chips.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    posts.forEach((a) => { a.hidden = t !== 'All' && a.dataset.topic !== t; });
-    soon.forEach((r) => { r.hidden = t !== 'All'; });
+    apply();
   });
+
+  // search: the magnifier opens a field over the chips; the list narrows as
+  // you type (title, summary, topic). Keyboard: "/" or Ctrl/Cmd+K opens it,
+  // Enter opens the first match, Escape closes and shows everything again.
+  const find = document.querySelector('.bl-find');
+  const box = document.querySelector('.bl-search');
+  if (find && box) {
+    const tools = find.closest('.bl-tools');
+    const input = box.querySelector('input');
+    const open = () => { box.hidden = false; tools.classList.add('is-searching'); find.setAttribute('aria-expanded', 'true'); input.focus(); };
+    const close = () => { box.hidden = true; tools.classList.remove('is-searching'); find.setAttribute('aria-expanded', 'false'); input.value = ''; query = ''; apply(); };
+    find.addEventListener('click', () => (box.hidden ? open() : close()));
+    box.querySelector('.bl-search-x').addEventListener('click', () => { close(); find.focus(); });
+    input.addEventListener('input', () => { query = input.value; apply(); });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); close(); find.focus(); }
+      if (e.key === 'Enter') { e.preventDefault(); const first = posts.find((a) => !a.hidden); if (first) first.click(); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); const first = posts.find((a) => !a.hidden); if (first) first.focus(); }
+    });
+    addEventListener('keydown', (e) => {
+      const el = document.activeElement;
+      const typing = el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+      if (((e.key === '/' && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) && box.hidden) { e.preventDefault(); open(); }
+    });
+  }
 })();
 
 /*===== BLOG: READ MARKS =====*/
