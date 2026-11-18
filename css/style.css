@@ -46,10 +46,10 @@
   --tenth-color: #ffb03a;
   --eleventh-color: #000000;
   --twelfth-color: #007bff;
-  --thirteenth-color: #151515; /* page background (was #1d1d1d) */
+  --thirteenth-color: #161310; /* page background: a warm black, like a switched-off tube (was var(--thirteenth-color)) */
   --fourteenth-color: #b3b3b3;
   --fifteenth-color: #ff7a1a;
-  --sixteenth-color: #1c1c1c; /* card gray: one step above the page (#151515) */
+  --sixteenth-color: #1c1c1c; /* card gray: one step above the page (var(--thirteenth-color)) */
 }
 
 @media screen and (min-width: 968px) {
@@ -85,7 +85,7 @@
    over it by scripts.js (.bg-math). */
 html {
   --edge-fade: min(22vw, 360px);
-  --crt-edge-color: #0b0b0b; /* #151515 under the screen's darkest edge */
+  --crt-edge-color: #0c0a08; /* the page colour under the screen's darkest edge */
   scroll-behavior: smooth;
   background:
     /* soft fade around the edges: the grid shows in the middle and melts
@@ -2778,7 +2778,7 @@ details>summary {
 }
 
 .flap {
-  background: #1c1c1c /* = 3% white over the page (#151515), solid so the grid stays out */;
+  background: #1c1c1c /* = 3% white over the page (var(--thirteenth-color)), solid so the grid stays out */;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.6rem, 2.5vw, 1.25rem) 0.75rem;
@@ -4742,7 +4742,7 @@ a.tk-item:hover,
   align-items: center;
   overflow: hidden;
   /* small fixed dots, the same size on phone and desktop */
-  background: #151515 radial-gradient(circle, rgba(255, 255, 255, .05) .4px, transparent .7px) 0 0 / 6px 6px;
+  background: var(--thirteenth-color) radial-gradient(circle, rgba(255, 255, 255, .05) .4px, transparent .7px) 0 0 / 6px 6px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
 }
 
@@ -5249,7 +5249,7 @@ a.tk-item:hover,
 }
 
 .vs {
-  background: #1c1c1c /* = 3% white over the page (#151515), solid so the grid stays out */;
+  background: #1c1c1c /* = 3% white over the page (var(--thirteenth-color)), solid so the grid stays out */;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 1rem;
@@ -6058,7 +6058,7 @@ a.tk-item:hover,
   width: 2.8rem;
   height: 2.8rem;
   border-radius: 50%;
-  background: #151515;
+  background: var(--thirteenth-color);
   border: 2px solid var(--fifteenth-color);
   font-size: .9rem;
   font-weight: 800;
@@ -6800,8 +6800,8 @@ html.is-frozen .egg-crash * {
   height: 22px;
   margin-left: -5px;
   border-radius: 50%;
-  background: #151515;
-  box-shadow: 0 0 0 2px #151515;
+  background: var(--thirteenth-color);
+  box-shadow: 0 0 0 2px var(--thirteenth-color);
 }
 
 /* the drawn eyes are wider than an emoji: tuck them in so the next one doesn't cover them */
@@ -7490,7 +7490,7 @@ html.is-frozen .egg-crash * {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(90deg, rgba(21, 21, 21, .92), rgba(21, 21, 21, .76) 55%, rgba(21, 21, 21, .66));
+  background: linear-gradient(90deg, rgba(22, 19, 16, .92), rgba(22, 19, 16, .76) 55%, rgba(22, 19, 16, .66));
 }
 
 @keyframes xb-drift {
@@ -8516,7 +8516,7 @@ html.is-frozen .egg-crash * {
   font: 800 .56rem ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: #151515;
+  color: var(--thirteenth-color);
 }
 
 /* back: the movie's details fill the card over its own poster, blurred
@@ -9234,7 +9234,7 @@ html.is-frozen .egg-crash * {
   overflow: visible;
 }
 
-.pb-node rect { fill: #151515; stroke: #3a3a3a; stroke-width: 1.2; }
+.pb-node rect { fill: var(--thirteenth-color); stroke: #3a3a3a; stroke-width: 1.2; }
 .pb-node text {
   font: 600 12px var(--body-font);
   fill: #eee;
@@ -9268,10 +9268,10 @@ html.is-frozen .egg-crash * {
 }
 
 /* Huffman tree: letter tiles, count circles, 0/1 badges, code chips */
-.hf-leaf rect { fill: #151515; stroke: #3a3a3a; stroke-width: 1.2; }
+.hf-leaf rect { fill: var(--thirteenth-color); stroke: #3a3a3a; stroke-width: 1.2; }
 .hf-leaf text { font: 700 18px var(--body-font); fill: #eee; text-anchor: middle; }
 .hf-leaf .hf-n { font-size: 11px; font-weight: 500; fill: #8a8a8a; }
-.hf-sum circle { fill: #151515; stroke: #ff7a1a; stroke-width: 2; }
+.hf-sum circle { fill: var(--thirteenth-color); stroke: #ff7a1a; stroke-width: 2; }
 .hf-sum text { font: 700 14px var(--body-font); fill: #eee; text-anchor: middle; }
 .hf-bit circle { fill: #ff7a1a; }
 .hf-bit text,
@@ -9280,7 +9280,7 @@ html.is-frozen .egg-crash * {
 .hf-code text { fill: #ff7a1a; }
 .hf-path { stroke: #fff; stroke-width: 3.5; }
 .hf-sum .hf-start { font: 700 10px var(--body-font); letter-spacing: .12em; fill: #ff7a1a; text-anchor: end; }
-.hf-tile { fill: #151515; stroke: #3a3a3a; stroke-width: 1.2; }
+.hf-tile { fill: var(--thirteenth-color); stroke: #3a3a3a; stroke-width: 1.2; }
 .hf-tl { font: 700 15px var(--body-font); fill: #eee; text-anchor: middle; }
 .hf-tc { font: 700 13px ui-monospace, "SF Mono", Menlo, Consolas, monospace; fill: #ff7a1a; text-anchor: middle; }
 .hf-total { font: 600 12px var(--body-font); fill: #8a8a8a; text-anchor: middle; }
@@ -9658,7 +9658,7 @@ html.is-frozen .egg-crash * {
   padding: 0 2.1rem 0 .95rem;
   border: 1px solid #2c2c2c;
   border-radius: 999px;
-  background: #151515;
+  background: var(--thirteenth-color);
   font: 600 .82rem var(--body-font);
   color: #e6e6e6;
   cursor: pointer;
@@ -9763,7 +9763,7 @@ html.is-frozen .egg-crash * {
   margin-left: -1rem;
   margin-right: -1rem;
   padding: .6rem 1rem;
-  background: rgba(21, 21, 21, .86);
+  background: rgba(22, 19, 16, .86);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -11307,8 +11307,8 @@ body::after {
   z-index: 9998;
   pointer-events: none;
   background:
-    linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
-    linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+    linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .5) calc(20vw + 12px), rgb(12 10 8 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .15) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
+    linear-gradient(var(--crt-edge-color) 200px, rgb(12 10 8 / .5) 212px, rgb(12 10 8 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(12 10 8 / .15) calc(100% - 310px), rgb(12 10 8 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
     radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
 }
 /* tablets and computers: the sides darken over a longer stretch, so where
@@ -11317,8 +11317,8 @@ body::after {
 @media (min-width: 768px) {
   body::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .8) calc(20vw + 30px), rgb(12 10 8 / .5) calc(20vw + 90px), rgb(12 10 8 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .2) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 90px), rgb(12 10 8 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) 200px, rgb(12 10 8 / .5) 212px, rgb(12 10 8 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(12 10 8 / .15) calc(100% - 310px), rgb(12 10 8 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
   html::after {
@@ -11340,16 +11340,16 @@ body::after {
 @media (pointer: coarse) {
   body::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .5) calc(20vw + 12px), rgb(12 10 8 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .15) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(12 10 8 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(12 10 8 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(12 10 8 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(12 10 8 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(12 10 8 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(12 10 8 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(12 10 8 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(12 10 8 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(12 10 8 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
 @media (pointer: coarse) and (min-width: 768px) {
   body::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(11 11 11 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(11 11 11 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(11 11 11 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .8) calc(20vw + 30px), rgb(12 10 8 / .5) calc(20vw + 90px), rgb(12 10 8 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .2) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 90px), rgb(12 10 8 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(12 10 8 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(12 10 8 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(12 10 8 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(12 10 8 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(12 10 8 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(12 10 8 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 230px), rgb(12 10 8 / .25) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 160px), rgb(12 10 8 / .55) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 100px), rgb(12 10 8 / .85) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 40px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
@@ -11358,16 +11358,16 @@ body::after {
 @media (pointer: coarse) {
   html.fav-sheet-open body::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(11 11 11 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .5) calc(20vw + 12px), rgb(12 10 8 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .15) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(12 10 8 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(12 10 8 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(12 10 8 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(12 10 8 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(12 10 8 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(12 10 8 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(12 10 8 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
 @media (pointer: coarse) and (min-width: 768px) {
   html.fav-sheet-open body::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(11 11 11 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .8) calc(20vw + 30px), rgb(12 10 8 / .5) calc(20vw + 90px), rgb(12 10 8 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .2) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 90px), rgb(12 10 8 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(12 10 8 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(12 10 8 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(12 10 8 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(12 10 8 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(12 10 8 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(12 10 8 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(12 10 8 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
@@ -11608,8 +11608,8 @@ html.crt-boot .nav-logo-group {
   body::after { content: none; }
   html::after {
     background:
-      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
-      linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .8) calc(20vw + 30px), rgb(12 10 8 / .5) calc(20vw + 90px), rgb(12 10 8 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(12 10 8 / .2) calc(100% - 34vw), rgb(12 10 8 / .5) calc(100% - 20vw - 90px), rgb(12 10 8 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) 200px, rgb(12 10 8 / .5) 212px, rgb(12 10 8 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(12 10 8 / .15) calc(100% - 310px), rgb(12 10 8 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%),
       repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
     -webkit-mask: none;
@@ -11833,7 +11833,7 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
   margin: 0;
   padding: 0;
   list-style: none;
-  background: #151515;
+  background: var(--thirteenth-color);
   border: 1px solid #2c2c2c;
   box-shadow: 0 18px 40px -12px #000;
 }
@@ -11907,4 +11907,75 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
 #favGrid.is-revealing .fav-card.is-picked { position: relative; z-index: 2; box-shadow: 0 0 0 2px var(--fifteenth-color), 0 0 30px rgba(255, 122, 26, .45); }
 @media (prefers-reduced-motion: reduce) {
   .fav-search, .fav-top-item.is-tapped { animation: none; }
+}
+
+/*===== THEME: warmer screen =====*/
+/* A warm black page (variables above), a soft amber for the small screen
+   text, a phosphor glow when things are pointed at or tapped, a fine grain
+   in the background, glowing titles and channel numbers on the home page. */
+:root { --amber: #ffbe4d; }
+
+/* 2. amber: the small "on screen" text only; orange stays for titles and links */
+.fav-hero-onair, .tv-osd, .fav-sheet-verdict, .fav-top-item::after { color: var(--amber); }
+.fav-top-item::after { color: #111; background: var(--amber); }
+.fav-hero-onair, .tv-osd { text-shadow: 0 0 6px rgba(255, 190, 77, .55); }
+
+/* 3. phosphor glow: links light up a little when pointed at, posters and
+   cards when pointed at or tapped */
+@media (hover: hover) {
+  .nav-link:hover, .hm-all:hover, .bl-read:hover, .nf-go:hover, .footer-top:hover,
+  .ps-body a:hover, .fav-hero-go:hover, .ab-cta-go > a:hover {
+    text-shadow: 0 0 10px rgba(255, 122, 26, .55);
+  }
+  .fav-card:hover, .fav-top-item:hover, .hc-row:hover .hc-shot, .bl-row:hover img, .xb-card:hover {
+    box-shadow: 0 0 0 1px rgba(255, 122, 26, .45), 0 0 22px rgba(255, 122, 26, .28);
+  }
+}
+.fav-card:active, .fav-top-item:active, .xb-card:active {
+  box-shadow: 0 0 0 1px rgba(255, 122, 26, .55), 0 0 22px rgba(255, 122, 26, .35);
+}
+.fav-card, .fav-top-item, .xb-card { transition: box-shadow .25s, transform .15s, filter .5s; }
+
+/* 4. grain: a very fine, still noise in the page background (part of the
+   page itself, so it costs nothing while scrolling) */
+html::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .92  0 0 0 0 .8  0 0 0 .9 -.35'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 140px 140px;
+  opacity: .05;
+}
+html { position: relative; }
+
+/* 5. titles: tighter, and the orange word glows faintly, like the logo */
+.section-title { letter-spacing: -.02em; }
+.about-title-color, .fav-shelf-title { text-shadow: 0 0 18px rgba(255, 122, 26, .28); }
+
+/* 6. home page: each section is a channel: a thin signal line above it and
+   its number before its name */
+main { counter-reset: hm-ch; }
+.hm-block:not([hidden]) { counter-increment: hm-ch; }
+.hm-block:not([hidden]) .hm-label::before {
+  content: "CH " counter(hm-ch, decimal-leading-zero);
+  margin-right: .8em;
+  font: 600 .7rem/1 ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .1em;
+  color: var(--amber);
+  text-shadow: 0 0 6px rgba(255, 190, 77, .45);
+}
+.hm-block:not([hidden]) ~ .hm-block:not([hidden]) {
+  position: relative;
+}
+.hm-block:not([hidden]) ~ .hm-block:not([hidden])::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1.6rem;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 122, 26, .55), rgba(255, 122, 26, .15) 40%, transparent 80%);
+  box-shadow: 0 0 8px rgba(255, 122, 26, .35);
+  pointer-events: none;
 }
