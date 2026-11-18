@@ -1249,23 +1249,33 @@
     let y0 = null, x0 = 0, dragY = 0, vertical = null, lastY = 0, lastT = 0, speed = 0;
     const tvOf = () => hero && hero.classList.contains('is-docked') ? hero.querySelector('.fav-hero-tv') : null;
     const shade = () => sheet.querySelector('.fav-sheet-shade');
-    // move the panel (and the trailer docked above it) with the finger; the
-    // further you pull, the more it resists, so it feels soft, not loose
+    // like YouTube: as you pull down, the trailer shrinks toward the spot it
+    // goes back to (the mini player in the corner, or the banner), the
+    // details slide down and fade, and the page shows through; let go and it
+    // finishes the move (or springs back if you didn't pull far)
+    let base = null, target = null;
     const follow = (dy, ease) => {
       const t = ease || 'none';
-      panel.style.transition = t === 'none' ? 'none' : `transform ${t}`;
-      panel.style.transform = dy ? `translateY(${dy}px)` : '';
+      const p = Math.min(1, dy / (innerHeight * .5));
+      panel.style.transition = t === 'none' ? 'none' : `transform ${t}, opacity ${t}`;
+      panel.style.transform = dy ? `translateY(${dy * 1.15}px)` : '';
+      panel.style.opacity = dy ? String(Math.max(0, 1 - p * 1.1)) : '';
       const tv = tvOf();
-      if (tv) { tv.style.transition = panel.style.transition; tv.style.transform = dy ? `translateY(${dy}px)` : ''; }
+      if (tv && base && target) {
+        const k = 1 + (target.w / base.width - 1) * p;
+        tv.style.transformOrigin = '0 0';
+        tv.style.transition = t === 'none' ? 'none' : `transform ${t}`;
+        tv.style.transform = dy ? `translate(${(target.x - base.left) * p}px, ${(target.y - base.top) * p}px) scale(${k})` : '';
+      }
       const sh = shade();
       sh.style.transition = t === 'none' ? 'none' : `opacity ${t}`;
-      sh.style.opacity = dy ? String(Math.max(0, 1 - dy / 500)) : '';
+      sh.style.opacity = dy ? String(Math.max(0, 1 - p)) : '';
     };
     const clearFollow = () => {
-      panel.style.transition = panel.style.transform = '';
+      panel.style.transition = panel.style.transform = panel.style.opacity = '';
       const sh = shade(); sh.style.transition = sh.style.opacity = '';
       const tv = hero && hero.querySelector('.fav-hero-tv');
-      if (tv) tv.style.transition = tv.style.transform = '';
+      if (tv) tv.style.transition = tv.style.transform = tv.style.transformOrigin = '';
     };
     // listening only on the details (and the trailer docked over them), not
     // the whole page: a page-wide touch listener that can block scrolling
@@ -1278,6 +1288,9 @@
       y0 = lastY = e.touches[0].clientY; x0 = e.touches[0].clientX; dragY = 0; vertical = null;
       lastT = performance.now(); speed = 0;
       panel.style.willChange = 'transform';
+      const tv = tvOf();
+      base = tv ? tv.getBoundingClientRect() : null;
+      target = tv && hero.closeTarget ? hero.closeTarget() : null;
     };
     const onMove = (e) => {
       if (y0 === null) return;
@@ -1289,7 +1302,7 @@
       speed = .7 * speed + .3 * ((y - lastY) / Math.max(1, now - lastT)); // px per ms, smoothed
       lastY = y; lastT = now;
       const pull = Math.max(0, dy);
-      dragY = pull < 160 ? pull : 160 + (pull - 160) * .55; // soft resistance after a short pull
+      dragY = pull;
       if (pull && e.cancelable) e.preventDefault();
       // one style update per screen frame, however fast the touch events come
       if (!moveFrame) moveFrame = requestAnimationFrame(() => { moveFrame = 0; if (y0 !== null) follow(dragY); });
@@ -1301,17 +1314,20 @@
       panel.style.willChange = '';
       if (!vertical) return;
       // a long enough pull, or a quick flick down, closes it
-      if (dragY > 140 || (speed > .55 && dragY > 50)) {
-        // the panel keeps going at about the speed you flicked it
-        const ms = Math.round(Math.min(420, Math.max(240, 380 - speed * 120)));
-        follow(panel.offsetHeight + 40, `${ms}ms cubic-bezier(.2, .7, .3, 1)`);
-        const tv = tvOf();
-        if (tv) { tv.style.transform = `translateY(${dragY}px)`; } // the trailer floats back from here
-        setTimeout(() => { closeSheet(); clearFollow(); }, ms - 40);
+      if (dragY > 120 || (speed > .5 && dragY > 40)) {
+        // finish the move at about the speed you flicked it: the trailer lands
+        // in its spot, then the page takes over from there with no jump
+        const ms = Math.round(Math.min(380, Math.max(220, 360 - speed * 120)));
+        follow(innerHeight * .5, `${ms}ms cubic-bezier(.2, .8, .3, 1)`);
+        setTimeout(() => {
+          if (hero) hero.skipGlide = true;
+          closeSheet();
+          clearFollow();
+        }, ms);
       } else {
         // not far enough: it settles back with a gentle spring
-        follow(0, '.45s cubic-bezier(.3, 1.35, .5, 1)');
-        setTimeout(clearFollow, 470);
+        follow(0, '.42s cubic-bezier(.3, 1.3, .5, 1)');
+        setTimeout(clearFollow, 440);
       }
     };
     const tvTarget = hero && hero.querySelector('.fav-hero-tv');
@@ -1567,6 +1583,7 @@
       const panel = document.querySelector('.fav-sheet-panel');
       if (panel) panel.style.maxHeight = panel.style.top = '';
       paint();
+      if (hero.skipGlide) { hero.skipGlide = false; queueHole(); return; } // a swipe already brought it here
       const last = vid.getBoundingClientRect();
       if (!reduceMotion.matches && last.width > 0 && last.bottom > 0 && last.top < innerHeight) {
         vid.animate([
@@ -1574,6 +1591,21 @@
           { transformOrigin: '0 0', transform: 'none', zIndex: 5 },
         ], { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' }).finished.then(queueHole, () => {});
       }
+    };
+    // where a closing trailer goes back to: the mini player (its saved spot,
+    // or the bottom right corner) once the banner is scrolled away, else the
+    // banner's frame
+    hero.closeTarget = () => {
+      if (past && !wide.matches) {
+        const w = Math.min(innerWidth * .52, 220), h = w * 9 / 16 + 2;
+        if (hero.classList.contains('is-placed')) {
+          return { x: parseFloat(hero.style.getPropertyValue('--mini-x')) || 0, y: parseFloat(hero.style.getPropertyValue('--mini-y')) || 0, w: w, h };
+        }
+        const sab = parseFloat(getComputedStyle(hero).getPropertyValue('--sab')) || 0;
+        return { x: innerWidth - 12 - w, y: innerHeight - sab - 76 - h, w, h };
+      }
+      const r = screen.getBoundingClientRect();
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
     };
     addEventListener('resize', () => docked && dockTop());
     // drag the mini player anywhere on the screen; it stays where you drop
