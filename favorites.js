@@ -1170,6 +1170,23 @@
   // the x, a tap outside, Esc or the phone's back swipe of the panel.
   let sheet = null;
   let lastFocus = null;
+  // the orange slash sits behind the poster and ends just past its edge, so
+  // the title, year and rating beside it always stay on the dark background
+  // (at some widths it reached under the year, grey on orange)
+  function fitSlash(slash, poster) {
+    if (!slash || !poster || !('ResizeObserver' in window)) return;
+    const fit = () => {
+      const pr = poster.getBoundingClientRect();
+      if (!pr.width) return;
+      slash.style.width = '';
+      const sr = slash.getBoundingClientRect(); // includes the skew
+      const want = slash.offsetWidth - (sr.right - (pr.right + 12)); // a thin angled sliver past the poster
+      if (want < slash.offsetWidth) slash.style.width = `${Math.max(0, Math.round(want))}px`;
+    };
+    const ro = new ResizeObserver(() => requestAnimationFrame(fit));
+    ro.observe(poster);
+    ro.observe(slash.parentElement);
+  }
   function buildSheet() {
     sheet = document.createElement('div');
     sheet.className = 'fav-sheet';
@@ -1193,6 +1210,7 @@
         <p class="fav-sheet-sum"></p>
       </div>`;
     document.body.appendChild(sheet);
+    fitSlash(sheet.querySelector('.fav-sheet-slash'), sheet.querySelector('.fav-sheet-poster'));
     sheet.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeSheet(); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
     // swipe the panel down to close it (phones)
@@ -1443,6 +1461,7 @@
         <button type="button" class="fav-hero-go">See details</button>
       </div>`;
     bar.after(hero);
+    fitSlash(hero.querySelector('.fav-hero-slash'), hero.querySelector('.fav-hero-poster'));
     // the banner pins just under the sticky menus (desktop): keep that gap exact
     const barH = () => hero.style.setProperty('--fav-bar-h', `${bar.offsetHeight}px`);
     barH(); addEventListener('resize', barH);
