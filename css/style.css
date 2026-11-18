@@ -11698,3 +11698,24 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .fav-bar .fav-pick.is-shuffling svg { animation: none; }
 }
+
+/*===== FAVORITES: the two menus react like the shuffle button =====*/
+/* hover: the orange selection box; click: a press; open (its list showing):
+   it stays lit, the arrow turned up */
+.fav-select select {
+  transition: border-color .15s, background-color .15s, color .15s, transform .12s;
+}
+.fav-select::after { transition: border-color .15s, transform .2s; }
+.fav-select:hover select,
+.fav-select select:focus-visible,
+.fav-select select[aria-expanded="true"] {
+  border-color: var(--fifteenth-color);
+  background-color: rgba(255, 122, 26, .1);
+  color: #ffb37a;
+  outline: none;
+}
+.fav-select:hover::after,
+.fav-select:has(select:focus-visible)::after,
+.fav-select:has(select[aria-expanded="true"])::after { border-color: var(--fifteenth-color); }
+.fav-select:has(select[aria-expanded="true"])::after { transform: translateY(.18rem) rotate(-135deg); }
+.fav-select select:active { transform: scale(.96); }
