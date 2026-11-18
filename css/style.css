@@ -10834,9 +10834,9 @@ h1.section-title .about-title-color::before {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 100%;
+    width: 640px; /* fixed: scaled to the frame by favorites.js (--yt-scale) */
     aspect-ratio: 16 / 9;
-    transform: translate(-50%, -50%) scale(1.36);
+    transform: translate(-50%, -50%) scale(var(--yt-scale, .7));
     border: 0;
     opacity: 0;
     transition: opacity .6s;

@@ -1317,7 +1317,12 @@
   let holeFrame = 0;
   function placeHole() {
     holeFrame = 0;
-    const slot = hero && hero.classList.contains('has-video') && !miniClosed && hero.querySelector('.fav-hero-video');
+    // phones: the player is always drawn 640 px wide and scaled to fit the
+    // frame or the mini player, so YouTube never re-lays it out (that brings
+    // its title and buttons back) and its overlays stay small
+    const box = hero && hero.querySelector('.fav-hero-video');
+    if (box && box.offsetWidth) box.style.setProperty('--yt-scale', (box.offsetWidth / 640 * 1.36).toFixed(4));
+    const slot = hero && hero.classList.contains('has-video') && !miniClosed && box;
     const r = slot && slot.getBoundingClientRect();
     if (!r || !r.width || r.bottom < 0 || r.top > innerHeight) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
     [r.left, r.top, r.width, r.height].forEach((n, i) => root.style.setProperty(holeVars[i], `${Math.round(n)}px`));
@@ -1364,7 +1369,7 @@
     let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
     const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
     if (typeof state !== 'number') return;
-    if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
+    if (state === 0) { ytCommand('seekTo', [TRAILER_START, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
       // YouTube puts its own title, channel logo, pause button and "Watch on
       // YouTube" over the first ~3 s of play, and they can't be turned off:
@@ -1391,6 +1396,8 @@
   const applySound = () => {
     if (soundOn) { ytCommand('unMute'); ytCommand('setVolume', [70]); } else ytCommand('mute');
   };
+  // trailers start a little way in, past the studio logos and titles
+  const TRAILER_START = 20;
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
@@ -1398,7 +1405,7 @@
     trailerFor(f).then((v) => {
       if (!v || id !== paintId) return;
       const fr = document.createElement('iframe');
-      fr.src = `https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+      fr.src = `https://www.youtube-nocookie.com/embed/${v}?start=${TRAILER_START}&autoplay=1&mute=1&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
       fr.title = `${f.title} trailer`;
       fr.allow = 'autoplay; encrypted-media';
       fr.tabIndex = -1;
