@@ -11089,10 +11089,12 @@ body::after {
   html::after {
     -webkit-mask-image:
       linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 140px), #000 calc(100% - 20vw - 140px), transparent calc(100% - 20vw)),
-      linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+      linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px)),
+      var(--hole-layer);
     mask-image:
       linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 140px), #000 calc(100% - 20vw - 140px), transparent calc(100% - 20vw)),
-      linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px));
+      linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px)),
+      var(--hole-layer);
   }
 }
 /* phones and tablets: the page fades softly into the dark at the top (an
@@ -11143,14 +11145,45 @@ html::after {
   z-index: 9999;
   pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
+  /* last layer: a hole where a trailer is playing (favorites.js sets
+     --hole-*), that thins out the scanlines so the video shows clearer */
   -webkit-mask-image:
     linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
-    linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px));
-  -webkit-mask-composite: source-in;
+    linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px)),
+    var(--hole-layer);
+  -webkit-mask-composite: source-in, source-out, source-over;
   mask-image:
     linear-gradient(90deg, transparent 20vw, #000 calc(20vw + 48px), #000 calc(100% - 20vw - 48px), transparent calc(100% - 20vw)),
-    linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px));
-  mask-composite: intersect;
+    linear-gradient(transparent 200px, rgb(0 0 0 / .35) 236px, #000 300px, #000 calc(100% - 248px), transparent calc(100% - 200px)),
+    var(--hole-layer);
+  mask-composite: intersect, subtract, add;
+  -webkit-mask-position: 0 0, 0 0, var(--hole-pos);
+  mask-position: 0 0, 0 0, var(--hole-pos);
+  -webkit-mask-size: auto, auto, var(--hole-size);
+  mask-size: auto, auto, var(--hole-size);
+  -webkit-mask-repeat: repeat, repeat, no-repeat;
+  mask-repeat: repeat, repeat, no-repeat;
+}
+/* the trailer hole (none until a trailer plays), in the screen layers' own
+   coordinates: they start 20vw left of and 200px above the screen */
+:root {
+  --hole-pos: calc(var(--hole-x, 0px) + 20vw) calc(var(--hole-y, 0px) + 200px);
+  --hole-size: var(--hole-w, 0px) var(--hole-h, 0px);
+  /* how much of the effect the hole takes away: .75 leaves a quarter of the
+     scanlines and edge fade on the trailer, a light touch of the TV look */
+  --hole-layer: linear-gradient(rgb(0 0 0 / .75), rgb(0 0 0 / .75));
+}
+body::after {
+  -webkit-mask-image: linear-gradient(#000 0 0), var(--hole-layer);
+  mask-image: linear-gradient(#000 0 0), var(--hole-layer);
+  -webkit-mask-position: 0 0, var(--hole-pos);
+  mask-position: 0 0, var(--hole-pos);
+  -webkit-mask-size: auto, var(--hole-size);
+  mask-size: auto, var(--hole-size);
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-out, source-over;
+  mask-composite: subtract, add;
 }
 
 /* channel change: moving between pages of the site, the new page comes in
