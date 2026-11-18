@@ -1498,6 +1498,10 @@
     key.split(',').forEach((n, i) => root.style.setProperty(holeVars[i], `${n}px`));
   }
   const queueHole = () => { if (!holeFrame) holeFrame = requestAnimationFrame(placeHole); };
+  // safety net: if the trailer ever ends up somewhere without the effect
+  // being told (an animation the phone cut short), it catches up within a
+  // second. Cheap: nothing changes on the page unless the trailer moved.
+  setInterval(() => { if (hero && hero.classList.contains('has-video') && !document.hidden) placeHole(); }, 800);
   addEventListener('scroll', queueHole, { passive: true });
   addEventListener('resize', queueHole);
   function setupMini() {
@@ -1668,6 +1672,7 @@
         if (sx === null) return;
         tvEl.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
         tvEl.style.opacity = String(Math.max(.35, 1 - outBy(startRect.left + dx, startRect.top + dy) * 1.1));
+        placeHole(); // the lighter screen effect over the trailer moves with it
       });
     }, { passive: false });
     const finish = () => {
@@ -1712,7 +1717,10 @@
         { transform: `translate3d(${x - nx}px, ${y - ny}px, 0)` },
         { transform: 'translate3d(0, 0, 0)' },
       ], { duration: Math.round(Math.max(260, Math.min(460, 420 - speed * 90))), easing: 'cubic-bezier(.18, .9, .3, 1.04)' });
-      settle.finished.then(() => { settle = null; queueHole(); }, () => {});
+      // the lighter screen effect over the trailer follows it as it glides
+      const track = () => { placeHole(); if (settle) requestAnimationFrame(track); };
+      requestAnimationFrame(track);
+      settle.finished.then(() => { settle = null; placeHole(); }, () => {});
       try { localStorage.setItem(POS_KEY, JSON.stringify({ fx: nx / innerWidth, fy: ny / innerHeight })); } catch (e) {}
     };
     tvEl.addEventListener('touchend', finish);
