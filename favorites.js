@@ -2133,26 +2133,58 @@
     };
     findButton.addEventListener('click', () => (box.hidden ? open() : close()));
     box.querySelector('.fav-search-x').addEventListener('click', close);
+    // keyboard: up and down move through the results, Enter opens the
+    // highlighted one (or the first), Escape closes. "/" or Ctrl/Cmd+K opens
+    // the search from anywhere on the page.
+    let active = -1;
+    const hl = (i) => {
+      const items = [...list.querySelectorAll('button')];
+      if (!items.length) { active = -1; return; }
+      active = (i + items.length) % items.length;
+      items.forEach((b, k) => b.setAttribute('aria-selected', String(k === active)));
+      items[active].scrollIntoView({ block: 'nearest' });
+      input.setAttribute('aria-activedescendant', items[active].id);
+    };
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-controls', 'favSearchList');
+    input.setAttribute('aria-expanded', 'false');
+    list.id = 'favSearchList';
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') close();
-      if (e.key === 'Enter') { const first = list.querySelector('button'); if (first) first.click(); }
+      if (e.key === 'Escape') { e.preventDefault(); close(); findButton.focus(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); hl(active + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); hl(active - 1); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        const items = [...list.querySelectorAll('button')];
+        const pick = items[active >= 0 ? active : 0];
+        if (pick) pick.click();
+      }
+    });
+    addEventListener('keydown', (e) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName) || (document.activeElement && document.activeElement.isContentEditable);
+      if (((e.key === '/' && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) && box.hidden) { e.preventDefault(); open(); }
     });
     input.addEventListener('input', () => {
       const q = norm(input.value);
       list.replaceChildren();
+      active = -1;
+      input.removeAttribute('aria-activedescendant');
+      input.setAttribute('aria-expanded', String(!!q));
       if (!q) return;
       const hits = cards.filter((c) => norm(`${c.fav.title} ${c.fav.by || ''}`).includes(q))
         .sort((a, b) => norm(a.fav.title).indexOf(q) - norm(b.fav.title).indexOf(q) || b.rating - a.rating)
         .slice(0, 6);
-      if (!hits.length) { list.innerHTML = '<li class="fav-search-none">Not on the list (yet)</li>'; return; }
-      hits.forEach((c) => {
+      if (!hits.length) { list.innerHTML = '<li class="fav-search-none" role="status">No results</li>'; return; }
+      hits.forEach((c, k) => {
         const li = document.createElement('li');
-        li.innerHTML = `<button type="button"><b></b><span></span></button>`;
+        li.innerHTML = `<button type="button" role="option" id="favOpt${k}" aria-selected="false" tabindex="-1"><b></b><span></span></button>`;
         li.querySelector('b').textContent = c.fav.title;
         li.querySelector('span').textContent = [TYPE_NAME[c.fav.type], c.fav.year, `${c.rating}\u2605`].filter(Boolean).join(' \u00b7 ');
         li.querySelector('button').addEventListener('click', () => go(c));
+        li.querySelector('button').addEventListener('mousemove', () => { if (active !== k) hl(k); });
         list.append(li);
       });
+      hl(0); // the first result is ready for Enter
     });
   }
 

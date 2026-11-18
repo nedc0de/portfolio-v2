@@ -11842,7 +11842,7 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
   cursor: pointer;
 }
 .fav-search-list li:last-child button { border-bottom: 0; }
-.fav-search-list button:hover, .fav-search-list button:focus-visible { background: rgba(255, 122, 26, .08); outline: 0; }
+.fav-search-list button:focus-visible, .fav-search-list button[aria-selected="true"] { background: rgba(255, 122, 26, .1); box-shadow: inset 2px 0 0 var(--fifteenth-color); outline: 0; }
 .fav-search-list b { font-weight: 700; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .fav-search-list span { flex: none; font-size: .75rem; color: #8a8a8a; }
 .fav-search-none { padding: .8rem .9rem; font-size: .85rem; color: #8a8a8a; }
@@ -11936,3 +11936,55 @@ main { counter-reset: hm-ch; }
   color: var(--amber);
   text-shadow: 0 0 6px rgba(255, 190, 77, .45);
 }
+
+/*===== BLOG: search =====*/
+/* the magnifier sits at the end of the topic chips; the field opens over
+   them and the list narrows as you type */
+.bl-tools { position: relative; display: flex; align-items: center; gap: .5rem; margin: 0 0 1.4rem; min-width: 0; }
+.bl-tools .bl-topics { flex: 1; min-width: 0; margin: 0; }
+.bl-find {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fifteenth-color);
+  cursor: pointer;
+  transition: transform .12s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+.bl-find:active { transform: scale(.86); }
+.bl-find svg { width: 19px; height: 19px; }
+.bl-search {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  padding: 0 .2rem 0 .9rem;
+  border: 1px solid rgba(255, 122, 26, .5);
+  background: #121212;
+  animation: fav-find-in .2s ease-out;
+}
+.bl-search[hidden] { display: none; }
+.bl-search input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  font-size: 1rem; /* 16px: iPhones don't zoom in on the field */
+  color: #f2f2f2;
+}
+.bl-search input::placeholder { color: #6f6f6f; }
+.bl-search input::-webkit-search-cancel-button { display: none; }
+.bl-search-x { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; background: none; color: #8a8a8a; cursor: pointer; }
+.bl-search-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.bl-none { margin: 2rem 0; color: #8a8a8a; }
+.bl-none[hidden], .bl-block[hidden], a.bl-feature[hidden] { display: none; }
