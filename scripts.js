@@ -867,23 +867,20 @@ const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
   });
   chips.hidden = false;
   // the topic chip and the search both narrow the list
-  let topic = 'All', query = '';
+  let topic = 'All';
   const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   posts.forEach((a) => { a.dataset.find = norm(a.textContent); });
-  const none = document.querySelector('.bl-none');
   const sections = [...document.querySelectorAll('.bl-block')];
   const apply = () => {
-    const words = norm(query).split(' ').filter(Boolean);
     let shown = 0;
     posts.forEach((a) => {
-      const ok = (topic === 'All' || a.dataset.topic === topic) && words.every((w) => a.dataset.find.includes(w));
+      const ok = topic === 'All' || a.dataset.topic === topic;
       a.hidden = !ok;
       if (ok) shown++;
     });
-    soon.forEach((r) => { r.hidden = topic !== 'All' || !!words.length; });
+    soon.forEach((r) => { r.hidden = topic !== 'All'; });
     // a section with nothing left in it hides its heading too
     sections.forEach((sec) => { sec.hidden = !sec.querySelector('a.bl-row:not([hidden]), .bl-row.is-soon:not([hidden])'); });
-    if (none) none.hidden = shown > 0;
   };
   chips.addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -893,24 +890,80 @@ const READ_KEY = 'nedcode-read-posts'; // see BLOG: READ MARKS below
     apply();
   });
 
-  // search: the magnifier opens a field over the chips; the list narrows as
-  // you type (title, summary, topic). Keyboard: "/" or Ctrl/Cmd+K opens it,
-  // Enter opens the first match, Escape closes and shows everything again.
+  // search: the magnifier opens a field over the chips and, as you type,
+  // the matching posts show as suggestions under it (like Favorites).
+  // Keyboard: "/" or Ctrl/Cmd+K opens it, up and down move through the
+  // suggestions, Enter opens the highlighted post, Escape closes.
   const find = document.querySelector('.bl-find');
   const box = document.querySelector('.bl-search');
   if (find && box) {
     const tools = find.closest('.bl-tools');
     const input = box.querySelector('input');
+    const list = box.querySelector('.bl-search-list');
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-controls', list.id);
+    input.setAttribute('aria-expanded', 'false');
+    let active = -1;
+    const hl = (i) => {
+      const items = [...list.querySelectorAll('a')];
+      if (!items.length) { active = -1; return; }
+      active = (i + items.length) % items.length;
+      items.forEach((it, k) => it.setAttribute('aria-selected', String(k === active)));
+      items[active].scrollIntoView({ block: 'nearest' });
+      input.setAttribute('aria-activedescendant', items[active].id);
+    };
+    const titleOf = (a) => (a.querySelector('h2, h3') || a).textContent.trim();
+    const metaOf = (a) => {
+      const parts = (a.querySelector('.bl-meta')?.textContent || '').split('·').map((t) => t.trim());
+      return [parts[1], parts[0]].filter(Boolean).join(' \u00b7 ');
+    };
     const open = () => { box.hidden = false; tools.classList.add('is-searching'); find.setAttribute('aria-expanded', 'true'); input.focus(); };
-    const close = () => { box.hidden = true; tools.classList.remove('is-searching'); find.setAttribute('aria-expanded', 'false'); input.value = ''; query = ''; apply(); };
+    const close = () => { box.hidden = true; tools.classList.remove('is-searching'); find.setAttribute('aria-expanded', 'false'); input.value = ''; list.replaceChildren(); input.setAttribute('aria-expanded', 'false'); active = -1; };
     find.addEventListener('click', () => (box.hidden ? open() : close()));
     box.querySelector('.bl-search-x').addEventListener('click', () => { close(); find.focus(); });
-    input.addEventListener('input', () => { query = input.value; apply(); });
+    input.addEventListener('input', () => {
+      const words = norm(input.value).split(' ').filter(Boolean);
+      list.replaceChildren();
+      active = -1;
+      input.removeAttribute('aria-activedescendant');
+      input.setAttribute('aria-expanded', String(!!words.length));
+      if (!words.length) return;
+      // title matches first, then the rest, newest first within each
+      const title = (a) => norm(titleOf(a));
+      const hits = posts.filter((a) => words.every((w) => a.dataset.find.includes(w)))
+        .sort((x, y) => (words.every((w) => title(y).includes(w)) - words.every((w) => title(x).includes(w))))
+        .slice(0, 6);
+      if (!hits.length) { list.innerHTML = '<li class="fav-search-none" role="status">No results</li>'; return; }
+      hits.forEach((a, k) => {
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = a.getAttribute('href');
+        link.id = `blOpt${k}`;
+        link.setAttribute('role', 'option');
+        link.setAttribute('aria-selected', 'false');
+        link.tabIndex = -1;
+        link.innerHTML = '<b></b><span></span>';
+        link.querySelector('b').textContent = titleOf(a);
+        link.querySelector('span').textContent = metaOf(a);
+        link.addEventListener('mousemove', () => { if (active !== k) hl(k); });
+        li.append(link);
+        list.append(li);
+      });
+      hl(0);
+    });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.preventDefault(); close(); find.focus(); }
-      if (e.key === 'Enter') { e.preventDefault(); const first = posts.find((a) => !a.hidden); if (first) first.click(); }
-      if (e.key === 'ArrowDown') { e.preventDefault(); const first = posts.find((a) => !a.hidden); if (first) first.focus(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); hl(active + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); hl(active - 1); }
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        const items = [...list.querySelectorAll('a')];
+        const pick = items[active >= 0 ? active : 0];
+        if (pick) pick.click();
+      }
     });
+    // a tap outside closes it
+    document.addEventListener('pointerdown', (e) => { if (!box.hidden && !tools.contains(e.target)) close(); });
     addEventListener('keydown', (e) => {
       const el = document.activeElement;
       const typing = el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
