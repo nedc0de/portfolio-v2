@@ -11669,3 +11669,32 @@ body::after {
 @media (min-width: 900px) {
   .fav-hero.is-docked.in-theater .fav-hero-video iframe { transform: translate(-50%, -50%) scale(1.5); }
 }
+
+/*===== FAVORITES: "pick for me" shows it's a button =====*/
+/* hover: the orange selection box; click: it presses in; while it picks:
+   the arrows keep crossing over, until it lands on a poster */
+.fav-bar .fav-pick {
+  border: 1px solid transparent;
+  transition: border-color .15s, background-color .15s, color .15s, transform .12s;
+}
+.fav-bar .fav-pick:hover,
+.fav-bar .fav-pick:focus-visible {
+  border-color: var(--fifteenth-color);
+  background: rgba(255, 122, 26, .1);
+  color: #ffb37a;
+  outline: none;
+}
+.fav-bar .fav-pick:active { transform: scale(.88); }
+.fav-bar .fav-pick.is-shuffling {
+  border-color: var(--fifteenth-color);
+  background: rgba(255, 122, 26, .16);
+  color: #fff;
+}
+.fav-bar .fav-pick.is-shuffling svg { animation: fav-shuffle .5s ease-in-out infinite; }
+@keyframes fav-shuffle {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(-1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-bar .fav-pick.is-shuffling svg { animation: none; }
+}

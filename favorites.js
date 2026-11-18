@@ -2042,6 +2042,7 @@
         card.classList.add('is-picked');
         setTimeout(() => card.classList.remove('is-picked'), 1600);
         picking = false;
+        pickButton.classList.remove('is-shuffling');
         // then it's the pick, like tapping it
         const item = cards.find((c) => c.el === card);
         if (hero) select(item);
@@ -2057,6 +2058,8 @@
       const pool = cards.filter((c) => c.shelf).map((c) => c.el);
       if (!pool.length) return;
       picking = true;
+      pickButton.classList.add('is-shuffling'); // the arrows keep shuffling until it lands
+      setTimeout(() => pickButton.classList.remove('is-shuffling'), 4000); // in case it never lands
       pool.forEach((c) => setFlipped(c, false));
       const target = pool[Math.floor(Math.random() * pool.length)];
       if (reduceMotion.matches) return land(target);
