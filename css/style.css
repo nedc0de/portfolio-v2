@@ -11383,8 +11383,6 @@ html::after {
 /* the trailer hole (none until a trailer plays), in the screen layers' own
    coordinates: they start 20vw left of and 200px above the screen */
 :root {
-  --hole-pos: calc(var(--hole-x, 0px) + 20vw) calc(var(--hole-y, 0px) + 200px);
-  --hole-size: var(--hole-w, 0px) var(--hole-h, 0px);
   /* how much of the effect the hole takes away: .75 leaves a quarter of the
      scanlines and edge fade on the trailer, a light touch of the TV look */
   --hole-layer: linear-gradient(rgb(0 0 0 / .75), rgb(0 0 0 / .75));
@@ -11564,11 +11562,34 @@ html.crt-boot .nav-logo-group {
 .fav-row .fav-face { -webkit-backface-visibility: visible; backface-visibility: visible; }
 .fav-row .fav-back { display: none; }
 
-/* computers: the scanlines skip their edge mask (a second full-screen pass
-   every frame) and sit under the edge fade instead, which darkens them out
-   towards the sides the same way. With a trailer hole the masks come back. */
-@media (pointer: fine) {
-  html:not(.has-hole)::after { -webkit-mask: none; mask: none; z-index: 9996; }
+/* computers: the edge fade and the scanlines are one layer instead of two
+   (html::after: the fade drawn over the lines, which darkens them out towards
+   the sides the same way the lines' own edge mask did). It has no mask at
+   all, except while a trailer cuts its hole: then one masked full-screen
+   layer instead of two. */
+@media (pointer: fine) and (min-width: 768px) {
+  body::after { content: none; }
+  html::after {
+    background:
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) 200px, rgb(11 11 11 / .5) 212px, rgb(11 11 11 / .15) 290px, transparent 400px, transparent calc(100% - 420px), rgb(11 11 11 / .15) calc(100% - 310px), rgb(11 11 11 / .5) calc(100% - 212px), var(--crt-edge-color) calc(100% - 200px)),
+      radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%),
+      repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
+    -webkit-mask: none;
+    mask: none;
+  }
+  html.has-hole::after {
+    -webkit-mask-image: linear-gradient(#000 0 0), var(--hole-layer);
+    mask-image: linear-gradient(#000 0 0), var(--hole-layer);
+    -webkit-mask-position: 0 0, var(--hole-pos);
+    mask-position: 0 0, var(--hole-pos);
+    -webkit-mask-size: auto, var(--hole-size);
+    mask-size: auto, var(--hole-size);
+    -webkit-mask-repeat: repeat, no-repeat;
+    mask-repeat: repeat, no-repeat;
+    -webkit-mask-composite: source-out, source-over;
+    mask-composite: subtract, add;
+  }
 }
 
 /* the figure by "Ned" and the flickering logo letters get their own layers,
@@ -11584,3 +11605,12 @@ html.crt-chan::before { content: none; animation: none; }
    details are open hid the scrollbar on Windows PCs, so the whole page
    jumped sideways and was laid out and redrawn on every open and close */
 html { scrollbar-gutter: stable; }
+
+/* the trailer hole's spot: favorites.js writes --hole-x/y/w/h into a rule
+   for these two layers only (not on <html>, where each move restyled the
+   whole page every frame of a scroll or a glide) */
+html::after,
+body::after {
+  --hole-pos: calc(var(--hole-x, 0px) + 20vw) calc(var(--hole-y, 0px) + 200px);
+  --hole-size: var(--hole-w, 0px) var(--hole-h, 0px);
+}

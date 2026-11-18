@@ -1479,7 +1479,11 @@
   const root = document.documentElement;
   const holeVars = ['--hole-x', '--hole-y', '--hole-w', '--hole-h'];
   let holeFrame = 0;
+  let holeSettle = 0;
   let lastHole = null;
+  const holeSheet = document.head.appendChild(document.createElement('style'));
+  holeSheet.textContent = 'html::after, body::after {}';
+  const holeRule = holeSheet.sheet.cssRules[0];
   function placeHole() {
     holeFrame = 0;
     // phones: the player is always drawn 640 px wide and scaled to fit the
@@ -1493,11 +1497,24 @@
     // makes the browser restyle the whole page, which made scrolling lag
     const key = r && r.width && r.bottom >= 0 && r.top <= innerHeight ? [r.left, r.top, r.width, r.height].map(Math.round).join() : '';
     if (key === lastHole) return;
+    const moving = !!(lastHole && key); // it was cut and the trailer moved
     lastHole = key;
-    // the screen effect only uses its (costly) masks while there's a hole to cut
-    root.classList.toggle('has-hole', !!key);
-    if (!key) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
-    key.split(',').forEach((n, i) => root.style.setProperty(holeVars[i], `${n}px`));
+    clearTimeout(holeSettle);
+    // the screen effect only uses its (costly) masks while there's a hole to
+    // cut, and the spot goes into a rule for the two screen layers only
+    // (written on <html>, every move restyled the whole page)
+    if (!key) { root.classList.remove('has-hole'); holeVars.forEach((v) => holeRule.style.removeProperty(v)); return; }
+    const cut = () => {
+      key.split(',').forEach((n, i) => holeRule.style.setProperty(holeVars[i], `${n}px`));
+      root.classList.add('has-hole');
+    };
+    // while the trailer moves (the banner sliding up into place, a glide, a
+    // drag) the hole steps aside and comes back once it's still: redrawing a
+    // full-screen mask at a new spot every frame was what made scrolling with
+    // a trailer stutter
+    if (!moving) return cut();
+    root.classList.remove('has-hole');
+    holeSettle = setTimeout(() => { if (lastHole === key) cut(); }, 160);
   }
   const queueHole = () => { if (!holeFrame) holeFrame = requestAnimationFrame(placeHole); };
   // safety net: if the trailer ever ends up somewhere without the effect
