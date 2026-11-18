@@ -1248,12 +1248,14 @@
     document.documentElement.classList.add('fav-sheet-open');
     requestAnimationFrame(() => requestAnimationFrame(() => sheet.classList.add('is-open')));
     q('.fav-sheet-x').focus({ preventScroll: true });
+    if (hero && hero.dock) hero.dock(item);
   }
   function closeSheet() {
     sheet.classList.remove('is-open');
     document.documentElement.classList.remove('fav-sheet-open');
     setTimeout(() => { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 320);
     if (lastFocus) lastFocus.focus({ preventScroll: true });
+    if (hero && hero.undock) hero.undock();
   }
 
   /*---------- the select screen's big preview ----------*/
@@ -1335,8 +1337,48 @@
     let past = false;
     // shown whenever the banner is scrolled away (its still shows until the
     // trailer starts), so the pick and its trailer stay with you
+    // phones: opening a title's details brings its trailer along, docked
+    // just above the details panel (the same player moves, so it keeps
+    // playing), and it goes back when the panel closes
+    let docked = false;
+    const dockTop = () => {
+      const panel = document.querySelector('.fav-sheet-panel');
+      if (!panel) return;
+      const w = innerWidth - 24;
+      const h = w * 9 / 16;
+      const safeTop = 12 + (parseFloat(getComputedStyle(hero).getPropertyValue('--sat')) || 0);
+      // the panel gives up room (and scrolls) if the trailer wouldn't fit
+      panel.style.maxHeight = `${Math.round(innerHeight - h - safeTop - 12)}px`;
+      const top = innerHeight - panel.offsetHeight - h - 12;
+      hero.style.setProperty('--dock-top', `${Math.max(safeTop, top)}px`);
+      queueHole();
+    };
+    let panelWatch = null;
+    hero.dock = (item) => {
+      if (wide.matches || item !== current) return;
+      docked = true;
+      miniClosed = false;
+      dockTop();
+      hero.classList.add('is-docked');
+      paint();
+      ytCommand('playVideo');
+      if (!panelWatch && 'ResizeObserver' in window) {
+        panelWatch = new ResizeObserver(() => docked && dockTop());
+        panelWatch.observe(document.querySelector('.fav-sheet-panel'));
+      }
+      setTimeout(dockTop, 420); // once the panel has slid up
+    };
+    hero.undock = () => {
+      if (!docked) return;
+      docked = false;
+      hero.classList.remove('is-docked');
+      const panel = document.querySelector('.fav-sheet-panel');
+      if (panel) panel.style.maxHeight = '';
+      paint();
+    };
+    addEventListener('resize', () => docked && dockTop());
     const paint = () => {
-      hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed);
+      hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed && !docked);
       queueHole();
       setTimeout(queueHole, 350); // after the mini player has slid in
     };
