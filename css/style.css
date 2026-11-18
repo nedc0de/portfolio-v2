@@ -11389,7 +11389,9 @@ html::after {
      scanlines and edge fade on the trailer, a light touch of the TV look */
   --hole-layer: linear-gradient(rgb(0 0 0 / .75), rgb(0 0 0 / .75));
 }
-body::after {
+/* only while a trailer shows: a mask makes the graphics card draw this
+   full-screen layer twice every frame, so without a hole it has none */
+html.has-hole body::after {
   -webkit-mask-image: linear-gradient(#000 0 0), var(--hole-layer);
   mask-image: linear-gradient(#000 0 0), var(--hole-layer);
   -webkit-mask-position: 0 0, var(--hole-pos);
@@ -11553,3 +11555,23 @@ html.crt-boot .nav-logo-group {
 @media print {
   html::after, body::after { content: none; }
 }
+
+/*===== PERFORMANCE: lighter drawing, same look =====*/
+/* Favorites posters were 3D flip cards (four layers each, 450+ for the page)
+   but nothing flips them anymore: in the grid they're flat cards now */
+.fav-row .fav-card { perspective: none; }
+.fav-row .fav-inner { transform-style: flat; transform: none; transition: none; }
+.fav-row .fav-face { -webkit-backface-visibility: visible; backface-visibility: visible; }
+.fav-row .fav-back { display: none; }
+
+/* computers: the scanlines skip their edge mask (a second full-screen pass
+   every frame) and sit under the edge fade instead, which darkens them out
+   towards the sides the same way. With a trailer hole the masks come back. */
+@media (pointer: fine) {
+  html:not(.has-hole)::after { -webkit-mask: none; mask: none; z-index: 9996; }
+}
+
+/* the figure by "Ned" and the flickering logo letters get their own layers,
+   so animating them no longer repaints the whole page */
+.stick { will-change: transform; }
+.nav-logo1, .nav-logo2, .nav-logo5, .nav-logo6 { will-change: opacity; }

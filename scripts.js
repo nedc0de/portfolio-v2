@@ -1314,7 +1314,12 @@ function readPostsSeen() {
   };
   let last = performance.now();
   let shown = 0;
+  // at most 60 updates a second (120-165Hz PC monitors called this two to
+  // three times as often), and none while the logo is scrolled out of view
+  let logoSeen = true, sleeping = false;
   const frame = (now) => {
+    if (!logoSeen) { sleeping = true; return; }
+    if (now - last < 15) { requestAnimationFrame(frame); return; }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     const off = group.classList.contains('is-power-off');
@@ -1391,6 +1396,10 @@ function readPostsSeen() {
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => {
+    logoSeen = e.isIntersecting;
+    if (logoSeen && sleeping) { sleeping = false; last = performance.now(); requestAnimationFrame(frame); }
+  }).observe(group);
 })();
 
 /*===== HOME: newsletter sign-up =====*/
@@ -3271,15 +3280,24 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     return `M${f2(n[0])} ${f2(n[1])}Q${f2(mx + lean)} ${f2(my)} ${f2(h[0])} ${f2(h[1])}`;
   };
 
+  // only touch an attribute when its value really changed: rewriting the
+  // same value still made the browser restyle and repaint him every frame,
+  // even standing still
+  const setA = (node, k, v) => {
+    const c = node.__a || (node.__a = {});
+    if (c[k] === v) return;
+    c[k] = v;
+    node.setAttribute(k, v);
+  };
   const draw = (now) => {
     const p = pos;
-    head.setAttribute('cx', f2(p.head[0]));
-    head.setAttribute('cy', f2(p.head[1]));
+    setA(head, 'cx', f2(p.head[0]));
+    setA(head, 'cy', f2(p.head[1]));
     // cap: sits on his head, tilts with it, brim faces the way he's facing
     const tilt = Math.atan2(p.head[1] - p.neck[1], p.head[0] - p.neck[0]) * 180 / Math.PI + 90;
     const front = mode === 'wave' || (tapHop && (mode === 'jump' || mode === 'crouch'));
     svg.classList.toggle('is-front', front);
-    if (capF) capF.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)})`);
+    if (capF) setA(capF, 'transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${tilt.toFixed(1)})`);
     if (!front) {
       const [tx, ty] = lookTarget(p, now);
       const dx = tx - p.head[0], dy = ty - p.head[1];
@@ -3288,35 +3306,35 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const want = Math.max(-38, Math.min(38, Math.atan2(dy, Math.abs(dx) || .01) * 180 / Math.PI));
       const ldt = Math.min(.05, (now - (lookPrev || now)) / 1000); lookPrev = now;
       lookAng += (want - lookAng) * Math.min(1, ldt * 9);
-      cap.setAttribute('transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${(tilt + lookAng * facing).toFixed(1)}) scale(${facing} 1)`);
+      setA(cap, 'transform', `translate(${f2(p.head[0])} ${f2(p.head[1])}) rotate(${(tilt + lookAng * facing).toFixed(1)}) scale(${facing} 1)`);
     }
-    body.setAttribute('d', spine(p.neck, p.hip, p.head));
-    armA.setAttribute('d', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
-    armB.setAttribute('d', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
-    legA.setAttribute('d', hose(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
-    legB.setAttribute('d', hose(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
+    setA(body, 'd', spine(p.neck, p.hip, p.head));
+    setA(armA, 'd', hose(p.sh, joint(p.sh, p.ha, ARM, bend[0]), p.ha));
+    setA(armB, 'd', hose(p.sh, joint(p.sh, p.hb, ARM, bend[1]), p.hb));
+    setA(legA, 'd', hose(p.hip, joint(p.hip, p.fa, LEG, bend[2]), p.fa));
+    setA(legB, 'd', hose(p.hip, joint(p.hip, p.fb, LEG, bend[3]), p.fb));
     // sketch look: each limb again underneath as its dark ink outline, and a
     // faint orange construction line along it; guide lines on the blank head
     [body, armA, armB, legA, legB].forEach((part, i) => {
       const d = part.getAttribute('d');
-      if (inks[i]) inks[i].setAttribute('d', d);
-      if (cores[i]) cores[i].setAttribute('d', d);
+      if (inks[i]) setA(inks[i], 'd', d);
+      if (cores[i]) setA(cores[i], 'd', d);
     });
     // hands and shoes; shoes point the way he faces (outwards when he faces you)
-    hands.forEach((hd, i) => { if (!hd) return; const h = i ? p.hb : p.ha; hd.setAttribute('cx', f2(h[0])); hd.setAttribute('cy', f2(h[1])); });
+    hands.forEach((hd, i) => { if (!hd) return; const h = i ? p.hb : p.ha; setA(hd, 'cx', f2(h[0])); setA(hd, 'cy', f2(h[1])); });
     const isFront = svg.classList.contains('is-front');
     feet.forEach((fp, i) => {
       if (!fp) return;
       const f = i ? p.fb : p.fa, dir = isFront ? (i ? 1 : -1) : facing;
       const d = `M${f2(f[0] - dir * .7)} ${f2(f[1] - 1)}L${f2(f[0] + dir * 2.3)} ${f2(f[1] - .9)}`;
-      fp[0].setAttribute('d', d); fp[1].setAttribute('d', d);
+      setA(fp[0], 'd', d); setA(fp[1], 'd', d);
     });
     const nearHead = (h) => Math.hypot(h[0] - p.head[0], h[1] - p.head[1]) < 9.2;
     layer(isFront, isFront ? 1 : facing, nearHead(p.ha), nearHead(p.hb));
     if (guide) {
       const [hx, hy] = p.head;
       const off = svg.classList.contains('is-front') ? 0 : facing * 1.4; // the face's centre line
-      guide.setAttribute('d', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + off)} ${f2(hy - 6.7)}Q${f2(hx + off * 2.6)} ${f2(hy)} ${f2(hx + off)} ${f2(hy + 6.7)}`);
+      setA(guide, 'd', `M${f2(hx - 6.2)} ${f2(hy + .6)}Q${f2(hx)} ${f2(hy + 2.6)} ${f2(hx + 6.2)} ${f2(hy + .6)}M${f2(hx + off)} ${f2(hy - 6.7)}Q${f2(hx + off * 2.6)} ${f2(hy)} ${f2(hx + off)} ${f2(hy + 6.7)}`);
     }
     // smears: a quick arm swing leaves a short fading streak behind the hand
     ['ha', 'hb'].forEach((k, i) => {
@@ -3326,39 +3344,39 @@ document.querySelectorAll('.hc-list').forEach((list) => {
       const old = tr[0], speed = len(old, p[k]);
       const on = speed > 5 && !still.matches;
       smears[i].style.opacity = on ? f2(Math.min(.35, (speed - 5) / 20)) : '0';
-      if (on) smears[i].setAttribute('d', pts(old, p[k]));
+      if (on) setA(smears[i], 'd', pts(old, p[k]));
     });
-    lapBase.setAttribute('d', pts(p.l2, p.l1));
-    lapScreen.setAttribute('d', pts(p.l1, p.l3));
+    setA(lapBase, 'd', pts(p.l2, p.l1));
+    setA(lapScreen, 'd', pts(p.l1, p.l3));
     man.style.opacity = ox > 30 ? f2(Math.max(0, 1 - (ox - 30) / 10)) : '';
     // the mug: in his hand, or where he put it down
     const m = mugAt === 'hand' ? [p.hb[0] + 1, p.hb[1] + 2.5] : mugAt;
-    if (m) mug.setAttribute('transform', `translate(${f2(m[0])} ${f2(m[1])})`);
+    if (m) setA(mug, 'transform', `translate(${f2(m[0])} ${f2(m[1])})`);
     mug.style.opacity = mugAt === 'hand' ? man.style.opacity : ''; // in his hand, it goes where he goes
-    if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
+    if (lifting) dbs.forEach((g, i) => { const h = i ? p.hb : p.ha; setA(g, 'transform', `translate(${f2(h[0])} ${f2(h[1])})`); });
     const phoneOut = onPhone || svg.classList.contains('has-phone');
     const atEar = onPhone || mode === 'phone';
-    if (phoneOut) phone.setAttribute('transform', `translate(${f2(p.hb[0] + .4)} ${f2(p.hb[1] - (atEar ? .4 : 1))}) rotate(${atEar ? 12 : -5})`);
+    if (phoneOut) setA(phone, 'transform', `translate(${f2(p.hb[0] + .4)} ${f2(p.hb[1] - (atEar ? .4 : 1))}) rotate(${atEar ? 12 : -5})`);
     phone.style.opacity = phoneOut ? man.style.opacity : '';
-    if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; g.setAttribute('cx', f2(h[0])); g.setAttribute('cy', f2(h[1])); });
+    if (svg.classList.contains('has-gloves')) gloves.forEach((g, i) => { const h = i ? p.hb : p.ha; setA(g, 'cx', f2(h[0])); setA(g, 'cy', f2(h[1])); });
     // brush in his right hand, bristles pointing at the "d"
-    if (svg.classList.contains('has-brush')) brush.setAttribute('transform', `translate(${f2(p.hb[0])} ${f2(p.hb[1])}) rotate(${mode === 'paint' ? -90 : 0})`);
+    if (svg.classList.contains('has-brush')) setA(brush, 'transform', `translate(${f2(p.hb[0])} ${f2(p.hb[1])}) rotate(${mode === 'paint' ? -90 : 0})`);
     // spray mist: a cone of orange dots puffing from the nozzle onto the "d"
     const spraying = mode === 'paint' && (now - modeStart) > 250;
     mist.forEach((c) => {
-      if (!spraying) { c.setAttribute('r', '0'); return; }
+      if (!spraying) { setA(c, 'r', '0'); return; }
       const f = Math.random();
-      c.setAttribute('cx', f2(p.hb[0] - 6 - f * 9));
-      c.setAttribute('cy', f2(p.hb[1] + (Math.random() - .5) * (2 + f * 9)));
-      c.setAttribute('r', f2(.5 + Math.random() * 1.1));
+      setA(c, 'cx', f2(p.hb[0] - 6 - f * 9));
+      setA(c, 'cy', f2(p.hb[1] + (Math.random() - .5) * (2 + f * 9)));
+      setA(c, 'r', f2(.5 + Math.random() * 1.1));
       c.style.opacity = f2(.25 + (1 - f) * .6);
     });
     // peace sign on his left hand
-    if (svg.classList.contains('has-peace')) peace.setAttribute('transform', `translate(${f2(p.ha[0])} ${f2(p.ha[1] - 1)})`);
+    if (svg.classList.contains('has-peace')) setA(peace, 'transform', `translate(${f2(p.ha[0])} ${f2(p.ha[1] - 1)})`);
     // selfie flash at the phone
     const fl = (now - flashAt) / 260;
     flash.style.opacity = fl >= 0 && fl < 1 ? f2((1 - fl) * .95) : '0';
-    flash.setAttribute('cx', f2(p.hb[0])); flash.setAttribute('cy', f2(p.hb[1] - 2)); flash.setAttribute('r', fl >= 0 && fl < 1 ? f2(4 + fl * 6) : '0'); // only during the flash: unclamped it grew huge and blocked taps
+    setA(flash, 'cx', f2(p.hb[0])); setA(flash, 'cy', f2(p.hb[1] - 2)); setA(flash, 'r', fl >= 0 && fl < 1 ? f2(4 + fl * 6) : '0'); // only during the flash: unclamped it grew huge and blocked taps
     // the paper plane: in his hand, or flying a loop over "Ned" and back
     if (svg.classList.contains('has-plane')) {
       const u = (now - planeAt) / PLANE_MS;
@@ -3375,7 +3393,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
         lookAt = Math.max(-1, Math.min(1, (x - p.head[0]) / 30));
         planeXY = [x, y];
       } else { lookAt = 0; planePrev = null; planeXY = null; }
-      plane.setAttribute('transform', `translate(${f2(x)} ${f2(y)}) rotate(${ang.toFixed(1)})`);
+      setA(plane, 'transform', `translate(${f2(x)} ${f2(y)}) rotate(${ang.toFixed(1)})`);
     }
     // painting the "d": orange fills it from the bottom up, stroke by stroke
     if (d) {
@@ -3398,8 +3416,8 @@ document.querySelectorAll('.hc-list').forEach((list) => {
     bits.forEach((b, i) => {
       const u = (now - live[i].t0) / 1600;
       if (u < 0 || u > 1) { b.style.opacity = '0'; return; }
-      b.setAttribute('x', f2(live[i].x + u * 3));
-      b.setAttribute('y', f2(live[i].y - u * 16));
+      setA(b, 'x', f2(live[i].x + u * 3));
+      setA(b, 'y', f2(live[i].y - u * 16));
       b.style.opacity = f2(Math.sin(Math.PI * u) * .9);
     });
     if (flags.code && now > nextBit && !document.hidden) {
@@ -3416,6 +3434,9 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 
   let raf = 0, last = 0, onScreen = true;
   const frame = (now) => {
+    // at most 60 updates a second, whatever the monitor's refresh rate (a
+    // 144Hz screen drew him 144 times a second, the home page's biggest cost)
+    if (last && now - last < 15) { raf = requestAnimationFrame(frame); return; }
     let dt = Math.min(.05, (now - (last || now)) / 1000);
     last = now;
     while (dt > 0) { const h = Math.min(dt, 1 / 120); step(h, now); dt -= h; }
@@ -3819,3 +3840,10 @@ document.querySelectorAll('.hc-list').forEach((list) => {
   addEventListener('resize', close);
 })();
 
+
+/*===== CRT power-on: tidy up once it has played =====*/
+// The power-on and channel-change effects are layers over the whole screen
+// (one of them blended with the page) that stayed in place, invisible, for
+// the whole visit, so the graphics card kept drawing them. They're done
+// within 1.5s: after that the classes go, and the layers with them.
+setTimeout(() => document.documentElement.classList.remove('crt-boot', 'crt-chan'), 2200);

@@ -1494,6 +1494,8 @@
     const key = r && r.width && r.bottom >= 0 && r.top <= innerHeight ? [r.left, r.top, r.width, r.height].map(Math.round).join() : '';
     if (key === lastHole) return;
     lastHole = key;
+    // the screen effect only uses its (costly) masks while there's a hole to cut
+    root.classList.toggle('has-hole', !!key);
     if (!key) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
     key.split(',').forEach((n, i) => root.style.setProperty(holeVars[i], `${n}px`));
   }
