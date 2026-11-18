@@ -1246,51 +1246,64 @@
     // swipe down anywhere on the screen while the details are open (the
     // panel, the trailer above it or the dimmed page) and it all slides away
     // together. Inside the panel, only once its text is scrolled to the top.
-    let y0 = null, x0 = 0, dragY = 0, vertical = null;
+    let y0 = null, x0 = 0, dragY = 0, vertical = null, lastY = 0, lastT = 0, speed = 0;
     const tvOf = () => hero && hero.classList.contains('is-docked') ? hero.querySelector('.fav-hero-tv') : null;
-    const follow = (dy, animate) => {
-      const ease = animate ? 'transform .3s cubic-bezier(.22, 1, .36, 1)' : 'none';
-      panel.style.transition = ease;
+    const shade = () => sheet.querySelector('.fav-sheet-shade');
+    // move the panel (and the trailer docked above it) with the finger; the
+    // further you pull, the more it resists, so it feels soft, not loose
+    const follow = (dy, ease) => {
+      const t = ease || 'none';
+      panel.style.transition = t === 'none' ? 'none' : `transform ${t}`;
       panel.style.transform = dy ? `translateY(${dy}px)` : '';
       const tv = tvOf();
-      if (tv) { tv.style.transition = ease; tv.style.transform = dy ? `translateY(${dy}px)` : ''; }
-      sheet.querySelector('.fav-sheet-shade').style.opacity = dy ? String(Math.max(0, 1 - dy / 400)) : '';
+      if (tv) { tv.style.transition = panel.style.transition; tv.style.transform = dy ? `translateY(${dy}px)` : ''; }
+      const sh = shade();
+      sh.style.transition = t === 'none' ? 'none' : `opacity ${t}`;
+      sh.style.opacity = dy ? String(Math.max(0, 1 - dy / 500)) : '';
+    };
+    const clearFollow = () => {
+      panel.style.transition = panel.style.transform = '';
+      const sh = shade(); sh.style.transition = sh.style.opacity = '';
+      const tv = hero && hero.querySelector('.fav-hero-tv');
+      if (tv) tv.style.transition = tv.style.transform = '';
     };
     addEventListener('touchstart', (e) => {
       if (sheet.hidden || !sheet.classList.contains('is-open')) return;
       const inPanel = panel.contains(e.target);
       if (inPanel && panel.scrollTop > 0) { y0 = null; return; }
-      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dragY = 0; vertical = null;
+      y0 = lastY = e.touches[0].clientY; x0 = e.touches[0].clientX; dragY = 0; vertical = null;
+      lastT = performance.now(); speed = 0;
     }, { passive: true });
     addEventListener('touchmove', (e) => {
       if (y0 === null) return;
-      const dy = e.touches[0].clientY - y0, dx = e.touches[0].clientX - x0;
+      const y = e.touches[0].clientY;
+      const dy = y - y0, dx = e.touches[0].clientX - x0;
       if (vertical === null && (Math.abs(dy) > 8 || Math.abs(dx) > 8)) vertical = Math.abs(dy) > Math.abs(dx);
       if (!vertical) return;
-      dragY = Math.max(0, dy);
-      if (dragY && e.cancelable) e.preventDefault();
-      follow(dragY, false);
+      const now = performance.now();
+      speed = .7 * speed + .3 * ((y - lastY) / Math.max(1, now - lastT)); // px per ms, smoothed
+      lastY = y; lastT = now;
+      const pull = Math.max(0, dy);
+      dragY = pull < 160 ? pull : 160 + (pull - 160) * .55; // soft resistance after a short pull
+      if (pull && e.cancelable) e.preventDefault();
+      follow(dragY);
     }, { passive: false });
     addEventListener('touchend', () => {
       if (y0 === null) return;
       y0 = null;
       if (!vertical) return;
-      if (dragY > 90) {
-        follow(innerHeight, true);
-        setTimeout(() => {
-          closeSheet();
-          panel.style.transition = panel.style.transform = '';
-          sheet.querySelector('.fav-sheet-shade').style.opacity = '';
-          const tv = hero && hero.querySelector('.fav-hero-tv');
-          if (tv) tv.style.transition = tv.style.transform = '';
-        }, 260);
+      // a long enough pull, or a quick flick down, closes it
+      if (dragY > 140 || (speed > .55 && dragY > 50)) {
+        // the panel keeps going at about the speed you flicked it
+        const ms = Math.round(Math.min(420, Math.max(240, 380 - speed * 120)));
+        follow(panel.offsetHeight + 40, `${ms}ms cubic-bezier(.2, .7, .3, 1)`);
+        const tv = tvOf();
+        if (tv) { tv.style.transform = `translateY(${dragY}px)`; } // the trailer floats back from here
+        setTimeout(() => { closeSheet(); clearFollow(); }, ms - 40);
       } else {
-        follow(0, true);
-        setTimeout(() => {
-          panel.style.transition = '';
-          const tv = hero && hero.querySelector('.fav-hero-tv');
-          if (tv) tv.style.transition = '';
-        }, 320);
+        // not far enough: it settles back with a gentle spring
+        follow(0, '.45s cubic-bezier(.3, 1.35, .5, 1)');
+        setTimeout(clearFollow, 470);
       }
     });
   }
