@@ -10961,6 +10961,36 @@ h1.section-title .about-title-color::before {
   .fav-hero.is-mini .fav-hero-tv { animation: none; }
 }
 
+/* tuning: from the moment a title is picked until its trailer cuts in,
+   the trailer's spot shows TV static over the still, like changing channel */
+.fav-hero-video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(transparent 46%, rgba(255, 200, 150, .18) 50%, transparent 54%) 0 0 / 100% 100% no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .9  0 0 0 0 .8  0 0 0 1.6 -.45'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px,
+    rgba(11, 11, 11, .35);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.fav-hero.is-tuning .fav-hero-video::after {
+  opacity: .9;
+  animation: fav-tune .45s steps(1, end) infinite;
+}
+.fav-hero.is-tuning .fav-hero-video { opacity: 1; }
+@keyframes fav-tune {
+  0% { background-position: 0 0, 0 0, 0 0; }
+  25% { background-position: 0 -30px, 53px 97px, 0 0; opacity: .75; }
+  50% { background-position: 0 40px, 131px 29px, 0 0; opacity: .95; }
+  75% { background-position: 0 -10px, 71px 151px, 0 0; opacity: .8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-hero.is-tuning .fav-hero-video::after { animation: none; }
+}
+
 /*===== PROJECTS: phones show each site right under its row =====*/
 /* Desktop keeps the hover card; on phones the floating card covered other
    rows, so each project plays its preview right under it, inside a slim

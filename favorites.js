@@ -1375,7 +1375,7 @@
       // YouTube" over the first ~3 s of play, and they can't be turned off:
       // the still stays up until they've faded, then the trailer shows
       clearTimeout(hero.videoHide);
-      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, 3200);
+      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); hero.classList.remove('is-tuning'); if (hero.paintMini) hero.paintMini(); }, 3200);
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
     else if (!miniClosed) { clearTimeout(hero.videoHide); hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
@@ -1401,9 +1401,16 @@
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
-    if (reduceMotion.matches) return; // every screen size: wide banners on the right, phones in the frame on top
+    if (reduceMotion.matches) return;
+    // the moment you pick: the frame flickers into static, like a TV changing
+    // channel, while YouTube loads and its own title and buttons fade; the
+    // trailer then cuts in clean (css: "tuning")
+    hero.classList.add('is-tuning');
+    clearTimeout(hero.tuneEnd);
+    hero.tuneEnd = setTimeout(() => hero.classList.remove('is-tuning'), 9000); // never plays: back to the still // every screen size: wide banners on the right, phones in the frame on top
     trailerFor(f).then((v) => {
-      if (!v || id !== paintId) return;
+      if (id !== paintId) return;
+      if (!v) { hero.classList.remove('is-tuning'); return; }
       const fr = document.createElement('iframe');
       fr.src = `https://www.youtube-nocookie.com/embed/${v}?start=${TRAILER_START}&autoplay=1&mute=1&controls=0&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&fs=0&cc_load_policy=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
       fr.title = `${f.title} trailer`;
