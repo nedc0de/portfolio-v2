@@ -11039,6 +11039,54 @@ h1.section-title .about-title-color::before {
   .fav-hero.is-tuning .fav-hero-video::after { animation: none; }
 }
 
+/* the poster you tap presses in and springs back (favorites.js) */
+.fav-card.is-tapped { animation: fav-tap .32s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes fav-tap {
+  0% { scale: 1; }
+  35% { scale: .93; }
+  100% { scale: 1; }
+}
+
+/* switching from a playing trailer: a bright burst of static over the
+   frame before the next one tunes in */
+.fav-hero.is-switching .fav-hero-video::after {
+  opacity: 1;
+  animation: fav-switch .45s steps(1, end);
+}
+@keyframes fav-switch {
+  0% { filter: brightness(2.4); background-position: 0 0, 0 0, 0 0; }
+  25% { filter: brightness(1.9); background-position: 0 30px, 91px 13px, 0 0; }
+  50% { filter: brightness(1.4); background-position: 0 -20px, 23px 117px, 0 0; }
+  75% { filter: brightness(1.1); background-position: 0 10px, 140px 80px, 0 0; }
+}
+
+/* the details panel: its parts rise in one after another as it slides up */
+.fav-sheet.is-open .fav-sheet-poster,
+.fav-sheet.is-open .fav-sheet-kicker,
+.fav-sheet.is-open .fav-sheet-title,
+.fav-sheet.is-open .fav-sheet-meta,
+.fav-sheet.is-open .fav-sheet-by,
+.fav-sheet.is-open .fav-sheet-rate,
+.fav-sheet.is-open .fav-sheet-sum { animation: fav-rise .42s cubic-bezier(.22, 1, .36, 1) both; }
+.fav-sheet.is-open .fav-sheet-poster { animation-delay: .08s; }
+.fav-sheet.is-open .fav-sheet-kicker { animation-delay: .14s; }
+.fav-sheet.is-open .fav-sheet-title { animation-delay: .19s; }
+.fav-sheet.is-open .fav-sheet-meta { animation-delay: .24s; }
+.fav-sheet.is-open .fav-sheet-by { animation-delay: .28s; }
+.fav-sheet.is-open .fav-sheet-rate { animation-delay: .32s; }
+.fav-sheet.is-open .fav-sheet-sum { animation-delay: .38s; }
+@keyframes fav-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-card.is-tapped,
+  .fav-hero.is-switching .fav-hero-video::after,
+  .fav-sheet.is-open .fav-sheet-poster, .fav-sheet.is-open .fav-sheet-kicker, .fav-sheet.is-open .fav-sheet-title,
+  .fav-sheet.is-open .fav-sheet-meta, .fav-sheet.is-open .fav-sheet-by, .fav-sheet.is-open .fav-sheet-rate,
+  .fav-sheet.is-open .fav-sheet-sum { animation: none; }
+}
+
 /*===== PROJECTS: phones show each site right under its row =====*/
 /* Desktop keeps the hover card; on phones the floating card covered other
    rows, so each project plays its preview right under it, inside a slim
