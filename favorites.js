@@ -1057,7 +1057,10 @@
         if (picking) return;
         if (hero && current !== item) {
           select(item);
-          if (!heroInView()) openSheet(item); // the preview is scrolled away: show the pick here
+          // the preview is scrolled away: on phones the mini player pinned to
+          // the top already shows the pick and plays its trailer; elsewhere
+          // the details panel opens here
+          if (!heroInView() && !hero.classList.contains('is-mini')) openSheet(item);
         } else openSheet(item);
       };
       card.addEventListener('click', open);
@@ -1277,7 +1280,7 @@
         <div class="fav-hero-tv">
           <span class="fav-hero-video" aria-hidden="true"></span>
           <span class="fav-hero-onair" aria-hidden="true">TRAILER</span>
-          <button type="button" class="fav-hero-mini-info" aria-label="Back to the trailer"><b class="fav-hero-mini-title"></b><small class="fav-hero-mini-rate"></small></button>
+          <button type="button" class="fav-hero-mini-info" aria-label="See details"><b class="fav-hero-mini-title"></b><small class="fav-hero-mini-rate"></small></button>
           <button type="button" class="fav-hero-sound" aria-pressed="false" aria-label="Turn trailer sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fhs-spk" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="fhs-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="fhs-off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
           <button type="button" class="fav-hero-mini-x" aria-label="Close the mini player"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
         </div>
@@ -1309,16 +1312,17 @@
   function setupMini() {
     const screen = hero.querySelector('.fav-hero-screen');
     let past = false;
-    const paint = () => hero.classList.toggle('is-mini', past && !wide.matches && hero.classList.contains('has-video') && !miniClosed);
+    // shown whenever the banner is scrolled away (its still shows until the
+    // trailer starts), so the pick and its trailer stay with you
+    const paint = () => hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed);
     hero.paintMini = paint;
     new IntersectionObserver(([e]) => {
       past = !e.isIntersecting && e.boundingClientRect.top < 0;
       if (!past && miniClosed) { miniClosed = false; ytCommand('playVideo'); } // back at the banner: play again
       paint();
     }).observe(screen);
-    hero.querySelector('.fav-hero-mini-info').addEventListener('click', () => {
-      screen.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'center' });
-    });
+    // tap the title: the pick's details
+    hero.querySelector('.fav-hero-mini-info').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-mini-x').addEventListener('click', () => {
       miniClosed = true;
       ytCommand('pauseVideo');
@@ -1396,10 +1400,12 @@
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     hero.querySelector('.fav-hero-rate').innerHTML = `${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span>`;
     hero.querySelector('.fav-hero-mini-title').textContent = f.title;
-    hero.querySelector('.fav-hero-mini-rate').innerHTML = `<b>${item.rating}</b> ${escapeHTML(verdict(item.rating))} · tap to watch`;
+    hero.querySelector('.fav-hero-mini-rate').innerHTML = `<b>${item.rating}</b> ${escapeHTML(verdict(item.rating))} · details`;
     miniClosed = false; // picking something new brings the player back
+    hero.classList.remove('is-mini-swap'); void hero.offsetWidth; hero.classList.add('is-mini-swap');
     hero.querySelector('.fav-hero-sum').textContent = '';
-    hero.classList.remove('has-cover', 'has-backdrop', 'has-video', 'is-mini');
+    hero.classList.remove('has-cover', 'has-backdrop', 'has-video');
+    if (hero.paintMini) hero.paintMini();
     playTrailer(f, id);
     hero.style.removeProperty('--backdrop');
     // a quick flash, like the portrait swapping in
