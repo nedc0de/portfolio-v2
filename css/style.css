@@ -10033,6 +10033,90 @@ html.fav-sheet-open { overflow: hidden; }
 
 /*===== 404: page not found =====*/
 .nf-hero { padding: 2rem 0 4rem; text-align: center; }
+/*===== 404: "No signal" =====*/
+/* An old TV showing a test pattern in the site's greys and oranges, CH 404 in
+   the corner like a channel display and NO SIGNAL in the middle. offline.html
+   uses the same TV with only static ("Signal lost"). */
+.tv {
+  position: relative;
+  margin: 1.6rem auto 0;
+  max-width: 34rem;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0d0d0d;
+  box-shadow: 0 0 0 1px #2a2a2a, 0 0 0 10px #141414, 0 0 0 11px #262626, 0 30px 60px -20px rgba(0, 0, 0, .9);
+}
+.tv::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, .65));
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .8);
+}
+.tv-bars { position: absolute; inset: 0 0 28% 0; display: grid; grid-template-columns: repeat(7, 1fr); }
+.tv-bars i:nth-child(1) { background: #c9c9c9; }
+.tv-bars i:nth-child(2) { background: #a8a8a8; }
+.tv-bars i:nth-child(3) { background: #ffb37a; }
+.tv-bars i:nth-child(4) { background: #ff7a1a; }
+.tv-bars i:nth-child(5) { background: #b8521a; }
+.tv-bars i:nth-child(6) { background: #5a5a5a; }
+.tv-bars i:nth-child(7) { background: #2a2a2a; }
+.tv-strip { position: absolute; left: 0; right: 0; bottom: 16%; height: 12%; display: grid; grid-template-columns: repeat(7, 1fr); }
+.tv-strip i:nth-child(odd) { background: #1a1a1a; }
+.tv-strip i:nth-child(even) { background: rgba(255, 122, 26, .2); }
+.tv-foot { position: absolute; left: 0; right: 0; bottom: 0; height: 16%; display: grid; grid-template-columns: 2fr 1fr 2fr 1fr 1fr; }
+.tv-foot i:nth-child(1), .tv-foot i:nth-child(3) { background: #101010; }
+.tv-foot i:nth-child(2) { background: #f2f2f2; }
+.tv-foot i:nth-child(4) { background: #1c1c1c; }
+.tv-foot i:nth-child(5) { background: #070707; }
+.tv-noise {
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .9  0 0 0 0 .8  0 0 0 1.6 -.45'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px;
+  opacity: .22;
+  mix-blend-mode: screen;
+  animation: tv-noise .5s steps(1, end) infinite;
+}
+@keyframes tv-noise {
+  0% { background-position: 0 0; }
+  25% { background-position: 53px 97px; }
+  50% { background-position: 131px 29px; }
+  75% { background-position: 71px 151px; }
+}
+.tv-osd {
+  position: absolute;
+  top: 7%;
+  left: 6%;
+  padding: .25rem .45rem;
+  background: rgba(11, 11, 11, .8);
+  font: 600 .95rem/1 ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .08em;
+  color: #ffb37a;
+  text-shadow: 0 0 6px rgba(255, 122, 26, .8);
+}
+.tv-msg {
+  position: absolute;
+  left: 50%;
+  top: 41%;
+  transform: translate(-50%, -50%);
+  padding: .55rem 1rem;
+  background: #0b0b0b;
+  border: 1px solid #ff7a1a;
+  font: 700 1.15rem/1 ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: .22em;
+  color: #ff7a1a;
+  text-shadow: 0 0 8px rgba(255, 122, 26, .7);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tv-noise { animation: none; }
+}
+
 .nf-lead { max-width: 30rem; margin: 2rem auto 1.4rem; font-size: 1rem; line-height: 1.6; color: #a8a8a8; }
 .nf-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.4rem; margin: 0; }
 .nf-go { font-weight: 700; color: var(--fifteenth-color); }
