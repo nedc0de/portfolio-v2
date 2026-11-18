@@ -1055,6 +1055,8 @@
       // "See details") and the details panel slides up
       const open = () => {
         if (picking) return;
+        // a quick press-in bounce on the poster you tapped
+        card.classList.remove('is-tapped'); void card.offsetWidth; card.classList.add('is-tapped');
         if (hero && current !== item) {
           select(item);
           // the preview is scrolled away: on phones the mini player pinned to
@@ -1552,6 +1554,13 @@
     miniClosed = false; // picking something new brings the player back
     hero.classList.remove('is-mini-swap'); void hero.offsetWidth; hero.classList.add('is-mini-swap');
     hero.querySelector('.fav-hero-sum').textContent = '';
+    // switching from a title that was playing: a bright burst of static
+    // first, like flicking the channel, then the new one tunes in
+    if (hero.classList.contains('has-video')) {
+      hero.classList.remove('is-switching'); void hero.offsetWidth; hero.classList.add('is-switching');
+      clearTimeout(hero.switchEnd);
+      hero.switchEnd = setTimeout(() => hero.classList.remove('is-switching'), 450);
+    }
     hero.classList.remove('has-cover', 'has-backdrop', 'has-video', 'needs-tap');
     if (hero.paintMini) hero.paintMini();
     playTrailer(f, id);
