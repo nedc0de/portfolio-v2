@@ -58,6 +58,7 @@ creator.
 **Visuals: always find a way.** Every post gets:
 
 - An original cover from `tools/blog-cover.html` (og + thumb sizes).
+  Then give the og image the screen lines: `python3 tools/og-crt.py <og.jpg> <og.jpg>`.
   Posts on the same topic (e.g. several GTA 6 posts) stay on the dark/yellow
   template but each gets its own simple icon on the right (`.art` slot) and,
   for leaks, the red glow (`body.leak`): wifi crossed out for "no online",
