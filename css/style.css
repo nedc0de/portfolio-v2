@@ -10789,6 +10789,12 @@ h1.section-title .about-title-color::before {
     top: var(--fav-bar-h, 3.6rem);
     z-index: 15;
     box-shadow: 0 18px 30px -18px rgba(0, 0, 0, .9);
+    transition: box-shadow .35s;
+  }
+  /* pinned: a soft band of the page colour under it, so posters scrolling
+     beneath fade away instead of being sliced by its edge */
+  .fav-hero.is-stuck {
+    box-shadow: 0 18px 30px -18px rgba(0, 0, 0, .9), 0 44px 36px -2px var(--thirteenth-color);
   }
 }
 

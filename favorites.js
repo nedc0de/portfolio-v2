@@ -912,7 +912,7 @@
   let topRow = null;
   function buildTopRow(shown) {
     if (topRow) topRow.remove();
-    const top = shown.filter((c) => c.rating >= 5).sort((a, b) => (b.fav.year || 0) - (a.fav.year || 0));
+    const top = shown.filter((c) => c.rating >= 5 && c.fav.type !== 'book').sort((a, b) => (b.fav.year || 0) - (a.fav.year || 0));
     if (top.length < 3) { topRow = null; return; }
     topRow = document.createElement('section');
     topRow.className = 'fav-top';
@@ -1493,6 +1493,15 @@
     // the banner pins just under the sticky menus (desktop): keep that gap exact
     const barH = () => hero.style.setProperty('--fav-bar-h', `${bar.offsetHeight}px`);
     barH(); addEventListener('resize', barH);
+    // computers: once the banner is pinned, the posters scrolling under it
+    // fade out into the page instead of being cut by its bottom edge
+    let stuck = false, stuckFrame = 0;
+    const checkStuck = () => {
+      stuckFrame = 0;
+      const now = wide.matches && grid.getBoundingClientRect().top < hero.getBoundingClientRect().bottom; // posters are passing under it
+      if (now !== stuck) { stuck = now; hero.classList.toggle('is-stuck', now); }
+    };
+    addEventListener('scroll', () => { if (!stuckFrame) stuckFrame = requestAnimationFrame(checkStuck); }, { passive: true });
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => {
       soundOn = !soundOn;
