@@ -1963,6 +1963,7 @@
         card.classList.add('is-picked');
         setTimeout(() => card.classList.remove('is-picked'), 1600);
         picking = false;
+        if (pickButton) pickButton.classList.remove('is-picking');
         // then it's the pick, like tapping it
         const item = cards.find((c) => c.el === card);
         if (hero) select(item);
@@ -1973,11 +1974,17 @@
   }
 
   if (pickButton) {
+    // feels pressed the moment your finger touches it (phones don't show a
+    // press on their own)
+    const press = (on) => pickButton.classList.toggle('is-pressed', on);
+    pickButton.addEventListener('pointerdown', () => press(true));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => pickButton.addEventListener(ev, () => setTimeout(() => press(false), 90)));
     pickButton.addEventListener('click', () => {
       if (picking) return;
       const pool = cards.filter((c) => c.shelf).map((c) => c.el);
       if (!pool.length) return;
       picking = true;
+      pickButton.classList.add('is-picking');
       pool.forEach((c) => setFlipped(c, false));
       const target = pool[Math.floor(Math.random() * pool.length)];
       if (reduceMotion.matches) return land(target);
