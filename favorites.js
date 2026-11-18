@@ -1309,12 +1309,32 @@
   // the top of the screen (the same player, so it keeps playing), with the
   // title next to it: tap it to go back up, or close it.
   let miniClosed = false;
+  // While a trailer shows, the site's screen effect (scanlines, edge fade)
+  // gets a hole cut exactly where the video is, so it plays clean and sharp
+  // (css: "the trailer hole"). Kept in place as you scroll.
+  const root = document.documentElement;
+  const holeVars = ['--hole-x', '--hole-y', '--hole-w', '--hole-h'];
+  let holeFrame = 0;
+  function placeHole() {
+    holeFrame = 0;
+    const slot = hero && hero.classList.contains('has-video') && !miniClosed && hero.querySelector('.fav-hero-video');
+    const r = slot && slot.getBoundingClientRect();
+    if (!r || !r.width || r.bottom < 0 || r.top > innerHeight) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
+    [r.left, r.top, r.width, r.height].forEach((n, i) => root.style.setProperty(holeVars[i], `${Math.round(n)}px`));
+  }
+  const queueHole = () => { if (!holeFrame) holeFrame = requestAnimationFrame(placeHole); };
+  addEventListener('scroll', queueHole, { passive: true });
+  addEventListener('resize', queueHole);
   function setupMini() {
     const screen = hero.querySelector('.fav-hero-screen');
     let past = false;
     // shown whenever the banner is scrolled away (its still shows until the
     // trailer starts), so the pick and its trailer stay with you
-    const paint = () => hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed);
+    const paint = () => {
+      hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed);
+      queueHole();
+      setTimeout(queueHole, 350); // after the mini player has slid in
+    };
     hero.paintMini = paint;
     new IntersectionObserver(([e]) => {
       past = !e.isIntersecting && e.boundingClientRect.top < 0;
