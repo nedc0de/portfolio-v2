@@ -11194,6 +11194,24 @@ body::after {
       radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
   }
 }
+/* Favorites details open (phones): the bottom fade shrinks to a thin strip
+   so the summary at the bottom of the panel stays readable */
+@media (pointer: coarse) {
+  html.fav-sheet-open body::after {
+    background:
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .5) calc(20vw + 12px), rgb(11 11 11 / .15) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .15) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 12px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(11 11 11 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
+  }
+}
+@media (pointer: coarse) and (min-width: 768px) {
+  html.fav-sheet-open body::after {
+    background:
+      linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(11 11 11 / .8) calc(20vw + 30px), rgb(11 11 11 / .5) calc(20vw + 90px), rgb(11 11 11 / .2) 34vw, transparent 50vw, transparent calc(100% - 50vw), rgb(11 11 11 / .2) calc(100% - 34vw), rgb(11 11 11 / .5) calc(100% - 20vw - 90px), rgb(11 11 11 / .8) calc(100% - 20vw - 30px), var(--crt-edge-color) calc(100% - 20vw)),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(11 11 11 / 0.92) calc(200px + env(safe-area-inset-top, 0px) + 8px), rgb(11 11 11 / 0.75) calc(200px + env(safe-area-inset-top, 0px) + 20px), rgb(11 11 11 / 0.52) calc(200px + env(safe-area-inset-top, 0px) + 36px), rgb(11 11 11 / 0.32) calc(200px + env(safe-area-inset-top, 0px) + 54px), rgb(11 11 11 / 0.16) calc(200px + env(safe-area-inset-top, 0px) + 72px), rgb(11 11 11 / 0.06) calc(200px + env(safe-area-inset-top, 0px) + 88px), transparent calc(200px + env(safe-area-inset-top, 0px) + 104px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 44px), rgb(11 11 11 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 16px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
+  }
+}
 /* the rolling band of light (an element scripts.js adds): moved with
    transform only, under the edge fade */
 .crt-band {
