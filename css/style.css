@@ -10962,12 +10962,10 @@ h1.section-title .about-title-color::before {
   /* the banner has to sit above the details panel for its trailer to, but
      only the trailer shows: the rest of the banner hides while it's docked
      (it overlapped the panel when you opened details from the top) */
-  .fav-hero.is-docked { z-index: 201; visibility: hidden; }
-  .fav-hero.is-docked .fav-hero-tv { visibility: visible; }
   .fav-hero.is-docked .fav-hero-tv {
     position: fixed;
-    left: 12px;
-    right: 12px;
+    left: var(--dock-left, 12px);
+    width: var(--dock-w, calc(100% - 24px));
     top: var(--dock-top, 20vh);
     bottom: auto;
     z-index: 201;
@@ -10977,6 +10975,47 @@ h1.section-title .about-title-color::before {
     animation: fav-dock .38s cubic-bezier(.22, 1, .36, 1);
   }
 }
+/* docked over the details, every screen size (phones above, here the rest) */
+.fav-hero.is-docked { z-index: 201; visibility: hidden; }
+.fav-hero.is-docked .fav-hero-tv { visibility: visible; }
+@media (min-width: 900px) {
+  .fav-hero.is-docked .fav-hero-screen { display: block; }
+  .fav-hero.is-docked .fav-hero-tv {
+    display: block;
+    position: fixed;
+    left: var(--dock-left);
+    top: var(--dock-top);
+    width: var(--dock-w);
+    z-index: 201;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid rgba(255, 122, 26, .45);
+    box-shadow: 0 18px 40px -12px #000;
+    background: #111;
+    animation: fav-dock .38s cubic-bezier(.22, 1, .36, 1);
+  }
+  .fav-hero.is-docked .fav-hero-video {
+    inset: 0;
+    width: auto;
+    opacity: 1;
+    -webkit-mask: none;
+    mask: none;
+    background: var(--backdrop, none) center 30% / cover no-repeat;
+  }
+}
+
+/* swiping between titles in the details: the new one slides in from the side */
+.fav-sheet-panel.is-next .fav-sheet-body,
+.fav-sheet-panel.is-next .fav-sheet-sum { animation: fav-step-next .32s cubic-bezier(.22, 1, .36, 1); }
+.fav-sheet-panel.is-prev .fav-sheet-body,
+.fav-sheet-panel.is-prev .fav-sheet-sum { animation: fav-step-prev .32s cubic-bezier(.22, 1, .36, 1); }
+@keyframes fav-step-next { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes fav-step-prev { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fav-sheet-panel.is-next .fav-sheet-body, .fav-sheet-panel.is-next .fav-sheet-sum,
+  .fav-sheet-panel.is-prev .fav-sheet-body, .fav-sheet-panel.is-prev .fav-sheet-sum { animation: none; }
+}
+
 @keyframes fav-dock {
   from { opacity: 0; transform: translateY(40px) scale(.96); }
   to { opacity: 1; transform: none; }
