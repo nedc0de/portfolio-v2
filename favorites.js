@@ -1347,11 +1347,11 @@
     clearTimeout(hero.videoHide);
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, 4500); // wait out the pause icon YouTube shows for a few seconds as it starts
+      // show it 3 seconds after the pick (the still shows until then), and at
+      // least 1.5 s after it starts, to wait out the icon YouTube flashes
+      const wait = Math.max(1500, 3000 - (Date.now() - (hero.pickedAt || 0)));
+      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, wait);
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
-      // no captions: a phone set to always show subtitles makes YouTube add
-      // them to the muted preview, where they'd be cut off by the zoom
-      if (!fr.ccOff) { fr.ccOff = true; ytCommand('unloadModule', ['captions']); ytCommand('unloadModule', ['cc']); }
     }
     else if (!miniClosed) { hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
   });
@@ -1382,7 +1382,6 @@
       fr.title = `${f.title} trailer`;
       fr.allow = 'autoplay; encrypted-media';
       fr.tabIndex = -1;
-      fr.loading = 'lazy';
       // the player tells us its state: the video only shows while it's
       // actually playing, so YouTube's play button, loading spinner, pause
       // and end screens never appear (the still shows instead)
@@ -1398,6 +1397,7 @@
     item.el.setAttribute('aria-pressed', 'true');
     const f = item.fav;
     const id = ++paintId; // a slow cover for an earlier pick never lands on this one
+    hero.pickedAt = Date.now();
     hero.querySelector('.fav-hero-kicker').textContent = `P1 · ${kicker || TYPE_NAME[f.type]}`;
     hero.querySelector('.fav-hero-title').textContent = f.title;
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
