@@ -1282,6 +1282,7 @@
         <div class="fav-hero-tv">
           <span class="fav-hero-video" aria-hidden="true"></span>
           <span class="fav-hero-onair" aria-hidden="true">TRAILER</span>
+          <button type="button" class="fav-hero-play">TAP TO PLAY</button>
           <button type="button" class="fav-hero-mini-info" aria-label="See details"><b class="fav-hero-mini-title"></b><small class="fav-hero-mini-rate"></small></button>
           <button type="button" class="fav-hero-sound" aria-pressed="false" aria-label="Turn trailer sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fhs-spk" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="fhs-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="fhs-off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
           <button type="button" class="fav-hero-mini-x" aria-label="Close the mini player"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
@@ -1303,6 +1304,18 @@
     barH(); addEventListener('resize', barH);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
+    // the phone wouldn't start it by itself (Low Power Mode does this): a tap
+    // on the picture plays it
+    hero.querySelector('.fav-hero-play').addEventListener('click', () => {
+      hero.classList.remove('needs-tap');
+      hero.classList.add('is-tuning');
+      ytCommand('playVideo');
+      clearTimeout(hero.tapTimer);
+      hero.tapTimer = setTimeout(() => {
+        const fr = hero.querySelector('.fav-hero-video iframe');
+        if (fr && !fr.playing) { hero.classList.remove('is-tuning'); hero.classList.add('needs-tap'); }
+      }, 6000);
+    });
     setupMini();
     select(item);
   }
@@ -1414,6 +1427,7 @@
     if (state === 0) { ytCommand('seekTo', [TRAILER_START, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
       fr.playing = true;
+      hero.classList.remove('needs-tap');
       // YouTube puts its own title, channel logo, pause button and "Watch on
       // YouTube" over the first ~3 s of play, and they can't be turned off:
       // the still stays up until they've faded, then the trailer shows
@@ -1474,6 +1488,12 @@
         }, 700);
       };
       slot.append(fr);
+      clearTimeout(hero.tapTimer);
+      hero.tapTimer = setTimeout(() => {
+        if (fr.playing || !fr.isConnected) return;
+        hero.classList.remove('is-tuning');
+        hero.classList.add('needs-tap');
+      }, 6000);
     }).catch(() => {});
   }
   function select(item, kicker) {
@@ -1493,7 +1513,7 @@
     miniClosed = false; // picking something new brings the player back
     hero.classList.remove('is-mini-swap'); void hero.offsetWidth; hero.classList.add('is-mini-swap');
     hero.querySelector('.fav-hero-sum').textContent = '';
-    hero.classList.remove('has-cover', 'has-backdrop', 'has-video');
+    hero.classList.remove('has-cover', 'has-backdrop', 'has-video', 'needs-tap');
     if (hero.paintMini) hero.paintMini();
     playTrailer(f, id);
     hero.style.removeProperty('--backdrop');
