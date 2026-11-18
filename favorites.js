@@ -1197,14 +1197,51 @@
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
     // swipe the panel down to close it (phones)
     const panel = sheet.querySelector('.fav-sheet-panel');
-    // swipe it left or right for the next or previous title on that shelf
-    let hx = null, hy = 0;
-    panel.addEventListener('touchstart', (e) => { hx = e.touches[0].clientX; hy = e.touches[0].clientY; }, { passive: true });
-    panel.addEventListener('touchend', (e) => {
+    // swipe it left or right for the next or previous title on that shelf:
+    // the details follow your finger, slide off, and the next title's slide
+    // in from the other side (the trailer above moves along with them)
+    let hx = null, hy = 0, side = null, hdx = 0;
+    const parts = () => [...panel.querySelectorAll('.fav-sheet-body, .fav-sheet-sum')];
+    const slide = (dx, ms) => {
+      const k = Math.min(1, Math.abs(dx) / 260);
+      parts().forEach((el) => {
+        el.style.transition = ms ? `transform ${ms}ms cubic-bezier(.22, 1, .36, 1), opacity ${ms}ms` : 'none';
+        el.style.transform = dx ? `translateX(${dx}px)` : '';
+        el.style.opacity = dx ? String(1 - k * .8) : '';
+      });
+      const tv = hero && hero.classList.contains('is-docked') ? hero.querySelector('.fav-hero-video') : null;
+      if (tv) {
+        tv.style.transition = ms ? `transform ${ms}ms cubic-bezier(.22, 1, .36, 1), opacity ${ms}ms` : 'none';
+        tv.style.transform = dx ? `translateX(${dx * .35}px)` : '';
+        tv.style.opacity = dx ? String(1 - k * .6) : '';
+      }
+    };
+    panel.addEventListener('touchstart', (e) => { hx = e.touches[0].clientX; hy = e.touches[0].clientY; side = null; hdx = 0; }, { passive: true });
+    panel.addEventListener('touchmove', (e) => {
       if (hx === null) return;
-      const ddx = e.changedTouches[0].clientX - hx, ddy = e.changedTouches[0].clientY - hy;
+      const dx = e.touches[0].clientX - hx, dy = e.touches[0].clientY - hy;
+      if (side === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) side = Math.abs(dx) > Math.abs(dy) * 1.2;
+      if (!side) return;
+      hdx = dx;
+      slide(dx, 0);
+    }, { passive: true });
+    panel.addEventListener('touchend', () => {
+      if (hx === null) return;
       hx = null;
-      if (Math.abs(ddx) > 70 && Math.abs(ddx) > Math.abs(ddy) * 1.6) stepSheet(ddx < 0 ? 1 : -1);
+      if (!side) return;
+      const dir = hdx < 0 ? 1 : -1;
+      if (Math.abs(hdx) > 70 && canStep(dir)) {
+        slide(-dir * innerWidth * .6, 180);
+        setTimeout(() => {
+          stepSheet(dir);
+          slide(dir * innerWidth * .45, 0); // the new one waits just off the other side
+          requestAnimationFrame(() => requestAnimationFrame(() => slide(0, 380)));
+          setTimeout(() => slide(0, 0), 420);
+        }, 180);
+      } else {
+        slide(0, 300);
+        setTimeout(() => slide(0, 0), 320);
+      }
     });
     // swipe down anywhere on the screen while the details are open (the
     // panel, the trailer above it or the dimmed page) and it all slides away
@@ -1258,17 +1295,18 @@
     });
   }
   let sheetItem = null;
-  function stepSheet(dir) {
-    if (!sheetItem) return;
+  const neighbour = (dir) => {
+    if (!sheetItem) return null;
     let el = sheetItem.el;
     do el = dir > 0 ? el.nextElementSibling : el.previousElementSibling;
     while (el && (!el.classList.contains('fav-card') || !el.offsetParent));
-    const next = el && cards.find((c) => c.el === el);
+    return el && cards.find((c) => c.el === el);
+  };
+  const canStep = (dir) => !!neighbour(dir);
+  function stepSheet(dir) {
+    const next = neighbour(dir);
     if (!next) return;
     if (hero) select(next);
-    const body = sheet.querySelector('.fav-sheet-panel');
-    body.classList.remove('is-next', 'is-prev'); void body.offsetWidth;
-    body.classList.add(dir > 0 ? 'is-next' : 'is-prev');
     openSheet(next);
   }
   function openSheet(item) {
@@ -1739,7 +1777,8 @@
     hero.classList.remove('has-cover', 'has-backdrop', 'has-video', 'needs-tap');
     if (hero.paintMini) hero.paintMini();
     playTrailer(f, id);
-    hero.style.removeProperty('--backdrop');
+    // the last title's still stays up until the new one has loaded, so the
+    // trailer frame never goes blank while switching
     // a quick flash, like the portrait swapping in
     hero.classList.remove('is-swap');
     void hero.offsetWidth;
