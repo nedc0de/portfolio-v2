@@ -1413,6 +1413,7 @@
     if (typeof state !== 'number') return;
     if (state === 0) { ytCommand('seekTo', [TRAILER_START, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
+      fr.playing = true;
       // YouTube puts its own title, channel logo, pause button and "Watch on
       // YouTube" over the first ~3 s of play, and they can't be turned off:
       // the still stays up until they've faded, then the trailer shows
@@ -1461,7 +1462,17 @@
       // the player tells us its state: the video only shows while it's
       // actually playing, so YouTube's play button, loading spinner, pause
       // and end screens never appear (the still shows instead)
-      fr.onload = () => { try { fr.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); } catch (e) {} };
+      // phones don't always start a muted trailer by themselves when it's
+      // small or picked further down the page (it only started once the
+      // details opened), so it's told to play until it reports playing
+      fr.onload = () => {
+        try { fr.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*'); } catch (e) {}
+        let tries = 0;
+        const kick = setInterval(() => {
+          if (fr.playing || !fr.isConnected || ++tries > 10) return clearInterval(kick);
+          try { fr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*'); } catch (e) {}
+        }, 700);
+      };
       slot.append(fr);
     }).catch(() => {});
   }
