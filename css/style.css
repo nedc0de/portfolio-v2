@@ -10892,20 +10892,23 @@ h1.section-title .about-title-color::before {
   .fav-hero-sound[aria-pressed="false"] .fhs-on { display: none; }
   .fav-hero-sound[aria-pressed="true"] { color: #ff7a1a; }
 
-  /* scrolled past: the same player shrinks into a slim bar pinned to the top */
-  /* above the screen's dark top fade (body::after, 9998) so the mini player
-     sits bright at the top; the scanlines (html::after) still run over it */
+  /* scrolled past: the same player shrinks into a small floating player in
+     the bottom right corner, like YouTube's: the video with its title and a
+     close button under it. Above the screen's dark edge fade (body::after,
+     9998) so it stays bright; the scanlines (html::after) still run over it.
+     It sits clear of the browser's bottom toolbar. */
   .fav-hero.is-mini { z-index: 9999; }
   .fav-hero.is-mini .fav-hero-tv {
     position: fixed;
-    inset: auto 10px auto 10px;
-    top: calc(10px + env(safe-area-inset-top, 0px));
+    inset: auto 12px auto auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
     z-index: 30;
     display: grid;
-    grid-template-columns: 112px 1fr auto auto;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 8px;
-    padding: 6px;
+    width: min(52vw, 220px);
+    gap: 0;
+    padding: 0;
     background: rgba(17, 17, 17, .94);
     border: 1px solid rgba(255, 122, 26, .45);
     box-shadow: 0 12px 30px -10px #000;
@@ -10913,13 +10916,14 @@ h1.section-title .about-title-color::before {
     backdrop-filter: blur(8px);
     animation: fav-mini-in .3s ease-out;
   }
-  .fav-hero.is-mini .fav-hero-video { position: relative; inset: auto; width: 112px; aspect-ratio: 16 / 9; }
+  .fav-hero.is-mini .fav-hero-video { position: relative; inset: auto; grid-area: 1 / 1 / 2 / 3; width: 100%; aspect-ratio: 16 / 9; }
   .fav-hero.is-mini .fav-hero-onair { display: none; }
-  .fav-hero.is-mini .fav-hero-sound { position: static; }
+  .fav-hero.is-mini .fav-hero-sound { position: relative; grid-area: 1 / 1 / 2 / 3; justify-self: end; align-self: end; z-index: 2; right: auto; bottom: auto; }
   .fav-hero.is-mini .fav-hero-mini-info {
     display: block;
+    grid-area: 2 / 1;
     min-width: 0;
-    padding: 0;
+    padding: 6px 4px 7px 9px;
     border: 0;
     background: none;
     text-align: left;
@@ -10932,17 +10936,18 @@ h1.section-title .about-title-color::before {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: .8rem;
+    font-size: .7rem;
     font-weight: 800;
     line-height: 1.2;
     text-transform: uppercase;
     color: #f2f2f2;
   }
-  .fav-hero-mini-rate { display: block; margin-top: 3px; font-size: .68rem; color: #8a8a8a; }
+  .fav-hero-mini-rate { display: block; margin-top: 2px; font-size: .6rem; color: #8a8a8a; }
   /* picking another title down the page: its name slides in */
   .fav-hero.is-mini.is-mini-swap .fav-hero-mini-info { animation: fav-swap .35s ease-out; }
   .fav-hero-mini-rate b { color: var(--fifteenth-color); }
   .fav-hero.is-mini .fav-hero-mini-x {
+    grid-area: 2 / 2;
     display: grid;
     place-items: center;
     width: 32px;
@@ -11041,11 +11046,12 @@ h1.section-title .about-title-color::before {
   cursor: pointer;
 }
 @media (max-width: 899px) {
-  .fav-hero.is-mini.needs-tap .fav-hero-play { position: static; grid-area: 1 / 1; font-size: .55rem; letter-spacing: .08em; }
-  .fav-hero.is-mini .fav-hero-video { grid-area: 1 / 1; }
+  .fav-hero.is-mini.needs-tap .fav-hero-play { position: static; grid-area: 1 / 1 / 2 / 3; font-size: .6rem; letter-spacing: .08em; }
 }
+/* the back-to-top button would sit under the mini player: it steps aside */
+html:has(.fav-hero.is-mini) .back-to-top-btn { opacity: 0; pointer-events: none; }
 @keyframes fav-mini-in {
-  from { opacity: 0; transform: translateY(-12px); }
+  from { opacity: 0; transform: translateY(16px) scale(.96); }
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
