@@ -11719,3 +11719,21 @@ body::after {
 .fav-select:has(select[aria-expanded="true"])::after { border-color: var(--fifteenth-color); }
 .fav-select:has(select[aria-expanded="true"])::after { transform: translateY(.18rem) rotate(-135deg); }
 .fav-select select:active { transform: scale(.96); }
+
+/*===== Text links: a simple hover =====*/
+/* "Get to know me", "Play with it", "See all picks", "All posts", "Read
+   post", the 404 links and "Back to top" no longer roll up on hover: they
+   just get lighter (orange ones a lighter orange, grey ones white) */
+.roll > span,
+.roll.is-rolled > span,
+a:hover .roll > span,
+a:focus-visible .roll > span {
+  transform: none !important;
+  text-shadow: none !important;
+  transition: none !important;
+}
+.xb-go, .hm-all, .bl-read, .nf-go, .footer-top { transition: color .2s; }
+.xb-go:hover, .hm-all:hover, .bl-read:hover, .nf-go:hover,
+.xb-go:focus-visible, .hm-all:focus-visible, .bl-read:focus-visible, .nf-go:focus-visible,
+a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
+.footer-top:hover, .footer-top:focus-visible { color: #f2f2f2; }
