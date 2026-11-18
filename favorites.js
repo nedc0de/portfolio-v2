@@ -1405,8 +1405,10 @@
       const tv = hero.querySelector('.fav-hero-tv');
       const vid = hero.querySelector('.fav-hero-video');
       const first = tv.getBoundingClientRect();
-      tv.style.animation = 'none'; // no slide-in for the mini player: the picture flies into it
-      setTimeout(() => { tv.style.animation = ''; }, 500);
+      // no slide-in for the mini player: the picture flies into it. (Turning
+      // the slide-in back on here made it replay, a small jump after closing;
+      // it comes back once the mini player has gone away.)
+      tv.style.animation = 'none';
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
       if (panel) panel.style.maxHeight = '';
@@ -1421,7 +1423,9 @@
     };
     addEventListener('resize', () => docked && dockTop());
     const paint = () => {
+      const was = hero.classList.contains('is-mini');
       hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed && !docked);
+      if (was && !hero.classList.contains('is-mini') && !docked) hero.querySelector('.fav-hero-tv').style.animation = '';
       queueHole();
       setTimeout(queueHole, 350); // after the mini player has slid in
     };
