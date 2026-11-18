@@ -1212,7 +1212,7 @@
     if (!sheet) buildSheet();
     const f = item.fav;
     const q = (c) => sheet.querySelector(c);
-    q('.fav-sheet-kicker').textContent = `P1 · ${f === FEATURED ? 'Just watched' : TYPE_NAME[f.type]}`;
+    q('.fav-sheet-kicker').textContent = `P1 · ${TYPE_NAME[f.type]}`;
     q('.fav-sheet-title').textContent = f.title;
     q('.fav-sheet-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     q('.fav-sheet-by').textContent = f.by ? (f.type === 'book' ? 'by ' : 'Directed by ') + f.by : '';
@@ -1258,8 +1258,9 @@
   // in the grid (with a P1 tag) and shows big up here, with its stars, its
   // summary (desktop) and a button to its details. Picked further down, with
   // the preview scrolled away, the details panel opens instead. It starts on
-  // the latest movie.
-  const FEATURED = FAVORITES.find((f) => f.type === 'movie');
+  // There Will Be Blood.
+  // the banner always opens on There Will Be Blood (any movie if it's ever removed)
+  const FEATURED = FAVORITES.find((f) => f.title === 'There Will Be Blood') || FAVORITES.find((f) => f.type === 'movie');
   let hero = null;
   let current = null;
   let paintId = 0;
@@ -1298,7 +1299,7 @@
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
     setupMini();
-    select(item, 'Just watched');
+    select(item);
   }
   // Phones and upright tablets: the trailer plays in a wide frame on top of
   // the banner. Scroll past it and it shrinks into a mini player pinned to
