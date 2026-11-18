@@ -1433,7 +1433,18 @@
       // the still stays up until they've faded, then the trailer shows
       clearTimeout(hero.videoHide);
       hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); hero.classList.remove('is-tuning'); if (hero.paintMini) hero.paintMini(); }, 3200);
-      if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
+      if (soundOn && !fr.soundSet) { fr.soundSet = true; fr.unmutedAt = Date.now(); applySound(); }
+    }
+    // iPhones pause a video that turns its sound on without a tap on it, so
+    // with sound on, each new trailer stopped (and only played after a second
+    // tap). If that happens: back to muted and keep playing; the speaker
+    // button shows muted, and one tap on it brings the sound
+    else if (state === 2 && fr.unmutedAt && Date.now() - fr.unmutedAt < 2500) {
+      fr.unmutedAt = 0;
+      soundOn = false;
+      paintSound();
+      ytCommand('mute');
+      ytCommand('playVideo');
     }
     else if (!miniClosed) { clearTimeout(hero.videoHide); hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
   });
