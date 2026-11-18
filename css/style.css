@@ -11624,10 +11624,17 @@ body::after {
     width: min(880px, 92vw);
     max-height: 94vh;
     padding-top: calc(var(--theater-h, 0px) + 1.5rem);
-    overflow-x: hidden;
-    scrollbar-width: none; /* a very long summary still scrolls, without a bar in the card */
+    overflow: hidden;
   }
-  .fav-sheet-panel.is-theater::-webkit-scrollbar { display: none; }
+  /* a long summary scrolls in its own space under the title; the trailer,
+     poster and title stay put */
+  .fav-sheet-panel.is-theater .fav-sheet-sum {
+    max-height: var(--sum-max, none);
+    overflow-y: auto;
+    padding-right: .4rem;
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+  }
   .fav-sheet-panel.is-theater .fav-sheet-poster { width: 132px; }
   .fav-sheet-panel.is-theater .fav-sheet-slash { top: calc(var(--theater-h, 0px) + 2.4rem); height: 150px; }
   .fav-sheet-panel.is-theater .fav-sheet-x { top: calc(var(--theater-h, 0px) + .9rem); }

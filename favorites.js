@@ -1555,14 +1555,18 @@
         panel.style.setProperty('--theater-h', '0px');
         // the card's details alone, then the biggest screen that still lets
         // the whole card fit in the window (smaller laptops get a smaller one)
-        // (twice: a narrower card wraps its text onto more lines)
+        // sized by the window only, never by the summary: every card has the
+        // same wide layout, and a long summary scrolls inside the card (it
+        // used to shrink the whole card into a narrow one)
         const full = panel.offsetWidth, room = Math.min(innerHeight * .94, innerHeight - safeTop * 2);
-        for (let pass = 0; pass < 2; pass++) {
-          h = Math.min(full * 9 / 16, room - panel.scrollHeight - 28); // a little room for a summary that loads late
-          w = Math.min(full, Math.max(h, 180) * 16 / 9);
-          panel.style.width = w < full ? `${Math.round(w)}px` : '';
-        }
+        const sumEl = panel.querySelector('.fav-sheet-sum');
+        const info = panel.scrollHeight - (sumEl ? sumEl.offsetHeight : 0);
+        h = Math.min(full * 9 / 16, room - info - 70); // keeps a few lines of the summary in view
+        w = Math.min(full, Math.max(h, 240) * 16 / 9);
+        panel.style.width = w < full ? `${Math.round(w)}px` : '';
         h = w * 9 / 16;
+        // whatever height is left is the summary's; a longer one scrolls in place
+        panel.style.setProperty('--sum-max', `${Math.max(70, Math.round(room - h - info - 8))}px`);
         panel.style.setProperty('--theater-h', `${Math.round(h)}px`);
         const ph = panel.offsetHeight;
         top = Math.max(safeTop, (innerHeight - ph) / 2);
@@ -1629,7 +1633,7 @@
       tv.style.animation = 'none';
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
-      if (panel) { panel.style.maxHeight = panel.style.top = panel.style.width = ''; panel.classList.remove('is-theater'); panel.style.removeProperty('--theater-h'); }
+      if (panel) { panel.style.maxHeight = panel.style.top = panel.style.width = ''; panel.classList.remove('is-theater'); panel.style.removeProperty('--theater-h'); panel.style.removeProperty('--sum-max'); }
       hero.classList.remove('in-theater');
       paint();
       if (hero.skipGlide) { hero.skipGlide = false; queueHole(); return; } // a swipe already brought it here
