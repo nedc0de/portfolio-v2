@@ -1544,7 +1544,7 @@
     };
     let panelWatch = null;
     hero.dock = (item) => {
-      if (item !== current || !hero.querySelector('.fav-hero-video')) return;
+      if (item !== current || !hero.querySelector('.fav-hero-video') || hero.classList.contains('no-trailer')) return;
       // the picture glides from where it is (mini player or banner) down to
       // its spot above the details, growing as it goes
       const tv = hero.querySelector('.fav-hero-tv');
@@ -1735,7 +1735,7 @@
     tvEl.addEventListener('click', (e) => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); } }, true);
     const paint = () => {
       const was = hero.classList.contains('is-mini');
-      hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed && !docked);
+      hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed && !docked && !hero.classList.contains('no-trailer'));
       if (was && !hero.classList.contains('is-mini') && !docked) hero.querySelector('.fav-hero-tv').style.animation = '';
       queueHole();
       setTimeout(queueHole, 350); // after the mini player has slid in
@@ -1820,7 +1820,7 @@
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
-    if (reduceMotion.matches) return;
+    if (reduceMotion.matches || f.type === 'book') return; // books have no trailer
     // the moment you pick: the frame flickers into static, like a TV changing
     // channel, while YouTube loads and its own title and buttons fade; the
     // trailer then cuts in clean (css: "tuning")
@@ -1886,7 +1886,12 @@
     if (hero.paintMini) hero.paintMini();
     playTrailer(f, id);
     // the last title's still stays up until the new one has loaded, so the
-    // trailer frame never goes blank while switching
+    // trailer frame never goes blank while switching. A book has no trailer:
+    // no video frame, no mini player, just its details.
+    const isBook = f.type === 'book';
+    hero.classList.toggle('no-trailer', isBook);
+    if (isBook) { hero.style.removeProperty('--backdrop'); hero.classList.remove('is-tuning', 'is-switching'); }
+    if (hero.paintMini) hero.paintMini();
     // a quick flash, like the portrait swapping in
     hero.classList.remove('is-swap');
     void hero.offsetWidth;
