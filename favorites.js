@@ -1197,6 +1197,15 @@
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
     // swipe the panel down to close it (phones)
     const panel = sheet.querySelector('.fav-sheet-panel');
+    // swipe it left or right for the next or previous title on that shelf
+    let hx = null, hy = 0;
+    panel.addEventListener('touchstart', (e) => { hx = e.touches[0].clientX; hy = e.touches[0].clientY; }, { passive: true });
+    panel.addEventListener('touchend', (e) => {
+      if (hx === null) return;
+      const ddx = e.changedTouches[0].clientX - hx, ddy = e.changedTouches[0].clientY - hy;
+      hx = null;
+      if (Math.abs(ddx) > 70 && Math.abs(ddx) > Math.abs(ddy) * 1.6) stepSheet(ddx < 0 ? 1 : -1);
+    });
     let y0 = null;
     panel.addEventListener('touchstart', (e) => { y0 = panel.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
     panel.addEventListener('touchmove', (e) => {
@@ -1212,8 +1221,23 @@
       if (dy > 90) closeSheet();
     });
   }
+  let sheetItem = null;
+  function stepSheet(dir) {
+    if (!sheetItem) return;
+    let el = sheetItem.el;
+    do el = dir > 0 ? el.nextElementSibling : el.previousElementSibling;
+    while (el && (!el.classList.contains('fav-card') || !el.offsetParent));
+    const next = el && cards.find((c) => c.el === el);
+    if (!next) return;
+    if (hero) select(next);
+    const body = sheet.querySelector('.fav-sheet-panel');
+    body.classList.remove('is-next', 'is-prev'); void body.offsetWidth;
+    body.classList.add(dir > 0 ? 'is-next' : 'is-prev');
+    openSheet(next);
+  }
   function openSheet(item) {
     if (!item) return;
+    sheetItem = item;
     if (!sheet) buildSheet();
     const f = item.fav;
     const q = (c) => sheet.querySelector(c);
@@ -1305,7 +1329,12 @@
     const barH = () => hero.style.setProperty('--fav-bar-h', `${bar.offsetHeight}px`);
     barH(); addEventListener('resize', barH);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
-    hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
+    hero.querySelector('.fav-hero-sound').addEventListener('click', () => {
+      soundOn = !soundOn;
+      try { soundOn ? localStorage.setItem(SOUND_KEY, '1') : localStorage.removeItem(SOUND_KEY); } catch (e) {}
+      paintSound(); applySound();
+    });
+    paintSound();
     // the phone wouldn't start it by itself (Low Power Mode does this): a tap
     // on the picture plays it
     hero.querySelector('.fav-hero-play').addEventListener('click', () => {
@@ -1356,30 +1385,47 @@
     // just above the details panel (the same player moves, so it keeps
     // playing), and it goes back when the panel closes
     let docked = false;
+    // where the docked trailer goes: right above the details panel, which
+    // is a bottom sheet on phones and a centred card on bigger screens
     const dockTop = () => {
       const panel = document.querySelector('.fav-sheet-panel');
-      if (!panel) return;
-      const w = innerWidth - 24;
-      const h = w * 9 / 16;
+      if (!panel) return false;
       const safeTop = 12 + (parseFloat(getComputedStyle(hero).getPropertyValue('--sat')) || 0);
-      // the panel gives up room (and scrolls) if the trailer wouldn't fit
-      panel.style.maxHeight = `${Math.round(innerHeight - h - safeTop - 12)}px`;
-      const top = innerHeight - panel.offsetHeight - h - 12;
-      hero.style.setProperty('--dock-top', `${Math.max(safeTop, top)}px`);
+      let w, h, top;
+      if (innerWidth < 768) {
+        w = innerWidth - 24;
+        h = w * 9 / 16;
+        // the panel gives up room (and scrolls) if the trailer wouldn't fit
+        panel.style.maxHeight = `${Math.round(innerHeight - h - safeTop - 12)}px`;
+        top = Math.max(safeTop, innerHeight - panel.offsetHeight - h - 12);
+      } else {
+        // the card and the trailer are centred together: the card moves down
+        // to make room, and the trailer shrinks only if the screen is short
+        const ph = panel.offsetHeight;
+        h = Math.min(panel.offsetWidth * 9 / 16, innerHeight - ph - safeTop - 36);
+        if (h < 110) return false; // no room above the card
+        w = h * 16 / 9;
+        top = Math.max(safeTop, (innerHeight - (h + 12 + ph)) / 2);
+        panel.style.top = `${Math.round(top + h + 12 + ph / 2)}px`;
+      }
+      hero.style.setProperty('--dock-top', `${Math.round(top)}px`);
+      hero.style.setProperty('--dock-left', `${Math.round((innerWidth - w) / 2)}px`);
+      hero.style.setProperty('--dock-w', `${Math.round(w)}px`);
       queueHole();
+      return true;
     };
     let panelWatch = null;
     hero.dock = (item) => {
-      if (wide.matches || item !== current) return;
+      if (item !== current || !hero.querySelector('.fav-hero-video')) return;
       // the picture glides from where it is (mini player or banner) down to
       // its spot above the details, growing as it goes
       const tv = hero.querySelector('.fav-hero-tv');
       const first = hero.querySelector('.fav-hero-video').getBoundingClientRect();
       const glide = !reduceMotion.matches && first.width > 0 && first.bottom > 0 && first.top < innerHeight;
+      if (!dockTop()) return;
       tv.style.animation = glide ? 'none' : '';
       docked = true;
       miniClosed = false;
-      dockTop();
       hero.classList.add('is-docked');
       paint();
       if (glide) {
@@ -1411,7 +1457,7 @@
       tv.style.animation = 'none';
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
-      if (panel) panel.style.maxHeight = '';
+      if (panel) panel.style.maxHeight = panel.style.top = '';
       paint();
       const last = vid.getBoundingClientRect();
       if (!reduceMotion.matches && last.width > 0 && last.bottom > 0 && last.top < innerHeight) {
@@ -1422,6 +1468,43 @@
       }
     };
     addEventListener('resize', () => docked && dockTop());
+    // swipe the mini player sideways or up to close it, like a music app's
+    const tvEl = hero.querySelector('.fav-hero-tv');
+    let sx = null, sy = 0, dx = 0, dy = 0, swiped = false;
+    tvEl.addEventListener('touchstart', (e) => {
+      if (!hero.classList.contains('is-mini')) return;
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = dy = 0; swiped = false;
+      tvEl.style.transition = 'none';
+    }, { passive: true });
+    tvEl.addEventListener('touchmove', (e) => {
+      if (sx === null) return;
+      dx = e.touches[0].clientX - sx;
+      dy = Math.min(0, e.touches[0].clientY - sy);
+      if (Math.abs(dx) > 8 || dy < -8) swiped = true;
+      tvEl.style.transform = `translate(${dx}px, ${dy}px)`;
+      tvEl.style.opacity = String(Math.max(.2, 1 - Math.max(Math.abs(dx) / 260, -dy / 120)));
+    }, { passive: true });
+    tvEl.addEventListener('touchend', () => {
+      if (sx === null) return;
+      sx = null;
+      const away = Math.abs(dx) > 90 || dy < -45;
+      tvEl.style.transition = 'transform .28s ease-out, opacity .28s';
+      if (away) {
+        tvEl.style.transform = Math.abs(dx) > 90 ? `translateX(${dx > 0 ? 120 : -120}%)` : 'translateY(-140%)';
+        tvEl.style.opacity = '0';
+        setTimeout(() => {
+          miniClosed = true;
+          ytCommand('pauseVideo');
+          paint();
+          tvEl.style.transition = tvEl.style.transform = tvEl.style.opacity = '';
+        }, 280);
+      } else {
+        tvEl.style.transform = tvEl.style.opacity = '';
+        setTimeout(() => { tvEl.style.transition = ''; }, 300);
+      }
+    });
+    // a swipe isn't a tap: don't open the details after one
+    tvEl.addEventListener('click', (e) => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); } }, true);
     const paint = () => {
       const was = hero.classList.contains('is-mini');
       hero.classList.toggle('is-mini', past && !wide.matches && !miniClosed && !docked);
@@ -1484,7 +1567,10 @@
   });
   // the one control: sound on or off (the trailer starts muted). The choice
   // carries over when you pick another title.
+  // the sound choice is remembered on this device for next time
+  const SOUND_KEY = 'nedcode-fav-sound';
   let soundOn = false;
+  try { soundOn = localStorage.getItem(SOUND_KEY) === '1'; } catch (e) {}
   const ytCommand = (func, args = []) => {
     const fr = hero && hero.querySelector('.fav-hero-video iframe');
     if (fr) try { fr.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*'); } catch (e) {}
@@ -2041,4 +2127,22 @@
   renderStats();
   buildCards();
   buildBanner();
+  // look each title's trailer up as its poster comes near the screen (one at
+  // a time, gently), so a tap finds it ready and the static is short
+  if ('IntersectionObserver' in window) {
+    const queue = [];
+    let busy = false;
+    const pump = () => {
+      if (busy || !queue.length) return;
+      busy = true;
+      trailerFor(queue.shift().fav).catch(() => {}).finally(() => setTimeout(() => { busy = false; pump(); }, 250));
+    };
+    const ahead = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      ahead.unobserve(e.target);
+      const item = cards.find((c) => c.el === e.target);
+      if (item && item.fav.type !== 'book') { queue.push(item); pump(); }
+    }), { rootMargin: '300px 0px' });
+    cards.forEach((c) => ahead.observe(c.el));
+  }
 })();
