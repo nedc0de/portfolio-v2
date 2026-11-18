@@ -1206,19 +1206,55 @@
       hx = null;
       if (Math.abs(ddx) > 70 && Math.abs(ddx) > Math.abs(ddy) * 1.6) stepSheet(ddx < 0 ? 1 : -1);
     });
-    let y0 = null;
-    panel.addEventListener('touchstart', (e) => { y0 = panel.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
-    panel.addEventListener('touchmove', (e) => {
-      if (y0 === null) return;
-      const dy = Math.max(0, e.touches[0].clientY - y0);
+    // swipe down anywhere on the screen while the details are open (the
+    // panel, the trailer above it or the dimmed page) and it all slides away
+    // together. Inside the panel, only once its text is scrolled to the top.
+    let y0 = null, x0 = 0, dragY = 0, vertical = null;
+    const tvOf = () => hero && hero.classList.contains('is-docked') ? hero.querySelector('.fav-hero-tv') : null;
+    const follow = (dy, animate) => {
+      const ease = animate ? 'transform .3s cubic-bezier(.22, 1, .36, 1)' : 'none';
+      panel.style.transition = ease;
       panel.style.transform = dy ? `translateY(${dy}px)` : '';
+      const tv = tvOf();
+      if (tv) { tv.style.transition = ease; tv.style.transform = dy ? `translateY(${dy}px)` : ''; }
+      sheet.querySelector('.fav-sheet-shade').style.opacity = dy ? String(Math.max(0, 1 - dy / 400)) : '';
+    };
+    addEventListener('touchstart', (e) => {
+      if (sheet.hidden || !sheet.classList.contains('is-open')) return;
+      const inPanel = panel.contains(e.target);
+      if (inPanel && panel.scrollTop > 0) { y0 = null; return; }
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dragY = 0; vertical = null;
     }, { passive: true });
-    panel.addEventListener('touchend', (e) => {
+    addEventListener('touchmove', (e) => {
       if (y0 === null) return;
-      const dy = e.changedTouches[0].clientY - y0;
+      const dy = e.touches[0].clientY - y0, dx = e.touches[0].clientX - x0;
+      if (vertical === null && (Math.abs(dy) > 8 || Math.abs(dx) > 8)) vertical = Math.abs(dy) > Math.abs(dx);
+      if (!vertical) return;
+      dragY = Math.max(0, dy);
+      if (dragY && e.cancelable) e.preventDefault();
+      follow(dragY, false);
+    }, { passive: false });
+    addEventListener('touchend', () => {
+      if (y0 === null) return;
       y0 = null;
-      panel.style.transform = '';
-      if (dy > 90) closeSheet();
+      if (!vertical) return;
+      if (dragY > 90) {
+        follow(innerHeight, true);
+        setTimeout(() => {
+          closeSheet();
+          panel.style.transition = panel.style.transform = '';
+          sheet.querySelector('.fav-sheet-shade').style.opacity = '';
+          const tv = hero && hero.querySelector('.fav-hero-tv');
+          if (tv) tv.style.transition = tv.style.transform = '';
+        }, 260);
+      } else {
+        follow(0, true);
+        setTimeout(() => {
+          panel.style.transition = '';
+          const tv = hero && hero.querySelector('.fav-hero-tv');
+          if (tv) tv.style.transition = '';
+        }, 320);
+      }
     });
   }
   let sheetItem = null;
