@@ -1212,7 +1212,7 @@
     if (!sheet) buildSheet();
     const f = item.fav;
     const q = (c) => sheet.querySelector(c);
-    q('.fav-sheet-kicker').textContent = `P1 · ${f === FEATURED ? 'Just watched' : TYPE_NAME[f.type]}`;
+    q('.fav-sheet-kicker').textContent = `P1 · ${TYPE_NAME[f.type]}`;
     q('.fav-sheet-title').textContent = f.title;
     q('.fav-sheet-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     q('.fav-sheet-by').textContent = f.by ? (f.type === 'book' ? 'by ' : 'Directed by ') + f.by : '';
@@ -1258,8 +1258,9 @@
   // in the grid (with a P1 tag) and shows big up here, with its stars, its
   // summary (desktop) and a button to its details. Picked further down, with
   // the preview scrolled away, the details panel opens instead. It starts on
-  // the latest movie.
-  const FEATURED = FAVORITES.find((f) => f.type === 'movie');
+  // There Will Be Blood.
+  // the banner always opens on There Will Be Blood (any movie if it's ever removed)
+  const FEATURED = FAVORITES.find((f) => f.title === 'There Will Be Blood') || FAVORITES.find((f) => f.type === 'movie');
   let hero = null;
   let current = null;
   let paintId = 0;
@@ -1272,8 +1273,15 @@
     hero.setAttribute('aria-live', 'polite');
     hero.innerHTML = `
       <span class="fav-hero-bg" aria-hidden="true"></span>
-      <span class="fav-hero-video" aria-hidden="true"></span>
-      <button type="button" class="fav-hero-sound" aria-pressed="false" aria-label="Turn trailer sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fhs-spk" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="fhs-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="fhs-off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+      <div class="fav-hero-screen">
+        <div class="fav-hero-tv">
+          <span class="fav-hero-video" aria-hidden="true"></span>
+          <span class="fav-hero-onair" aria-hidden="true">TRAILER</span>
+          <button type="button" class="fav-hero-mini-info" aria-label="Back to the trailer"><b class="fav-hero-mini-title"></b><small class="fav-hero-mini-rate"></small></button>
+          <button type="button" class="fav-hero-sound" aria-pressed="false" aria-label="Turn trailer sound on"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fhs-spk" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="fhs-on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="fhs-off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+          <button type="button" class="fav-hero-mini-x" aria-label="Close the mini player"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+        </div>
+      </div>
       <span class="fav-hero-slash" aria-hidden="true"></span>
       <span class="fav-hero-poster"><img alt="" width="342" height="513"></span>
       <div class="fav-hero-info">
@@ -1290,7 +1298,33 @@
     barH(); addEventListener('resize', barH);
     hero.querySelector('.fav-hero-go').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-sound').addEventListener('click', () => { soundOn = !soundOn; paintSound(); applySound(); });
-    select(item, 'Just watched');
+    setupMini();
+    select(item);
+  }
+  // Phones and upright tablets: the trailer plays in a wide frame on top of
+  // the banner. Scroll past it and it shrinks into a mini player pinned to
+  // the top of the screen (the same player, so it keeps playing), with the
+  // title next to it: tap it to go back up, or close it.
+  let miniClosed = false;
+  function setupMini() {
+    const screen = hero.querySelector('.fav-hero-screen');
+    let past = false;
+    const paint = () => hero.classList.toggle('is-mini', past && !wide.matches && hero.classList.contains('has-video') && !miniClosed);
+    hero.paintMini = paint;
+    new IntersectionObserver(([e]) => {
+      past = !e.isIntersecting && e.boundingClientRect.top < 0;
+      if (!past && miniClosed) { miniClosed = false; ytCommand('playVideo'); } // back at the banner: play again
+      paint();
+    }).observe(screen);
+    hero.querySelector('.fav-hero-mini-info').addEventListener('click', () => {
+      screen.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'center' });
+    });
+    hero.querySelector('.fav-hero-mini-x').addEventListener('click', () => {
+      miniClosed = true;
+      ytCommand('pauseVideo');
+      paint();
+    });
+    wide.addEventListener('change', paint);
   }
   const heroInView = () => {
     const r = hero.getBoundingClientRect();
@@ -1309,10 +1343,10 @@
     clearTimeout(hero.videoHide);
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      hero.videoHide = setTimeout(() => hero.classList.add('has-video'), 4500); // wait out the pause icon YouTube shows for a few seconds as it starts
+      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, 4500); // wait out the pause icon YouTube shows for a few seconds as it starts
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
-    else hero.classList.remove('has-video');
+    else if (!miniClosed) { hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
   });
   // the one control: sound on or off (the trailer starts muted). The choice
   // carries over when you pick another title.
@@ -1333,7 +1367,7 @@
   function playTrailer(f, id) {
     const slot = hero.querySelector('.fav-hero-video');
     slot.replaceChildren();
-    if (!wide.matches || reduceMotion.matches) return;
+    if (reduceMotion.matches) return; // every screen size: wide banners on the right, phones in the frame on top
     trailerFor(f).then((v) => {
       if (!v || id !== paintId) return;
       const fr = document.createElement('iframe');
@@ -1361,8 +1395,11 @@
     hero.querySelector('.fav-hero-title').textContent = f.title;
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
     hero.querySelector('.fav-hero-rate').innerHTML = `${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span>`;
+    hero.querySelector('.fav-hero-mini-title').textContent = f.title;
+    hero.querySelector('.fav-hero-mini-rate').innerHTML = `<b>${item.rating}</b> ${escapeHTML(verdict(item.rating))} · tap to watch`;
+    miniClosed = false; // picking something new brings the player back
     hero.querySelector('.fav-hero-sum').textContent = '';
-    hero.classList.remove('has-cover', 'has-backdrop', 'has-video');
+    hero.classList.remove('has-cover', 'has-backdrop', 'has-video', 'is-mini');
     playTrailer(f, id);
     hero.style.removeProperty('--backdrop');
     // a quick flash, like the portrait swapping in
