@@ -11986,5 +11986,26 @@ main { counter-reset: hm-ch; }
 .bl-search input::-webkit-search-cancel-button { display: none; }
 .bl-search-x { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; background: none; color: #8a8a8a; cursor: pointer; }
 .bl-search-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.bl-none { margin: 2rem 0; color: #8a8a8a; }
-.bl-none[hidden], .bl-block[hidden], a.bl-feature[hidden] { display: none; }
+.bl-block[hidden], a.bl-feature[hidden] { display: none; }
+/* suggestions: the same list as Favorites' search, with links */
+.bl-search-list { z-index: 6; }
+.bl-search-list a {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .8rem;
+  padding: .75rem .9rem;
+  border-bottom: 1px solid #222;
+  text-decoration: none;
+  color: #e6e6e6;
+}
+.bl-search-list li:last-child a { border-bottom: 0; }
+.bl-search-list a[aria-selected="true"], .bl-search-list a:focus-visible { background: rgba(255, 122, 26, .1); box-shadow: inset 2px 0 0 var(--fifteenth-color); outline: 0; }
+.bl-search-list b { font-weight: 700; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.bl-search-list span { flex: none; font-size: .75rem; color: #8a8a8a; }
+/* phones: a suggestion's title gets the full width, its details under it */
+@media (max-width: 600px) {
+  .fav-search-list button, .bl-search-list a { flex-direction: column; align-items: flex-start; gap: .15rem; }
+  .fav-search-list b, .bl-search-list b { max-width: 100%; }
+}
