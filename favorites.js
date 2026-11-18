@@ -1364,14 +1364,12 @@
     let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
     const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
     if (typeof state !== 'number') return;
-    clearTimeout(hero.videoHide);
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      // YouTube shows its own title, pause button and "Watch on YouTube" for
-      // the first few seconds of play (and they can't be turned off), so the
-      // still stays up until they've faded: 4 s after it starts playing
-      const wait = Math.max(4000, 3000 - (Date.now() - (hero.pickedAt || 0)));
-      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, wait);
+      // shows the moment it starts playing (YouTube may flash its own title
+      // and buttons for the first few seconds; they can't be turned off)
+      hero.classList.add('has-video');
+      if (hero.paintMini) hero.paintMini();
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
     else if (!miniClosed) { hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
@@ -1418,7 +1416,6 @@
     item.el.setAttribute('aria-pressed', 'true');
     const f = item.fav;
     const id = ++paintId; // a slow cover for an earlier pick never lands on this one
-    hero.pickedAt = Date.now();
     hero.querySelector('.fav-hero-kicker').textContent = `P1 · ${kicker || TYPE_NAME[f.type]}`;
     hero.querySelector('.fav-hero-title').textContent = f.title;
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
