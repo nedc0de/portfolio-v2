@@ -11614,3 +11614,44 @@ body::after {
   --hole-pos: calc(var(--hole-x, 0px) + 20vw) calc(var(--hole-y, 0px) + 200px);
   --hole-size: var(--hole-w, 0px) var(--hole-h, 0px);
 }
+
+/*===== FAVORITES (computers): details as a theater card =====*/
+/* With a trailer, "See details" opens one wide card: the trailer is its
+   screen, full width across the top (favorites.js places it there), and the
+   poster, title, stars and summary sit underneath. */
+@media (min-width: 900px) {
+  .fav-sheet-panel.is-theater {
+    width: min(880px, 92vw);
+    max-height: 94vh;
+    padding-top: calc(var(--theater-h, 0px) + 1.5rem);
+    overflow-x: hidden;
+    scrollbar-width: none; /* a very long summary still scrolls, without a bar in the card */
+  }
+  .fav-sheet-panel.is-theater::-webkit-scrollbar { display: none; }
+  .fav-sheet-panel.is-theater .fav-sheet-poster { width: 132px; }
+  .fav-sheet-panel.is-theater .fav-sheet-slash { top: calc(var(--theater-h, 0px) + 2.4rem); height: 150px; }
+  .fav-sheet-panel.is-theater .fav-sheet-x { top: calc(var(--theater-h, 0px) + .9rem); }
+  .fav-sheet-panel.is-theater .fav-sheet-sum { margin-top: 1.2rem; }
+  /* the screen: flush with the card, its frame is the card's */
+  .fav-hero.is-docked.in-theater .fav-hero-tv {
+    border: 0;
+    box-shadow: none;
+  }
+  /* a soft fade from the picture into the card below it */
+  .fav-hero.is-docked.in-theater .fav-hero-tv::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 18%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(transparent, #171717);
+  }
+  /* the picture shows only once the trailer really plays: until then the
+     title's still (with the tuning static), never YouTube's own title,
+     pause button and logo that cover the first seconds */
+  .fav-hero.is-docked .fav-hero-video iframe { opacity: 0; transition: opacity .6s; }
+  .fav-hero.is-docked.has-video .fav-hero-video iframe { opacity: 1; }
+}

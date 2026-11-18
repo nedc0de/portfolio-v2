@@ -1545,6 +1545,28 @@
         // the panel gives up room (and scrolls) if the trailer wouldn't fit
         panel.style.maxHeight = `${Math.round(innerHeight - h - safeTop - 12)}px`;
         top = Math.max(safeTop, innerHeight - panel.offsetHeight - h - 12);
+      } else if (innerWidth >= 900) {
+        // computers: a theater card. The trailer is the card's own screen,
+        // full width across its top, with the details underneath; the card
+        // widens for it and the pair stays centred
+        panel.classList.add('is-theater');
+        hero.classList.add('in-theater');
+        panel.style.width = '';
+        panel.style.setProperty('--theater-h', '0px');
+        // the card's details alone, then the biggest screen that still lets
+        // the whole card fit in the window (smaller laptops get a smaller one)
+        // (twice: a narrower card wraps its text onto more lines)
+        const full = panel.offsetWidth, room = Math.min(innerHeight * .94, innerHeight - safeTop * 2);
+        for (let pass = 0; pass < 2; pass++) {
+          h = Math.min(full * 9 / 16, room - panel.scrollHeight - 28); // a little room for a summary that loads late
+          w = Math.min(full, Math.max(h, 180) * 16 / 9);
+          panel.style.width = w < full ? `${Math.round(w)}px` : '';
+        }
+        h = w * 9 / 16;
+        panel.style.setProperty('--theater-h', `${Math.round(h)}px`);
+        const ph = panel.offsetHeight;
+        top = Math.max(safeTop, (innerHeight - ph) / 2);
+        panel.style.top = `${Math.round(top + ph / 2)}px`;
       } else {
         // the card and the trailer are centred together: the card moves down
         // to make room, and the trailer shrinks only if the screen is short
@@ -1556,7 +1578,10 @@
         panel.style.top = `${Math.round(top + h + 12 + ph / 2)}px`;
       }
       hero.style.setProperty('--dock-top', `${Math.round(top)}px`);
-      hero.style.setProperty('--dock-left', `${Math.round((innerWidth - w) / 2)}px`);
+      // the theater card is centred in the details layer (the page's width
+      // without the scrollbar): the screen lines up with it exactly
+      const box = panel.classList.contains('is-theater') ? panel.parentElement.getBoundingClientRect() : { left: 0, width: innerWidth };
+      hero.style.setProperty('--dock-left', `${Math.round(box.left + (box.width - w) / 2)}px`);
       hero.style.setProperty('--dock-w', `${Math.round(w)}px`);
       queueHole();
       return true;
@@ -1604,7 +1629,8 @@
       tv.style.animation = 'none';
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
-      if (panel) panel.style.maxHeight = panel.style.top = '';
+      if (panel) { panel.style.maxHeight = panel.style.top = panel.style.width = ''; panel.classList.remove('is-theater'); panel.style.removeProperty('--theater-h'); }
+      hero.classList.remove('in-theater');
       paint();
       if (hero.skipGlide) { hero.skipGlide = false; queueHole(); return; } // a swipe already brought it here
       const last = vid.getBoundingClientRect();
