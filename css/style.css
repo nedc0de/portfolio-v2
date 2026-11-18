@@ -11579,3 +11579,8 @@ html.crt-boot .nav-logo-group {
 /* no static burst when moving between pages (the power-on on a first visit
    or a refresh stays) */
 html.crt-chan::before { content: none; animation: none; }
+
+/* the scrollbar's space is always kept: locking the page while Favorites
+   details are open hid the scrollbar on Windows PCs, so the whole page
+   jumped sideways and was laid out and redrawn on every open and close */
+html { scrollbar-gutter: stable; }
