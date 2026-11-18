@@ -1513,11 +1513,14 @@
       setTimeout(queueHole, 350); // after the mini player has slid in
     };
     hero.paintMini = paint;
+    // the mini player takes over as soon as most of the banner's video has
+    // scrolled away (under half of it left on screen), not only once it's
+    // completely gone
     new IntersectionObserver(([e]) => {
-      past = !e.isIntersecting && e.boundingClientRect.top < 0;
+      past = e.boundingClientRect.top < 0 && e.intersectionRatio < .5;
       if (!past && miniClosed) { miniClosed = false; ytCommand('playVideo'); } // back at the banner: play again
       paint();
-    }).observe(screen);
+    }, { threshold: [0, .25, .5, .75, 1] }).observe(screen);
     // tap the title: the pick's details
     hero.querySelector('.fav-hero-mini-info').addEventListener('click', () => current && openSheet(current));
     hero.querySelector('.fav-hero-mini-x').addEventListener('click', () => {
