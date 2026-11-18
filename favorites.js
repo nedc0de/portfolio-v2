@@ -1631,7 +1631,10 @@
           { transformOrigin: '0 0', transform: 'none' },
         ], { duration: 480, easing: 'cubic-bezier(.22, 1, .36, 1)' }).finished.then(queueHole, () => {});
       }
-      ytCommand('playVideo');
+      // only if it isn't already playing: telling a playing trailer to play
+      // makes YouTube show its title, pause button and logo again
+      const vf = hero.querySelector('.fav-hero-video iframe');
+      if (!vf || !vf.playing) ytCommand('playVideo');
       if (!panelWatch && 'ResizeObserver' in window) {
         panelWatch = new ResizeObserver(() => docked && dockTop());
         panelWatch.observe(document.querySelector('.fav-sheet-panel'));
@@ -1840,7 +1843,15 @@
     let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
     const state = d && (d.event === 'onStateChange' ? d.info : d.info && d.info.playerState);
     if (typeof state !== 'number') return;
-    if (state === 0) { ytCommand('seekTo', [TRAILER_START, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
+    // our own loop (YouTube's loop adds previous/next buttons). Starting over
+    // brings YouTube's title, pause button and logo back for a few seconds,
+    // so the still shows again until they've faded, like the first start
+    if (state === 0) {
+      clearTimeout(hero.videoHide);
+      hero.classList.remove('has-video');
+      ytCommand('seekTo', [TRAILER_START, true]);
+      ytCommand('playVideo');
+    }
     if (state === 1) {
       fr.playing = true;
       hero.classList.remove('needs-tap');

@@ -11662,3 +11662,10 @@ body::after {
   .fav-hero.is-docked .fav-hero-video iframe { opacity: 0; transition: opacity .6s; }
   .fav-hero.is-docked.has-video .fav-hero-video iframe { opacity: 1; }
 }
+
+/* the theater card's screen is cropped as much as the banner's, so
+   YouTube's title bar (top) and logo and "More videos" (bottom) stay out of
+   the frame */
+@media (min-width: 900px) {
+  .fav-hero.is-docked.in-theater .fav-hero-video iframe { transform: translate(-50%, -50%) scale(1.5); }
+}
