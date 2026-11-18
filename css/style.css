@@ -11553,21 +11553,6 @@ html.crt-boot body::before {
   100% { opacity: 0; }
 }
 
-/* colour split: as it opens, the picture shakes sideways for a moment with
-   red and blue fringes, then snaps into place */
-html.crt-boot .l-header,
-html.crt-boot .l-main > :first-child {
-  /* backwards, not both: once it's over nothing may stay on the header. Even a
-     zero translate would trap the phone menu (position: fixed) inside it */
-  animation: crt-split .36s steps(1, end) .4s backwards;
-}
-@keyframes crt-split {
-  0% { translate: -3px 0; filter: drop-shadow(3px 0 rgb(255 40 40 / .55)) drop-shadow(-3px 0 rgb(40 150 255 / .55)); }
-  25% { translate: 2px 0; filter: drop-shadow(-2px 0 rgb(255 40 40 / .5)) drop-shadow(2px 0 rgb(40 150 255 / .5)); }
-  50% { translate: -1px 0; filter: drop-shadow(1px 0 rgb(255 40 40 / .4)) drop-shadow(-1px 0 rgb(40 150 255 / .4)); }
-  75%, 100% { translate: 0 0; filter: none; }
-}
-
 /* the NED CODE sign gets its power last: it flickers on just after the
    picture opens (its look is unchanged, only when it lights up) */
 html.crt-boot .nav-logo-group {
@@ -11585,7 +11570,7 @@ html.crt-boot .nav-logo-group {
   .crt-band { display: none; }
   html.crt-chan::before { content: none; }
   html.crt-boot::before, html.crt-boot body::before { content: none; }
-  html.crt-boot .l-header, html.crt-boot .l-main > :first-child, html.crt-boot .nav-logo-group { animation: none; }
+  html.crt-boot .nav-logo-group { animation: none; }
 }
 @media print {
   html::after, body::after { content: none; }
@@ -11797,23 +11782,26 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
 /* the search field covers the menus while it's open */
 .fav-search {
   position: absolute;
-  inset: 0 0 auto 0;
+  /* lined up with the banner and the menus: the bar's own side padding in,
+     as tall as the menus */
+  inset: 50% 1rem auto 1rem;
+  transform: translateY(-50%);
   z-index: 40;
   display: flex;
   align-items: center;
   gap: .4rem;
   padding: 0 .2rem 0 .9rem;
-  min-height: 100%;
+  height: 40px;
   border: 1px solid rgba(255, 122, 26, .5);
   background: #121212;
   animation: fav-find-in .2s ease-out;
 }
 .fav-search[hidden] { display: none; }
-@keyframes fav-find-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes fav-find-in { from { opacity: 0; } }
 .fav-search input {
   flex: 1;
   min-width: 0;
-  height: 44px;
+  height: 38px;
   border: 0;
   outline: 0;
   background: none;
@@ -11911,7 +11899,7 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
 
 /*===== THEME: warmer screen =====*/
 /* A warm black page (variables above), a soft amber for the small screen
-   text, a phosphor glow when things are pointed at or tapped, a fine grain
+   text, a fine grain
    in the background, glowing titles and channel numbers on the home page. */
 :root { --amber: #ffbe4d; }
 
@@ -11919,22 +11907,6 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
 .fav-hero-onair, .tv-osd, .fav-sheet-verdict, .fav-top-item::after { color: var(--amber); }
 .fav-top-item::after { color: #111; background: var(--amber); }
 .fav-hero-onair, .tv-osd { text-shadow: 0 0 6px rgba(255, 190, 77, .55); }
-
-/* 3. phosphor glow: links light up a little when pointed at, posters and
-   cards when pointed at or tapped */
-@media (hover: hover) {
-  .nav-link:hover, .hm-all:hover, .bl-read:hover, .nf-go:hover, .footer-top:hover,
-  .ps-body a:hover, .fav-hero-go:hover, .ab-cta-go > a:hover {
-    text-shadow: 0 0 10px rgba(255, 122, 26, .55);
-  }
-  .fav-card:hover, .fav-top-item:hover, .hc-row:hover .hc-shot, .bl-row:hover img, .xb-card:hover {
-    box-shadow: 0 0 0 1px rgba(255, 122, 26, .45), 0 0 22px rgba(255, 122, 26, .28);
-  }
-}
-.fav-card:active, .fav-top-item:active, .xb-card:active {
-  box-shadow: 0 0 0 1px rgba(255, 122, 26, .55), 0 0 22px rgba(255, 122, 26, .35);
-}
-.fav-card, .fav-top-item, .xb-card { transition: box-shadow .25s, transform .15s, filter .5s; }
 
 /* 4. grain: a very fine, still noise in the page background (part of the
    page itself, so it costs nothing while scrolling) */
@@ -11953,8 +11925,7 @@ html { position: relative; }
 .section-title { letter-spacing: -.02em; }
 .about-title-color, .fav-shelf-title { text-shadow: 0 0 18px rgba(255, 122, 26, .28); }
 
-/* 6. home page: each section is a channel: a thin signal line above it and
-   its number before its name */
+/* 6. home page: each section is a channel, its number before its name */
 main { counter-reset: hm-ch; }
 .hm-block:not([hidden]) { counter-increment: hm-ch; }
 .hm-block:not([hidden]) .hm-label::before {
@@ -11964,18 +11935,4 @@ main { counter-reset: hm-ch; }
   letter-spacing: .1em;
   color: var(--amber);
   text-shadow: 0 0 6px rgba(255, 190, 77, .45);
-}
-.hm-block:not([hidden]) ~ .hm-block:not([hidden]) {
-  position: relative;
-}
-.hm-block:not([hidden]) ~ .hm-block:not([hidden])::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -1.6rem;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(255, 122, 26, .55), rgba(255, 122, 26, .15) 40%, transparent 80%);
-  box-shadow: 0 0 8px rgba(255, 122, 26, .35);
-  pointer-events: none;
 }
