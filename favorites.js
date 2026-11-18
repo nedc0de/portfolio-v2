@@ -1369,11 +1369,25 @@
     let panelWatch = null;
     hero.dock = (item) => {
       if (wide.matches || item !== current) return;
+      // the picture glides from where it is (mini player or banner) down to
+      // its spot above the details, growing as it goes
+      const tv = hero.querySelector('.fav-hero-tv');
+      const first = hero.querySelector('.fav-hero-video').getBoundingClientRect();
+      const glide = !reduceMotion.matches && first.width > 0 && first.bottom > 0 && first.top < innerHeight;
+      tv.style.animation = glide ? 'none' : '';
       docked = true;
       miniClosed = false;
       dockTop();
       hero.classList.add('is-docked');
       paint();
+      if (glide) {
+        const last = tv.getBoundingClientRect();
+        const k = first.width / last.width;
+        tv.animate([
+          { transformOrigin: '0 0', transform: `translate(${first.left - last.left}px, ${first.top - last.top}px) scale(${k})` },
+          { transformOrigin: '0 0', transform: 'none' },
+        ], { duration: 480, easing: 'cubic-bezier(.22, 1, .36, 1)' }).finished.then(queueHole, () => {});
+      }
       ytCommand('playVideo');
       if (!panelWatch && 'ResizeObserver' in window) {
         panelWatch = new ResizeObserver(() => docked && dockTop());
@@ -1384,6 +1398,7 @@
     hero.undock = () => {
       if (!docked) return;
       docked = false;
+      hero.querySelector('.fav-hero-tv').style.animation = '';
       hero.classList.remove('is-docked');
       const panel = document.querySelector('.fav-sheet-panel');
       if (panel) panel.style.maxHeight = '';
