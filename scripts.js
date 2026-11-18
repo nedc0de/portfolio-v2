@@ -29,6 +29,13 @@ const firebaseConfig = {
   document.body.append(band);
 }
 
+/*=============== OFFLINE: "Signal lost" screen ===============*/
+// sw.js keeps a copy of offline.html and shows it when a page can't load
+// because the connection dropped. It caches nothing else.
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
   navToggle = document.getElementById('nav-toggle'),

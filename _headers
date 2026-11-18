@@ -16,3 +16,8 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# The service worker (offline "Signal lost" screen) must always be fresh, so
+# changes to it reach visitors straight away
+/sw.js
+  Cache-Control: no-cache
