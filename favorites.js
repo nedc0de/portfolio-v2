@@ -1468,7 +1468,7 @@
       }
     };
     addEventListener('resize', () => docked && dockTop());
-    // swipe the mini player sideways or up to close it, like a music app's
+    // swipe the mini player sideways or down to close it, like YouTube's
     const tvEl = hero.querySelector('.fav-hero-tv');
     let sx = null, sy = 0, dx = 0, dy = 0, swiped = false;
     tvEl.addEventListener('touchstart', (e) => {
@@ -1479,18 +1479,18 @@
     tvEl.addEventListener('touchmove', (e) => {
       if (sx === null) return;
       dx = e.touches[0].clientX - sx;
-      dy = Math.min(0, e.touches[0].clientY - sy);
-      if (Math.abs(dx) > 8 || dy < -8) swiped = true;
+      dy = Math.max(0, e.touches[0].clientY - sy);
+      if (Math.abs(dx) > 8 || dy > 8) swiped = true;
       tvEl.style.transform = `translate(${dx}px, ${dy}px)`;
-      tvEl.style.opacity = String(Math.max(.2, 1 - Math.max(Math.abs(dx) / 260, -dy / 120)));
+      tvEl.style.opacity = String(Math.max(.2, 1 - Math.max(Math.abs(dx) / 200, dy / 120)));
     }, { passive: true });
     tvEl.addEventListener('touchend', () => {
       if (sx === null) return;
       sx = null;
-      const away = Math.abs(dx) > 90 || dy < -45;
+      const away = Math.abs(dx) > 70 || dy > 45;
       tvEl.style.transition = 'transform .28s ease-out, opacity .28s';
       if (away) {
-        tvEl.style.transform = Math.abs(dx) > 90 ? `translateX(${dx > 0 ? 120 : -120}%)` : 'translateY(-140%)';
+        tvEl.style.transform = Math.abs(dx) > 70 ? `translateX(${dx > 0 ? 130 : -130}%)` : 'translateY(160%)';
         tvEl.style.opacity = '0';
         setTimeout(() => {
           miniClosed = true;
