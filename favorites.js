@@ -1267,14 +1267,19 @@
       const tv = hero && hero.querySelector('.fav-hero-tv');
       if (tv) tv.style.transition = tv.style.transform = '';
     };
-    addEventListener('touchstart', (e) => {
+    // listening only on the details (and the trailer docked over them), not
+    // the whole page: a page-wide touch listener that can block scrolling
+    // made iPhones hesitate on every scroll
+    let moveFrame = 0;
+    const onStart = (e) => {
       if (sheet.hidden || !sheet.classList.contains('is-open')) return;
       const inPanel = panel.contains(e.target);
       if (inPanel && panel.scrollTop > 0) { y0 = null; return; }
       y0 = lastY = e.touches[0].clientY; x0 = e.touches[0].clientX; dragY = 0; vertical = null;
       lastT = performance.now(); speed = 0;
-    }, { passive: true });
-    addEventListener('touchmove', (e) => {
+      panel.style.willChange = 'transform';
+    };
+    const onMove = (e) => {
       if (y0 === null) return;
       const y = e.touches[0].clientY;
       const dy = y - y0, dx = e.touches[0].clientX - x0;
@@ -1286,11 +1291,14 @@
       const pull = Math.max(0, dy);
       dragY = pull < 160 ? pull : 160 + (pull - 160) * .55; // soft resistance after a short pull
       if (pull && e.cancelable) e.preventDefault();
-      follow(dragY);
-    }, { passive: false });
-    addEventListener('touchend', () => {
+      // one style update per screen frame, however fast the touch events come
+      if (!moveFrame) moveFrame = requestAnimationFrame(() => { moveFrame = 0; if (y0 !== null) follow(dragY); });
+    };
+    const onEnd = () => {
       if (y0 === null) return;
       y0 = null;
+      cancelAnimationFrame(moveFrame); moveFrame = 0;
+      panel.style.willChange = '';
       if (!vertical) return;
       // a long enough pull, or a quick flick down, closes it
       if (dragY > 140 || (speed > .55 && dragY > 50)) {
@@ -1305,6 +1313,13 @@
         follow(0, '.45s cubic-bezier(.3, 1.35, .5, 1)');
         setTimeout(clearFollow, 470);
       }
+    };
+    const tvTarget = hero && hero.querySelector('.fav-hero-tv');
+    [sheet, tvTarget].filter(Boolean).forEach((el) => {
+      el.addEventListener('touchstart', onStart, { passive: true });
+      el.addEventListener('touchmove', onMove, { passive: false });
+      el.addEventListener('touchend', onEnd);
+      el.addEventListener('touchcancel', onEnd);
     });
   }
   let sheetItem = null;
@@ -1448,6 +1463,7 @@
   const root = document.documentElement;
   const holeVars = ['--hole-x', '--hole-y', '--hole-w', '--hole-h'];
   let holeFrame = 0;
+  let lastHole = null;
   function placeHole() {
     holeFrame = 0;
     // phones: the player is always drawn 640 px wide and scaled to fit the
@@ -1457,8 +1473,13 @@
     if (box && box.offsetWidth) box.style.setProperty('--yt-scale', (box.offsetWidth / 640 * 1.36).toFixed(4));
     const slot = hero && hero.classList.contains('has-video') && !miniClosed && box;
     const r = slot && slot.getBoundingClientRect();
-    if (!r || !r.width || r.bottom < 0 || r.top > innerHeight) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
-    [r.left, r.top, r.width, r.height].forEach((n, i) => root.style.setProperty(holeVars[i], `${Math.round(n)}px`));
+    // only touch the page's styles when the spot actually moved: each change
+    // makes the browser restyle the whole page, which made scrolling lag
+    const key = r && r.width && r.bottom >= 0 && r.top <= innerHeight ? [r.left, r.top, r.width, r.height].map(Math.round).join() : '';
+    if (key === lastHole) return;
+    lastHole = key;
+    if (!key) { holeVars.forEach((v) => root.style.removeProperty(v)); return; }
+    key.split(',').forEach((n, i) => root.style.setProperty(holeVars[i], `${n}px`));
   }
   const queueHole = () => { if (!holeFrame) holeFrame = requestAnimationFrame(placeHole); };
   addEventListener('scroll', queueHole, { passive: true });
