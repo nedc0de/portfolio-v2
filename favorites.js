@@ -1349,6 +1349,9 @@
     if (state === 1) {
       hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, 4500); // wait out the pause icon YouTube shows for a few seconds as it starts
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
+      // no captions: a phone set to always show subtitles makes YouTube add
+      // them to the muted preview, where they'd be cut off by the zoom
+      if (!fr.ccOff) { fr.ccOff = true; ytCommand('unloadModule', ['captions']); ytCommand('unloadModule', ['cc']); }
     }
     else if (!miniClosed) { hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
   });
