@@ -1468,29 +1468,64 @@
       }
     };
     addEventListener('resize', () => docked && dockTop());
-    // swipe the mini player sideways or down to close it, like YouTube's
+    // drag the mini player anywhere on the screen; it stays where you drop
+    // it (remembered on this device). Dragged mostly off the screen, it
+    // closes, like flicking it away.
     const tvEl = hero.querySelector('.fav-hero-tv');
-    let sx = null, sy = 0, dx = 0, dy = 0, swiped = false;
+    const POS_KEY = 'nedcode-fav-mini-pos';
+    const bounds = (w, h) => {
+      const top = 8 + (parseFloat(getComputedStyle(hero).getPropertyValue('--sat')) || 0);
+      return { minX: 8, maxX: innerWidth - w - 8, minY: top, maxY: innerHeight - h - 76 };
+    };
+    const place = (x, y) => {
+      const r = tvEl.getBoundingClientRect();
+      const bd = bounds(r.width, r.height);
+      x = Math.min(bd.maxX, Math.max(bd.minX, x));
+      y = Math.min(bd.maxY, Math.max(bd.minY, y));
+      hero.style.setProperty('--mini-x', `${Math.round(x)}px`);
+      hero.style.setProperty('--mini-y', `${Math.round(y)}px`);
+      hero.classList.add('is-placed');
+      return [x, y];
+    };
+    try {
+      const saved = JSON.parse(localStorage.getItem(POS_KEY));
+      if (saved && innerWidth > 0) {
+        hero.style.setProperty('--mini-x', `${Math.round(saved.fx * innerWidth)}px`);
+        hero.style.setProperty('--mini-y', `${Math.round(saved.fy * innerHeight)}px`);
+        hero.classList.add('is-placed');
+      }
+    } catch (e) {}
+    let sx = null, sy = 0, dx = 0, dy = 0, swiped = false, startRect = null;
     tvEl.addEventListener('touchstart', (e) => {
       if (!hero.classList.contains('is-mini')) return;
       sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = dy = 0; swiped = false;
+      startRect = tvEl.getBoundingClientRect();
       tvEl.style.transition = 'none';
     }, { passive: true });
     tvEl.addEventListener('touchmove', (e) => {
       if (sx === null) return;
       dx = e.touches[0].clientX - sx;
-      dy = Math.max(0, e.touches[0].clientY - sy);
-      if (Math.abs(dx) > 8 || dy > 8) swiped = true;
+      dy = e.touches[0].clientY - sy;
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) swiped = true;
+      if (e.cancelable) e.preventDefault(); // the page doesn't scroll while you drag it
       tvEl.style.transform = `translate(${dx}px, ${dy}px)`;
-      tvEl.style.opacity = String(Math.max(.2, 1 - Math.max(Math.abs(dx) / 200, dy / 120)));
-    }, { passive: true });
+      // fading as it leaves the screen
+      const x = startRect.left + dx, y = startRect.top + dy;
+      const outX = Math.max(0, -x, x + startRect.width - innerWidth) / startRect.width;
+      const outY = Math.max(0, -y, y + startRect.height - innerHeight) / startRect.height;
+      tvEl.style.opacity = String(Math.max(.25, 1 - Math.max(outX, outY) * 1.2));
+    }, { passive: false });
     tvEl.addEventListener('touchend', () => {
       if (sx === null) return;
       sx = null;
-      const away = Math.abs(dx) > 70 || dy > 45;
-      tvEl.style.transition = 'transform .28s ease-out, opacity .28s';
-      if (away) {
-        tvEl.style.transform = Math.abs(dx) > 70 ? `translateX(${dx > 0 ? 130 : -130}%)` : 'translateY(160%)';
+      if (!swiped) { tvEl.style.transform = tvEl.style.opacity = tvEl.style.transition = ''; return; }
+      const x = startRect.left + dx, y = startRect.top + dy;
+      const outX = Math.max(0, -x, x + startRect.width - innerWidth) / startRect.width;
+      const outY = Math.max(0, -y, y + startRect.height - innerHeight) / startRect.height;
+      tvEl.style.transition = 'transform .28s cubic-bezier(.22, 1, .36, 1), opacity .28s';
+      if (Math.max(outX, outY) > .45) {
+        // flicked off the screen: close it
+        tvEl.style.transform = `translate(${dx * 1.8}px, ${dy * 1.8}px)`;
         tvEl.style.opacity = '0';
         setTimeout(() => {
           miniClosed = true;
@@ -1498,12 +1533,23 @@
           paint();
           tvEl.style.transition = tvEl.style.transform = tvEl.style.opacity = '';
         }, 280);
-      } else {
-        tvEl.style.transform = tvEl.style.opacity = '';
-        setTimeout(() => { tvEl.style.transition = ''; }, 300);
+        return;
       }
+      // dropped: it stays there (kept on screen), the move eased in
+      const [nx, ny] = place(x, y);
+      tvEl.style.transform = `translate(${x - nx}px, ${y - ny}px)`;
+      tvEl.style.opacity = '';
+      requestAnimationFrame(() => { tvEl.style.transform = ''; });
+      setTimeout(() => { tvEl.style.transition = ''; queueHole(); }, 300);
+      try { localStorage.setItem(POS_KEY, JSON.stringify({ fx: nx / innerWidth, fy: ny / innerHeight })); } catch (e) {}
     });
-    // a swipe isn't a tap: don't open the details after one
+    // keep it on screen when the phone turns
+    addEventListener('resize', () => {
+      if (!hero.classList.contains('is-placed') || !hero.classList.contains('is-mini')) return;
+      const r = tvEl.getBoundingClientRect();
+      place(r.left, r.top);
+    });
+    // a drag isn't a tap: don't open the details after one
     tvEl.addEventListener('click', (e) => { if (swiped) { swiped = false; e.stopPropagation(); e.preventDefault(); } }, true);
     const paint = () => {
       const was = hero.classList.contains('is-mini');
