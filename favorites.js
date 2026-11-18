@@ -1366,13 +1366,14 @@
     if (typeof state !== 'number') return;
     if (state === 0) { ytCommand('seekTo', [0, true]); ytCommand('playVideo'); } // our own loop: YouTube's loop adds previous/next buttons
     if (state === 1) {
-      // shows the moment it starts playing (YouTube may flash its own title
-      // and buttons for the first few seconds; they can't be turned off)
-      hero.classList.add('has-video');
-      if (hero.paintMini) hero.paintMini();
+      // YouTube puts its own title, channel logo, pause button and "Watch on
+      // YouTube" over the first ~3 s of play, and they can't be turned off:
+      // the still stays up until they've faded, then the trailer shows
+      clearTimeout(hero.videoHide);
+      hero.videoHide = setTimeout(() => { hero.classList.add('has-video'); if (hero.paintMini) hero.paintMini(); }, 3200);
       if (soundOn && !fr.soundSet) { fr.soundSet = true; applySound(); }
     }
-    else if (!miniClosed) { hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
+    else if (!miniClosed) { clearTimeout(hero.videoHide); hero.classList.remove('has-video'); if (hero.paintMini) hero.paintMini(); }
   });
   // the one control: sound on or off (the trailer starts muted). The choice
   // carries over when you pick another title.
