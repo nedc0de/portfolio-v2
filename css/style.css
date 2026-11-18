@@ -10919,11 +10919,15 @@ h1.section-title .about-title-color::before {
   .fav-hero.is-mini .fav-hero-video { position: relative; inset: auto; grid-area: 1 / 1 / 2 / 3; width: 100%; aspect-ratio: 16 / 9; }
   .fav-hero.is-mini .fav-hero-onair { display: none; }
   .fav-hero.is-mini .fav-hero-sound { position: relative; grid-area: 1 / 1 / 2 / 3; justify-self: end; align-self: end; z-index: 2; right: auto; bottom: auto; }
+  /* just the video: the whole picture is the tap target for the details
+     (no title or rating), the close button sits on its top right corner */
   .fav-hero.is-mini .fav-hero-mini-info {
     display: block;
-    grid-area: 2 / 1;
+    grid-area: 1 / 1 / 2 / 3;
+    align-self: stretch;
+    z-index: 1;
     min-width: 0;
-    padding: 6px 4px 7px 9px;
+    padding: 0;
     border: 0;
     background: none;
     text-align: left;
@@ -10946,8 +10950,15 @@ h1.section-title .about-title-color::before {
   /* picking another title down the page: its name slides in */
   .fav-hero.is-mini.is-mini-swap .fav-hero-mini-info { animation: fav-swap .35s ease-out; }
   .fav-hero-mini-rate b { color: var(--fifteenth-color); }
+  .fav-hero.is-mini .fav-hero-mini-title,
+  .fav-hero.is-mini .fav-hero-mini-rate { display: none; }
   .fav-hero.is-mini .fav-hero-mini-x {
-    grid-area: 2 / 2;
+    grid-area: 1 / 1 / 2 / 3;
+    justify-self: end;
+    align-self: start;
+    z-index: 3;
+    color: #e6e6e6;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .9));
     display: grid;
     place-items: center;
     width: 32px;
@@ -10955,7 +10966,6 @@ h1.section-title .about-title-color::before {
     padding: 0;
     border: 0;
     background: none;
-    color: #8a8a8a;
     cursor: pointer;
   }
   .fav-hero-mini-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
