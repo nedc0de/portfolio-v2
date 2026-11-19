@@ -48,7 +48,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     const span = document.createElement('span');
     span.className = 'lv-micro';
     span.setAttribute('aria-hidden', 'true');
-    span.textContent = `${pre}-${String(i + 1).padStart(2, '0')} \u00b7 MTL`; // the label's own name is right above it
+    span.textContent = `${pre}-${String(i + 1).padStart(2, '0')}`; // the label's own name is right above it
     el.append(span);
   });
 })();
