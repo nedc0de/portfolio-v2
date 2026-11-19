@@ -12054,14 +12054,17 @@ main { counter-reset: hm-ch; }
 .hc-body .lv-micro { margin-top: .3rem; }
 .fav-hero-info .lv-micro { margin-top: .5rem; }
 
-/* armour plates, kept on two cards only: the home page's "New in the Lab"
-   card and the contact box at the bottom (cut corners, a seam line, rivets) */
-.xb-card.xb-lb, .hm-signoff .ab-cta {
+/* armour plate, kept on one card only: the home page's "New in the Lab"
+   card (cut corners, a seam line, rivets) */
+.xb-card.xb-lb {
   border-radius: 0;
   border: 1px solid #2a2622;
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
 }
-.xb-card.xb-lb::before, .hm-signoff .ab-cta::before {
+/* the contact box has no frame, only its "Send me a DM" button keeps the
+   cut corner */
+.hm-signoff .ab-cta-go > a { clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
+.xb-card.xb-lb::before {
   content: "";
   position: absolute;
   inset: 0;
