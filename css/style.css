@@ -12137,6 +12137,9 @@ main { counter-reset: hm-ch; }
   letter-spacing: -.05em;
   color: rgba(255, 255, 255, .035);
   -webkit-text-stroke: 1px rgba(255, 255, 255, .06);
+  /* it fades away towards its bottom, so it melts into the page under the title */
+  -webkit-mask-image: linear-gradient(#000 25%, transparent 80%);
+  mask-image: linear-gradient(#000 25%, transparent 80%);
 }
 /* it bleeds past the page's sides without widening the page */
 body { overflow-x: clip; }
