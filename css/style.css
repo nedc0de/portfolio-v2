@@ -12054,42 +12054,6 @@ main { counter-reset: hm-ch; }
 .hc-body .lv-micro { margin-top: .3rem; }
 .fav-hero-info .lv-micro { margin-top: .5rem; }
 
-/* stencil numbers: a big outlined number behind each home section */
-.hm-block { position: relative; }
-.hm-block:not([hidden])::after {
-  content: counter(hm-ch, decimal-leading-zero);
-  position: absolute;
-  right: -.2rem;
-  top: -1.7rem;
-  z-index: 0;
-  font: 900 5.5rem/1 Poppins, sans-serif;
-  letter-spacing: -.04em;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, .07);
-  pointer-events: none;
-}
-.hm-block > * { position: relative; z-index: 1; }
-
-/* armour plates: cut corners, a seam line and corner rivets */
-.xb-card, .ab-cta {
-  border-radius: 0;
-  border: 1px solid #2a2622;
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-}
-.xb-card::before, .ab-cta::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background:
-    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) 7px 7px / 8px 8px no-repeat,
-    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) calc(100% - 24px) 7px / 8px 8px no-repeat,
-    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) 7px calc(100% - 15px) / 8px 8px no-repeat,
-    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) calc(100% - 7px) calc(100% - 7px) / 8px 8px no-repeat,
-    linear-gradient(90deg, transparent, #2e2a25 12%, #2e2a25 88%, transparent) 0 34px / 100% 1px no-repeat;
-}
-
 /* safety-yellow tags */
 .fav-hero-kicker, .tk3-verdict, .lv-haz {
   background: var(--hazard);
