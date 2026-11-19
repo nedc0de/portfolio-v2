@@ -1363,6 +1363,7 @@ function readPostsSeen() {
   };
   // the N-E-D secret: every cable flashes at once
   group.raceSparks = () => { run(0); run(2); glowLoop(); };
+  group.flashCable = run; // 0 = right cable (O), 2 = left cable (N)
 
   // The laser tip, like a welding/cutting spark: a white-hot core in a tight
   // glow, a starburst of thin rays that shimmer, and two kinds of sparks:
@@ -3966,5 +3967,7 @@ setTimeout(() => document.documentElement.classList.remove('crt-boot', 'crt-chan
 // on power-on, current runs down the logo's cables just before its letters ignite
 if (document.documentElement.classList.contains('crt-boot') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const sign = document.querySelector('.nav-logo-group');
-  setTimeout(() => { if (sign && sign.raceSparks) sign.raceSparks(); }, 350);
+  // each cable flashes just as its own letter ignites: left one with the N, right one with the O
+  setTimeout(() => { if (sign && sign.flashCable) sign.flashCable(2); }, 480);
+  setTimeout(() => { if (sign && sign.flashCable) sign.flashCable(0); }, 960);
 }
