@@ -12151,3 +12151,32 @@ h1.section-title .about-title-color::before,
 h1.section-title .about-title-color::after { content: none; }
 /* the 5 stars tag is a tag: yellow like the others */
 .fav-top-item::after { background: var(--hazard); }
+
+/*===== CRT SCREEN: a lighter edge fade =====*/
+/* The black fade at the screen's edges is now a thin band right at the edge
+   (it still ends exactly on the browser's surround colour, so no seams),
+   so the whole page reads clearly. The scanlines stay. */
+:root {
+  --crt-side: linear-gradient(90deg, var(--crt-edge-color) 20vw, rgb(12 10 8 / .4) calc(20vw + 10px), transparent calc(20vw + 44px), transparent calc(100% - 20vw - 44px), rgb(12 10 8 / .4) calc(100% - 20vw - 10px), var(--crt-edge-color) calc(100% - 20vw));
+  --crt-ends: linear-gradient(var(--crt-edge-color) 200px, rgb(12 10 8 / .4) 210px, transparent 244px, transparent calc(100% - 244px), rgb(12 10 8 / .4) calc(100% - 210px), var(--crt-edge-color) calc(100% - 200px));
+  --crt-warm: radial-gradient(ellipse at 50% 35%, rgba(255, 122, 26, .05), transparent 65%);
+}
+body::after,
+html.fav-sheet-open body::after { background: var(--crt-side), var(--crt-ends), var(--crt-warm); }
+/* phones and tablets: a short soft fade just under the status bar and above
+   the browser's bottom bar, nothing more */
+@media (pointer: coarse) {
+  body::after,
+  html.fav-sheet-open body::after {
+    background:
+      var(--crt-side),
+      linear-gradient(var(--crt-edge-color) calc(200px + env(safe-area-inset-top, 0px)), rgb(12 10 8 / .5) calc(200px + env(safe-area-inset-top, 0px) + 10px), transparent calc(200px + env(safe-area-inset-top, 0px) + 40px), transparent calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 50px), rgb(12 10 8 / .5) calc(100% - 200px - env(safe-area-inset-bottom, 0px) - 14px), var(--crt-edge-color) calc(100% - 200px - env(safe-area-inset-bottom, 0px))),
+      var(--crt-warm);
+  }
+}
+/* computers: the fade and the scanlines share one layer */
+@media (pointer: fine) and (min-width: 768px) {
+  html::after {
+    background: var(--crt-side), var(--crt-ends), var(--crt-warm), repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
+  }
+}
