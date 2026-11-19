@@ -12095,3 +12095,26 @@ main { counter-reset: hm-ch; }
   vertical-align: 2px;
 }
 .fav-hero-title { letter-spacing: .04em; }
+
+/*===== THEME: livery on every page =====*/
+/* the same wide-spaced white labels as the home page */
+.ab-label, .bl-label, .ab-cta-k {
+  color: #f2f2f2;
+  letter-spacing: .5em;
+  font-weight: 700;
+  font-size: .72rem;
+}
+/* safety-yellow tags */
+.bl-tag, .lab-tag {
+  border: 0;
+  border-radius: 0;
+  background: var(--hazard);
+  color: #111;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+/* the main buttons keep one cut corner, like the home page's DM button */
+.ab-cta-go > a, .ct-send, .hm-news button[type="submit"] {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
