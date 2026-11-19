@@ -38,34 +38,19 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 
 /*=============== LIVERY: serial print on every page ===============*/
 // Section labels get a tiny serial line under them, like the fine print on a
-// jet or a flight suit (the home page writes its own). Project rows on the
-// projects page get theirs too. css: "THEME: livery".
+// jet or a flight suit (the home page writes its own). css: "THEME: livery".
 (() => {
   const page = (location.pathname.split('/').filter(Boolean)[0] || 'home').replace(/\.html$/, '');
   const PREFIX = { home: 'NC', about: 'AB', blog: 'BL', projects: 'PJ', favorites: 'FV', lab: 'LB', contact: 'CT' };
   const pre = PREFIX[page] || 'NC';
-  const label = (t) => t.replace(/[^a-z0-9 ]/gi, '').trim().replace(/\s+/g, ' ').slice(0, 16).toUpperCase();
   document.querySelectorAll('.ab-label, .bl-label, .hm-label').forEach((el, i) => {
     if (el.querySelector('.lv-micro')) return;
     const span = document.createElement('span');
     span.className = 'lv-micro';
     span.setAttribute('aria-hidden', 'true');
-    span.textContent = `${pre}-${String(i + 1).padStart(2, '0')} \u00b7 ${label(el.textContent)} \u00b7 MTL`;
+    span.textContent = `${pre}-${String(i + 1).padStart(2, '0')} \u00b7 MTL`; // the label's own name is right above it
     el.append(span);
   });
-  if (page === 'projects') {
-    const rows = [...document.querySelectorAll('.hc-row')];
-    rows.forEach((row, i) => {
-      const stack = row.querySelector('.hc-stack');
-      if (!stack || row.querySelector('.lv-micro')) return;
-      const year = row.querySelector('.hc-year')?.textContent.trim() || '';
-      const span = document.createElement('span');
-      span.className = 'lv-micro';
-      span.setAttribute('aria-hidden', 'true');
-      span.textContent = [`PRJ-${String(26 - i).padStart(3, '0')}`, year, 'LIVE'].filter(Boolean).join(' \u00b7 ');
-      stack.after(span);
-    });
-  }
 })();
 
 /*=============== SHOW MENU ===============*/
