@@ -12135,8 +12135,8 @@ main { counter-reset: hm-ch; }
   white-space: nowrap;
   font: 900 clamp(7rem, 38vw, 20rem)/1 Poppins, sans-serif;
   letter-spacing: -.05em;
-  color: rgba(255, 255, 255, .035);
-  -webkit-text-stroke: 1px rgba(255, 255, 255, .06);
+  color: rgba(255, 255, 255, .075);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .13);
 }
 /* it bleeds past the page's sides without widening the page */
 body { overflow-x: clip; }
