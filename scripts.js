@@ -1260,6 +1260,8 @@ function readPostsSeen() {
   const charge = (cls) => {
     const letter = group.querySelector('.' + cls);
     if (!letter || letter.classList.contains('is-relight') || group.classList.contains('is-power-off')) return;
+    // during the power-on the letters ignite on their own (css: logo-ignite)
+    if (document.documentElement.classList.contains('crt-boot')) return;
     letter.classList.remove('is-off', 'is-zap', 'is-charge');
     void letter.offsetWidth;
     letter.classList.add('is-charge');
@@ -3958,5 +3960,11 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // The power-on and channel-change effects are layers over the whole screen
 // (one of them blended with the page) that stayed in place, invisible, for
 // the whole visit, so the graphics card kept drawing them. They're done
-// within 1.5s: after that the classes go, and the layers with them.
-setTimeout(() => document.documentElement.classList.remove('crt-boot', 'crt-chan'), 2200);
+// within 1.5s (the logo's power-up within 2.5s): after that the classes go,
+// and the layers with them.
+setTimeout(() => document.documentElement.classList.remove('crt-boot', 'crt-chan'), 2600);
+// on power-on, current runs down the logo's cables just before its letters ignite
+if (document.documentElement.classList.contains('crt-boot') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const sign = document.querySelector('.nav-logo-group');
+  setTimeout(() => { if (sign && sign.raceSparks) sign.raceSparks(); }, 350);
+}

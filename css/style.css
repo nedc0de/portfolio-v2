@@ -11553,24 +11553,50 @@ html.crt-boot body::before {
   100% { opacity: 0; }
 }
 
-/* the NED CODE sign gets its power last: it flickers on just after the
-   picture opens (its look is unchanged, only when it lights up) */
-html.crt-boot .nav-logo-group {
-  animation: crt-logo .6s steps(1, end) .5s both;
+/* the NED CODE sign powers up like a real neon sign: it's there from the
+   start, dark (its grey unlit tubes), current runs down the cables
+   (scripts.js), then the tubes ignite one by one, N-E-D, a beat, C-O-D-E,
+   each with a sputter. The last E struggles before it catches, and the
+   whole sign surges bright for a moment once it's fully lit. */
+html.crt-boot .nav-logo-group :where(.nav-logo-layer:not(.nav-logo)) {
+  animation: logo-ignite .5s steps(1, end) both;
 }
-@keyframes crt-logo {
+html.crt-boot .nav-logo-group .nav-logo1 { animation-delay: .55s; }
+html.crt-boot .nav-logo-group .nav-logo2 { animation-delay: .66s; }
+html.crt-boot .nav-logo-group .nav-logo3 { animation-delay: .77s; }
+html.crt-boot .nav-logo-group .nav-logo4 { animation-delay: .93s; }
+html.crt-boot .nav-logo-group .nav-logo5 { animation-delay: 1.03s; }
+html.crt-boot .nav-logo-group .nav-logo6 { animation-delay: 1.13s; }
+html.crt-boot .nav-logo-group .nav-logo7 { animation: logo-ignite-late .8s steps(1, end) 1.2s both; }
+html.crt-boot .nav-logo-group { animation: logo-surge .45s ease-out 2s both; }
+@keyframes logo-ignite {
   0% { opacity: 0; }
-  20% { opacity: .85; }
-  30% { opacity: .15; }
-  45% { opacity: 1; }
-  58% { opacity: .35; }
-  70%, 100% { opacity: 1; }
+  18% { opacity: .75; }
+  28% { opacity: .05; }
+  42% { opacity: .9; }
+  52% { opacity: .3; }
+  66%, 100% { opacity: 1; }
+}
+@keyframes logo-ignite-late {
+  0% { opacity: 0; }
+  10% { opacity: .55; }
+  16%, 44% { opacity: 0; }
+  50% { opacity: .8; }
+  57% { opacity: .1; }
+  68% { opacity: .9; }
+  75% { opacity: .35; }
+  86%, 100% { opacity: 1; }
+}
+@keyframes logo-surge {
+  0% { filter: brightness(1); }
+  25% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
 }
 @media (prefers-reduced-motion: reduce) {
   .crt-band { display: none; }
   html.crt-chan::before { content: none; }
   html.crt-boot::before, html.crt-boot body::before { content: none; }
-  html.crt-boot .nav-logo-group { animation: none; }
+  html.crt-boot .nav-logo-group, html.crt-boot .nav-logo-group .nav-logo-layer.nav-logo-layer.nav-logo-layer { animation: none; }
 }
 @media print {
   html::after, body::after { content: none; }
