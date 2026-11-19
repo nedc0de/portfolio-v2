@@ -1350,6 +1350,10 @@ function readPostsSeen() {
       : [{ opacity: 0 }, { opacity: 1, offset: 0.06 }, { opacity: 0.2, offset: 0.12 }, { opacity: 1, offset: 0.2 },
         { opacity: 0.45, offset: 0.3 }, { opacity: 1, offset: 0.38 }, { opacity: 0 }],
     { duration: 900, easing: 'linear' }).onfinish = () => g.remove();
+    // the flashing cable breaks through the screen's dark edge (css)
+    group.classList.add('is-flash');
+    clearTimeout(group.flashTimer);
+    group.flashTimer = setTimeout(() => group.classList.remove('is-flash'), 1200);
     setTimeout(() => {
       charge(LETTER[i]);
       burst(c, i);
