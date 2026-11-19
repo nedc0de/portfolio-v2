@@ -12135,8 +12135,11 @@ main { counter-reset: hm-ch; }
   white-space: nowrap;
   font: 900 clamp(7rem, 38vw, 20rem)/1 Poppins, sans-serif;
   letter-spacing: -.05em;
-  color: rgba(255, 255, 255, .075);
-  -webkit-text-stroke: 1px rgba(255, 255, 255, .13);
+  color: rgba(255, 255, 255, .035);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .06);
+  /* it fades away towards its bottom, so it melts into the page under the title */
+  -webkit-mask-image: linear-gradient(#000 25%, transparent 80%);
+  mask-image: linear-gradient(#000 25%, transparent 80%);
 }
 /* it bleeds past the page's sides without widening the page */
 body { overflow-x: clip; }
