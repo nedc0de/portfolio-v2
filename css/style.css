@@ -12031,3 +12031,79 @@ main { counter-reset: hm-ch; }
 .fav-bar .fav-pick:hover, .fav-bar .fav-find:hover { color: #ffb37a; }
 .fav-bar .fav-pick:focus-visible, .fav-bar .fav-find:focus-visible { outline: 1px solid var(--fifteenth-color); outline-offset: 2px; }
 .fav-bar .fav-pick.is-shuffling { color: #ffb37a; }
+
+/*===== THEME: livery (hardware paint scheme) =====*/
+/* Inspired by aerospace liveries: wide-spaced white labels, tiny serial
+   print, big outlined stencil numbers, cut-corner armour plates with rivets,
+   and safety-yellow tags. Orange stays the signal colour. */
+:root { --hazard: #f2c230; }
+
+/* wide-spaced labels, their channel number in orange */
+.hm-label { color: #f2f2f2; letter-spacing: .5em; font-weight: 700; font-size: .72rem; }
+.hm-block:not([hidden]) .hm-label::before { color: var(--fifteenth-color); text-shadow: none; letter-spacing: .12em; }
+
+/* serial print: tiny grey codes */
+.lv-micro {
+  display: block;
+  margin-top: .35rem;
+  font: 500 .52rem/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #5f5850;
+}
+.hc-body .lv-micro { margin-top: .3rem; }
+.fav-hero-info .lv-micro { margin-top: .5rem; }
+
+/* stencil numbers: a big outlined number behind each home section */
+.hm-block { position: relative; }
+.hm-block:not([hidden])::after {
+  content: counter(hm-ch, decimal-leading-zero);
+  position: absolute;
+  right: -.2rem;
+  top: -1.7rem;
+  z-index: 0;
+  font: 900 5.5rem/1 Poppins, sans-serif;
+  letter-spacing: -.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .07);
+  pointer-events: none;
+}
+.hm-block > * { position: relative; z-index: 1; }
+
+/* armour plates: cut corners, a seam line and corner rivets */
+.xb-card, .ab-cta {
+  border-radius: 0;
+  border: 1px solid #2a2622;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+.xb-card::before, .ab-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) 7px 7px / 8px 8px no-repeat,
+    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) calc(100% - 24px) 7px / 8px 8px no-repeat,
+    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) 7px calc(100% - 15px) / 8px 8px no-repeat,
+    radial-gradient(circle, #3d362f 1.3px, transparent 1.7px) calc(100% - 7px) calc(100% - 7px) / 8px 8px no-repeat,
+    linear-gradient(90deg, transparent, #2e2a25 12%, #2e2a25 88%, transparent) 0 34px / 100% 1px no-repeat;
+}
+
+/* safety-yellow tags */
+.fav-hero-kicker, .tk3-verdict, .lv-haz {
+  background: var(--hazard);
+  color: #111;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-shadow: none;
+}
+.lv-haz {
+  display: inline-block;
+  margin-left: .5rem;
+  padding: .12rem .4rem;
+  font: 800 .55rem/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  text-transform: uppercase;
+  vertical-align: 2px;
+}
+.fav-hero-title { letter-spacing: .04em; }

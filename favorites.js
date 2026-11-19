@@ -1996,6 +1996,12 @@
     hero.querySelector('.fav-hero-kicker').textContent = `P1 · ${kicker || TYPE_NAME[f.type]}`;
     hero.querySelector('.fav-hero-title').textContent = f.title;
     hero.querySelector('.fav-hero-meta').textContent = [f.year, f.genre].filter(Boolean).join(' · ');
+    // a tiny serial line, like the fine print on a jet or a flight suit
+    const serial = hero.querySelector('.lv-micro') || hero.querySelector('.fav-hero-info').appendChild(Object.assign(document.createElement('span'), { className: 'lv-micro' }));
+    serial.setAttribute('aria-hidden', 'true');
+    const by = (f.by || '').split(/\s+/);
+    const who = by.length > 1 ? by.slice(0, -1).map((w) => w[0] + '.').join('') + ' ' + by[by.length - 1] : f.by || '';
+    serial.textContent = [`FAV-${String(cards.indexOf(item) + 1).padStart(3, '0')}`, who && `${f.type === 'book' ? 'BY' : 'DIR'} ${who}`, f.year].filter(Boolean).join(' · ').toUpperCase();
     hero.querySelector('.fav-hero-rate').innerHTML = `${starsHTML(item.rating)}<b>${item.rating}</b><span>${escapeHTML(verdict(item.rating))}</span>`;
     hero.querySelector('.fav-hero-mini-title').textContent = f.title;
     hero.querySelector('.fav-hero-mini-rate').innerHTML = `<b>${item.rating}</b> ${escapeHTML(verdict(item.rating))} · details`;

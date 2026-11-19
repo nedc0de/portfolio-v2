@@ -15,7 +15,7 @@
   <!-- Custom and external CSS -->
   <!-- CRT power-on on a first visit or a refresh; a quick channel change between pages (css: "CRT SCREEN") -->
   <script>try{var n=(performance.getEntriesByType("navigation")[0]||{}).type,r=document.referrer&&new URL(document.referrer).origin===location.origin;document.documentElement.classList.add(n==="reload"||!sessionStorage.getItem("nedcode-on")||!(r||n==="back_forward")?"crt-boot":"crt-chan");sessionStorage.setItem("nedcode-on","1")}catch(e){}</script>
-  <link rel="stylesheet" href="./css/style.css?v=48">
+  <link rel="stylesheet" href="./css/style.css?v=49">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
 
   <title>NEDCODE | Ned, Frontend Developer in Montreal</title>
@@ -201,7 +201,7 @@
       <!--===== SELECTED WORK: the 3 newest projects (full list on projects.html) =====-->
       <div class="hm-block">
         <div class="hm-latest-head">
-          <p class="hm-label">Selected work</p>
+          <p class="hm-label">Selected work<span class="lv-micro" aria-hidden="true">NC-01 · REV 26 · MTL</span></p>
         </div>
         <!-- one yellow trace runs down through a node per project, like a
              circuit; scripts.js lights it node by node as it scrolls in -->
@@ -209,8 +209,9 @@
           <li><a class="hc-row" href="https://cuisinesensoria.com" target="_blank" rel="noopener">
             <span class="hc-node" aria-hidden="true"></span>
             <span class="hc-body">
-              <span class="hc-top"><span class="hc-name">Cuisine Sensoria<span class="sr-only"> (opens in a new tab)</span></span><span class="hc-year">2026</span></span>
+              <span class="hc-top"><span class="hc-name">Cuisine Sensoria<span class="lv-haz">New</span><span class="sr-only"> (opens in a new tab)</span></span><span class="hc-year">2026</span></span>
               <span class="hc-desc">A private chef &amp; gourmet caterer in Montreal.</span>
+              <span class="lv-micro" aria-hidden="true">PRJ-026 · MTL · LIVE</span>
             </span>
           </a></li>
           <li><a class="hc-row" href="https://iconettestudio.com" target="_blank" rel="noopener">
@@ -218,6 +219,7 @@
             <span class="hc-body">
               <span class="hc-top"><span class="hc-name">Iconette Studio<span class="sr-only"> (opens in a new tab)</span></span><span class="hc-year">2026</span></span>
               <span class="hc-desc">Soft pastel icons &amp; wallpapers for iPhone.</span>
+              <span class="lv-micro" aria-hidden="true">PRJ-025 · WEB · LIVE</span>
             </span>
           </a></li>
           <li><a class="hc-row" href="https://wallofokay.com" target="_blank" rel="noopener">
@@ -225,6 +227,7 @@
             <span class="hc-body">
               <span class="hc-top"><span class="hc-name">Wall of Okay<span class="sr-only"> (opens in a new tab)</span></span><span class="hc-year">2026</span></span>
               <span class="hc-desc">Calm Notion templates for ADHD brains, guided by Hupp.</span>
+              <span class="lv-micro" aria-hidden="true">PRJ-024 · ADHD · LIVE</span>
             </span>
           </a></li>
         </ol>
@@ -234,7 +237,7 @@
       <!--===== LATEST POSTS: filled from blog.html by scripts.js =====-->
       <div class="hm-block hm-latest" hidden>
         <div class="hm-latest-head">
-          <p class="hm-label">Latest posts</p>
+          <p class="hm-label">Latest posts<span class="lv-micro" aria-hidden="true">NC-02 · LOG · DISPATCH</span></p>
           <a class="hm-all" href="blog.html">All posts</a>
         </div>
         <div class="hm-cards"></div>
@@ -246,7 +249,7 @@
            About: Ned's six words, one at a time. Lab: a working flip board,
            tap it to flip through cities (scripts.js). -->
       <div class="hm-block">
-        <p class="hm-label">Explore</p>
+        <p class="hm-label">Explore<span class="lv-micro" aria-hidden="true">NC-03 · NAV · FIELD</span></p>
         <div class="xb">
           <!-- Just watched: a 3D movie card you can grab and spin all the way
                round, or tap to flip (scripts.js). Front: the poster; back: the
