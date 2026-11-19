@@ -12206,3 +12206,20 @@ html.fav-sheet-open body::after { background: var(--crt-side), var(--crt-ends), 
     background: var(--crt-side), var(--crt-ends), var(--crt-warm), repeating-linear-gradient(0deg, rgba(0, 0, 0, .32) 0 1px, transparent 1px 3px);
   }
 }
+
+/*===== LOGO ABOVE THE SCREEN'S DARK EDGE =====*/
+/* The lit sign sits over the dark fade at the top of the screen (body::after,
+   9998) instead of being dimmed by it; the header no longer makes its own
+   layer, so the logo can climb out of it. Phones keep the scanlines running
+   over the sign (html::after, 9999, painted after it); on computers the fade
+   and lines share that one layer, so the sign goes just above it. It drops
+   back under while the phone menu or a details sheet is open. */
+.l-header { z-index: auto; }
+.nav-logo-group { z-index: 9999; }
+@media (pointer: fine) and (min-width: 768px) {
+  .nav-logo-group { z-index: 10000; }
+}
+html.fav-sheet-open .nav-logo-group,
+body:has(.nav-menu.show-menu) .nav-logo-group { z-index: 0; }
+/* the power-on still covers the sign on computers until the screen opens */
+html.crt-boot::before { z-index: 10002; }
