@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1125 450" width="1125" height="450">
+<!-- part of full-logo.svg, used only by the logo build-up on a first visit or refresh (scripts.js) --><style>path{stroke-dasharray:1 1;stroke-dashoffset:1;animation:d 420ms cubic-bezier(.45,0,.2,1) forwards}@keyframes d{to{stroke-dashoffset:0}}</style><defs>
+<filter id="sh" x="-5%" y="-10%" width="115%" height="130%" color-interpolation-filters="sRGB"><feFlood flood-color="#000" flood-opacity=".45"/><feComposite in2="SourceAlpha" operator="in"/><feGaussianBlur stdDeviation="4"/><feOffset dx="4" dy="6"/></filter>
+<filter id="bl" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter>
+<clipPath id="front"><rect x="200" y="200" width="680" height="165"/></clipPath>
+<clipPath id="in"><rect x="205" y="162" width="787" height="190"/></clipPath>
+</defs>
+<g fill="none" stroke-linecap="round"><g stroke="#000" stroke-opacity=".4" stroke-width="7" transform="translate(2 3)" filter="url(#bl)"><path pathLength="1" d="M740 172 C740 144 788 144 788 172"/></g><g stroke="#2f2f2f" stroke-width="7"><path pathLength="1" d="M740 172 C740 144 788 144 788 172"/></g><g stroke="#3b3b3b" stroke-width="1.2" transform="translate(-1.4 -1.4)"><path pathLength="1" d="M740 172 C740 144 788 144 788 172"/></g></g>
+</svg>
