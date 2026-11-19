@@ -12118,3 +12118,25 @@ main { counter-reset: hm-ch; }
 .ab-cta-go > a, .ct-send, .hm-news button[type="submit"] {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px));
 }
+
+/*===== THEME: stencil words =====*/
+/* a giant faded word behind each page's title, cut off at the screen's
+   edges like the lettering printed on a jet (the word is in the page's HTML:
+   data-word). Not on the home page, whose hero stays as it is. */
+.favorites-title[data-word] { position: relative; isolation: isolate; }
+.favorites-title[data-word]::before {
+  content: attr(data-word);
+  position: absolute;
+  left: 50%;
+  top: -.15em;
+  transform: translateX(-50%);
+  z-index: -1;
+  pointer-events: none;
+  white-space: nowrap;
+  font: 900 clamp(7rem, 38vw, 20rem)/1 Poppins, sans-serif;
+  letter-spacing: -.05em;
+  color: rgba(255, 255, 255, .035);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, .06);
+}
+/* it bleeds past the page's sides without widening the page */
+body { overflow-x: clip; }
