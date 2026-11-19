@@ -11901,7 +11901,7 @@ a:hover .xb-go, a:hover .bl-read { color: #ffb37a; }
 /* A warm black page (variables above), a soft amber for the small screen
    text, a fine grain
    in the background, glowing titles and channel numbers on the home page. */
-:root { --amber: #ffbe4d; }
+:root { --amber: var(--fifteenth-color); } /* was a separate amber: one orange and one yellow are enough */
 
 /* 2. amber: the small "on screen" text only; orange stays for titles and links */
 .fav-hero-onair, .tv-osd, .fav-sheet-verdict, .fav-top-item::after { color: var(--amber); }
@@ -12140,3 +12140,11 @@ main { counter-reset: hm-ch; }
 }
 /* it bleeds past the page's sides without widening the page */
 body { overflow-x: clip; }
+
+/*===== THEME: decluttered =====*/
+/* page titles: just the orange word over the stencil word, no "h1" tag or
+   selection box */
+h1.section-title .about-title-color::before,
+h1.section-title .about-title-color::after { content: none; }
+/* the 5 stars tag is a tag: yellow like the others */
+.fav-top-item::after { background: var(--hazard); }
