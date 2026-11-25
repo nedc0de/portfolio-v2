@@ -53,6 +53,50 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   });
 })();
 
+/*=============== LOGO: built up on a first visit or a refresh ===============*/
+// Right after the screen powers on, the logo puts itself together: the window
+// opens, the letters light up one at a time, then the little wire on top
+// draws in, then the braided cables run out and plug into the N and O, and
+// current runs down them once. Moving between pages it's simply there.
+// The parts are pieces of full-logo.svg (img/logo-boot-*.svg); once built,
+// the normal logo takes over again (it looks exactly the same).
+(() => {
+  const root = document.documentElement;
+  const group = document.querySelector('.nav-logo-group');
+  const base = group && group.querySelector('.nav-logo');
+  if (!base || !root.classList.contains('crt-boot') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  root.classList.add('logo-boot');
+  const parts = ['back', 'arch', 'window', 'front'].map((name) => {
+    const layer = document.createElement('div');
+    layer.className = `nav-logo-layer logo-boot-part logo-boot-${name}`;
+    layer.setAttribute('aria-hidden', 'true');
+    layer.append(Object.assign(document.createElement('img'), { alt: '', decoding: 'async' }));
+    return layer;
+  });
+  base.after(...parts);
+  // same folder as the logo itself ("./img/" or "../img/" in blog posts),
+  // fetched now so each part is ready the moment its turn comes
+  const dir = (base.querySelector('img').getAttribute('src') || '').replace(/full-logo.*$/, '');
+  const url = (name) => `${dir}logo-boot-${name}.svg?v=1`;
+  ['window', 'arch', 'back', 'front'].forEach((name) => { new Image().src = url(name); });
+  const show = (name, at) => setTimeout(() => {
+    const layer = group.querySelector(`.logo-boot-${name}`);
+    if (layer) layer.querySelector('img').src = url(name);
+  }, at);
+  show('window', 450);   // the window opens
+  // (the letters light up from 900ms: css "logo-boot")
+  show('arch', 1750);    // the wire on top
+  show('back', 2150);    // the cables, behind and in front of the window
+  show('front', 2150);
+  setTimeout(() => {
+    root.classList.remove('logo-boot');
+    parts.forEach((p) => p.remove());
+    // the sign is complete: current runs down each cable into its letter
+    if (group.flashCable) { group.flashCable(2); setTimeout(() => group.flashCable(0), 260); }
+  }, 3350);
+})();
+
+
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
   navToggle = document.getElementById('nav-toggle'),
@@ -1288,10 +1332,11 @@ function readPostsSeen() {
   // at 8.8s. The little loop on top glows at 10.7s.
   const FLASHES = [[0, 2240], [2, 8800]]; // [cable, ms into the cycle]
   FLASHES.forEach(([i, at]) => {
-    const next = () => setTimeout(() => { flash(i); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
+    // (skipped while the logo is still building itself: its cables aren't drawn yet)
+    const next = () => setTimeout(() => { if (!document.documentElement.classList.contains('logo-boot')) flash(i); next(); }, ((at - phase() + CYCLE) % CYCLE) || CYCLE);
     next();
   });
-  const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
+  const next = () => setTimeout(() => { if (!group.classList.contains('is-power-off') && !document.documentElement.classList.contains('logo-boot')) glowLoop(); next(); }, ((10720 - phase() + CYCLE) % CYCLE) || CYCLE);
   next();
 
   // A snake is one clean, even laser line: an orange body with a pale core,
@@ -3969,7 +4014,7 @@ document.querySelectorAll('.hc-list').forEach((list) => {
 // and the layers with them.
 setTimeout(() => document.documentElement.classList.remove('crt-boot', 'crt-chan'), 2600);
 // on power-on, current runs down the logo's cables just before its letters ignite
-if (document.documentElement.classList.contains('crt-boot') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (document.documentElement.classList.contains('crt-boot') && !document.documentElement.classList.contains('logo-boot') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const sign = document.querySelector('.nav-logo-group');
   // each cable flashes just as its own letter ignites: left one with the N, right one with the O
   setTimeout(() => { if (sign && sign.flashCable) sign.flashCable(2); }, 480);
