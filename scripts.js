@@ -55,9 +55,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 
 /*=============== LOGO: built up on a first visit or a refresh ===============*/
 // Right after the screen powers on, the logo puts itself together: the window
-// opens, the letters light up one at a time, then the little wire on top
-// draws in, then the braided cables run out and plug into the N and O, and
-// current runs down them once. Moving between pages it's simply there.
+// opens (its tubes dark), the little wire on top draws in, the braided cables
+// run out and plug into the N and O, and with the power connected the letters
+// light up one at a time; then current runs down the cables once. Moving between pages it's simply there.
 // The parts are pieces of full-logo.svg (img/logo-boot-*.svg); once built,
 // the normal logo takes over again (it looks exactly the same).
 (() => {
@@ -83,17 +83,17 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     const layer = group.querySelector(`.logo-boot-${name}`);
     if (layer) layer.querySelector('img').src = url(name);
   }, at);
-  show('window', 450);   // the window opens
-  // (the letters light up from 900ms: css "logo-boot")
-  show('arch', 1750);    // the wire on top
-  show('back', 2150);    // the cables, behind and in front of the window
-  show('front', 2150);
+  show('window', 450);   // the window opens, its tubes still dark
+  show('arch', 900);     // the wire on top
+  show('back', 1300);    // the cables, behind and in front of the window
+  show('front', 1300);
+  // (as the cables plug in, the letters light up one by one: css "logo-boot")
   setTimeout(() => {
     root.classList.remove('logo-boot');
     parts.forEach((p) => p.remove());
     // the sign is complete: current runs down each cable into its letter
     if (group.flashCable) { group.flashCable(2); setTimeout(() => group.flashCable(0), 260); }
-  }, 3350);
+  }, 3500);
 })();
 
 
