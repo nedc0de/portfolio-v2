@@ -12231,13 +12231,13 @@ body:has(.nav-menu.show-menu) .nav-logo-group.is-flash .nav-logo-spark { z-index
 html.logo-boot .nav-logo-group, html.logo-boot.crt-boot .nav-logo-group { animation: none; }
 html.logo-boot .nav-logo-group > .nav-logo img { opacity: 0; }
 .logo-boot-part { pointer-events: none; }
-.logo-boot-part img:not([src]) { visibility: hidden; }
+.logo-boot-part svg { display: block; width: 100%; height: auto; }
 .logo-boot-back, .logo-boot-arch { z-index: 1; }
 .logo-boot-window { z-index: 2; }
 .logo-boot-front { z-index: 3; }
 html.logo-boot .nav-logo-group .nav-logo-layer:not(.nav-logo):not(.logo-boot-part) { z-index: 4; }
 /* the window opens like a screen switching on */
-.logo-boot-window img[src] { transform-origin: 50% 57%; animation: logo-window .42s cubic-bezier(.2, .8, .3, 1) both; }
+.logo-boot-window svg { transform-origin: 50% 57%; animation: logo-window .42s cubic-bezier(.2, .8, .3, 1) both; }
 @keyframes logo-window {
   0% { transform: scale(.06, .02); filter: brightness(3); opacity: 0; }
   35% { transform: scale(1, .02); filter: brightness(3); opacity: 1; }
