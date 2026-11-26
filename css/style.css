@@ -12249,13 +12249,13 @@ html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo1, html.logo-boot .nav-lo
 html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo5, html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo6, html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo7 {
   animation: logo-letter .45s steps(1, end) both; /* in place of the plain power-on's ignite */
 }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo1 { animation-delay: 2.25s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo2 { animation-delay: 2.36s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo3 { animation-delay: 2.47s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo4 { animation-delay: 2.58s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo5 { animation-delay: 2.69s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo6 { animation-delay: 2.80s; }
-html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo7 { animation-delay: 2.91s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo1 { animation-delay: 2.70s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo2 { animation-delay: 2.81s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo3 { animation-delay: 2.92s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo4 { animation-delay: 3.03s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo5 { animation-delay: 3.14s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo6 { animation-delay: 3.25s; }
+html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo7 { animation-delay: 3.36s; }
 @keyframes logo-letter {
   0% { opacity: 0; }
   25% { opacity: .9; }

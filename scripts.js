@@ -77,23 +77,23 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
   // same folder as the logo itself ("./img/" or "../img/" in blog posts),
   // fetched now so each part is ready the moment its turn comes
   const dir = (base.querySelector('img').getAttribute('src') || '').replace(/full-logo.*$/, '');
-  const url = (name) => `${dir}logo-boot-${name}.svg?v=1`;
+  const url = (name) => `${dir}logo-boot-${name}.svg?v=2`;
   ['window', 'arch', 'back', 'front'].forEach((name) => { new Image().src = url(name); });
   const show = (name, at) => setTimeout(() => {
     const layer = group.querySelector(`.logo-boot-${name}`);
     if (layer) layer.querySelector('img').src = url(name);
   }, at);
   show('window', 450);   // the window opens, its tubes still dark
-  show('arch', 900);     // the wire on top
-  show('back', 1300);    // the cables, behind and in front of the window
-  show('front', 1300);
+  show('arch', 850);     // the wire on top
+  show('back', 1250);    // the cables, behind and in front of the window
+  show('front', 1250);
   // (as the cables plug in, the letters light up one by one: css "logo-boot")
   setTimeout(() => {
     root.classList.remove('logo-boot');
     parts.forEach((p) => p.remove());
     // the sign is complete: current runs down each cable into its letter
     if (group.flashCable) { group.flashCable(2); setTimeout(() => group.flashCable(0), 260); }
-  }, 3500);
+  }, 3950);
 })();
 
 
