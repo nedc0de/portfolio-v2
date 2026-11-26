@@ -57,7 +57,8 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 // Right after the screen powers on, the logo puts itself together: the window
 // opens (its tubes dark), the little wire on top draws in, the braided cables
 // run out and plug into the N and O, and with the power connected the letters
-// light up one at a time; then current runs down the cables once. Moving between pages it's simply there.
+// light up one at a time; then current runs down the cables once. Moving
+// between pages it's simply there.
 // The parts are pieces of full-logo.svg (img/logo-boot-*.svg); once built,
 // the normal logo takes over again (it looks exactly the same).
 (() => {
@@ -70,18 +71,23 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
     const layer = document.createElement('div');
     layer.className = `nav-logo-layer logo-boot-part logo-boot-${name}`;
     layer.setAttribute('aria-hidden', 'true');
-    layer.append(Object.assign(document.createElement('img'), { alt: '', decoding: 'async' }));
     return layer;
   });
   base.after(...parts);
-  // same folder as the logo itself ("./img/" or "../img/" in blog posts),
-  // fetched now so each part is ready the moment its turn comes
+  // Each part is fetched now (same folder as the logo: "./img/" or "../img/"
+  // in blog posts) and put into the page itself when its turn comes: iPhones
+  // don't play animations inside an SVG shown as a picture, only inline.
+  // (Every id, class and animation name in a part has its own prefix.)
   const dir = (base.querySelector('img').getAttribute('src') || '').replace(/full-logo.*$/, '');
-  const url = (name) => `${dir}logo-boot-${name}.svg?v=2`;
-  ['window', 'arch', 'back', 'front'].forEach((name) => { new Image().src = url(name); });
+  const svgs = {};
+  ['window', 'arch', 'back', 'front'].forEach((name) => {
+    svgs[name] = fetch(`${dir}logo-boot-${name}.svg?v=3`).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+  });
   const show = (name, at) => setTimeout(() => {
-    const layer = group.querySelector(`.logo-boot-${name}`);
-    if (layer) layer.querySelector('img').src = url(name);
+    svgs[name].then((svg) => {
+      const layer = group.querySelector(`.logo-boot-${name}`);
+      if (layer && svg.includes('<svg')) layer.innerHTML = svg.slice(svg.indexOf('<svg'));
+    });
   }, at);
   show('window', 450);   // the window opens, its tubes still dark
   show('arch', 850);     // the wire on top
