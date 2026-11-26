@@ -12262,3 +12262,39 @@ html.logo-boot .nav-logo-group .nav-logo-layer.nav-logo7 { animation-delay: 3.36
   40% { opacity: .15; }
   60%, 100% { opacity: 1; }
 }
+
+/*===== LAB: rewire the sign (lab.js) =====*/
+.rw { margin-top: 1rem; }
+.rw-frame { overflow: hidden; margin: 0 -1rem; }
+.rw-stage { position: relative; aspect-ratio: 1125 / 600; user-select: none; -webkit-user-select: none; }
+/* phones: zoomed in on the sign and the box (the empty sides cropped off),
+   so the plugs are big enough to grab */
+@media (max-width: 600px) {
+  .rw-stage { width: calc(100% * 1125 / 840); margin-left: calc(-100% * 175 / 840); }
+}
+.rw-stage img { position: absolute; left: 0; top: 0; width: 100%; height: auto; pointer-events: none; }
+.rw-letter { opacity: 0; transition: opacity .3s; }
+.rw-letter.is-lit { opacity: 1; }
+.rw-letter.is-igniting { animation: logo-letter .5s steps(1, end) both; }
+.rw-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; touch-action: none; }
+.rw-socket { fill: #1a1a1a; stroke: #3a3a3a; stroke-width: 1.2; transition: fill .2s; }
+.rw-socket.is-live { fill: var(--fifteenth-color); stroke: #ffb37a; }
+.rw-box { fill: #1c1a17; stroke: #3a3530; stroke-width: 2; }
+.rw-led { fill: #3a1a0a; transition: fill .3s; }
+.rw.is-done .rw-led { fill: var(--fifteenth-color); filter: drop-shadow(0 0 4px var(--fifteenth-color)); }
+.rw-box-label { font: 700 15px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .22em; fill: #8a8a8a; }
+.rw-cable path { fill: none; stroke-linecap: round; pointer-events: none; }
+.rw-sheath { stroke: #1b1b1b; stroke-width: 10; }
+.rw-braid { stroke: #050505; stroke-width: 10.5; stroke-linecap: butt; stroke-dasharray: 3 3; }
+.rw-shine { stroke: #6a6a6a; stroke-opacity: .7; stroke-width: 2; transform: translate(-1.8px, -1.8px); }
+.rw-plug { cursor: grab; outline: none; }
+.rw.is-dragging .rw-plug { cursor: grabbing; }
+.rw-plug-body { fill: #161616; stroke: #3a3a3a; stroke-width: 1.5; }
+.rw-plug-collar { fill: #c81e2a; }
+.rw-plug-tip { fill: #2c2c2c; }
+.rw-plug:focus-visible .rw-plug-body { stroke: var(--fifteenth-color); stroke-width: 2.5; }
+.rw.is-done .rw-stage { animation: logo-surge .6s ease-out; }
+.rw-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .6rem; }
+.rw-count { margin: 0; font: 600 .78rem ui-monospace, Menlo, Consolas, monospace; letter-spacing: .14em; text-transform: uppercase; color: #8a8a8a; }
+.rw.is-done .rw-count { color: var(--fifteenth-color); }
+@media (prefers-reduced-motion: reduce) { .rw-letter.is-igniting, .rw.is-done .rw-stage { animation: none; } }

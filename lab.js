@@ -1362,3 +1362,136 @@
   const first = list.findIndex((f) => f.type === 'movie');
   pick.value = String(first < 0 ? 0 : first);
 })();
+
+/*===== EXPERIMENT 5: rewire the sign =====*/
+// The NEDCODE sign (the same pieces as the logo) sits dark over a power box
+// with two braided cables. Drag a plug into the socket under a letter and that
+// letter lights up and stays lit; move the plug on to the next one. All seven
+// lit: the sign surges back on. Keyboard: focus a plug, left/right arrows move
+// it from socket to socket.
+(() => {
+  const box = document.getElementById('labRewire');
+  if (!box) return;
+  const svg = box.querySelector('.rw-wires');
+  const letters = [...box.querySelectorAll('.rw-letter')];
+  const count = box.querySelector('.rw-count');
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => e.setAttribute(k, v));
+    if (parent) parent.append(e);
+    return e;
+  };
+  // sockets: on the window's bottom edge, under each letter (the logo's own
+  // coordinates, 1125 x 450, the stage is 1125 x 600)
+  const X = [313, 404, 491, 608, 715, 824, 909];
+  const SY = 346;
+  const sockets = X.map((x) => el('rect', { x: x - 13, y: SY - 3, width: 26, height: 11, rx: 2, class: 'rw-socket' }, svg));
+  // the power box and its two cables
+  el('rect', { x: 528, y: 548, width: 140, height: 44, rx: 6, class: 'rw-box' }, svg);
+  el('circle', { cx: 548, cy: 570, r: 5, class: 'rw-led' }, svg);
+  el('text', { x: 612, y: 575, class: 'rw-box-label', 'text-anchor': 'middle' }, svg).textContent = 'POWER';
+  const REST = [[430, 480], [770, 480]];
+  const PLUG = 1.6; // plugs drawn bigger than on the logo, to grab them easily
+  const ANCHOR = [[566, 548], [630, 548]];
+  const lit = new Set();
+  const cables = ANCHOR.map((a, i) => {
+    const g = el('g', { class: 'rw-cable' }, svg);
+    const parts = ['rw-sheath', 'rw-braid', 'rw-shine'].map((c) => el('path', { class: c }, g));
+    const plug = el('g', { class: 'rw-plug', tabindex: '0', role: 'slider', 'aria-label': `Cable ${i + 1}: drag it into a socket`, 'aria-valuemin': '0', 'aria-valuemax': '7', 'aria-valuenow': '0' }, svg);
+    el('rect', { x: -30, y: -20, width: 60, height: 90, fill: 'transparent' }, plug); // a big target for fingers
+    const art = el('g', { class: 'rw-plug-art' }, plug);
+    el('rect', { x: -8, y: 0, width: 16, height: 30, rx: 3, class: 'rw-plug-body' }, art);
+    el('rect', { x: -8.5, y: 9, width: 17, height: 5, class: 'rw-plug-collar' }, art);
+    el('rect', { x: -6, y: -3, width: 12, height: 4, rx: 1, class: 'rw-plug-tip' }, art);
+    return { a, parts, plug, x: REST[i][0], y: REST[i][1], socket: -1 };
+  });
+  const draw = (c) => {
+    const [ax, ay] = c.a;
+    const ex = c.x, ey = c.y + 30 * PLUG; // the cable leaves the plug's bottom
+    const sag = Math.min(160, 50 + Math.hypot(ex - ax, ey - ay) * .35);
+    const d = `M${ax} ${ay} C${ax} ${ay + 40} ${ex} ${Math.min(598, ey + sag)} ${ex} ${ey}`;
+    c.parts.forEach((p) => p.setAttribute('d', d));
+    c.plug.setAttribute('transform', `translate(${c.x} ${c.y}) scale(${PLUG})`);
+  };
+  const paint = () => {
+    letters.forEach((l, i) => l.classList.toggle('is-lit', lit.has(i)));
+    sockets.forEach((s, i) => s.classList.toggle('is-live', cables.some((c) => c.socket === i)));
+    count.textContent = lit.size === 7 ? 'NEDCODE is back on' : `${lit.size} / 7 lit`;
+    box.classList.toggle('is-done', lit.size === 7);
+  };
+  const plugInto = (c, i) => {
+    c.socket = i;
+    c.x = X[i]; c.y = SY + 4;
+    c.plug.setAttribute('aria-valuenow', String(i + 1));
+    if (!lit.has(i)) {
+      lit.add(i);
+      const l = letters[i];
+      l.classList.remove('is-igniting'); void l.offsetWidth; l.classList.add('is-igniting');
+    }
+    paint();
+  };
+  cables.forEach(draw);
+
+  // dragging
+  const toSvg = (e) => {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  };
+  cables.forEach((c, n) => {
+    let held = false, dx = 0, dy = 0;
+    c.plug.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      held = true;
+      c.plug.setPointerCapture(e.pointerId);
+      const p = toSvg(e);
+      dx = c.x - p.x; dy = c.y - p.y;
+      c.socket = -1;
+      svg.append(c.plug); // the plug you hold is on top
+      box.classList.add('is-dragging');
+      paint();
+    });
+    c.plug.addEventListener('pointermove', (e) => {
+      if (!held) return;
+      const p = toSvg(e);
+      c.x = Math.max(12, Math.min(1113, p.x + dx));
+      c.y = Math.max(SY + 4, Math.min(560, p.y + dy));
+      draw(c);
+    });
+    const drop = () => {
+      if (!held) return;
+      held = false;
+      box.classList.remove('is-dragging');
+      // close enough to a free socket: it snaps in
+      let best = -1, dist = 60;
+      X.forEach((x, i) => {
+        const d = Math.hypot(c.x - x, c.y - (SY + 4));
+        if (d < dist && !cables.some((o) => o !== c && o.socket === i)) { dist = d; best = i; }
+      });
+      if (best >= 0) plugInto(c, best);
+      draw(c);
+    };
+    c.plug.addEventListener('pointerup', drop);
+    c.plug.addEventListener('pointercancel', drop);
+    // keyboard: left and right move the plug along the sockets
+    c.plug.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const step = e.key === 'ArrowRight' ? 1 : -1;
+      let i = c.socket < 0 ? (n === 0 ? 0 : 6) : c.socket + step;
+      while (i >= 0 && i < 7 && cables.some((o) => o !== c && o.socket === i)) i += step;
+      if (i < 0 || i > 6) return;
+      plugInto(c, i);
+      draw(c);
+    });
+  });
+
+  box.querySelector('.rw-reset').addEventListener('click', () => {
+    lit.clear();
+    cables.forEach((c, i) => { c.socket = -1; [c.x, c.y] = REST[i]; c.plug.setAttribute('aria-valuenow', '0'); draw(c); });
+    letters.forEach((l) => l.classList.remove('is-igniting'));
+    paint();
+  });
+  paint();
+})();
