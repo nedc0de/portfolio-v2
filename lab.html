@@ -15,7 +15,7 @@
   <!-- Custom and external CSS -->
   <!-- CRT power-on on a first visit or a refresh; a quick channel change between pages (css: "CRT SCREEN") -->
   <script>try{var n=(performance.getEntriesByType("navigation")[0]||{}).type,r=document.referrer&&new URL(document.referrer).origin===location.origin;document.documentElement.classList.add(n==="reload"||!sessionStorage.getItem("nedcode-on")||!(r||n==="back_forward")?"crt-boot":"crt-chan");sessionStorage.setItem("nedcode-on","1")}catch(e){}</script>
-  <link rel="stylesheet" href="./css/style.css?v=62">
+  <link rel="stylesheet" href="./css/style.css?v=63">
   <link rel="shortcut icon" type="image/png" href="./img/favicon.ico" />
 
   <title>The Lab: Interactive Web Experiments | NEDCODE</title>
@@ -228,7 +228,7 @@
            score and verdict stamp on the front, the take and a QR code to the
            Favorites page on the back. lab.js builds it from favorites.js. -->
       <article class="lab-item" id="receipt-printer" aria-labelledby="rcpt-title">
-        <h2 class="lab-item-title" id="rcpt-title">Receipt printer <span class="lab-tag">New</span></h2>
+        <h2 class="lab-item-title" id="rcpt-title">Receipt printer</h2>
         <p class="lab-item-note">Pick something from my favorites and print its receipt. Tap the receipt to flip it.</p>
 
         <div class="rp" id="labReceipt">
@@ -253,6 +253,34 @@
           <p class="rp-sr" aria-live="polite"></p>
         </div>
         <noscript><p class="lab-item-note">Turn on JavaScript to print a receipt.</p></noscript>
+      </article>
+
+      <!-- EXPERIMENT 5: rewire the sign. The NEDCODE sign has lost power: drag
+           its two cables from the power box and plug them into the sockets
+           under the letters. A letter lights up once it's been powered and
+           stays lit; light all seven and the sign comes back on. lab.js. -->
+      <article class="lab-item" id="rewire" aria-labelledby="rw-title">
+        <h2 class="lab-item-title" id="rw-title">Rewire the sign <span class="lab-tag">New</span></h2>
+        <p class="lab-item-note">The sign lost power. Drag the cables into the sockets under each letter to light it back up.</p>
+
+        <div class="rw" id="labRewire">
+          <div class="rw-frame"><div class="rw-stage">
+            <img class="rw-window" src="img/logo-boot-window.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-ned-n.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-ned-e.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-ned-d.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-code-c.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-code-o.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-code-d.svg?v=3" alt="" width="1125" height="450">
+            <img class="rw-letter" src="img/logo-code-e.svg?v=3" alt="" width="1125" height="450">
+            <svg class="rw-wires" viewBox="0 0 1125 600" role="group" aria-label="The sign's two cables"></svg>
+          </div></div>
+          <div class="rw-bar">
+            <p class="rw-count" aria-live="polite">0 / 7 lit</p>
+            <button type="button" class="flap-add rw-reset">Unplug all</button>
+          </div>
+        </div>
+        <noscript><p class="lab-item-note">Turn on JavaScript to rewire the sign.</p></noscript>
       </article>
     </section>
   </main>
