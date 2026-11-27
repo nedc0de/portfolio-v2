@@ -2845,15 +2845,15 @@ function readPostsSeen() {
     } else start();
   }
 
-  // Lab: one row for the newest experiment, the last one in lab.html; its
-  // title and link come from there
+  // Lab: one row for the newest experiment, the one tagged "New" in lab.html
+  // (else the first one); its title and link come from there
   const lab = box.querySelector('.xb-lb');
   if (lab) {
     fetch('lab.html', { cache: 'no-cache' })
       .then((r) => (r.ok ? r.text() : Promise.reject()))
       .then((html) => {
-        const items = new DOMParser().parseFromString(html, 'text/html').querySelectorAll('.lab-item');
-        const last = items[items.length - 1];
+        const items = [...new DOMParser().parseFromString(html, 'text/html').querySelectorAll('.lab-item')];
+        const last = items.find((it) => /new/i.test(it.querySelector('.lab-tag')?.textContent || '')) || items[0];
         const title = last?.querySelector('.lab-item-title')?.firstChild?.textContent.trim();
         if (!title) return;
         lab.querySelector('h3').textContent = title;
