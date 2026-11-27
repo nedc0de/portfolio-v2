@@ -22,7 +22,9 @@ Shared styles live in `css/style.css`, shared behaviour in `scripts.js`.
 - Test every change for real before asking to merge: tap through it on a
   phone-size browser on every page it touches, including Netlify-style pretty
   URLs (`/about` instead of `/about.html`), and check links actually open.
-- New Lab experiments go at the top of `lab.html` (with an `id`) and get the
+- Newest first, everywhere: new things go at the top of their list and older
+  ones move down (Lab experiments, projects, blog posts, Favorites…).
+  New Lab experiments go at the top of `lab.html` (with an `id`) and get the
   `<span class="lab-tag">New</span>` tag (remove it from the previous one): the
   home page's "New in the Lab" row shows the one tagged New.
 - Never change the logo, the home hero ("Hi, I'm Ned 👋 / Frontend Dev /
